@@ -186,15 +186,25 @@ export default function DiegoAvatar({
         fill="none" 
         xmlns="http://www.w3.org/2000/svg"
       >
-        {/* Dolphin body (light blue) */}
+        {/* Improved dolphin body (light blue) with more dolphin-like shape */}
         <path 
-          d="M12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2Z" 
+          d="M12 3C7.02944 3 3 7.02944 3 12C3 16.9706 7.02944 21 12 21C16.9706 21 21 16.9706 21 12C21 7.02944 16.9706 3 12 3Z" 
           fill="#6CB4EE"
         />
         
-        {/* Dolphin fin on top */}
+        {/* More prominent dolphin fin on top */}
         <path 
-          d="M12 2C9.5 2 8 3 7.5 3.5C11 2.5 12 5 12 6C12 5 13 2.5 16.5 3.5C16 3 14.5 2 12 2Z" 
+          d="M12 3C10 3 9 5 8.5 6C9 4 11 3 12 2C13 2 15 3 15.5 6C15 5 14 3 12 3Z" 
+          fill="#4B9FE1"
+        />
+        
+        {/* Side fins */}
+        <path
+          d="M4 13C3 13 2 14 3 15C4 16 5 15 6 14.5C5 14.75 4.5 14 4 13Z"
+          fill="#4B9FE1"
+        />
+        <path
+          d="M20 13C21 13 22 14 21 15C20 16 19 15 18 14.5C19 14.75 19.5 14 20 13Z"
           fill="#4B9FE1"
         />
         
