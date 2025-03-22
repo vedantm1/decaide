@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -17,6 +17,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { EVENT_TYPE_GROUPS } from "@shared/schema";
+import { useMicroInteractions } from "@/hooks/use-micro-interactions";
 
 // Profile form schema
 const profileSchema = z.object({
@@ -37,7 +38,15 @@ const notificationSchema = z.object({
 export default function SettingsPage() {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { triggerAnimation } = useMicroInteractions();
   const [activeTab, setActiveTab] = useState("profile");
+  
+  // Appearance settings state
+  const [appearance, setAppearance] = useState({
+    theme: "light",
+    colorScheme: "default",
+    fontSize: "medium"
+  });
   
   // Profile form
   const profileForm = useForm<z.infer<typeof profileSchema>>({
