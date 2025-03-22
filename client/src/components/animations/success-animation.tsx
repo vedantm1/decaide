@@ -116,9 +116,9 @@ export default function SuccessAnimation({
   const [showCelebration, setShowCelebration] = useState(false);
   const controls = useAnimationControls();
   
-  // Emojis for the floating animation
+  // Emojis for the floating animation including tropical elements
   const emojis = useRef([
-    '🏆', '🌟', '✨', '💯', '🔥', '👏', '🎉', '🚀', '💪', '👍'
+    '🏆', '🌟', '✨', '💯', '🔥', '👏', '🎉', '🚀', '💪', '👍', '🍹', '🥥', '🌴', '🏄', '🌊'
   ]);
 
   // Generate random positions for emojis

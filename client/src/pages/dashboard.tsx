@@ -18,6 +18,50 @@ export default function Dashboard() {
   const { triggerAnimation, showMascot } = useMicroInteractions();
   const { toast } = useToast();
   const [showBreakTimer, setShowBreakTimer] = useState(false);
+  const [showTrialBanner, setShowTrialBanner] = useState(false);
+  const [trialDaysLeft, setTrialDaysLeft] = useState(3);
+  const [trialHoursLeft, setTrialHoursLeft] = useState(0);
+  
+  // Calculate remaining trial time
+  useEffect(() => {
+    if (user && user.subscriptionTier === 'free') {
+      // Check if trial start date exists in localStorage, if not, set it
+      const trialStartDate = localStorage.getItem('trialStartDate');
+      if (!trialStartDate) {
+        localStorage.setItem('trialStartDate', new Date().toISOString());
+        setShowTrialBanner(true);
+        setTrialDaysLeft(3);
+        setTrialHoursLeft(0);
+      } else {
+        // Calculate time elapsed since trial started
+        const startDate = new Date(trialStartDate);
+        const currentDate = new Date();
+        const timeDiff = Math.abs(currentDate.getTime() - startDate.getTime());
+        const hoursDiff = Math.floor(timeDiff / (1000 * 60 * 60));
+        const daysDiff = Math.floor(hoursDiff / 24);
+        
+        // Calculate days and hours left
+        let daysLeft = 3 - daysDiff;
+        let hoursLeft = 24 - (hoursDiff % 24);
+        
+        if (daysLeft <= 0 && hoursLeft <= 0) {
+          // Trial has expired
+          setTrialDaysLeft(0);
+          setTrialHoursLeft(0);
+        } else if (daysLeft <= 0) {
+          // Less than a day left
+          setTrialDaysLeft(0);
+          setTrialHoursLeft(hoursLeft);
+        } else {
+          setTrialDaysLeft(daysLeft);
+          setTrialHoursLeft(hoursLeft);
+        }
+        
+        setShowTrialBanner(true);
+      }
+    }
+  }, [user]);
+  
   // Trigger welcome animation only on first login
   useEffect(() => {
     // Check if the user just logged in (flag set in auth hook)
@@ -27,7 +71,13 @@ export default function Dashboard() {
       // Delay slightly to ensure the animation is seen
       setTimeout(() => {
         triggerAnimation('stars', 'Welcome to DecA(I)de!');
-        showMascot(`Hi ${user.username || 'there'}! I'm Diego the Dolphin, your DECA companion. Ready to practice today?`, 'bottom-right');
+        
+        if (user.subscriptionTier === 'free') {
+          // Welcome new trial user with a tropical theme
+          showMascot(`Aloha ${user.username || 'there'}! I'm Diego the DecA(I)de Dolphin! 🌴 You've started your 3-day free trial. Let's dive in and make waves at your next DECA competition!`, 'bottom-right');
+        } else {
+          showMascot(`Hi ${user.username || 'there'}! I'm Diego the DecA(I)de Dolphin, your DECA companion. Ready to practice today?`, 'bottom-right');
+        }
         
         // Remove the login flag so animation doesn't show again until next login
         sessionStorage.removeItem('justLoggedIn');
@@ -106,7 +156,72 @@ export default function Dashboard() {
               </div>
             </div>
             
-            {/* Daily Challenge Card */}
+            {/* Free Trial Banner - Tropical Theme */}
+            {showTrialBanner && user?.subscriptionTier === 'free' && (
+              <motion.div 
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-6 bg-gradient-to-r from-blue-400 to-cyan-500 rounded-xl overflow-hidden shadow-lg border border-blue-300"
+              >
+                <div className="relative p-5">
+                  {/* Palm tree decoration */}
+                  <div className="absolute -top-5 -right-5 w-32 h-32 opacity-10">
+                    <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M50,10 C45,25 60,30 55,40 C50,50 60,60 50,70 C40,60 50,50 45,40 C40,30 55,25 50,10 Z" fill="white"/>
+                      <rect x="48" y="70" width="4" height="30" fill="white"/>
+                    </svg>
+                  </div>
+                  
+                  {/* Wave decoration */}
+                  <div className="absolute bottom-0 left-0 right-0 h-12 opacity-20">
+                    <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+                      <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" fill="white" />
+                    </svg>
+                  </div>
+                  
+                  <div className="flex flex-col md:flex-row items-center justify-between">
+                    <div className="mb-4 md:mb-0">
+                      <h3 className="text-xl font-bold text-white flex items-center">
+                        <span className="mr-2">🏝️</span> Your Tropical Trial Experience
+                      </h3>
+                      <p className="text-blue-50 mt-1 max-w-xl">
+                        Enjoy full access to all DecA(I)de features for {trialDaysLeft} day{trialDaysLeft !== 1 ? 's' : ''} 
+                        {trialHoursLeft > 0 && trialDaysLeft === 0 ? ` and ${trialHoursLeft} hour${trialHoursLeft !== 1 ? 's' : ''}` : ''}.
+                        {trialDaysLeft === 0 && trialHoursLeft <= 5 ? ' Hurry, your trial is almost over!' : ' Dive into all our features!'}
+                      </p>
+                    </div>
+                    
+                    <div className="flex items-center space-x-3">
+                      {(trialDaysLeft > 0 || trialHoursLeft > 0) ? (
+                        <div className="bg-white bg-opacity-20 backdrop-filter backdrop-blur-sm rounded-lg px-4 py-2 text-white font-medium flex items-center">
+                          <span className="mr-2">⏳</span>
+                          {trialDaysLeft > 0 ? (
+                            <span>{trialDaysLeft}d {trialHoursLeft}h remaining</span>
+                          ) : (
+                            <span>{trialHoursLeft}h remaining</span>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="bg-red-500 bg-opacity-80 rounded-lg px-4 py-2 text-white font-medium flex items-center">
+                          <span className="mr-2">⚠️</span>
+                          <span>Trial expired</span>
+                        </div>
+                      )}
+                      
+                      <a 
+                        href="/pricing" 
+                        className="px-5 py-2.5 bg-yellow-400 hover:bg-yellow-500 text-blue-900 font-bold rounded-lg transition-all shadow-md hover:shadow-lg flex items-center"
+                      >
+                        <span className="mr-2">🌊</span>
+                        Upgrade Now
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+          {/* Daily Challenge Card */}
             {dailyChallenge && (
               <DailyChallenge challenge={dailyChallenge} />
             )}

@@ -182,21 +182,48 @@ export function MicroInteractionsProvider({ children }: { children: ReactNode })
             <div className="absolute -top-16 -left-8 w-24 h-24 rounded-full bg-blue-500 border-4 border-white shadow-md flex items-center justify-center overflow-hidden">
               <svg viewBox="0 0 100 100" className="w-20 h-20">
                 <g transform="translate(50 50)">
-                  {/* Dolphin head */}
-                  <ellipse cx="0" cy="0" rx="35" ry="40" fill="#3B82F6" />
+                  {/* Proper dolphin shape */}
+                  <path 
+                    d="M-25,-10 C-40,-25 -20,-40 0,-35 C20,-40 35,-20 30,0 C25,20 5,35 -10,25 C-25,15 -30,0 -25,-10 Z" 
+                    fill="#3B82F6" 
+                  />
+                  
+                  {/* Dolphin fin */}
+                  <path 
+                    d="M20,-15 C30,-25 35,-15 30,-5 C25,-8 20,-10 20,-15 Z" 
+                    fill="#2563EB" 
+                  />
+                  
+                  {/* Dolphin snout */}
+                  <path 
+                    d="M-25,-10 C-35,-5 -40,5 -30,10 C-25,12 -20,10 -15,5 C-20,0 -25,-5 -25,-10 Z" 
+                    fill="#60A5FA" 
+                  />
                   
                   {/* Dolphin smile */}
-                  <path d="M-15,10 Q0,25 15,10" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" />
+                  <path 
+                    d="M-20,5 Q-10,15 5,5" 
+                    fill="none" 
+                    stroke="white" 
+                    strokeWidth="2.5" 
+                    strokeLinecap="round" 
+                  />
                   
                   {/* Eyes */}
-                  <circle cx="-10" cy="-5" r="6" fill="white" />
-                  <circle cx="10" cy="-5" r="6" fill="white" />
-                  <circle cx="-10" cy="-5" r="3" fill="black" />
-                  <circle cx="10" cy="-5" r="3" fill="black" />
+                  <circle cx="-15" cy="-5" r="4" fill="white" />
+                  <circle cx="0" cy="-10" r="4" fill="white" />
+                  <circle cx="-15" cy="-5" r="2" fill="black" />
+                  <circle cx="0" cy="-10" r="2" fill="black" />
                   
-                  {/* Blush */}
-                  <circle cx="-18" cy="8" r="5" fill="#F87171" opacity="0.5" />
-                  <circle cx="18" cy="8" r="5" fill="#F87171" opacity="0.5" />
+                  {/* Water splash effect */}
+                  <path 
+                    d="M-30,20 C-25,15 -15,25 -10,20 C-5,25 5,15 10,20 C15,15 25,25 30,20" 
+                    fill="none" 
+                    stroke="#93C5FD" 
+                    strokeWidth="2" 
+                    strokeDasharray="2,2" 
+                    opacity="0.7" 
+                  />
                 </g>
               </svg>
             </div>
@@ -208,7 +235,7 @@ export function MicroInteractionsProvider({ children }: { children: ReactNode })
             <div className="pl-16">
               <div className="text-left">
                 <p className="font-bold text-blue-800 text-xl bg-gradient-to-r from-blue-600 to-cyan-600 text-transparent bg-clip-text">
-                  {mascotDetails.message.length > 50 ? "Diego says:" : "Hi, I'm Diego!"}
+                  {mascotDetails.message.length > 50 ? "Diego says:" : "Hi, I'm Diego the DecA(I)de Dolphin!"}
                 </p>
                 <div className="relative">
                   <p className="text-sm text-blue-700 mt-2 leading-relaxed">

@@ -496,11 +496,15 @@ export default function AuthPage() {
                                       setSelectedUiTheme('aquaBlue');
                                     }}
                                   >
-                                    <div className="p-4 h-20 flex flex-col justify-between">
-                                      <div className="w-full h-8 rounded-md bg-blue-500 mb-2"></div>
+                                    <div className="p-4 h-20 flex flex-col justify-between bg-gradient-to-b from-white to-blue-50">
+                                      <div className="flex flex-col gap-1">
+                                        <div className="w-full h-2 rounded-sm bg-blue-500"></div>
+                                        <div className="w-full h-2 rounded-sm bg-blue-400"></div>
+                                        <div className="w-full h-2 rounded-sm bg-blue-300"></div>
+                                      </div>
                                       <div>
-                                        <span className="text-xs font-medium">Aqua Blue</span>
-                                        <p className="text-xs text-slate-600 mt-0.5">Professional</p>
+                                        <span className="text-xs font-medium text-blue-700">Aqua Blue</span>
+                                        <p className="text-xs text-slate-600 mt-0.5">Business & Finance</p>
                                       </div>
                                     </div>
                                   </motion.div>
@@ -513,11 +517,15 @@ export default function AuthPage() {
                                       setSelectedUiTheme('coralPink');
                                     }}
                                   >
-                                    <div className="p-4 h-20 flex flex-col justify-between">
-                                      <div className="w-full h-8 rounded-md bg-pink-500 mb-2"></div>
+                                    <div className="p-4 h-20 flex flex-col justify-between bg-gradient-to-b from-white to-pink-50">
+                                      <div className="flex flex-col gap-1">
+                                        <div className="w-full h-2 rounded-sm bg-pink-500"></div>
+                                        <div className="w-full h-2 rounded-sm bg-pink-400"></div>
+                                        <div className="w-full h-2 rounded-sm bg-pink-300"></div>
+                                      </div>
                                       <div>
-                                        <span className="text-xs font-medium">Coral Pink</span>
-                                        <p className="text-xs text-slate-600 mt-0.5">Vibrant</p>
+                                        <span className="text-xs font-medium text-pink-700">Coral Pink</span>
+                                        <p className="text-xs text-slate-600 mt-0.5">Marketing & Hospitality</p>
                                       </div>
                                     </div>
                                   </motion.div>
@@ -530,11 +538,15 @@ export default function AuthPage() {
                                       setSelectedUiTheme('mintGreen');
                                     }}
                                   >
-                                    <div className="p-4 h-20 flex flex-col justify-between">
-                                      <div className="w-full h-8 rounded-md bg-green-500 mb-2"></div>
+                                    <div className="p-4 h-20 flex flex-col justify-between bg-gradient-to-b from-white to-green-50">
+                                      <div className="flex flex-col gap-1">
+                                        <div className="w-full h-2 rounded-sm bg-green-500"></div>
+                                        <div className="w-full h-2 rounded-sm bg-green-400"></div>
+                                        <div className="w-full h-2 rounded-sm bg-green-300"></div>
+                                      </div>
                                       <div>
-                                        <span className="text-xs font-medium">Mint Green</span>
-                                        <p className="text-xs text-slate-600 mt-0.5">Calming</p>
+                                        <span className="text-xs font-medium text-green-700">Mint Green</span>
+                                        <p className="text-xs text-slate-600 mt-0.5">Entrepreneurship</p>
                                       </div>
                                     </div>
                                   </motion.div>
@@ -547,11 +559,15 @@ export default function AuthPage() {
                                       setSelectedUiTheme('royalPurple');
                                     }}
                                   >
-                                    <div className="p-4 h-20 flex flex-col justify-between">
-                                      <div className="w-full h-8 rounded-md bg-purple-500 mb-2"></div>
+                                    <div className="p-4 h-20 flex flex-col justify-between bg-gradient-to-b from-white to-purple-50">
+                                      <div className="flex flex-col gap-1">
+                                        <div className="w-full h-2 rounded-sm bg-purple-500"></div>
+                                        <div className="w-full h-2 rounded-sm bg-purple-400"></div>
+                                        <div className="w-full h-2 rounded-sm bg-purple-300"></div>
+                                      </div>
                                       <div>
-                                        <span className="text-xs font-medium">Royal Purple</span>
-                                        <p className="text-xs text-slate-600 mt-0.5">Elegant</p>
+                                        <span className="text-xs font-medium text-purple-700">Royal Purple</span>
+                                        <p className="text-xs text-slate-600 mt-0.5">Leadership & Management</p>
                                       </div>
                                     </div>
                                   </motion.div>
@@ -577,16 +593,29 @@ export default function AuthPage() {
                                       setSelectedColorScheme('memphis');
                                     }}
                                   >
-                                    <div className="p-4 h-24 bg-gradient-to-br from-blue-100 to-green-100 relative">
-                                      {/* Repositioned shapes to avoid covering text */}
-                                      <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-yellow-400"></div>
-                                      <div className="absolute top-4 left-4 w-8 h-2 bg-pink-400"></div>
-                                      <div className="absolute top-2 left-6 w-4 h-4 rounded-md bg-purple-400 rotate-45"></div>
+                                    <div className="p-4 h-24 bg-white bg-opacity-90 relative rounded-md overflow-hidden">
+                                      {/* Memphis-style patterns with actual colors based on the selected theme */}
+                                      <div className={`absolute -right-2 -top-2 w-10 h-10 rounded-full bg-${selectedUiTheme === 'aquaBlue' ? 'blue' : selectedUiTheme === 'coralPink' ? 'pink' : selectedUiTheme === 'mintGreen' ? 'green' : 'purple'}-300`}></div>
+                                      <div className={`absolute top-6 left-2 w-12 h-2 rounded-md bg-${selectedUiTheme === 'aquaBlue' ? 'blue' : selectedUiTheme === 'coralPink' ? 'pink' : selectedUiTheme === 'mintGreen' ? 'green' : 'purple'}-400`}></div>
+                                      <div className={`absolute bottom-2 right-8 w-6 h-6 rotate-45 bg-${selectedUiTheme === 'aquaBlue' ? 'cyan' : selectedUiTheme === 'coralPink' ? 'red' : selectedUiTheme === 'mintGreen' ? 'emerald' : 'indigo'}-200`}></div>
+                                      <div className={`absolute left-14 top-10 w-3 h-3 rounded-full bg-${selectedUiTheme === 'aquaBlue' ? 'sky' : selectedUiTheme === 'coralPink' ? 'rose' : selectedUiTheme === 'mintGreen' ? 'teal' : 'violet'}-300`}></div>
                                       
-                                      {/* Text moved down with clear space above */}
-                                      <div className="absolute bottom-2 left-4 right-4">
-                                        <span className="text-xs font-medium block">Memphis Style</span>
-                                        <p className="text-xs text-slate-600">Fun geometric patterns</p>
+                                      {/* Zig-zag pattern as additional Memphis element */}
+                                      <svg className="absolute bottom-10 right-2 w-14 h-3" viewBox="0 0 60 10">
+                                        <path 
+                                          d="M0,5 L10,0 L20,5 L30,0 L40,5 L50,0 L60,5" 
+                                          stroke={selectedUiTheme === 'aquaBlue' ? '#60A5FA' : selectedUiTheme === 'coralPink' ? '#FB7185' : selectedUiTheme === 'mintGreen' ? '#34D399' : '#A78BFA'} 
+                                          strokeWidth="2" 
+                                          fill="none" 
+                                        />
+                                      </svg>
+                                      
+                                      {/* Text with enough space */}
+                                      <div className="absolute bottom-1 left-3 right-3">
+                                        <span className={`text-xs font-bold block text-${selectedUiTheme === 'aquaBlue' ? 'blue' : selectedUiTheme === 'coralPink' ? 'pink' : selectedUiTheme === 'mintGreen' ? 'green' : 'purple'}-600`}>
+                                          Memphis Style
+                                        </span>
+                                        <p className="text-xs text-slate-700">Playful geometric patterns</p>
                                       </div>
                                     </div>
                                   </motion.div>
@@ -599,15 +628,21 @@ export default function AuthPage() {
                                       setSelectedColorScheme('minimalist');
                                     }}
                                   >
-                                    <div className="p-4 h-24 bg-gradient-to-br from-gray-50 to-gray-100 relative">
-                                      {/* Minimalist design elements */}
-                                      <div className="absolute top-4 left-4 w-12 h-1 bg-gray-400"></div>
-                                      <div className="absolute top-8 left-4 w-8 h-1 bg-gray-300"></div>
+                                    <div className="p-4 h-24 bg-white relative rounded-md overflow-hidden">
+                                      {/* Clean minimalist design that adapts to selected theme */}
+                                      <div className={`absolute top-4 left-4 w-12 h-0.5 bg-${selectedUiTheme === 'aquaBlue' ? 'blue' : selectedUiTheme === 'coralPink' ? 'pink' : selectedUiTheme === 'mintGreen' ? 'green' : 'purple'}-400`}></div>
+                                      <div className={`absolute top-7 left-4 w-8 h-0.5 bg-${selectedUiTheme === 'aquaBlue' ? 'blue' : selectedUiTheme === 'coralPink' ? 'pink' : selectedUiTheme === 'mintGreen' ? 'green' : 'purple'}-300`}></div>
+                                      <div className={`absolute top-10 left-4 w-5 h-0.5 bg-${selectedUiTheme === 'aquaBlue' ? 'blue' : selectedUiTheme === 'coralPink' ? 'pink' : selectedUiTheme === 'mintGreen' ? 'green' : 'purple'}-200`}></div>
                                       
-                                      {/* Text positioned consistently with Memphis style */}
-                                      <div className="absolute bottom-2 left-4 right-4">
-                                        <span className="text-xs font-medium block">Minimalist</span>
-                                        <p className="text-xs text-slate-600">Clean, focused design</p>
+                                      {/* Subtle horizontal divider */}
+                                      <div className="absolute right-4 left-4 top-16 h-px bg-gray-200"></div>
+                                      
+                                      {/* Text positioned with better spacing */}
+                                      <div className="absolute bottom-1 left-3 right-3">
+                                        <span className={`text-xs font-bold block text-${selectedUiTheme === 'aquaBlue' ? 'blue' : selectedUiTheme === 'coralPink' ? 'pink' : selectedUiTheme === 'mintGreen' ? 'green' : 'purple'}-600`}>
+                                          Minimalist
+                                        </span>
+                                        <p className="text-xs text-slate-700">Clean, focused design</p>
                                       </div>
                                     </div>
                                   </motion.div>
