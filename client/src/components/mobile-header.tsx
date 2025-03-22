@@ -4,6 +4,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { SUBSCRIPTION_LIMITS } from "@shared/schema";
+import Logo from "@/components/ui/logo";
 
 export default function MobileHeader() {
   const [location] = useLocation();
@@ -47,12 +48,7 @@ export default function MobileHeader() {
   return (
     <div className="md:hidden fixed inset-x-0 top-0 z-50 bg-white border-b border-slate-200 flex items-center justify-between p-4">
       <div className="flex items-center gap-2">
-        <div className="relative w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-          <span className="text-white font-heading font-bold text-base">D</span>
-          <span className="absolute -top-1 -right-1 bg-accent text-white text-xs font-bold rounded-full h-4 w-4 flex items-center justify-center">
-            AI
-          </span>
-        </div>
+        <Logo variant="minimal" mode="light" width={30} height={30} />
         <span className="font-heading font-bold text-lg text-slate-800">{getPageTitle()}</span>
       </div>
       
@@ -67,14 +63,15 @@ export default function MobileHeader() {
             {/* Logo Area */}
             <div className="flex items-center justify-center p-5 border-b border-slate-200">
               <Link href="/" onClick={() => setIsOpen(false)}>
-                <a className="flex items-center gap-2">
-                  <div className="relative w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-                    <span className="text-white font-heading font-bold text-xl">D</span>
-                    <span className="absolute -top-1 -right-1 bg-accent text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-                      AI
-                    </span>
-                  </div>
-                  <span className="font-heading font-bold text-xl text-slate-800">DecA<span className="text-primary">(I)</span>de</span>
+                <a>
+                  <Logo 
+                    variant="default" 
+                    mode="light" 
+                    showText={true} 
+                    showTagline={true} 
+                    width={45} 
+                    height={45} 
+                  />
                 </a>
               </Link>
             </div>

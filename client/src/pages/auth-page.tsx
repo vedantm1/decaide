@@ -15,6 +15,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useMicroInteractions } from "@/hooks/use-micro-interactions";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { motion } from "framer-motion";
+import Logo from "@/components/ui/logo";
 import { 
   Accordion,
   AccordionContent,
@@ -201,13 +202,15 @@ export default function AuthPage() {
         <Card className="w-full max-w-md shadow-lg" ref={formRef}>
           <CardHeader className="space-y-1">
             <div className="flex items-center justify-center mb-6">
-              <div className="relative w-12 h-12 bg-primary rounded-lg flex items-center justify-center">
-                <span className="text-white font-heading font-bold text-2xl">D</span>
-                <span className="absolute -top-1 -right-1 bg-accent text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-                  AI
-                </span>
-              </div>
-              <span className="font-heading font-bold text-2xl text-slate-800 ml-2">DecA<span className="text-primary">(I)</span>de</span>
+              <Logo 
+                variant="default" 
+                mode="light" 
+                showText={true} 
+                showTagline={true} 
+                width={50} 
+                height={50} 
+                className="scale-110"
+              />
             </div>
             <CardTitle className="text-2xl text-center">Welcome</CardTitle>
             <CardDescription className="text-center">
