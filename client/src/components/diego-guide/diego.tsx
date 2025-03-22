@@ -191,6 +191,7 @@ export default function Diego({ isNewUser = false, currentStep = TUTORIAL_STEPS.
   const funFactTimerRef = useRef<number | null>(null);
   const isMobile = useIsMobile();
   const { triggerAnimation } = useMicroInteractions();
+  const { openChat } = useDiegoGuide();
 
   // Auto-show Diego for new users
   useEffect(() => {
@@ -543,12 +544,17 @@ const content = TUTORIAL_CONTENT[activeStep as keyof typeof TUTORIAL_CONTENT] as
                 <div className="flex items-center justify-between bg-primary text-white rounded-t-lg p-3">
                   <h3 className="font-medium text-sm">{content.title}</h3>
                   <div className="flex items-center gap-2">
-                    <button onClick={minimizeDiego} className="text-white/80 hover:text-white">
+                    <button onClick={openChat} className="text-white/80 hover:text-white" title="Chat with Diego">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </button>
+                    <button onClick={minimizeDiego} className="text-white/80 hover:text-white" title="Minimize">
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M19 13H5V11H19V13Z" fill="currentColor"/>
                       </svg>
                     </button>
-                    <button onClick={toggleDiego} className="text-white/80 hover:text-white">
+                    <button onClick={toggleDiego} className="text-white/80 hover:text-white" title="Close">
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M6 18L18 6M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
@@ -581,19 +587,40 @@ const content = TUTORIAL_CONTENT[activeStep as keyof typeof TUTORIAL_CONTENT] as
         )}
       </AnimatePresence>
 
-      {/* Persistent floating Diego button when not visible */}
+      {/* Persistent floating Diego buttons when not visible */}
       {!isVisible && !isNewUser && !isWandering && (
-        <motion.div
-          className="fixed bottom-5 right-5 z-50 cursor-pointer"
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          whileHover={{ scale: 1.1 }}
-          onClick={toggleDiego}
-        >
-          <div className="bg-primary text-white p-3 rounded-full shadow-lg">
-            <DiegoAvatar emotion="happy" size="sm" />
-          </div>
-        </motion.div>
+        <div className="fixed bottom-5 right-5 z-50 flex flex-col items-end gap-2">
+          {/* Chat button */}
+          <motion.div
+            className="cursor-pointer"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            whileHover={{ scale: 1.1 }}
+            onClick={openChat}
+          >
+            <div className="bg-primary/90 text-white p-2 rounded-full shadow-lg flex items-center gap-2">
+              <span className="text-xs font-medium whitespace-nowrap px-2">Chat with Diego</span>
+              <div className="bg-white/20 p-1 rounded-full">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div>
+            </div>
+          </motion.div>
+          
+          {/* Diego avatar button */}
+          <motion.div
+            className="cursor-pointer"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            whileHover={{ scale: 1.1 }}
+            onClick={toggleDiego}
+          >
+            <div className="bg-primary text-white p-3 rounded-full shadow-lg">
+              <DiegoAvatar emotion="happy" size="sm" />
+            </div>
+          </motion.div>
+        </div>
       )}
     </>
   );

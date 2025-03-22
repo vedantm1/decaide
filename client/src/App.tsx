@@ -21,6 +21,7 @@ import { AuthProvider } from "@/hooks/use-auth";
 import { MicroInteractionsProvider } from "@/hooks/use-micro-interactions";
 import { DiegoGuideProvider, useDiegoGuide } from "@/hooks/use-diego-guide";
 import Diego from "@/components/diego-guide/diego";
+import DiegoChat from "@/components/diego-guide/diego-chat";
 
 function Router() {
   return (
