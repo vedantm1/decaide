@@ -25,11 +25,17 @@ export default function Dashboard() {
   // Calculate remaining trial time
   useEffect(() => {
     if (user && user.subscriptionTier === 'free') {
+      // Check if the tutorial has been completed
+      const tutorialCompleted = localStorage.getItem('diegoTutorialCompleted') === 'true';
+      // Check if this is a new user
+      const isFirstTimeUser = localStorage.getItem('isFirstTimeUser') !== 'false';
+      
       // Check if trial start date exists in localStorage, if not, set it
       const trialStartDate = localStorage.getItem('trialStartDate');
       if (!trialStartDate) {
         localStorage.setItem('trialStartDate', new Date().toISOString());
-        setShowTrialBanner(true);
+        // Only show banner if tutorial is completed or not a new user
+        setShowTrialBanner(tutorialCompleted || !isFirstTimeUser);
         setTrialDaysLeft(3);
         setTrialHoursLeft(0);
       } else {
@@ -88,7 +94,12 @@ export default function Dashboard() {
           }
         }
         
-        setShowTrialBanner(true);
+        // For first-time users, only show banner after tutorial is completed
+        const isFirstTimeUser = localStorage.getItem('isFirstTimeUser') !== 'false';
+        const tutorialCompleted = localStorage.getItem('diegoTutorialCompleted') === 'true';
+        
+        // Only show the banner if tutorial completed or this isn't first time user
+        setShowTrialBanner(tutorialCompleted || !isFirstTimeUser);
       }
     }
   }, [user]);
@@ -97,23 +108,32 @@ export default function Dashboard() {
   useEffect(() => {
     // Check if the user just logged in (flag set in auth hook)
     const justLoggedIn = sessionStorage.getItem('justLoggedIn') === 'true';
+    // Check if the tutorial has been completed
+    const tutorialCompleted = localStorage.getItem('diegoTutorialCompleted') === 'true';
     
     if (justLoggedIn && user) {
-      // Delay slightly to ensure the animation is seen
+      // Only show welcome messages if tutorial is already completed or this isn't first time
+      const isFirstTimeUser = localStorage.getItem('isFirstTimeUser') !== 'false';
+      
+      // Delay longer if this is a first-time user to allow tutorial to start first
+      const delayTime = isFirstTimeUser ? 10000 : 800;
+      
       setTimeout(() => {
         triggerAnimation('stars', 'Welcome to DecA(I)de!');
         
         if (user.subscriptionTier === 'free') {
-          // Welcome new trial user with a tropical theme
-          triggerAnimation('confetti');
-          showAchievement("Welcome!", `You've started your 3-day free trial. Let's get started with DECA preparation!`, 50);
+          // Welcome new trial user with a tropical theme - show only if tutorial completed or not first time
+          if (tutorialCompleted || !isFirstTimeUser) {
+            triggerAnimation('confetti');
+            showAchievement("Welcome!", `You've started your 3-day free trial. Let's get started with DECA preparation!`, 50);
+          }
         } else {
           showAchievement("Welcome Back!", `Ready to practice for your next DECA competition?`, 10);
         }
         
         // Remove the login flag so animation doesn't show again until next login
         sessionStorage.removeItem('justLoggedIn');
-      }, 800);
+      }, delayTime);
     }
   }, [triggerAnimation, showAchievement, user]);
   
