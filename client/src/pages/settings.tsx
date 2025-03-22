@@ -130,7 +130,7 @@ export default function SettingsPage() {
       try {
         // Save to user profile if authenticated
         if (user?.id) {
-          const res = await apiRequest("POST", "/api/user/appearance", {
+          const res = await apiRequest("POST", "/api/user/settings", {
             uiTheme: data.colorScheme
           });
           return await res.json();
@@ -143,18 +143,36 @@ export default function SettingsPage() {
       }
     },
     onSuccess: () => {
+      // Invalidate the user data to get the updated preferences
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      
       toast({
         title: "Appearance Updated",
         description: "Your theme preferences have been saved.",
       });
       triggerAnimation('confetti', 'Theme Updated!');
       
-      // Apply theme settings
-      if (appearance.theme === 'system') {
-        document.documentElement.setAttribute('data-theme', 'system');
+      // Apply theme (light/dark/system)
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const isDarkMode = appearance.theme === 'dark' || (appearance.theme === 'system' && prefersDark);
+      
+      if (isDarkMode) {
+        document.documentElement.classList.add('dark');
       } else {
-        document.documentElement.setAttribute('data-theme', appearance.theme);
+        document.documentElement.classList.remove('dark');
       }
+      
+      // Remove all theme classes first
+      const themeClasses = [
+        'theme-business', 'theme-finance', 'theme-hospitality', 
+        'theme-marketing', 'theme-entrepreneurship', 'theme-admin',
+        'theme-aquaBlue', 'theme-coralPink', 'theme-mintGreen', 'theme-royalPurple'
+      ];
+      
+      document.documentElement.classList.remove(...themeClasses);
+      
+      // Apply new color scheme class
+      document.documentElement.classList.add(`theme-${appearance.colorScheme}`);
     },
     onError: (error: Error) => {
       toast({
