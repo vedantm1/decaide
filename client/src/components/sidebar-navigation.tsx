@@ -5,15 +5,15 @@ import { SUBSCRIPTION_LIMITS } from "@shared/schema";
 export default function SidebarNavigation() {
   const [location] = useLocation();
   const { user, logoutMutation } = useAuth();
-  
+
   const subscriptionTier = user?.subscriptionTier || "standard";
   const stars = SUBSCRIPTION_LIMITS[subscriptionTier as keyof typeof SUBSCRIPTION_LIMITS]?.stars || 2;
-  
+
   // Check if the current path matches the link path
   const isActive = (path: string) => {
     return location === path;
   };
-  
+
   return (
     <aside className="hidden md:flex md:flex-col w-64 bg-white border-r border-slate-200">
       {/* Logo Area */}
@@ -28,7 +28,7 @@ export default function SidebarNavigation() {
             <span className="font-heading font-bold text-xl text-slate-800">DecA<span className="text-primary">(I)</span>de</span>
           </div>
       </div>
-      
+
       {/* User Profile Summary */}
       <div className="p-4 border-b border-slate-200">
         <div className="flex items-center gap-3">
@@ -40,7 +40,7 @@ export default function SidebarNavigation() {
             <p className="text-xs text-slate-500">{user?.eventType || "No event selected"}</p>
           </div>
         </div>
-        
+
         {/* Subscription Badge */}
         <div className="mt-3 flex items-center gap-1.5 text-xs bg-slate-100 rounded-full px-3 py-1 w-fit">
           <div className="flex">
@@ -51,7 +51,7 @@ export default function SidebarNavigation() {
           <span className="font-medium text-slate-600 capitalize">{subscriptionTier} Plan</span>
         </div>
       </div>
-      
+
       {/* Navigation Links */}
       <nav className="flex-1 overflow-y-auto py-4 px-3">
         <div className="space-y-1">
@@ -65,7 +65,7 @@ export default function SidebarNavigation() {
             <i className="fas fa-chart-line w-5 text-center text-primary"></i>
             <span>Dashboard</span>
           </div>
-          
+
           <div className="pt-2">
             <p className="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Practice</p>
             <div
@@ -117,7 +117,7 @@ export default function SidebarNavigation() {
                 <span>Written Events</span>
               </div>
           </div>
-          
+
           <div className="pt-2">
             <p className="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Account</p>
             <div
@@ -182,7 +182,7 @@ export default function SidebarNavigation() {
           </div>
         </div>
       </nav>
-      
+
       {/* Daily Practice Reminder */}
       <div className="p-4 mx-3 mb-4 bg-primary-50 rounded-lg border border-primary-100">
         <div className="flex items-center justify-between mb-2">

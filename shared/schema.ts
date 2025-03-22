@@ -81,8 +81,8 @@ export type InsertSession = z.infer<typeof insertSessionSchema>;
 // Subscription tier limits
 export const SUBSCRIPTION_LIMITS = {
   standard: {
-    roleplays: 3,              // Limited roleplay scenarios per month
-    tests: 2,                  // Limited practice tests per month
+    roleplays: 10,             // Limited roleplay scenarios per month
+    tests: 15,                 // Limited practice tests per month
     piExplanations: 10,        // Limited performance indicator explanations
     examplePapers: 2,          // Limited example written event papers
     exampleDialogues: 2,       // Limited example roleplay dialogues
@@ -98,8 +98,8 @@ export const SUBSCRIPTION_LIMITS = {
     price: 12.99
   },
   plus: {
-    roleplays: 10,             // More roleplay scenarios per month
-    tests: 8,                  // More practice tests per month
+    roleplays: 25,             // More roleplay scenarios per month
+    tests: 25,                 // More practice tests per month
     piExplanations: 30,        // More performance indicator explanations
     examplePapers: 7,          // More example written event papers
     exampleDialogues: 7,       // More example roleplay dialogues

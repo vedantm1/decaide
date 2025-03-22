@@ -16,7 +16,11 @@
 
 @layer components {
   .bubble-text-visible {
-    @apply text-black; /* Ensure text is black */
+    @apply text-slate-800; /* Improve text contrast */
+  }
+
+  .marketing-text {
+    @apply text-slate-800; /* Ensure marketing text is visible */
   }
 
   .deca-cluster-badge {
