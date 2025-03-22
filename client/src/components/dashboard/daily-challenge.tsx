@@ -17,9 +17,9 @@ export default function DailyChallenge({ challenge }: DailyChallengeProps) {
     <div className="mt-6 bg-gradient-to-r from-primary-600 to-primary-800 rounded-xl p-5 text-white shadow-lg">
       <div className="flex justify-between items-start">
         <div>
-          <span className="text-xs font-medium bg-white/20 rounded-full px-2.5 py-1">DAILY CHALLENGE</span>
-          <h3 className="text-lg font-bold mt-3 font-heading text-white">{challenge.title}</h3>
-          <p className="text-white mt-1 text-sm">{challenge.description}</p>
+          <span className="text-xs font-medium bg-white rounded-full px-2.5 py-1 text-primary-700">DAILY CHALLENGE</span>
+          <h3 className="text-lg font-bold mt-3 font-heading text-black">{challenge.title}</h3>
+          <p className="text-black mt-1 text-sm">{challenge.description}</p>
           
           <div className="mt-4 flex gap-3">
             <Button 
