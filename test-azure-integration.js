@@ -1,5 +1,8 @@
 // Simple test for Azure OpenAI integration
-const { getOpenAIClient } = require('./server/services/azureOpenai');
+import { getOpenAIClient } from './server/services/azureOpenai.js';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 async function testAzureOpenAI() {
   try {
@@ -12,13 +15,13 @@ async function testAzureOpenAI() {
     
     const response = await client.getChatCompletions(
       deployment,
+      [
+        { role: "system", content: "You are a helpful assistant." },
+        { role: "user", content: "What is DECA?" }
+      ],
       {
-        messages: [
-          { role: "system", content: "You are a helpful assistant." },
-          { role: "user", content: "What is DECA?" }
-        ],
         temperature: 0.7,
-        max_tokens: 200
+        maxTokens: 200
       }
     );
     

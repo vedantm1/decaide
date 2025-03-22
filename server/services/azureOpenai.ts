@@ -76,13 +76,13 @@ Your response should include:
     // Make the API call
     const response = await client.getChatCompletions(
       AZURE_OPENAI_DEPLOYMENT,
+      [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt }
+      ],
       {
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt }
-        ],
         temperature: 0.7,
-        max_tokens: 2000
+        maxTokens: 2000
       }
     );
     
@@ -167,13 +167,13 @@ Return the results in JSON format that matches this structure:
     // Make the API call
     const response = await client.getChatCompletions(
       AZURE_OPENAI_DEPLOYMENT,
+      [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt }
+      ],
       {
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt }
-        ],
         temperature: 0.5,
-        max_tokens: 4000
+        maxTokens: 4000
       }
     );
     
@@ -245,13 +245,13 @@ Your tone should be educational, clear, and encouraging to high school DECA stud
     // Make the API call
     const response = await client.getChatCompletions(
       AZURE_OPENAI_DEPLOYMENT,
+      [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt }
+      ],
       {
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt }
-        ],
         temperature: 0.3,
-        max_tokens: 1000
+        maxTokens: 1000
       }
     );
     
