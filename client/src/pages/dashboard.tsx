@@ -69,6 +69,12 @@ export default function Dashboard() {
                 <button className="px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded-lg text-sm font-medium transition">
                   New Practice
                 </button>
+                {user?.subscriptionTier === "standard" && (
+                  <a href="/pricing" className="px-4 py-2 bg-accent hover:bg-accent/90 text-white rounded-lg text-sm font-medium transition flex items-center gap-1">
+                    <i className="fas fa-arrow-circle-up text-white"></i>
+                    <span>Upgrade</span>
+                  </a>
+                )}
                 <div className="w-10 h-10 bg-white rounded-full border border-slate-200 flex items-center justify-center cursor-pointer hover:bg-slate-50">
                   <i className="fas fa-bell text-slate-400"></i>
                 </div>

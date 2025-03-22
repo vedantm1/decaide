@@ -11,6 +11,7 @@ import PracticeTestsPage from "@/pages/practice-tests";
 import WrittenEventsPage from "@/pages/written-events";
 import MyProgressPage from "@/pages/my-progress";
 import SettingsPage from "@/pages/settings";
+import PricingPage from "@/pages/pricing";
 import { ProtectedRoute } from "./lib/protected-route";
 import { AuthProvider } from "@/hooks/use-auth";
 
@@ -24,6 +25,7 @@ function Router() {
       <ProtectedRoute path="/written-events" component={WrittenEventsPage} />
       <ProtectedRoute path="/progress" component={MyProgressPage} />
       <ProtectedRoute path="/settings" component={SettingsPage} />
+      <ProtectedRoute path="/pricing" component={PricingPage} />
       <Route path="/auth" component={AuthPage} />
       <Route component={NotFound} />
     </Switch>

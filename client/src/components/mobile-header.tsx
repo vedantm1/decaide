@@ -197,6 +197,24 @@ export default function MobileHeader() {
                       <span className="ml-auto bg-primary text-white text-xs px-1.5 py-0.5 rounded-md">New</span>
                     </a>
                   </Link>
+                  <Link href="/pricing">
+                    <a 
+                      onClick={() => setIsOpen(false)}
+                      className={`flex items-center gap-3 px-4 py-2.5 rounded-lg font-medium text-sm ${
+                        isActive("/pricing") 
+                          ? "text-slate-800 bg-slate-100" 
+                          : "text-slate-600 hover:bg-slate-100"
+                      }`}
+                    >
+                      <i className={`fas fa-credit-card w-5 text-center ${
+                        isActive("/pricing") ? "text-primary" : "text-slate-400"
+                      }`}></i>
+                      <span>Subscription Plans</span>
+                      {subscriptionTier === "standard" && (
+                        <span className="ml-auto bg-accent text-white text-xs px-1.5 py-0.5 rounded-md">Upgrade</span>
+                      )}
+                    </a>
+                  </Link>
                   <Link href="/settings">
                     <a 
                       onClick={() => setIsOpen(false)}
