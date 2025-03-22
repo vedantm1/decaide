@@ -14,6 +14,9 @@ import aiRoutes from "./routes/aiRoutes";
 export async function registerRoutes(app: Express): Promise<Server> {
   // Set up authentication routes
   setupAuth(app);
+  
+  // Register AI routes
+  app.use("/api/ai", aiRoutes);
 
   // API routes
   // Get subscription info

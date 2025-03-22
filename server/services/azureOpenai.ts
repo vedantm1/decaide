@@ -1,259 +1,422 @@
 import { OpenAIClient, AzureKeyCredential } from "@azure/openai";
 import dotenv from "dotenv";
 
-// Initialize environment variables
 dotenv.config();
 
-// Check for required environment variables
-if (!process.env.AZURE_OPENAI_KEY) {
-  console.warn("Missing AZURE_OPENAI_KEY environment variable. Azure OpenAI services will not function.");
+// Environment variables for Azure OpenAI
+const AZURE_OPENAI_KEY = process.env.AZURE_OPENAI_KEY;
+const AZURE_OPENAI_ENDPOINT = process.env.AZURE_OPENAI_ENDPOINT;
+const AZURE_OPENAI_DEPLOYMENT = process.env.AZURE_OPENAI_DEPLOYMENT || "gpt-4o-mini";
+
+// Check if required environment variables are set
+if (!AZURE_OPENAI_KEY || !AZURE_OPENAI_ENDPOINT) {
+  console.warn("Azure OpenAI credentials are missing. AI features will not work properly.");
 }
 
-if (!process.env.AZURE_OPENAI_ENDPOINT) {
-  console.warn("Missing AZURE_OPENAI_ENDPOINT environment variable. Azure OpenAI services will not function.");
-}
-
-// Create a singleton client that can be reused across requests
-let openAIClient: OpenAIClient | null = null;
-
-// Initialize the Azure OpenAI client
+/**
+ * Get an instance of the OpenAI client
+ */
 export function getOpenAIClient(): OpenAIClient {
-  if (!openAIClient && process.env.AZURE_OPENAI_KEY && process.env.AZURE_OPENAI_ENDPOINT) {
-    openAIClient = new OpenAIClient(
-      process.env.AZURE_OPENAI_ENDPOINT,
-      new AzureKeyCredential(process.env.AZURE_OPENAI_KEY)
-    );
+  if (!AZURE_OPENAI_KEY || !AZURE_OPENAI_ENDPOINT) {
+    throw new Error("Azure OpenAI credentials are missing. Please provide AZURE_OPENAI_KEY and AZURE_OPENAI_ENDPOINT.");
   }
   
-  if (!openAIClient) {
-    throw new Error("Azure OpenAI client could not be initialized. Check your environment variables.");
-  }
-  
-  return openAIClient;
+  return new OpenAIClient(
+    AZURE_OPENAI_ENDPOINT,
+    new AzureKeyCredential(AZURE_OPENAI_KEY)
+  );
 }
 
-// Default deployment name for GPT-4o-mini
-// This can be configured in your Azure OpenAI service
-const DEFAULT_DEPLOYMENT = process.env.AZURE_OPENAI_DEPLOYMENT || "gpt-4o-mini";
-
-// Generate roleplay scenario based on event type and performance indicators
+/**
+ * Generate a roleplay scenario based on event and performance indicators
+ */
 export async function generateRoleplayScenario(params: {
   eventCode: string;
   eventName: string;
   category: string;
   performanceIndicators: string[];
-  difficulty?: "easy" | "medium" | "hard";
+  difficulty: "easy" | "medium" | "hard";
 }): Promise<{
+  id: string;
   title: string;
   scenario: string;
-  backgroundInfo: string;
-  customerRole: string;
-  participantRole: string;
+  preparation: string;
+  role: string;
+  instructions: string;
   performanceIndicators: string[];
+  difficulty: string;
+  businessDescription?: string;
+  meetWith?: string;
 }> {
-  const client = getOpenAIClient();
-  const { eventCode, eventName, category, performanceIndicators, difficulty = "medium" } = params;
-  
-  // Create a detailed system prompt for roleplay generation
-  const systemPrompt = `You are an expert DECA roleplay scenario creator with years of experience judging DECA competitions.
-Your task is to create a realistic, detailed roleplay scenario for a ${eventName} (${eventCode}) event in the ${category} category.
-The difficulty level should be ${difficulty}.
-Create a scenario that allows the student to demonstrate understanding of these performance indicators: ${performanceIndicators.join(", ")}.
-Format the response as a valid JSON object with these fields:
-{
-  "title": "A descriptive title for the scenario",
-  "scenario": "A detailed situation description (200-300 words)",
-  "backgroundInfo": "Additional context for the participant (100-150 words)",
-  "customerRole": "Description of who the judge will be portraying",
-  "participantRole": "Description of the student's role in this scenario",
-  "performanceIndicators": ["List of 3-5 performance indicators being tested"]
-}
-Make the scenario realistic, challenging, and reflective of current business practices in ${category}.`;
-
   try {
-    const result = await client.getChatCompletions(
-      DEFAULT_DEPLOYMENT,
-      [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: `Create a ${difficulty} difficulty roleplay scenario for ${eventName} (${eventCode}) that tests these performance indicators: ${performanceIndicators.join(", ")}` }
-      ],
+    const client = getOpenAIClient();
+    
+    const { eventCode, eventName, category, performanceIndicators, difficulty } = params;
+    
+    // Create the system prompt
+    const systemPrompt = `You are an expert DECA competition coach who creates professional roleplay scenarios for DECA competitions.
+You will create a realistic and challenging roleplay scenario for event ${eventCode}: ${eventName} 
+in the ${category} category at ${difficulty} difficulty level.
+
+The scenario must incorporate all of these performance indicators:
+${performanceIndicators.map((pi, index) => `${index + 1}. ${pi}`).join('\n')}
+
+Your response should include:
+1. A creative title for the roleplay
+2. A detailed scenario background (200-300 words)
+3. Participant preparation instructions (100-150 words)
+4. The specific role the student will play
+5. The specific judge role (who they're meeting with)
+6. A realistic business description
+7. Clear instructions for what the participant needs to accomplish`;
+
+    // Create the user prompt - simple instruction
+    const userPrompt = `Please create a DECA roleplay scenario for the ${eventName} event with difficulty level: ${difficulty}.`;
+    
+    // Make the API call
+    const response = await client.getChatCompletions(
+      AZURE_OPENAI_DEPLOYMENT,
       {
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt }
+        ],
         temperature: 0.7,
-        maxTokens: 1500,
-        responseFormat: { type: "json_object" }
+        max_tokens: 2000
       }
     );
-
-    // Parse the JSON response
-    const completion = result.choices[0]?.message?.content || "{}";
-    return JSON.parse(completion);
+    
+    // Extract the content
+    const generatedContent = response.choices[0]?.message?.content || "";
+    
+    // Parse the content and format it
+    // For now, return a simplified structure - in a real application, you'd parse the response more carefully
+    return {
+      id: Date.now().toString(),
+      title: extractTitle(generatedContent),
+      scenario: extractSection(generatedContent, "Scenario", "Preparation"),
+      preparation: extractSection(generatedContent, "Preparation", "Role"),
+      role: extractSection(generatedContent, "Role", "Meet With"),
+      meetWith: extractSection(generatedContent, "Meet With", "Business Description"),
+      businessDescription: extractSection(generatedContent, "Business Description", "Instructions"),
+      instructions: extractSection(generatedContent, "Instructions", null),
+      performanceIndicators,
+      difficulty
+    };
   } catch (error) {
-    console.error("Error generating roleplay scenario:", error);
-    throw new Error("Failed to generate roleplay scenario. Please try again later.");
+    console.error("Error generating roleplay:", error);
+    throw new Error("Failed to generate roleplay scenario");
   }
 }
 
-// Generate practice test questions based on DECA knowledge areas
+/**
+ * Generate a practice test with questions and answers
+ */
 export async function generatePracticeTest(params: {
   eventCode: string;
   eventName: string;
   categories: string[];
   numQuestions: number;
-  difficulty?: "easy" | "medium" | "hard";
+  difficulty: "easy" | "medium" | "hard";
 }): Promise<{
-  testTitle: string;
-  questions: {
+  id: string;
+  title: string;
+  questions: Array<{
+    id: number;
     question: string;
     options: string[];
-    correctIndex: number;
+    correctAnswer: number;
     explanation: string;
-  }[];
+  }>;
 }> {
-  const client = getOpenAIClient();
-  const { eventCode, eventName, categories, numQuestions, difficulty = "medium" } = params;
-  
-  // Create a system prompt for test generation
-  const systemPrompt = `You are an expert DECA exam creator with deep knowledge of business concepts tested in DECA competitive events.
-Your task is to generate a practice test for the ${eventName} (${eventCode}) event focusing on these categories: ${categories.join(", ")}.
-Create ${numQuestions} multiple-choice questions at ${difficulty} difficulty level.
-Format the response as a valid JSON object with these fields:
+  try {
+    const client = getOpenAIClient();
+    
+    const { eventCode, eventName, categories, numQuestions, difficulty } = params;
+    
+    // Create the system prompt
+    const systemPrompt = `You are an expert DECA test question creator.
+Create a practice test for the DECA event ${eventCode}: ${eventName} 
+with ${numQuestions} multiple-choice questions at ${difficulty} difficulty level.
+
+The questions should be focused on these business categories:
+${categories.join(', ')}
+
+For each question:
+1. Provide a clear, concise question about a relevant business concept
+2. Include 4 possible answer choices labeled A, B, C, and D
+3. Indicate which answer (0=A, 1=B, 2=C, 3=D) is correct
+4. Provide a brief explanation of why the answer is correct
+
+Return the results in JSON format that matches this structure:
 {
-  "testTitle": "A descriptive title for this practice test",
   "questions": [
     {
-      "question": "The question text",
+      "id": 1,
+      "question": "What is...",
       "options": ["Option A", "Option B", "Option C", "Option D"],
-      "correctIndex": 0,
-      "explanation": "Explanation of why the correct answer is correct"
-    },
-    ...
+      "correctAnswer": 2,
+      "explanation": "Option C is correct because..."
+    }
   ]
-}
-Make questions realistic and similar to actual DECA exam questions. Include questions that test both knowledge and application.`;
+}`;
 
-  try {
-    const result = await client.getChatCompletions(
-      DEFAULT_DEPLOYMENT,
-      [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: `Create a ${difficulty} level practice test with ${numQuestions} questions for ${eventName} (${eventCode}) covering these categories: ${categories.join(", ")}` }
-      ],
+    // Create the user prompt
+    const userPrompt = `Generate ${numQuestions} ${difficulty} level questions for the ${eventName} event covering ${categories.join(', ')}.`;
+    
+    // Make the API call
+    const response = await client.getChatCompletions(
+      AZURE_OPENAI_DEPLOYMENT,
       {
-        temperature: 0.7,
-        maxTokens: Math.min(4000, 500 + (numQuestions * 350)), // Adjust token limit based on question count
-        responseFormat: { type: "json_object" }
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt }
+        ],
+        temperature: 0.5,
+        max_tokens: 4000
       }
     );
-
-    // Parse the JSON response
-    const completion = result.choices[0]?.message?.content || "{}";
-    return JSON.parse(completion);
+    
+    // Extract the content
+    const generatedContent = response.choices[0]?.message?.content || "";
+    
+    // Extract the JSON part of the response
+    const jsonMatch = generatedContent.match(/```json([\s\S]*?)```/) || 
+                     generatedContent.match(/{[\s\S]*}/);
+                     
+    if (!jsonMatch) {
+      throw new Error("Could not parse generated test questions");
+    }
+    
+    // Parse the JSON
+    let testData;
+    try {
+      const jsonContent = jsonMatch[1] || jsonMatch[0];
+      testData = JSON.parse(jsonContent.trim());
+    } catch (e) {
+      console.error("Failed to parse JSON from OpenAI response:", e);
+      throw new Error("Could not parse generated test questions");
+    }
+    
+    // Return the formatted test
+    return {
+      id: Date.now().toString(),
+      title: `${eventName} Practice Test - ${difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}`,
+      questions: testData.questions || []
+    };
   } catch (error) {
     console.error("Error generating practice test:", error);
-    throw new Error("Failed to generate practice test. Please try again later.");
+    throw new Error("Failed to generate practice test");
   }
 }
 
-// Generate detailed explanation for a performance indicator
+/**
+ * Generate an explanation for a performance indicator
+ */
 export async function explainPerformanceIndicator(params: {
   indicator: string;
   category: string;
-  format?: "concise" | "detailed";
+  format: "concise" | "detailed";
 }): Promise<{
   indicator: string;
   explanation: string;
-  businessExamples: string[];
-  relatedConcepts: string[];
-  testingTips: string[];
+  examples: string[];
+  tips: string[];
 }> {
-  const client = getOpenAIClient();
-  const { indicator, category, format = "detailed" } = params;
-  
-  // System prompt for performance indicator explanation
-  const systemPrompt = `You are an expert DECA coach and judge with extensive knowledge of business concepts and performance indicators.
-Your task is to provide a ${format} explanation of the performance indicator: "${indicator}" in the ${category} category.
-Format the response as a valid JSON object with these fields:
-{
-  "indicator": "The performance indicator being explained",
-  "explanation": "A thorough explanation of the concept and its importance (150-200 words)",
-  "businessExamples": ["3-5 real-world examples of this concept in business"],
-  "relatedConcepts": ["3-5 related business concepts the student should also understand"],
-  "testingTips": ["3-5 tips for demonstrating mastery of this indicator in a DECA event"]
-}
-Ensure the explanation is accurate, informative, and helpful for a high school DECA student.`;
-
   try {
-    const result = await client.getChatCompletions(
-      DEFAULT_DEPLOYMENT,
-      [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: `Explain the performance indicator "${indicator}" for ${category} at a ${format === "detailed" ? "comprehensive" : "high-level"} level of detail.` }
-      ],
+    const client = getOpenAIClient();
+    
+    const { indicator, category, format } = params;
+    
+    // Create the system prompt
+    const systemPrompt = `You are an expert DECA coach who specializes in explaining performance indicators to students.
+Explain the performance indicator "${indicator}" from the ${category} category in a ${format} format.
+
+Your response should include:
+1. A clear explanation of what the performance indicator means in business contexts
+2. 3 specific examples of how this performance indicator might be demonstrated in a DECA roleplay
+3. 3 practical tips for students to effectively demonstrate this performance indicator
+
+Your tone should be educational, clear, and encouraging to high school DECA students.`;
+
+    // Create the user prompt
+    const userPrompt = `Please explain the performance indicator "${indicator}" from the ${category} category.`;
+    
+    // Make the API call
+    const response = await client.getChatCompletions(
+      AZURE_OPENAI_DEPLOYMENT,
       {
-        temperature: 0.5,
-        maxTokens: 1200,
-        responseFormat: { type: "json_object" }
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt }
+        ],
+        temperature: 0.3,
+        max_tokens: 1000
       }
     );
-
-    // Parse the JSON response
-    const completion = result.choices[0]?.message?.content || "{}";
-    return JSON.parse(completion);
+    
+    // Extract the content
+    const generatedContent = response.choices[0]?.message?.content || "";
+    
+    // Parse the sections
+    const explanation = extractSection(generatedContent, "Explanation", "Examples") || 
+                     extractSection(generatedContent, "", "Examples");
+    const examplesText = extractSection(generatedContent, "Examples", "Tips");
+    const tipsText = extractSection(generatedContent, "Tips", null);
+    
+    // Extract bullet points
+    const examples = extractBulletPoints(examplesText);
+    const tips = extractBulletPoints(tipsText);
+    
+    return {
+      indicator,
+      explanation,
+      examples,
+      tips
+    };
   } catch (error) {
-    console.error("Error generating performance indicator explanation:", error);
-    throw new Error("Failed to generate explanation. Please try again later.");
+    console.error("Error explaining performance indicator:", error);
+    throw new Error("Failed to generate performance indicator explanation");
   }
 }
 
-// Generate written event feedback
+/**
+ * Generate feedback for a written event section
+ */
 export async function generateWrittenEventFeedback(params: {
   eventCode: string;
   eventName: string;
   projectDescription: string;
   section: string;
 }): Promise<{
-  overallFeedback: string;
-  strengthPoints: string[];
-  improvementAreas: string[];
-  suggestedRevisions: string[];
+  section: string;
+  strengths: string[];
+  weaknesses: string[];
+  suggestions: string[];
   score: number;
 }> {
-  const client = getOpenAIClient();
-  const { eventCode, eventName, projectDescription, section } = params;
-  
-  // System prompt for written event feedback
-  const systemPrompt = `You are an experienced DECA written event judge and coach.
-Your task is to review the ${section} section of a ${eventName} (${eventCode}) written project and provide constructive feedback.
-Format the response as a valid JSON object with these fields:
-{
-  "overallFeedback": "A summary assessment of the section (100-150 words)",
-  "strengthPoints": ["3-5 specific strengths"],
-  "improvementAreas": ["3-5 specific areas that need improvement"],
-  "suggestedRevisions": ["3-5 actionable suggestions for improving the section"],
-  "score": 85
-}
-The score should be between 1-100 and reflect how well the section meets DECA's standards and evaluation criteria.
-Be constructive, specific, and actionable in your feedback.`;
-
   try {
-    const result = await client.getChatCompletions(
-      DEFAULT_DEPLOYMENT,
-      [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: `Review this ${section} section of a ${eventName} (${eventCode}) written project: "${projectDescription}"` }
-      ],
+    const client = getOpenAIClient();
+    
+    const { eventCode, eventName, projectDescription, section } = params;
+    
+    // Create the system prompt
+    const systemPrompt = `You are an expert DECA judge who evaluates written business plans.
+Evaluate the following ${section} section for a ${eventName} (${eventCode}) project.
+
+Provide constructive feedback in this format:
+1. 3 strengths of the section
+2. 3 areas for improvement
+3. 3 specific suggestions to enhance the section
+4. A score from 1-10, where 10 is excellent
+
+You should be critical but constructive, focusing on helping the student improve their written event.`;
+
+    // Create the user prompt
+    const userPrompt = `Project description: ${projectDescription}\n\nPlease evaluate the ${section} section of this DECA written event.`;
+    
+    // Make the API call
+    const response = await client.getChatCompletions(
+      AZURE_OPENAI_DEPLOYMENT,
       {
-        temperature: 0.6,
-        maxTokens: 1000,
-        responseFormat: { type: "json_object" }
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt }
+        ],
+        temperature: 0.4,
+        max_tokens: 1500
       }
     );
-
-    // Parse the JSON response
-    const completion = result.choices[0]?.message?.content || "{}";
-    return JSON.parse(completion);
+    
+    // Extract the content
+    const generatedContent = response.choices[0]?.message?.content || "";
+    
+    // Parse the sections
+    const strengthsText = extractSection(generatedContent, "Strengths", "Areas for Improvement") || 
+                      extractSection(generatedContent, "Strengths", "Weaknesses");
+    const weaknessesText = extractSection(generatedContent, "Areas for Improvement", "Suggestions") || 
+                       extractSection(generatedContent, "Weaknesses", "Suggestions");
+    const suggestionsText = extractSection(generatedContent, "Suggestions", "Score");
+    const scoreText = extractSection(generatedContent, "Score", null);
+    
+    // Extract bullet points
+    const strengths = extractBulletPoints(strengthsText);
+    const weaknesses = extractBulletPoints(weaknessesText);
+    const suggestions = extractBulletPoints(suggestionsText);
+    
+    // Extract score
+    const scoreMatch = scoreText?.match(/(\d+(\.\d+)?)\s*\/\s*10/) || 
+                    scoreText?.match(/(\d+(\.\d+)?)/);
+    let score = 0;
+    if (scoreMatch) {
+      score = parseFloat(scoreMatch[1]);
+    }
+    
+    return {
+      section,
+      strengths,
+      weaknesses,
+      suggestions,
+      score
+    };
   } catch (error) {
     console.error("Error generating written event feedback:", error);
-    throw new Error("Failed to generate feedback. Please try again later.");
+    throw new Error("Failed to generate written event feedback");
   }
+}
+
+// Helper functions for parsing the generated content
+
+/**
+ * Extract title from generated content
+ */
+function extractTitle(content: string): string {
+  const titleMatch = content.match(/^#\s*(.+)$/m) || // Markdown
+                  content.match(/^Title:\s*(.+)$/m) || // Plain text with label
+                  content.match(/^(.+)$/m); // First line
+  return titleMatch ? titleMatch[1].trim() : "DECA Roleplay Scenario";
+}
+
+/**
+ * Extract a section from the generated content
+ */
+function extractSection(content: string, sectionStart: string, sectionEnd: string | null): string {
+  if (!content) return "";
+  
+  let startPattern = sectionStart ? new RegExp(`#+\\s*${sectionStart}:?|${sectionStart}:`, 'i') : /^/;
+  let endPattern = sectionEnd ? new RegExp(`#+\\s*${sectionEnd}:?|${sectionEnd}:`, 'i') : /$/;
+  
+  const startMatch = sectionStart ? content.match(startPattern) : { index: 0 };
+  if (!startMatch) return "";
+  
+  const startIndex = startMatch.index! + startMatch[0].length;
+  const endMatch = sectionEnd ? content.slice(startIndex).match(endPattern) : null;
+  const endIndex = endMatch ? startIndex + endMatch.index! : content.length;
+  
+  return content.slice(startIndex, endIndex).trim();
+}
+
+/**
+ * Extract bullet points from text
+ */
+function extractBulletPoints(text: string | null): string[] {
+  if (!text) return [];
+  
+  // Match numbered or bulleted lists
+  const bulletRegex = /(?:^|\n)(?:\d+\.|\*|\-|\•)\s*(.+?)(?=(?:\n(?:\d+\.|\*|\-|\•)|\n\n|$))/g;
+  const bullets: string[] = [];
+  let match;
+  
+  while ((match = bulletRegex.exec(text)) !== null) {
+    bullets.push(match[1].trim());
+  }
+  
+  // If no bullet points found, split by newlines and filter
+  if (bullets.length === 0) {
+    return text.split('\n')
+      .map(line => line.trim())
+      .filter(line => line.length > 0 && !line.match(/^#+\s/));
+  }
+  
+  return bullets;
 }
