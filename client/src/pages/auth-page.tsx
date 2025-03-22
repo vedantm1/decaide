@@ -584,7 +584,7 @@ export default function AuthPage() {
                                       setSelectedColorScheme('memphis');
                                     }}
                                   >
-                                    <div className="p-4 h-24 bg-white bg-opacity-90 relative rounded-md overflow-hidden">
+                                    <div className="p-4 h-28 bg-white bg-opacity-90 relative rounded-md overflow-hidden">
                                       {/* Memphis-style patterns with actual colors based on the selected theme */}
                                       <div className={`absolute -right-2 -top-2 w-10 h-10 rounded-full bg-${selectedUiTheme === 'aquaBlue' ? 'blue' : selectedUiTheme === 'coralPink' ? 'pink' : selectedUiTheme === 'mintGreen' ? 'green' : 'purple'}-300`}></div>
                                       <div className={`absolute top-6 left-2 w-12 h-2 rounded-md bg-${selectedUiTheme === 'aquaBlue' ? 'blue' : selectedUiTheme === 'coralPink' ? 'pink' : selectedUiTheme === 'mintGreen' ? 'green' : 'purple'}-400`}></div>
@@ -619,14 +619,11 @@ export default function AuthPage() {
                                       setSelectedColorScheme('minimalist');
                                     }}
                                   >
-                                    <div className="p-4 h-24 bg-white relative rounded-md overflow-hidden">
+                                    <div className="p-4 h-28 bg-white relative rounded-md overflow-hidden">
                                       {/* Clean minimalist design that adapts to selected theme */}
                                       <div className={`absolute top-4 left-4 w-12 h-0.5 bg-${selectedUiTheme === 'aquaBlue' ? 'blue' : selectedUiTheme === 'coralPink' ? 'pink' : selectedUiTheme === 'mintGreen' ? 'green' : 'purple'}-400`}></div>
                                       <div className={`absolute top-7 left-4 w-8 h-0.5 bg-${selectedUiTheme === 'aquaBlue' ? 'blue' : selectedUiTheme === 'coralPink' ? 'pink' : selectedUiTheme === 'mintGreen' ? 'green' : 'purple'}-300`}></div>
                                       <div className={`absolute top-10 left-4 w-5 h-0.5 bg-${selectedUiTheme === 'aquaBlue' ? 'blue' : selectedUiTheme === 'coralPink' ? 'pink' : selectedUiTheme === 'mintGreen' ? 'green' : 'purple'}-200`}></div>
-                                      
-                                      {/* Subtle horizontal divider */}
-                                      <div className="absolute right-4 left-4 top-16 h-px bg-gray-200"></div>
                                       
                                       {/* Text positioned with better spacing */}
                                       <div className="absolute bottom-1 left-3 right-3">
