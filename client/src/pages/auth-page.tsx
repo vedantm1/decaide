@@ -231,9 +231,9 @@ export default function AuthPage() {
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="login" value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full grid-cols-2 mb-6">
-                <TabsTrigger value="login">Login</TabsTrigger>
-                <TabsTrigger value="register">Register</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-2 mb-6 dark:bg-[var(--surface-2)] dark:text-white">
+                <TabsTrigger value="login" className="dark:data-[state=active]:bg-[var(--surface-1)] dark:data-[state=active]:text-white">Login</TabsTrigger>
+                <TabsTrigger value="register" className="dark:data-[state=active]:bg-[var(--surface-1)] dark:data-[state=active]:text-white">Register</TabsTrigger>
               </TabsList>
               
               {/* Login Form */}
@@ -671,16 +671,16 @@ export default function AuthPage() {
       
       {/* Right side - Hero section - Memphis Style */}
       <div className="hidden lg:flex lg:w-1/2 relative flex-col order-1 lg:order-2 bg-cyan-50 text-slate-900 p-12 overflow-hidden">
-        {/* Memphis style background patterns */}
-        <div className="absolute top-10 left-16 w-32 h-32 bg-primary/20 rounded-full" />
-        <div className="absolute bottom-20 right-14 w-40 h-40 bg-secondary/20 rounded-lg rotate-12" />
-        <div className="absolute top-40 right-12 w-24 h-24 bg-accent/20 rounded-full" />
-        <div className="absolute bottom-60 left-10 w-28 h-28 bg-yellow-200 rounded-lg -rotate-12" />
+        {/* Memphis style background patterns with increased saturation */}
+        <div className="absolute top-10 left-16 w-32 h-32 bg-primary/40 rounded-full shadow-sm" />
+        <div className="absolute bottom-20 right-14 w-40 h-40 bg-secondary/40 rounded-lg rotate-12 shadow-sm" />
+        <div className="absolute top-40 right-12 w-24 h-24 bg-accent/40 rounded-full shadow-sm" />
+        <div className="absolute bottom-60 left-10 w-28 h-28 bg-yellow-300 rounded-lg -rotate-12 shadow-sm" />
         
-        {/* Zigzag pattern */}
+        {/* Zigzag pattern with enhanced visibility */}
         <div className="absolute top-40 left-1/2 transform -translate-x-1/2 w-48 h-8">
           <svg viewBox="0 0 160 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M0 0L20 24L40 0L60 24L80 0L100 24L120 0L140 24L160 0" stroke="rgba(59, 130, 246, 0.5)" strokeWidth="3" fill="none" />
+            <path d="M0 0L20 24L40 0L60 24L80 0L100 24L120 0L140 24L160 0" stroke="rgba(59, 130, 246, 0.8)" strokeWidth="4" fill="none" />
           </svg>
         </div>
         
@@ -740,61 +740,73 @@ export default function AuthPage() {
         </div>
         
         <div className="h-full flex flex-col justify-center max-w-lg mx-auto z-10">
-          <div className="inline-flex items-center mb-6 bg-primary/10 px-4 py-2 rounded-lg">
-            <span className="inline-block mr-2 w-3 h-3 bg-primary rounded-full"></span>
+          <div className="inline-flex items-center mb-6 bg-primary/30 px-4 py-2 rounded-lg shadow-sm">
+            <span className="inline-block mr-2 w-3 h-3 bg-primary rounded-full shadow-sm"></span>
             <h2 className="text-xl font-heading font-bold text-slate-800 drop-shadow-sm">DECA AI Preparation</h2>
           </div>
           
           <h1 className="text-4xl md:text-5xl font-heading font-bold mb-8 text-slate-800">
-            <span className="block">Master DECA with</span>
+            <span className="relative inline-block px-2 mb-2">
+              <span className="relative z-10">Master DECA with</span>
+              <span className="absolute inset-0 bg-yellow-200/40 -rotate-1 rounded-md"></span>
+            </span>
             <span className="relative">
-              <span className="relative z-10">AI-Powered Practice</span>
-              <span className="absolute bottom-1 left-0 w-full h-4 bg-accent/30 -rotate-1"></span>
+              <span className="relative z-10 px-2">AI-Powered Practice</span>
+              <span className="absolute bottom-1 left-0 w-full h-5 bg-accent/40 -rotate-1 rounded-md"></span>
             </span>
           </h1>
           
           <div className="space-y-6 mb-10">
-            <div className="flex items-start">
-              <div className="mr-4 flex-shrink-0 w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+            <div className="flex items-start bg-blue-50/60 p-3 rounded-lg shadow-sm transform hover:scale-102 transition-transform duration-200">
+              <div className="mr-4 flex-shrink-0 w-12 h-12 bg-blue-200 rounded-lg flex items-center justify-center shadow-sm">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><line x1="10" y1="9" x2="8" y2="9"></line></svg>
               </div>
               <div>
-                <h3 className="font-semibold text-lg text-slate-800">Custom Roleplay Generation</h3>
-                <p className="text-slate-700">Practice with unlimited roleplay scenarios tailored to your event</p>
+                <h3 className="font-semibold text-lg text-slate-800 relative inline-block">
+                  <span className="relative z-10">Custom Roleplay Generation</span>
+                  <span className="absolute inset-x-0 bottom-0 h-2 bg-blue-200/40"></span>
+                </h3>
+                <p className="text-slate-700 mt-1">Practice with unlimited roleplay scenarios tailored to your event</p>
               </div>
             </div>
             
-            <div className="flex items-start">
-              <div className="mr-4 flex-shrink-0 w-12 h-12 bg-accent/20 rounded-lg flex items-center justify-center">
+            <div className="flex items-start bg-accent/10 p-3 rounded-lg shadow-sm transform hover:scale-102 transition-transform duration-200">
+              <div className="mr-4 flex-shrink-0 w-12 h-12 bg-accent/30 rounded-lg flex items-center justify-center shadow-sm">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-accent"><path d="M16 6H3"></path><path d="M11 12H3"></path><path d="M7 18H3"></path><path d="M12 18a5 5 0 0 0 9-3 4.5 4.5 0 0 0-4.5-4.5c-1.33 0-2.54.54-3.41 1.41L11 14"></path></svg>
               </div>
               <div>
-                <h3 className="font-semibold text-lg text-slate-800">Performance Indicator Mastery</h3>
-                <p className="text-slate-700">Learn and practice essential performance indicators with real-world examples</p>
+                <h3 className="font-semibold text-lg text-slate-800 relative inline-block">
+                  <span className="relative z-10">Performance Indicator Mastery</span>
+                  <span className="absolute inset-x-0 bottom-0 h-2 bg-accent/20"></span>
+                </h3>
+                <p className="text-slate-700 mt-1">Learn and practice essential performance indicators with real-world examples</p>
               </div>
             </div>
             
-            <div className="flex items-start">
-              <div className="mr-4 flex-shrink-0 w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+            <div className="flex items-start bg-yellow-50/60 p-3 rounded-lg shadow-sm transform hover:scale-102 transition-transform duration-200">
+              <div className="mr-4 flex-shrink-0 w-12 h-12 bg-yellow-200 rounded-lg flex items-center justify-center shadow-sm">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-yellow-600"><path d="M12 20v-6"></path><path d="M6 20v-6"></path><path d="M18 20v-6"></path><path d="M17 14h1a2 2 0 0 0 2-2V5a1 1 0 0 0-1-1h-6V2.12c0-.59-.26-1.05-.59-1.06-.32 0-.59.45-.59 1.04L11.97 4H5.95a.94.94 0 0 0-.9.94c0 .13.05.25.09.36C5.11 5.73 5.95 8 9 8h7.33a2 2 0 0 0 1.9-1.37"></path><path d="M12 20a2 2 0 0 0 4 0"></path><path d="M6 20a2 2 0 0 0 4 0"></path><path d="M18 20a2 2 0 0 0 4 0"></path></svg>
               </div>
               <div>
-                <h3 className="font-semibold text-lg text-slate-800">Practice Tests & Analytics</h3>
-                <p className="text-slate-700">Take exam-style tests and track your progress to identify areas for improvement</p>
+                <h3 className="font-semibold text-lg text-slate-800 relative inline-block">
+                  <span className="relative z-10">Practice Tests & Analytics</span>
+                  <span className="absolute inset-x-0 bottom-0 h-2 bg-yellow-200/40"></span>
+                </h3>
+                <p className="text-slate-700 mt-1">Take exam-style tests and track your progress to identify areas for improvement</p>
               </div>
             </div>
           </div>
           
-          <div className="inline-block relative bg-white rounded-lg px-6 py-3 border border-primary/30 shadow-sm">
+          <div className="inline-block relative bg-gradient-to-r from-blue-100 to-blue-50 dark:from-blue-600 dark:to-blue-800 rounded-lg px-6 py-3 border border-primary/30 shadow-sm">
             <div className="flex items-center space-x-4">
-              <div className="rounded-full bg-white/20 h-12 w-12 flex items-center justify-center">
+              <div className="rounded-full bg-primary/20 h-12 w-12 flex items-center justify-center text-primary dark:text-white">
                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd"></path>
                 </svg>
               </div>
               <div>
-                <h3 className="font-medium text-primary">Who says there is no <span className="font-bold text-accent italic">I</span> in team?</h3>
-                <p className="text-slate-700 text-sm mt-1">With DecA<span className="text-accent font-bold">(I)</span>de, your <span className="italic">individual</span> excellence is what makes your team unstoppable!</p>
+                <h3 className="font-medium text-primary dark:text-white">Who says there is no <span className="font-bold text-accent dark:text-yellow-300 italic">I</span> in team?</h3>
+                <p className="text-slate-700 dark:text-blue-100 text-sm mt-1">With DecA<span className="text-accent dark:text-yellow-300 font-bold">(I)</span>de, your <span className="italic">individual</span> excellence is what makes your team unstoppable!</p>
               </div>
             </div>
           </div>
