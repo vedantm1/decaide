@@ -1,6 +1,6 @@
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
-import { Express } from "express";
+import { Express, Request, Response, NextFunction } from "express";
 import session from "express-session";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
@@ -101,7 +101,7 @@ export function setupAuth(app: Express) {
   });
 
   // Session validation middleware - protect against multiple logins from different locations
-  const validateSession = async (req: any, res: Response, next: Function) => {
+  const validateSession = async (req: Request, res: Response, next: NextFunction) => {
     // Skip for non-authenticated requests
     if (!req.isAuthenticated()) {
       return next();
@@ -111,24 +111,36 @@ export function setupAuth(app: Express) {
     const sessionId = user.sessionId;
     
     // Skip validation for sessions without a sessionId (older sessions before feature was added)
-    if (!sessionId) {
+    // Also temporarily disable session validation for certain paths like roleplay/test generation
+    // This prevents unexpected logouts during navigation
+    if (!sessionId || 
+        req.path.includes('/roleplay') || 
+        req.path.includes('/test') || 
+        req.path.includes('/written') || 
+        req.path.includes('/pi')) {
       return next();
     }
     
-    // Check if the sessionId is valid for this user
-    const isValid = await storage.validateUserSession(user.id, sessionId);
-    
-    if (!isValid) {
-      // Session is invalid, force logout
-      req.logout((err: any) => {
-        if (err) return next(err);
-        return res.status(401).json({
-          error: "Your session has been invalidated because you logged in from another location.",
-          code: "SESSION_INVALIDATED"
+    try {
+      // Check if the sessionId is valid for this user
+      const isValid = await storage.validateUserSession(user.id, sessionId);
+      
+      if (!isValid) {
+        // Session is invalid, force logout
+        req.logout((err: any) => {
+          if (err) return next(err);
+          return res.status(401).json({
+            error: "Your session has been invalidated because you logged in from another location.",
+            code: "SESSION_INVALIDATED"
+          });
         });
-      });
-    } else {
-      // Session is valid, continue
+      } else {
+        // Session is valid, continue
+        next();
+      }
+    } catch (error) {
+      // If there's an error in validation, let the request proceed rather than logging out
+      console.error("Session validation error:", error);
       next();
     }
   };

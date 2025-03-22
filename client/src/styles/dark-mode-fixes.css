@@ -7,9 +7,22 @@ html[data-theme="dark"] {
   --dark-bg-primary: hsl(222.2 84% 4.9%);      /* Darkest background */
   --dark-bg-secondary: hsl(222.2 84% 8%);      /* Slightly lighter for cards */
   --dark-bg-tertiary: hsl(222.2 84% 12%);      /* Even lighter for inputs */
+  --dark-bg-highlight: hsl(222.2 84% 15%);     /* For hover states */
+  --dark-bg-accent: hsl(222.2 84% 20%);        /* For active states */
+  
   --dark-border: hsl(217.2 32.6% 17.5%);       /* Border color */
+  --dark-border-light: hsl(217.2 32.6% 25%);   /* Lighter border for contrast */
+  
   --dark-text-primary: hsl(210 40% 98%);       /* Primary text */
   --dark-text-secondary: hsl(215 20.2% 65.1%); /* Secondary text */
+  --dark-text-muted: hsl(215 20.2% 50%);       /* Muted text */
+  
+  /* Different UI surface elevations for dark mode */
+  --surface-0: hsl(222.2 84% 4.9%);  /* Base layer (background) */
+  --surface-1: hsl(222.2 84% 7%);    /* Slight elevation (cards) */
+  --surface-2: hsl(222.2 84% 9%);    /* Medium elevation (dropdowns) */
+  --surface-3: hsl(222.2 84% 11%);   /* Higher elevation (modals) */
+  --surface-4: hsl(222.2 84% 13%);   /* Highest elevation (tooltips) */
 }
 
 /* Body background */
@@ -131,4 +144,112 @@ html.dark svg, html[data-theme="dark"] svg {
 /* Chart backgrounds */
 html.dark [class*="chart"], html[data-theme="dark"] [class*="chart"] {
   background-color: var(--dark-bg-secondary) !important;
+}
+
+/* Surface styles for different UI elevation - apply these classes to elements */
+html.dark .surface-0, html[data-theme="dark"] .surface-0 {
+  background-color: var(--surface-0) !important;
+}
+
+html.dark .surface-1, html[data-theme="dark"] .surface-1 {
+  background-color: var(--surface-1) !important;
+}
+
+html.dark .surface-2, html[data-theme="dark"] .surface-2 {
+  background-color: var(--surface-2) !important;
+}
+
+html.dark .surface-3, html[data-theme="dark"] .surface-3 {
+  background-color: var(--surface-3) !important;
+}
+
+html.dark .surface-4, html[data-theme="dark"] .surface-4 {
+  background-color: var(--surface-4) !important;
+}
+
+/* Panel backgrounds for Written Events page */
+html.dark .panel-bg, html[data-theme="dark"] .panel-bg {
+  background-color: var(--dark-bg-secondary) !important;
+}
+
+/* Dropdown menus in dark mode */
+html.dark [role="menu"], 
+html.dark [role="listbox"],
+html[data-theme="dark"] [role="menu"],
+html[data-theme="dark"] [role="listbox"] {
+  background-color: var(--dark-bg-tertiary) !important;
+  border-color: var(--dark-border) !important;
+}
+
+/* Dropdown menu items */
+html.dark [role="menuitem"],
+html.dark [role="option"],
+html[data-theme="dark"] [role="menuitem"],
+html[data-theme="dark"] [role="option"] {
+  color: var(--dark-text-primary) !important;
+}
+
+/* Dropdown hover states */
+html.dark [role="menuitem"]:hover,
+html.dark [role="option"]:hover,
+html[data-theme="dark"] [role="menuitem"]:hover,
+html[data-theme="dark"] [role="option"]:hover {
+  background-color: var(--dark-bg-highlight) !important;
+}
+
+/* Dashboard cards */
+html.dark .dashboard-card,
+html[data-theme="dark"] .dashboard-card {
+  background-color: var(--dark-bg-secondary) !important;
+  border-color: var(--dark-border) !important;
+}
+
+/* Progress bars and sliders */
+html.dark .progress-bar-bg,
+html[data-theme="dark"] .progress-bar-bg {
+  background-color: var(--dark-border) !important;
+}
+
+html.dark .progress-bar-fill,
+html[data-theme="dark"] .progress-bar-fill {
+  background-color: var(--accent-color, hsl(var(--primary))) !important;
+}
+
+/* Enhanced link styling */
+html.dark a:not([class]),
+html[data-theme="dark"] a:not([class]) {
+  color: hsl(var(--primary)) !important;
+  text-decoration: underline;
+}
+
+/* Table striping in dark mode */
+html.dark tr:nth-child(even),
+html[data-theme="dark"] tr:nth-child(even) {
+  background-color: var(--surface-1) !important;
+}
+
+/* Fix pagination styling */
+html.dark nav[aria-label="pagination"],
+html[data-theme="dark"] nav[aria-label="pagination"] {
+  color: var(--dark-text-primary) !important;
+}
+
+/* Fix badge text */
+html.dark .badge, html.dark [class*="badge"],
+html[data-theme="dark"] .badge, html[data-theme="dark"] [class*="badge"] {
+  color: inherit !important;
+}
+
+/* Dark mode tooltip */
+html.dark [role="tooltip"],
+html[data-theme="dark"] [role="tooltip"] {
+  background-color: var(--surface-4) !important;
+  color: var(--dark-text-primary) !important;
+}
+
+/* Dialog/modal backgrounds */
+html.dark [role="dialog"],
+html[data-theme="dark"] [role="dialog"] {
+  background-color: var(--surface-2) !important;
+  border-color: var(--dark-border) !important;
 }
