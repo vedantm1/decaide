@@ -113,12 +113,12 @@ export default function PricingPage() {
                         Current Plan
                       </button>
                     ) : (
-                      <button 
-                        onClick={() => updateSubscriptionMutation.mutate("standard")}
-                        className="w-full py-2 px-4 bg-primary hover:bg-primary/90 text-white rounded-lg text-center font-medium transition"
+                      <Link 
+                        to={`/subscribe?priceId=price_standard&tier=standard&price=12.99`}
+                        className="w-full py-2 px-4 bg-primary hover:bg-primary/90 text-white rounded-lg text-center font-medium transition block"
                       >
                         Select Plan
-                      </button>
+                      </Link>
                     )}
                   </div>
                 </div>
@@ -166,12 +166,12 @@ export default function PricingPage() {
                         Current Plan
                       </button>
                     ) : (
-                      <button 
-                        onClick={() => updateSubscriptionMutation.mutate("plus")}
-                        className="w-full py-2 px-4 bg-primary hover:bg-primary/90 text-white rounded-lg text-center font-medium transition"
+                      <Link 
+                        to={`/subscribe?priceId=price_plus&tier=plus&price=19.99`}
+                        className="w-full py-2 px-4 bg-primary hover:bg-primary/90 text-white rounded-lg text-center font-medium transition block"
                       >
                         Upgrade to Plus
-                      </button>
+                      </Link>
                     )}
                   </div>
                 </div>
@@ -220,12 +220,12 @@ export default function PricingPage() {
                         Current Plan
                       </button>
                     ) : (
-                      <button 
-                        onClick={() => updateSubscriptionMutation.mutate("pro")}
-                        className="w-full py-2 px-4 bg-accent hover:bg-accent/90 text-white rounded-lg text-center font-medium transition"
+                      <Link 
+                        to={`/subscribe?priceId=price_pro&tier=pro&price=39.99`}
+                        className="w-full py-2 px-4 bg-accent hover:bg-accent/90 text-white rounded-lg text-center font-medium transition block"
                       >
                         Upgrade to Pro
-                      </button>
+                      </Link>
                     )}
                   </div>
                 </div>
