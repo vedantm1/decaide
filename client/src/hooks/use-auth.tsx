@@ -33,8 +33,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const loginMutation = useMutation({
     mutationFn: async (credentials: LoginData) => {
-      const res = await apiRequest("POST", "/api/login", credentials);
-      return await res.json();
+      try {
+        const res = await apiRequest("POST", "/api/login", credentials);
+        
+        // Handle specific error responses
+        if (!res.ok) {
+          if (res.status === 401) {
+            throw new Error("Invalid username or password. Please try again.");
+          } else if (res.status === 429) {
+            throw new Error("Too many login attempts. Please try again later.");
+          } else {
+            throw new Error("Server error. Please try again later.");
+          }
+        }
+        
+        return await res.json();
+      } catch (err: any) {
+        console.error("Login error:", err);
+        
+        // Provide user-friendly error message
+        if (err.message.includes("fetch failed") || err.message.includes("NetworkError")) {
+          throw new Error("Network connection issue. Please check your internet connection.");
+        }
+        
+        throw err; // Rethrow captured error with enhanced message
+      }
     },
     onSuccess: (user: SelectUser) => {
       queryClient.setQueryData(["/api/user"], user);
@@ -58,8 +81,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const registerMutation = useMutation({
     mutationFn: async (credentials: InsertUser) => {
-      const res = await apiRequest("POST", "/api/register", credentials);
-      return await res.json();
+      try {
+        const res = await apiRequest("POST", "/api/register", credentials);
+        
+        // Handle specific error responses
+        if (!res.ok) {
+          const errorData = await res.json().catch(() => ({}));
+          
+          if (res.status === 400 && errorData.message?.includes("Username already exists")) {
+            throw new Error("This username is already taken. Please choose another one.");
+          } else if (res.status === 400) {
+            throw new Error(errorData.message || "Invalid registration information. Please check your details.");
+          } else {
+            throw new Error("Server error. Please try again later.");
+          }
+        }
+        
+        return await res.json();
+      } catch (err: any) {
+        console.error("Registration error:", err);
+        
+        // Provide user-friendly error message for network issues
+        if (err.message.includes("fetch failed") || err.message.includes("NetworkError")) {
+          throw new Error("Network connection issue. Please check your internet connection.");
+        }
+        
+        throw err; // Rethrow captured error with enhanced message
+      }
     },
     onSuccess: (user: SelectUser) => {
       queryClient.setQueryData(["/api/user"], user);

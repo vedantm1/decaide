@@ -62,6 +62,12 @@ function App() {
 // This component manages the Diego UI using the hook
 function DiegoGuideManager() {
   const { isNewUser, currentStep, completeTutorial } = useDiegoGuide();
+  const [location] = window.location.pathname.split('?');
+  
+  // Hide Diego on the auth page
+  if (location === '/auth') {
+    return null;
+  }
   
   return (
     <Diego 
