@@ -24,6 +24,11 @@ interface DiegoGuideContextType {
   hasTutorialCompleted: boolean;
   isNewUser: boolean;
   setIsNewUser: (value: boolean) => void;
+  // Chat functionality
+  isChatOpen: boolean;
+  openChat: () => void;
+  closeChat: () => void;
+  toggleChat: () => void;
 }
 
 const DiegoGuideContext = createContext<DiegoGuideContextType | null>(null);
@@ -33,6 +38,7 @@ export function DiegoGuideProvider({ children }: { children: ReactNode }) {
   const [currentStep, setCurrentStep] = useState<TutorialStep>(null);
   const [hasTutorialCompleted, setHasTutorialCompleted] = useState(false);
   const [isNewUser, setIsNewUser] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   // Check localStorage on initial render to see if the user has completed the tutorial
   useEffect(() => {
@@ -53,6 +59,10 @@ export function DiegoGuideProvider({ children }: { children: ReactNode }) {
   const showDiego = (step: TutorialStep = 'welcome') => {
     setCurrentStep(step);
     setIsVisible(true);
+    // Close chat if open
+    if (isChatOpen) {
+      setIsChatOpen(false);
+    }
   };
 
   // Hide Diego
@@ -67,6 +77,27 @@ export function DiegoGuideProvider({ children }: { children: ReactNode }) {
     hideDiego();
   };
 
+  // Chat functionality
+  const openChat = () => {
+    setIsChatOpen(true);
+    // Hide tutorial if visible
+    if (isVisible) {
+      setIsVisible(false);
+    }
+  };
+
+  const closeChat = () => {
+    setIsChatOpen(false);
+  };
+
+  const toggleChat = () => {
+    if (isChatOpen) {
+      closeChat();
+    } else {
+      openChat();
+    }
+  };
+
   return (
     <DiegoGuideContext.Provider
       value={{
@@ -79,6 +110,10 @@ export function DiegoGuideProvider({ children }: { children: ReactNode }) {
         hasTutorialCompleted,
         isNewUser,
         setIsNewUser,
+        isChatOpen,
+        openChat,
+        closeChat,
+        toggleChat,
       }}
     >
       {children}

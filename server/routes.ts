@@ -10,6 +10,7 @@ import {
   SUBSCRIPTION_LIMITS 
 } from "@shared/schema";
 import aiRoutes from "./routes/aiRoutes";
+import chatRoutes from "./routes/chatRoutes";
 import { getOpenAIClient } from "./services/azureOpenai";
 import Stripe from "stripe";
 
@@ -27,6 +28,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Register AI routes
   app.use("/api/ai", aiRoutes);
+  
+  // Register Chat routes
+  app.use("/api/chat", chatRoutes);
 
   // API routes
   // Get subscription info
