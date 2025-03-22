@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { EVENT_TYPE_GROUPS } from "@shared/schema";
 import { useMicroInteractions } from "@/hooks/use-micro-interactions";
 
@@ -556,20 +557,24 @@ export default function SettingsPage() {
                     
                     <div>
                       <h3 className="text-base font-medium text-slate-700 mb-3">Font Size</h3>
-                      <div className="space-y-2">
-                        <div className="flex items-center">
-                          <input type="radio" id="fontSize-small" name="fontSize" className="h-4 w-4 text-primary border-slate-300 focus:ring-primary" />
-                          <label htmlFor="fontSize-small" className="ml-2 block text-sm text-slate-700">Small</label>
+                      <RadioGroup
+                        value={appearance.fontSize}
+                        onValueChange={(value) => setAppearance(prev => ({...prev, fontSize: value}))}
+                        className="space-y-2"
+                      >
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="small" id="fontSize-small" />
+                          <label htmlFor="fontSize-small" className="text-sm text-slate-700 cursor-pointer">Small</label>
                         </div>
-                        <div className="flex items-center">
-                          <input type="radio" id="fontSize-medium" name="fontSize" className="h-4 w-4 text-primary border-slate-300 focus:ring-primary" checked />
-                          <label htmlFor="fontSize-medium" className="ml-2 block text-sm text-slate-700">Medium (Default)</label>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="medium" id="fontSize-medium" />
+                          <label htmlFor="fontSize-medium" className="text-sm text-slate-700 cursor-pointer">Medium (Default)</label>
                         </div>
-                        <div className="flex items-center">
-                          <input type="radio" id="fontSize-large" name="fontSize" className="h-4 w-4 text-primary border-slate-300 focus:ring-primary" />
-                          <label htmlFor="fontSize-large" className="ml-2 block text-sm text-slate-700">Large</label>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="large" id="fontSize-large" />
+                          <label htmlFor="fontSize-large" className="text-sm text-slate-700 cursor-pointer">Large</label>
                         </div>
-                      </div>
+                      </RadioGroup>
                     </div>
                     
                     <Button 
