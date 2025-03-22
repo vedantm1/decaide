@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
+import { useMicroInteractions } from "@/hooks/use-micro-interactions";
 import SidebarNavigation from "@/components/sidebar-navigation";
 import MobileHeader from "@/components/mobile-header";
 import DailyChallenge from "@/components/dashboard/daily-challenge";
@@ -8,21 +9,42 @@ import StatsCard from "@/components/dashboard/stats-card";
 import ActivityItem from "@/components/dashboard/activity-item";
 import ContinueLearningCard from "@/components/dashboard/continue-learning-card";
 import UpgradeBanner from "@/components/dashboard/upgrade-banner";
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import BreakTimer from "@/components/break-timer";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const { triggerAnimation, showMascot } = useMicroInteractions();
+  const { toast } = useToast();
   const [showBreakTimer, setShowBreakTimer] = useState(false);
+  const [showWelcomeAnimation, setShowWelcomeAnimation] = useState(true);
   
-  // Set a timer to show the break dialog after 25 minutes
+  // Trigger welcome animation on first render
+  useEffect(() => {
+    if (showWelcomeAnimation) {
+      // Delay slightly to ensure the animation is seen
+      setTimeout(() => {
+        triggerAnimation('stars', 'Welcome back!');
+        showMascot(`Hey ${user?.username || 'there'}! Ready to practice for DECA today?`, 'bottom-right');
+        setShowWelcomeAnimation(false);
+      }, 800);
+    }
+  }, [triggerAnimation, showMascot, user, showWelcomeAnimation]);
+  
+  // Set a timer to show the break dialog after 5 minutes for demo purposes
+  // (would be 25 minutes in production)
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowBreakTimer(true);
-    }, 25 * 60 * 1000); // 25 minutes
+      toast({
+        title: "Break Time",
+        description: "Taking regular breaks helps improve retention and focus!",
+      });
+    }, 5 * 60 * 1000); // 5 minutes for demo purposes
     
     return () => clearTimeout(timer);
-  }, []);
+  }, [toast]);
   
   // User stats query
   const { data: stats, isLoading: statsLoading } = useQuery({
