@@ -22,6 +22,7 @@ import { MicroInteractionsProvider } from "@/hooks/use-micro-interactions";
 import { DiegoGuideProvider, useDiegoGuide } from "@/hooks/use-diego-guide";
 import Diego from "@/components/diego-guide/diego";
 import DiegoChat from "@/components/diego-guide/diego-chat";
+import ThemeProvider from "@/lib/theme-provider";
 
 function Router() {
   return (
@@ -48,13 +49,15 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <MicroInteractionsProvider>
-          <DiegoGuideProvider>
-            <Router />
-            <Toaster />
-            <DiegoGuideManager />
-          </DiegoGuideProvider>
-        </MicroInteractionsProvider>
+        <ThemeProvider>
+          <MicroInteractionsProvider>
+            <DiegoGuideProvider>
+              <Router />
+              <Toaster />
+              <DiegoGuideManager />
+            </DiegoGuideProvider>
+          </MicroInteractionsProvider>
+        </ThemeProvider>
       </AuthProvider>
     </QueryClientProvider>
   );

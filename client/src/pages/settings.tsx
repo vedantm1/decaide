@@ -76,17 +76,20 @@ export default function SettingsPage() {
       document.documentElement.classList.remove('dark');
     }
     
-    // Apply color scheme
-    document.documentElement.style.setProperty('--theme-color', getColorForScheme(appearance.colorScheme));
+    // Remove all theme classes first
+    const themeClasses = [
+      'theme-business', 'theme-finance', 'theme-hospitality', 
+      'theme-marketing', 'theme-entrepreneurship', 'theme-admin',
+      'theme-aquaBlue', 'theme-coralPink', 'theme-mintGreen', 'theme-royalPurple'
+    ];
     
-    // Apply font size
-    if (appearance.fontSize === 'small') {
-      document.documentElement.style.fontSize = '14px';
-    } else if (appearance.fontSize === 'medium') {
-      document.documentElement.style.fontSize = '16px';
-    } else if (appearance.fontSize === 'large') {
-      document.documentElement.style.fontSize = '18px';
-    }
+    document.documentElement.classList.remove(...themeClasses);
+    
+    // Apply new color scheme class
+    document.documentElement.classList.add(`theme-${appearance.colorScheme}`);
+    
+    // Apply font size using data attribute instead of direct style
+    document.documentElement.setAttribute('data-font-size', appearance.fontSize);
     
     // Apply visual style
     if (appearance.visualStyle === 'memphis') {

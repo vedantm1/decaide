@@ -1,32 +1,25 @@
+/* Theme Variables for DecA(I)de */
+
+/* Base Theme Colors - Light Mode */
 :root {
-  /* Default theme variables */
-  --theme-color: #3b82f6; /* default blue */
-  --font-size-base: 16px;
-  
-  /* Light mode colors */
+  /* Neutral colors */
   --background: 0 0% 100%;
   --foreground: 222.2 84% 4.9%;
   --card: 0 0% 100%;
   --card-foreground: 222.2 84% 4.9%;
   --popover: 0 0% 100%;
   --popover-foreground: 222.2 84% 4.9%;
-  --primary: 221.2 83.2% 53.3%;
-  --primary-foreground: 210 40% 98%;
-  --secondary: 210 40% 96.1%;
-  --secondary-foreground: 222.2 47.4% 11.2%;
   --muted: 210 40% 96.1%;
   --muted-foreground: 215.4 16.3% 46.9%;
   --accent: 210 40% 96.1%;
   --accent-foreground: 222.2 47.4% 11.2%;
-  --destructive: 0 84.2% 60.2%;
-  --destructive-foreground: 210 40% 98%;
   --border: 214.3 31.8% 91.4%;
   --input: 214.3 31.8% 91.4%;
   --ring: 221.2 83.2% 53.3%;
   --radius: 0.5rem;
 }
 
-/* Dark mode colors - activated when .dark class is added to HTML root */
+/* Dark Mode */
 .dark {
   --background: 222.2 84% 4.9%;
   --foreground: 210 40% 98%;
@@ -34,113 +27,233 @@
   --card-foreground: 210 40% 98%;
   --popover: 222.2 84% 4.9%;
   --popover-foreground: 210 40% 98%;
-  --primary: 217.2 91.2% 59.8%;
-  --primary-foreground: 222.2 47.4% 11.2%;
-  --secondary: 217.2 32.6% 17.5%;
-  --secondary-foreground: 210 40% 98%;
   --muted: 217.2 32.6% 17.5%;
   --muted-foreground: 215 20.2% 65.1%;
   --accent: 217.2 32.6% 17.5%;
   --accent-foreground: 210 40% 98%;
-  --destructive: 0 62.8% 30.6%;
-  --destructive-foreground: 210 40% 98%;
   --border: 217.2 32.6% 17.5%;
   --input: 217.2 32.6% 17.5%;
   --ring: 224.3 76.3% 48%;
 }
 
-/* DECA Cluster Theme Styles */
-.theme-business {
-  --theme-color: #ffd700;
-  --primary: 50 100% 50%;
-  --primary-foreground: 20 10% 10%;
-  --ring: 50 100% 50%;
-}
-
-.theme-finance {
-  --theme-color: #22c55e;
-  --primary: 142 70% 45%;
-  --primary-foreground: 210 40% 98%;
-  --ring: 142 70% 45%;
-}
-
-.theme-hospitality {
-  --theme-color: #3b82f6;
-  --primary: 221.2 83.2% 53.3%;
-  --primary-foreground: 210 40% 98%;
-  --ring: 221.2 83.2% 53.3%;
-}
-
-.theme-marketing {
-  --theme-color: #ef4444;
-  --primary: 0 84.2% 60.2%;
-  --primary-foreground: 210 40% 98%;
-  --ring: 0 84.2% 60.2%;
-}
-
-.theme-entrepreneurship {
-  --theme-color: #9ca3af;
-  --primary: 220 14% 65%;
-  --primary-foreground: 220 10% 15%;
-  --ring: 220 14% 65%;
-}
-
-.theme-admin {
-  --theme-color: #312e81;
-  --primary: 243 75% 34%;
-  --primary-foreground: 210 40% 98%;
-  --ring: 243 75% 34%;
-}
-
-/* Standard UI themes */
-.theme-aquaBlue {
-  --theme-color: #3b82f6;
-  --primary: 221.2 83.2% 53.3%;
-  --primary-foreground: 210 40% 98%;
-  --ring: 221.2 83.2% 53.3%;
-}
-
-.theme-coralPink {
-  --theme-color: #ec4899;
-  --primary: 331.3 89.5% 60.8%;
-  --primary-foreground: 210 40% 98%;
-  --ring: 331.3 89.5% 60.8%;
-}
-
-.theme-mintGreen {
-  --theme-color: #22c55e;
-  --primary: 142 70% 45%;
-  --primary-foreground: 210 40% 98%;
-  --ring: 142 70% 45%;
-}
-
-.theme-royalPurple {
-  --theme-color: #8b5cf6;
-  --primary: 262.1 83.3% 57.8%;
-  --primary-foreground: 210 40% 98%;
-  --ring: 262.1 83.3% 57.8%;
-}
-
-/* Memphis Style (default) */
-.memphis-style {
-  /* Add any specific Memphis style overrides */
-}
-
-/* Minimalist Style */
-.minimalist-style {
-  --radius: 0.25rem;
-  /* More minimal style overrides */
-}
-
-/* Font sizes */
-html[data-font-size="small"] {
+/* Font Size Variations */
+:root[data-font-size="small"] {
   font-size: 14px;
 }
 
-html[data-font-size="medium"] {
+:root[data-font-size="medium"] {
   font-size: 16px;
 }
 
-html[data-font-size="large"] {
+:root[data-font-size="large"] {
   font-size: 18px;
+}
+
+/* DECA Cluster Theme Colors */
+
+/* Business Management & Administration (Yellow) - BMA */
+.theme-business {
+  --primary: 45 100% 50%;  /* Yellow */
+  --primary-foreground: 210 40% 98%;
+  --secondary: 40 96% 90%;
+  --secondary-foreground: 222.2 47.4% 11.2%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --success: 142 76% 36%;
+  --success-foreground: 210 40% 98%;
+  
+  /* Memphis-style accent colors */
+  --memphis-accent-1: 40 96% 75%;
+  --memphis-accent-2: 45 70% 60%;
+  --memphis-accent-3: 50 80% 85%;
+  
+  /* Cluster Abbreviation */
+  --cluster-abbr: "BMA";
+}
+
+/* Finance (Green) - FIN */
+.theme-finance {
+  --primary: 142 76% 36%;  /* Green */
+  --primary-foreground: 210 40% 98%;
+  --secondary: 138 76% 90%;
+  --secondary-foreground: 222.2 47.4% 11.2%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --success: 142 76% 36%;
+  --success-foreground: 210 40% 98%;
+  
+  /* Memphis-style accent colors */
+  --memphis-accent-1: 130 60% 85%;
+  --memphis-accent-2: 150 70% 60%;
+  --memphis-accent-3: 170 80% 75%;
+  
+  /* Cluster Abbreviation */
+  --cluster-abbr: "FIN";
+}
+
+/* Hospitality & Tourism (Blue) - HOSP */
+.theme-hospitality {
+  --primary: 217 91% 60%;  /* Blue */
+  --primary-foreground: 210 40% 98%;
+  --secondary: 213 100% 96%;
+  --secondary-foreground: 222.2 47.4% 11.2%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --success: 142 76% 36%;
+  --success-foreground: 210 40% 98%;
+  
+  /* Memphis-style accent colors */
+  --memphis-accent-1: 195 80% 75%;
+  --memphis-accent-2: 210 70% 60%;
+  --memphis-accent-3: 225 60% 85%;
+  
+  /* Cluster Abbreviation */
+  --cluster-abbr: "HOSP";
+}
+
+/* Marketing (Red) - MKTG */
+.theme-marketing {
+  --primary: 0 84% 60%;  /* Red */
+  --primary-foreground: 210 40% 98%;
+  --secondary: 0 84% 90%;
+  --secondary-foreground: 222.2 47.4% 11.2%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --success: 142 76% 36%;
+  --success-foreground: 210 40% 98%;
+  
+  /* Memphis-style accent colors */
+  --memphis-accent-1: 350 80% 85%;
+  --memphis-accent-2: 0 70% 60%;
+  --memphis-accent-3: 10 60% 75%;
+  
+  /* Cluster Abbreviation */
+  --cluster-abbr: "MKTG";
+}
+
+/* Entrepreneurship (Gray/Silver) - ENTR */
+.theme-entrepreneurship {
+  --primary: 220 14% 60%;  /* Gray/Silver */
+  --primary-foreground: 210 40% 98%;
+  --secondary: 220 14% 90%;
+  --secondary-foreground: 222.2 47.4% 11.2%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --success: 142 76% 36%;
+  --success-foreground: 210 40% 98%;
+  
+  /* Memphis-style accent colors */
+  --memphis-accent-1: 210 10% 85%;
+  --memphis-accent-2: 220 20% 60%;
+  --memphis-accent-3: 230 30% 75%;
+  
+  /* Cluster Abbreviation */
+  --cluster-abbr: "ENTR";
+}
+
+/* Business Administration Core (Navy Blue) - BAC */
+.theme-admin {
+  --primary: 225 73% 20%;  /* Navy Blue */
+  --primary-foreground: 210 40% 98%;
+  --secondary: 222 47% 90%;
+  --secondary-foreground: 222.2 47.4% 11.2%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --success: 142 76% 36%;
+  --success-foreground: 210 40% 98%;
+  
+  /* Memphis-style accent colors */
+  --memphis-accent-1: 230 40% 75%;
+  --memphis-accent-2: 240 50% 60%;
+  --memphis-accent-3: 220 60% 85%;
+  
+  /* Cluster Abbreviation */
+  --cluster-abbr: "BAC";
+}
+
+/* Regular UI Color Themes */
+
+/* Aqua Blue Theme */
+.theme-aquaBlue {
+  --primary: 217 91% 60%;  /* Aqua Blue */
+  --primary-foreground: 210 40% 98%;
+  --secondary: 213 100% 96%;
+  --secondary-foreground: 222.2 47.4% 11.2%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --success: 142 76% 36%;
+  --success-foreground: 210 40% 98%;
+  
+  /* Memphis-style accent colors */
+  --memphis-accent-1: 195 80% 75%;
+  --memphis-accent-2: 210 70% 60%;
+  --memphis-accent-3: 225 60% 85%;
+}
+
+/* Coral Pink Theme */
+.theme-coralPink {
+  --primary: 336 80% 58%;  /* Coral Pink */
+  --primary-foreground: 210 40% 98%;
+  --secondary: 336 80% 95%;
+  --secondary-foreground: 222.2 47.4% 11.2%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --success: 142 76% 36%;
+  --success-foreground: 210 40% 98%;
+  
+  /* Memphis-style accent colors */
+  --memphis-accent-1: 320 80% 85%;
+  --memphis-accent-2: 340 70% 60%;
+  --memphis-accent-3: 350 60% 75%;
+}
+
+/* Mint Green Theme */
+.theme-mintGreen {
+  --primary: 152 76% 50%;  /* Mint Green */
+  --primary-foreground: 210 40% 98%;
+  --secondary: 152 76% 95%;
+  --secondary-foreground: 222.2 47.4% 11.2%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --success: 142 76% 36%;
+  --success-foreground: 210 40% 98%;
+  
+  /* Memphis-style accent colors */
+  --memphis-accent-1: 140 60% 85%;
+  --memphis-accent-2: 160 70% 60%;
+  --memphis-accent-3: 180 80% 75%;
+}
+
+/* Royal Purple Theme */
+.theme-royalPurple {
+  --primary: 270 76% 50%;  /* Royal Purple */
+  --primary-foreground: 210 40% 98%;
+  --secondary: 270 76% 95%;
+  --secondary-foreground: 222.2 47.4% 11.2%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --success: 142 76% 36%;
+  --success-foreground: 210 40% 98%;
+  
+  /* Memphis-style accent colors */
+  --memphis-accent-1: 260 60% 85%;
+  --memphis-accent-2: 280 70% 60%;
+  --memphis-accent-3: 290 80% 75%;
+}
+
+/* Visual Style Variations */
+
+/* Memphis-style decorations and elements */
+.memphis-style {
+  /* Memphis-style variables will be used in components */
+  --memphis-pattern-opacity: 0.15;
+  --memphis-dots-size: 10px;
+  --memphis-squiggle-width: 3px;
+}
+
+/* Minimalist style with fewer decorative elements */
+.minimalist-style {
+  --memphis-pattern-opacity: 0;
+  --memphis-dots-size: 0;
+  --memphis-squiggle-width: 0;
 }
