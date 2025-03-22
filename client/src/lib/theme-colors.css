@@ -1,0 +1,187 @@
+/* DECA Cluster Themes */
+
+/* Business Management (Yellow) */
+.theme-business {
+  --primary: 38 92% 50%;
+  --primary-foreground: 38 92% 10%;
+  --secondary: 40 96% 92%;
+  --secondary-foreground: 38 92% 30%;
+  --accent: 38 92% 90%;
+  --accent-foreground: 38 92% 30%;
+  --border: 38 12% 80%;
+  --ring: 38 92% 50%;
+  --chart-1: 38 92% 50%;
+  --chart-2: 38 72% 60%;
+  --chart-3: 38 52% 70%;
+  --chart-4: 38 32% 80%;
+  --chart-5: 38 12% 90%;
+}
+
+/* Finance (Green) */
+.theme-finance {
+  --primary: 142 76% 36%;
+  --primary-foreground: 355 100% 100%;
+  --secondary: 142 76% 96%;
+  --secondary-foreground: 142 76% 26%;
+  --accent: 142 76% 90%;
+  --accent-foreground: 142 76% 26%;
+  --border: 142 12% 80%;
+  --ring: 142 76% 36%;
+  --chart-1: 142 76% 36%;
+  --chart-2: 142 56% 46%;
+  --chart-3: 142 36% 56%;
+  --chart-4: 142 16% 66%;
+  --chart-5: 142 6% 76%;
+}
+
+/* Hospitality & Tourism (Blue) */
+.theme-hospitality {
+  --primary: 210 100% 56%;
+  --primary-foreground: 355 100% 100%;
+  --secondary: 210 100% 96%;
+  --secondary-foreground: 210 100% 36%;
+  --accent: 210 100% 90%;
+  --accent-foreground: 210 100% 36%;
+  --border: 210 12% 80%;
+  --ring: 210 100% 56%;
+  --chart-1: 210 100% 56%;
+  --chart-2: 210 80% 66%;
+  --chart-3: 210 60% 76%;
+  --chart-4: 210 40% 86%;
+  --chart-5: 210 20% 96%;
+}
+
+/* Marketing (Red) */
+.theme-marketing {
+  --primary: 0 72% 56%;
+  --primary-foreground: 355 100% 100%;
+  --secondary: 0 72% 96%;
+  --secondary-foreground: 0 72% 36%;
+  --accent: 0 72% 90%;
+  --accent-foreground: 0 72% 36%;
+  --border: 0 12% 80%;
+  --ring: 0 72% 56%;
+  --chart-1: 0 72% 56%;
+  --chart-2: 0 52% 66%;
+  --chart-3: 0 32% 76%;
+  --chart-4: 0 12% 86%;
+  --chart-5: 0 0% 96%;
+}
+
+/* Entrepreneurship (Gray/Silver) */
+.theme-entrepreneurship {
+  --primary: 220 14% 56%;
+  --primary-foreground: 355 100% 100%;
+  --secondary: 220 14% 96%;
+  --secondary-foreground: 220 14% 36%;
+  --accent: 220 14% 90%;
+  --accent-foreground: 220 14% 36%;
+  --border: 220 5% 80%;
+  --ring: 220 14% 56%;
+  --chart-1: 220 14% 56%;
+  --chart-2: 220 10% 66%;
+  --chart-3: 220 6% 76%;
+  --chart-4: 220 3% 86%;
+  --chart-5: 220 0% 96%;
+}
+
+/* Business Admin Core (Navy Blue) */
+.theme-admin {
+  --primary: 225 64% 32%;
+  --primary-foreground: 355 100% 100%;
+  --secondary: 225 64% 96%;
+  --secondary-foreground: 225 64% 22%;
+  --accent: 225 64% 90%;
+  --accent-foreground: 225 64% 22%;
+  --border: 225 12% 80%;
+  --ring: 225 64% 32%;
+  --chart-1: 225 64% 32%;
+  --chart-2: 225 54% 42%;
+  --chart-3: 225 44% 52%;
+  --chart-4: 225 34% 62%;
+  --chart-5: 225 24% 72%;
+}
+
+/* Additional Themes */
+
+/* Aqua Blue Theme */
+.theme-aquaBlue {
+  --primary: 190 100% 42%;
+  --primary-foreground: 355 100% 100%;
+  --secondary: 190 100% 96%;
+  --secondary-foreground: 190 100% 32%;
+  --accent: 190 100% 90%;
+  --accent-foreground: 190 100% 32%;
+  --border: 190 12% 80%;
+  --ring: 190 100% 42%;
+  --chart-1: 190 100% 42%;
+  --chart-2: 190 80% 52%;
+  --chart-3: 190 60% 62%;
+  --chart-4: 190 40% 72%;
+  --chart-5: 190 20% 82%;
+}
+
+/* Coral Pink Theme */
+.theme-coralPink {
+  --primary: 354 100% 70%;
+  --primary-foreground: 355 100% 100%;
+  --secondary: 354 100% 97%;
+  --secondary-foreground: 354 100% 50%;
+  --accent: 354 100% 92%;
+  --accent-foreground: 354 100% 50%;
+  --border: 354 12% 80%;
+  --ring: 354 100% 70%;
+  --chart-1: 354 100% 70%;
+  --chart-2: 354 80% 75%;
+  --chart-3: 354 60% 80%;
+  --chart-4: 354 40% 85%;
+  --chart-5: 354 20% 90%;
+}
+
+/* Mint Green Theme */
+.theme-mintGreen {
+  --primary: 152 76% 52%;
+  --primary-foreground: 355 100% 100%;
+  --secondary: 152 76% 97%;
+  --secondary-foreground: 152 76% 42%;
+  --accent: 152 76% 92%;
+  --accent-foreground: 152 76% 42%;
+  --border: 152 12% 80%;
+  --ring: 152 76% 52%;
+  --chart-1: 152 76% 52%;
+  --chart-2: 152 56% 62%;
+  --chart-3: 152 36% 72%;
+  --chart-4: 152 16% 82%;
+  --chart-5: 152 8% 92%;
+}
+
+/* Royal Purple Theme */
+.theme-royalPurple {
+  --primary: 270 76% 50%;
+  --primary-foreground: 355 100% 100%;
+  --secondary: 270 76% 96%;
+  --secondary-foreground: 270 76% 40%;
+  --accent: 270 76% 90%;
+  --accent-foreground: 270 76% 40%;
+  --border: 270 12% 80%;
+  --ring: 270 76% 50%;
+  --chart-1: 270 76% 50%;
+  --chart-2: 270 56% 60%;
+  --chart-3: 270 36% 70%;
+  --chart-4: 270 16% 80%;
+  --chart-5: 270 8% 90%;
+}
+
+/* DECA Cluster Badge Styles */
+.deca-cluster-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 4px 8px;
+  color: white;
+  font-weight: bold;
+  font-size: 0.75rem;
+  border-radius: 0 0.375rem 0 0.375rem;
+  transform: translateY(-25%);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
