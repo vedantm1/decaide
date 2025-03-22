@@ -49,10 +49,10 @@ const SubscribeForm = () => {
         title: "Subscription Successful",
         description: "Welcome to the premium experience!",
       });
-      
+
       // Show a success animation
       triggerAnimation('confetti', 'Subscription Activated!');
-      
+
       // Redirect should happen automatically with return_url
     }
 
@@ -64,7 +64,7 @@ const SubscribeForm = () => {
       <div className="bg-card border rounded-lg p-4">
         <PaymentElement />
       </div>
-      
+
       <div className="flex items-center justify-between">
         <button
           type="button"
@@ -73,7 +73,7 @@ const SubscribeForm = () => {
         >
           Back to plans
         </button>
-        
+
         <button
           type="submit"
           disabled={!stripe || isLoading}
@@ -111,7 +111,7 @@ export default function Subscribe() {
     const priceIdParam = params.get('priceId');
     const tierParam = params.get('tier');
     const priceParam = params.get('price');
-    
+
     if (!priceIdParam || !tierParam || !priceParam) {
       toast({
         title: "Invalid subscription parameters",
@@ -121,11 +121,11 @@ export default function Subscribe() {
       setLocation('/pricing');
       return;
     }
-    
+
     setPriceId(priceIdParam);
     setTier(tierParam);
     setPrice(parseFloat(priceParam));
-    
+
     // Check if user has an email
     if (!user?.email) {
       toast({
@@ -136,7 +136,7 @@ export default function Subscribe() {
       setLocation('/settings');
       return;
     }
-    
+
     // Create or get subscription
     apiRequest("POST", "/api/get-or-create-subscription", { 
       priceId: priceIdParam
@@ -165,7 +165,7 @@ export default function Subscribe() {
       </div>
     );
   }
-  
+
   return (
     <div className="container mx-auto py-12 px-4">
       <div className="max-w-3xl mx-auto">
@@ -175,13 +175,13 @@ export default function Subscribe() {
             Upgrade to {tier.charAt(0).toUpperCase() + tier.slice(1)} tier for ${price.toFixed(2)} per month
           </p>
         </div>
-        
+
         <div className="flex flex-col items-center justify-center">
           <Elements stripe={stripePromise} options={{ clientSecret }}>
             <SubscribeForm />
           </Elements>
         </div>
-        
+
         <div className="mt-8 bg-muted p-4 rounded-md max-w-md mx-auto">
           <h3 className="font-medium text-center mb-2">{tier.charAt(0).toUpperCase() + tier.slice(1)} Tier Benefits:</h3>
           {tier === 'plus' && (
@@ -204,14 +204,14 @@ export default function Subscribe() {
             </ul>
           )}
         </div>
-        
+
         <div className="mt-8 text-center text-sm text-muted-foreground">
           <p>Your payment is processed securely by Stripe. We don't store your card details.</p>
           <p className="mt-2">15% of all profits are donated to DECA's Emerging Leader Scholarship Fund.</p>
           <p className="mt-2">You can cancel your subscription at any time from your account settings.</p>
           <p className="copyright-text">© {new Date().getFullYear()} DecA(I)de. All rights reserved.</p>
         </div>
-      </div>>
+      </div>
     </div>
   );
 };
