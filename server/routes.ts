@@ -11,6 +11,15 @@ import {
 } from "@shared/schema";
 import aiRoutes from "./routes/aiRoutes";
 import { getOpenAIClient } from "./services/azureOpenai";
+import Stripe from "stripe";
+
+if (!process.env.STRIPE_SECRET_KEY) {
+  console.warn('Missing Stripe secret key. Stripe features will not work properly.');
+}
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
+  apiVersion: '2023-10-16',
+});
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Set up authentication routes
@@ -297,7 +306,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Update subscription
+  // Update subscription (manual for testing)
   app.post("/api/user/subscription", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
     
@@ -315,6 +324,189 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       res.status(500).json({ error: "Failed to update subscription" });
     }
+  });
+  
+  // Stripe API endpoints
+  // Create a payment intent for one-time payment
+  app.post('/api/create-payment-intent', async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+    
+    try {
+      const { amount } = req.body;
+      
+      // Create a PaymentIntent with the order amount and currency
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: Math.round(amount * 100), // convert to cents
+        currency: 'usd',
+        // Verify your integration by passing this to stripe.confirmCardPayment
+        // on the client side
+        metadata: {
+          userId: req.user!.id.toString()
+        }
+      });
+
+      res.send({
+        clientSecret: paymentIntent.client_secret,
+      });
+    } catch (error: any) {
+      res.status(500).json({ 
+        error: `Payment intent creation failed: ${error.message}` 
+      });
+    }
+  });
+  
+  // Create or get subscription
+  app.post('/api/get-or-create-subscription', async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+    
+    const user = req.user!;
+    const { priceId } = req.body;
+    
+    if (!priceId) {
+      return res.status(400).json({ error: 'Price ID is required' });
+    }
+    
+    try {
+      // If user already has a subscription, return it
+      if (user.stripeSubscriptionId) {
+        const subscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
+        
+        res.send({
+          subscriptionId: subscription.id,
+          clientSecret: subscription.latest_invoice?.payment_intent?.client_secret,
+        });
+        
+        return;
+      }
+      
+      // Create new customer if needed
+      if (!user.stripeCustomerId) {
+        if (!user.email) {
+          return res.status(400).json({ error: 'User email is required for subscription' });
+        }
+        
+        const customer = await stripe.customers.create({
+          email: user.email,
+          name: user.username,
+        });
+        
+        await storage.updateStripeCustomerId(user.id, customer.id);
+        user.stripeCustomerId = customer.id;
+      }
+      
+      // Create the subscription
+      const subscription = await stripe.subscriptions.create({
+        customer: user.stripeCustomerId,
+        items: [{ price: priceId }],
+        payment_behavior: 'default_incomplete',
+        expand: ['latest_invoice.payment_intent'],
+      });
+      
+      await storage.updateStripeSubscriptionId(user.id, subscription.id);
+      
+      // Get the tier from the subscription data
+      // This would need to map your Stripe product/price to your subscription tiers
+      const tierMap: Record<string, string> = {
+        'price_standard': 'standard',
+        'price_plus': 'plus',
+        'price_pro': 'pro',
+      };
+      
+      // Update the user's subscription tier
+      if (tierMap[priceId]) {
+        await storage.updateSubscription(user.id, tierMap[priceId]);
+      }
+      
+      res.send({
+        subscriptionId: subscription.id,
+        clientSecret: (subscription.latest_invoice as any)?.payment_intent?.client_secret,
+      });
+    } catch (error: any) {
+      res.status(500).json({ 
+        error: `Subscription creation failed: ${error.message}` 
+      });
+    }
+  });
+  
+  // Webhook endpoint to handle Stripe events
+  app.post('/api/webhook', async (req, res) => {
+    const sig = req.headers['stripe-signature'] as string;
+    
+    if (!process.env.STRIPE_WEBHOOK_SECRET) {
+      return res.status(400).send('Webhook secret is not configured');
+    }
+    
+    let event;
+    
+    try {
+      // Verify the event came from Stripe
+      event = stripe.webhooks.constructEvent(
+        (req as any).rawBody || req.body, 
+        sig, 
+        process.env.STRIPE_WEBHOOK_SECRET
+      );
+    } catch (err: any) {
+      console.error(`Webhook signature verification failed: ${err.message}`);
+      return res.status(400).send(`Webhook Error: ${err.message}`);
+    }
+    
+    // Handle the event
+    switch (event.type) {
+      case 'payment_intent.succeeded':
+        const paymentIntent = event.data.object;
+        console.log(`PaymentIntent for ${paymentIntent.amount} was successful!`);
+        // Update user subscription based on payment
+        if (paymentIntent.metadata?.userId) {
+          const userId = parseInt(paymentIntent.metadata.userId);
+          // Logic to update user subscription based on payment amount
+        }
+        break;
+        
+      case 'customer.subscription.created':
+      case 'customer.subscription.updated':
+        const subscription = event.data.object;
+        const customerId = subscription.customer as string;
+        
+        // Find user by Stripe customer ID
+        const user = await storage.getUserByStripeCustomerId(customerId);
+        
+        if (user) {
+          const status = subscription.status;
+          if (status === 'active' || status === 'trialing') {
+            // Map price to tier and update user subscription
+            const priceId = subscription.items.data[0].price.id;
+            const tierMap: Record<string, string> = {
+              'price_standard': 'standard',
+              'price_plus': 'plus',
+              'price_pro': 'pro',
+            };
+            
+            if (tierMap[priceId]) {
+              await storage.updateSubscription(user.id, tierMap[priceId]);
+            }
+          }
+        }
+        break;
+        
+      case 'customer.subscription.deleted':
+        const canceledSubscription = event.data.object;
+        const canceledCustomerId = canceledSubscription.customer as string;
+        
+        // Find user by Stripe customer ID
+        const canceledUser = await storage.getUserByStripeCustomerId(canceledCustomerId);
+        
+        if (canceledUser) {
+          // Downgrade to standard tier
+          await storage.updateSubscription(canceledUser.id, 'standard');
+        }
+        break;
+        
+      default:
+        console.log(`Unhandled event type ${event.type}`);
+    }
+    
+    // Return a response to acknowledge receipt of the event
+    res.json({ received: true });
   });
 
   const httpServer = createServer(app);

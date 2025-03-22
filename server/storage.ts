@@ -24,6 +24,12 @@ export interface IStorage {
   updateUserSettings(id: number, settings: { eventFormat?: string, eventCode?: string }): Promise<User | undefined>;
   updateSubscription(id: number, tier: string): Promise<User | undefined>;
   
+  // Stripe related methods
+  updateStripeCustomerId(userId: number, customerId: string): Promise<User | undefined>;
+  updateStripeSubscriptionId(userId: number, subscriptionId: string): Promise<User | undefined>;
+  updateUserStripeInfo(userId: number, info: { customerId: string, subscriptionId: string }): Promise<User | undefined>;
+  getUserByStripeCustomerId(customerId: string): Promise<User | undefined>;
+  
   // Performance Indicators methods
   getUserPIs(userId: number, category?: string): Promise<PerformanceIndicator[]>;
   updatePIStatus(userId: number, piId: number, status: string): Promise<boolean>;
@@ -197,6 +203,41 @@ export class MemStorage implements IStorage {
     user.subscriptionTier = tier;
     this.users.set(id, user);
     return user;
+  }
+  
+  // Stripe related methods
+  async updateStripeCustomerId(userId: number, customerId: string): Promise<User | undefined> {
+    const user = await this.getUser(userId);
+    if (!user) return undefined;
+    
+    user.stripeCustomerId = customerId;
+    this.users.set(userId, user);
+    return user;
+  }
+  
+  async updateStripeSubscriptionId(userId: number, subscriptionId: string): Promise<User | undefined> {
+    const user = await this.getUser(userId);
+    if (!user) return undefined;
+    
+    user.stripeSubscriptionId = subscriptionId;
+    this.users.set(userId, user);
+    return user;
+  }
+  
+  async updateUserStripeInfo(userId: number, info: { customerId: string, subscriptionId: string }): Promise<User | undefined> {
+    const user = await this.getUser(userId);
+    if (!user) return undefined;
+    
+    user.stripeCustomerId = info.customerId;
+    user.stripeSubscriptionId = info.subscriptionId;
+    this.users.set(userId, user);
+    return user;
+  }
+  
+  async getUserByStripeCustomerId(customerId: string): Promise<User | undefined> {
+    return Array.from(this.users.values()).find(
+      (user) => user.stripeCustomerId === customerId
+    );
   }
 
   // Performance Indicators methods

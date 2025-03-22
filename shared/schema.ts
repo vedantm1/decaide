@@ -7,17 +7,21 @@ export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
+  email: text("email"),
   eventFormat: text("event_format"), // roleplay or written
   eventCode: text("event_code"),     // event code like PBM, ACT, etc.
   subscriptionTier: text("subscription_tier").default("standard"),
   streak: integer("streak").default(0),
   lastLoginDate: timestamp("last_login_date"),
   points: integer("points").default(0),
+  stripeCustomerId: text("stripe_customer_id"),
+  stripeSubscriptionId: text("stripe_subscription_id"),
 });
 
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
+  email: true,
   eventFormat: true,
   eventCode: true,
 });
