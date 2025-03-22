@@ -70,13 +70,31 @@ export function Logo({
   // Other variants may have text optionally added
   return (
     <div className={cn('flex items-center gap-2', className)}>
-      <img 
-        src={getLogoSrc()} 
-        alt="DecA(I)de Logo" 
-        className="object-contain" 
-        width={width} 
-        height={height}
-      />
+      {/* Modern logo using SVG directly instead of an image */}
+      <div 
+        className={cn(
+          "rounded-lg flex items-center justify-center",
+          mode === 'dark' ? 'bg-blue-600' : 'bg-blue-500'
+        )}
+        style={{ width: width, height: height }}
+      >
+        <svg viewBox="0 0 24 24" width={width * 0.6} height={height * 0.6} fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path 
+            d="M12 3C7.02944 3 3 7.02944 3 12C3 16.9706 7.02944 21 12 21C16.9706 21 21 16.9706 21 12C21 7.02944 16.9706 3 12 3Z" 
+            fill="white"
+            fillOpacity="0.9"
+          />
+          <path 
+            d="M8 8L16 8C17.1046 8 18 8.89543 18 10L18 14C18 15.1046 17.1046 16 16 16L8 16C6.89543 16 6 15.1046 6 14L6 10C6 8.89543 6.89543 8 8 8Z" 
+            fill="#FFD700"
+            fillOpacity="0.2"
+          />
+          <path 
+            d="M10 12L14 14.5V9.5L10 12Z" 
+            fill="#FFD700"
+          />
+        </svg>
+      </div>
       
       {showText && (
         <div className="flex flex-col">
@@ -84,7 +102,7 @@ export function Logo({
             'font-bold text-lg leading-tight', 
             mode === 'dark' ? 'text-white' : 'text-slate-900'
           )}>
-            DecA(I)de
+            DecA<span className="text-primary">(I)</span>de
           </span>
           
           {showTagline && (
