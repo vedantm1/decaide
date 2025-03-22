@@ -712,9 +712,9 @@ export default function SettingsPage() {
                           className={`relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ${appearance.colorScheme === "aquaBlue" ? 'ring-blue-500 ring-2' : 'ring-border'} hover:scale-[1.02] shadow-sm`}
                           onClick={() => setAppearance(prev => ({...prev, colorScheme: "aquaBlue"}))}
                         >
-                          <div className="p-4 h-20 flex flex-col justify-between bg-gradient-to-b from-white to-blue-50 relative">
+                          <div className="p-4 h-24 flex flex-col justify-between bg-gradient-to-b from-white to-blue-50 dark:from-slate-800 dark:to-blue-950 relative">
                             {appearance.colorScheme === "aquaBlue" && (
-                              <div className="absolute top-2 right-2 bg-white rounded-full shadow p-0.5">
+                              <div className="absolute top-2 right-2 bg-white dark:bg-slate-700 rounded-full shadow p-0.5">
                                 <CheckIcon className="h-3 w-3 text-blue-500" />
                               </div>
                             )}
@@ -723,8 +723,8 @@ export default function SettingsPage() {
                               <div className="w-full h-2 rounded-sm bg-blue-400"></div>
                               <div className="w-full h-2 rounded-sm bg-blue-300"></div>
                             </div>
-                            <div>
-                              <span className="text-xs font-medium text-blue-700">Aqua Blue</span>
+                            <div className="mt-2">
+                              <span className="text-xs font-medium text-blue-700 dark:text-blue-300">Aqua Blue</span>
                             </div>
                           </div>
                         </div>
@@ -733,9 +733,9 @@ export default function SettingsPage() {
                           className={`relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ${appearance.colorScheme === "coralPink" ? 'ring-pink-500 ring-2' : 'ring-border'} hover:scale-[1.02] shadow-sm`}
                           onClick={() => setAppearance(prev => ({...prev, colorScheme: "coralPink"}))}
                         >
-                          <div className="p-4 h-20 flex flex-col justify-between bg-gradient-to-b from-white to-pink-50 relative">
+                          <div className="p-4 h-24 flex flex-col justify-between bg-gradient-to-b from-white to-pink-50 dark:from-slate-800 dark:to-pink-950 relative">
                             {appearance.colorScheme === "coralPink" && (
-                              <div className="absolute top-2 right-2 bg-white rounded-full shadow p-0.5">
+                              <div className="absolute top-2 right-2 bg-white dark:bg-slate-700 rounded-full shadow p-0.5">
                                 <CheckIcon className="h-3 w-3 text-pink-500" />
                               </div>
                             )}
@@ -744,8 +744,8 @@ export default function SettingsPage() {
                               <div className="w-full h-2 rounded-sm bg-pink-400"></div>
                               <div className="w-full h-2 rounded-sm bg-pink-300"></div>
                             </div>
-                            <div>
-                              <span className="text-xs font-medium text-pink-700">Coral Pink</span>
+                            <div className="mt-2">
+                              <span className="text-xs font-medium text-pink-700 dark:text-pink-300">Coral Pink</span>
                             </div>
                           </div>
                         </div>
@@ -754,9 +754,9 @@ export default function SettingsPage() {
                           className={`relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ${appearance.colorScheme === "mintGreen" ? 'ring-green-500 ring-2' : 'ring-border'} hover:scale-[1.02] shadow-sm`}
                           onClick={() => setAppearance(prev => ({...prev, colorScheme: "mintGreen"}))}
                         >
-                          <div className="p-4 h-20 flex flex-col justify-between bg-gradient-to-b from-white to-green-50 relative">
+                          <div className="p-4 h-24 flex flex-col justify-between bg-gradient-to-b from-white to-green-50 dark:from-slate-800 dark:to-green-950 relative">
                             {appearance.colorScheme === "mintGreen" && (
-                              <div className="absolute top-2 right-2 bg-white rounded-full shadow p-0.5">
+                              <div className="absolute top-2 right-2 bg-white dark:bg-slate-700 rounded-full shadow p-0.5">
                                 <CheckIcon className="h-3 w-3 text-green-500" />
                               </div>
                             )}
@@ -765,8 +765,8 @@ export default function SettingsPage() {
                               <div className="w-full h-2 rounded-sm bg-green-400"></div>
                               <div className="w-full h-2 rounded-sm bg-green-300"></div>
                             </div>
-                            <div>
-                              <span className="text-xs font-medium text-green-700">Mint Green</span>
+                            <div className="mt-2">
+                              <span className="text-xs font-medium text-green-700 dark:text-green-300">Mint Green</span>
                             </div>
                           </div>
                         </div>
@@ -775,9 +775,9 @@ export default function SettingsPage() {
                           className={`relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ${appearance.colorScheme === "royalPurple" ? 'ring-purple-500 ring-2' : 'ring-border'} hover:scale-[1.02] shadow-sm`}
                           onClick={() => setAppearance(prev => ({...prev, colorScheme: "royalPurple"}))}
                         >
-                          <div className="p-4 h-20 flex flex-col justify-between bg-gradient-to-b from-white to-purple-50 relative">
+                          <div className="p-4 h-24 flex flex-col justify-between bg-gradient-to-b from-white to-purple-50 dark:from-slate-800 dark:to-purple-950 relative">
                             {appearance.colorScheme === "royalPurple" && (
-                              <div className="absolute top-2 right-2 bg-white rounded-full shadow p-0.5">
+                              <div className="absolute top-2 right-2 bg-white dark:bg-slate-700 rounded-full shadow p-0.5">
                                 <CheckIcon className="h-3 w-3 text-purple-500" />
                               </div>
                             )}
@@ -786,8 +786,8 @@ export default function SettingsPage() {
                               <div className="w-full h-2 rounded-sm bg-purple-400"></div>
                               <div className="w-full h-2 rounded-sm bg-purple-300"></div>
                             </div>
-                            <div>
-                              <span className="text-xs font-medium text-purple-700">Royal Purple</span>
+                            <div className="mt-2">
+                              <span className="text-xs font-medium text-purple-700 dark:text-purple-300">Royal Purple</span>
                             </div>
                           </div>
                         </div>
@@ -804,21 +804,21 @@ export default function SettingsPage() {
                           className={`relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 hover:scale-[1.02] shadow-sm ${appearance.visualStyle === "memphis" ? 'ring-2 ring-primary' : 'ring-border'}`}
                           onClick={() => setAppearance(prev => ({...prev, visualStyle: "memphis"}))}
                         >
-                          <div className="p-4 h-28 bg-white bg-opacity-90 relative rounded-md overflow-hidden">
+                          <div className="p-4 h-28 bg-white dark:bg-[var(--dark-gradient-v-default)] bg-opacity-90 relative rounded-md overflow-hidden">
                             {/* Memphis-style patterns */}
-                            <div className="absolute -right-2 -top-2 w-10 h-10 rounded-full bg-blue-300"></div>
-                            <div className="absolute top-6 left-2 w-12 h-2 rounded-md bg-blue-400"></div>
-                            <div className="absolute bottom-3 right-8 w-6 h-6 border-2 border-yellow-400"></div>
-                            <div className="absolute bottom-10 left-10 w-3 h-3 bg-pink-300 rotate-45"></div>
-                            <div className="absolute top-1/2 right-1/3 w-8 h-1 bg-green-300"></div>
+                            <div className="absolute -right-2 -top-2 w-10 h-10 rounded-full bg-blue-300 dark:bg-blue-600 opacity-80"></div>
+                            <div className="absolute top-6 left-2 w-12 h-2 rounded-md bg-blue-400 dark:bg-blue-700 opacity-90"></div>
+                            <div className="absolute bottom-3 right-8 w-6 h-6 border-2 border-yellow-400 dark:border-yellow-600 opacity-90"></div>
+                            <div className="absolute bottom-10 left-10 w-3 h-3 bg-pink-300 dark:bg-pink-600 rotate-45 opacity-90"></div>
+                            <div className="absolute top-1/2 right-1/3 w-8 h-1 bg-green-300 dark:bg-green-600 opacity-90"></div>
                             {appearance.visualStyle === "memphis" && (
-                              <div className="absolute top-2 right-2 bg-white rounded-full shadow">
+                              <div className="absolute top-2 right-2 bg-white dark:bg-slate-700 rounded-full shadow">
                                 <CheckIcon className="h-4 w-4 text-primary" />
                               </div>
                             )}
                             <div className="mt-16">
-                              <span className="text-sm font-medium text-slate-800">Playful Style</span>
-                              <p className="text-xs text-slate-600 mt-1">Vibrant design with Memphis-style elements for a fun experience</p>
+                              <span className="text-sm font-medium text-slate-800 dark:text-slate-200">Playful Style</span>
+                              <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">Vibrant design with Memphis-style elements for a fun experience</p>
                             </div>
                           </div>
                         </div>
@@ -826,20 +826,19 @@ export default function SettingsPage() {
                           className={`relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 hover:scale-[1.02] shadow-sm ${appearance.visualStyle === "minimalist" ? 'ring-2 ring-primary' : 'ring-border'}`}
                           onClick={() => setAppearance(prev => ({...prev, visualStyle: "minimalist"}))}
                         >
-                          <div className="p-4 h-28 bg-white relative rounded-md overflow-hidden">
+                          <div className="p-4 h-28 bg-white dark:bg-[var(--dark-gradient-v-default)] relative rounded-md overflow-hidden">
                             {/* Clean minimalist design */}
-                            <div className="absolute top-4 left-4 w-12 h-0.5 bg-blue-400"></div>
-                            <div className="absolute top-7 left-4 w-8 h-0.5 bg-blue-300"></div>
-                            <div className="absolute top-10 left-4 w-5 h-0.5 bg-blue-200"></div>
-                            <div className="absolute top-16 left-4 w-3 h-3 rounded-full border border-slate-300"></div>
+                            <div className="absolute top-4 left-4 w-10 h-2 rounded-full bg-blue-400 opacity-75"></div>
+                            <div className="absolute top-8 left-4 w-6 h-2 rounded-full bg-blue-300 opacity-75"></div>
+                            <div className="absolute top-12 left-4 w-3 h-3 rounded-full border border-slate-300 dark:border-slate-500"></div>
                             {appearance.visualStyle === "minimalist" && (
-                              <div className="absolute top-2 right-2 bg-white rounded-full shadow">
+                              <div className="absolute top-2 right-2 bg-white dark:bg-slate-700 rounded-full shadow">
                                 <CheckIcon className="h-4 w-4 text-primary" />
                               </div>
                             )}
                             <div className="mt-16">
-                              <span className="text-sm font-medium text-slate-800">Simplified Style</span>
-                              <p className="text-xs text-slate-600 mt-1">Clean layout with focused design for improved readability</p>
+                              <span className="text-sm font-medium text-slate-800 dark:text-slate-200">Simplified Style</span>
+                              <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">Clean layout with focused design for improved readability</p>
                             </div>
                           </div>
                         </div>
@@ -853,7 +852,7 @@ export default function SettingsPage() {
                       <p className="text-xs text-slate-500 mb-4">Adjust the text size for better readability</p>
                       <div className="grid grid-cols-3 gap-3">
                         <div 
-                          className={`relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 p-4 ${appearance.fontSize === "small" ? 'ring-2 ring-primary bg-primary/5' : 'ring-border'} hover:scale-[1.02] shadow-sm`}
+                          className={`relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 p-4 ${appearance.fontSize === "small" ? 'ring-2 ring-primary bg-primary/5 dark:bg-primary/10' : 'ring-border'} hover:scale-[1.02] shadow-sm`}
                           onClick={() => setAppearance(prev => ({...prev, fontSize: "small"}))}
                         >
                           <div className="flex flex-col items-center space-y-2">
@@ -872,7 +871,7 @@ export default function SettingsPage() {
                         </div>
                         
                         <div 
-                          className={`relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 p-4 ${appearance.fontSize === "medium" ? 'ring-2 ring-primary bg-primary/5' : 'ring-border'} hover:scale-[1.02] shadow-sm`}
+                          className={`relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 p-4 ${appearance.fontSize === "medium" ? 'ring-2 ring-primary bg-primary/5 dark:bg-primary/10' : 'ring-border'} hover:scale-[1.02] shadow-sm`}
                           onClick={() => setAppearance(prev => ({...prev, fontSize: "medium"}))}
                         >
                           <div className="flex flex-col items-center space-y-2">
@@ -892,7 +891,7 @@ export default function SettingsPage() {
                         </div>
                         
                         <div 
-                          className={`relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 p-4 ${appearance.fontSize === "large" ? 'ring-2 ring-primary bg-primary/5' : 'ring-border'} hover:scale-[1.02] shadow-sm`}
+                          className={`relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 p-4 ${appearance.fontSize === "large" ? 'ring-2 ring-primary bg-primary/5 dark:bg-primary/10' : 'ring-border'} hover:scale-[1.02] shadow-sm`}
                           onClick={() => setAppearance(prev => ({...prev, fontSize: "large"}))}
                         >
                           <div className="flex flex-col items-center space-y-2">
