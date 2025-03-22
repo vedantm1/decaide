@@ -35,11 +35,22 @@ const PlayfulBackground: React.FC<PlayfulBackgroundProps> = ({ enabled, colorSch
     // Get colors based on color scheme, default to aquaBlue if scheme not found
     const schemeColors = baseColors[colorScheme as keyof typeof baseColors] || baseColors.aquaBlue;
     
-    // For dark mode, return less saturated, darker colors
+    // For dark mode, use color opposites with reduced opacity for contrast
     if (isDarkMode) {
+      // Create complementary colors for dark mode by using opposite colors
       return schemeColors.map(color => {
-        // Convert to complementary colors for dark mode to create contrast
-        return color.replace('#', '#33');
+        // Basic complementary color calculation
+        const hex = color.replace('#', '');
+        const r = parseInt(hex.slice(0, 2), 16);
+        const g = parseInt(hex.slice(2, 4), 16);
+        const b = parseInt(hex.slice(4, 6), 16);
+        
+        // Generate colors with higher contrast but lower opacity for dark mode
+        const complementaryR = Math.floor((255 - r) * 0.7);
+        const complementaryG = Math.floor((255 - g) * 0.7);
+        const complementaryB = Math.floor((255 - b) * 0.7);
+        
+        return `rgb(${complementaryR}, ${complementaryG}, ${complementaryB})`;
       });
     }
     
@@ -69,20 +80,59 @@ const PlayfulBackground: React.FC<PlayfulBackgroundProps> = ({ enabled, colorSch
     const newShapes: Shape[] = [];
     
     // Generate only a few shapes to avoid performance issues and distraction
-    const numShapes = Math.min(8, Math.floor(window.innerWidth / 200));
+    // Add more shapes for larger screens but keep them sparse
+    const numShapes = Math.min(12, Math.floor(window.innerWidth / 180));
     
+    // Define areas to avoid (main content areas)
+    const avoidAreas = [
+      // Center area where main content usually is
+      { x1: 30, y1: 15, x2: 70, y2: 85 }, 
+      // Top header area
+      { x1: 0, y1: 0, x2: 100, y2: 10 },
+      // Bottom footer area
+      { x1: 0, y1: 85, x2: 100, y2: 100 },
+    ];
+    
+    // Check if a position is in an area to avoid
+    const isInAvoidArea = (x: number, y: number): boolean => {
+      for (const area of avoidAreas) {
+        if (x >= area.x1 && x <= area.x2 && y >= area.y1 && y <= area.y2) {
+          return true;
+        }
+      }
+      return false;
+    };
+    
+    // Generate positions that are not in avoid areas
     for (let i = 0; i < numShapes; i++) {
+      let x = Math.random() * 100;
+      let y = Math.random() * 100;
+      
+      // Try to find a position that's not in an avoid area
+      // Maximum 10 attempts to avoid infinite loop
+      let attempts = 0;
+      while (isInAvoidArea(x, y) && attempts < 10) {
+        x = Math.random() * 100;
+        y = Math.random() * 100;
+        attempts++;
+      }
+      
+      // If we couldn't find a good position after 10 attempts, skip this shape
+      if (isInAvoidArea(x, y)) {
+        continue;
+      }
+      
       const shapeTypes: Array<Shape['type']> = ['circle', 'square', 'triangle', 'zigzag', 'wave'];
       newShapes.push({
         id: i,
         type: shapeTypes[Math.floor(Math.random() * shapeTypes.length)],
-        x: Math.random() * 100,
-        y: Math.random() * 100,
-        size: 20 + Math.random() * 60,
+        x: x,
+        y: y,
+        size: 15 + Math.random() * 45, // Slightly smaller shapes
         rotation: Math.random() * 360,
         color: colors[Math.floor(Math.random() * colors.length)],
         delay: Math.random() * 5,
-        duration: 20 + Math.random() * 40
+        duration: 40 + Math.random() * 60 // Much slower animations
       });
     }
     
@@ -102,7 +152,7 @@ const PlayfulBackground: React.FC<PlayfulBackgroundProps> = ({ enabled, colorSch
       {shapes.map((shape) => (
         <motion.div
           key={shape.id}
-          className="absolute opacity-10"
+          className="absolute opacity-5" // Reduced opacity to make them very subtle
           style={{
             left: `${shape.x}%`,
             top: `${shape.y}%`,
@@ -113,10 +163,10 @@ const PlayfulBackground: React.FC<PlayfulBackgroundProps> = ({ enabled, colorSch
             transform: `rotate(${shape.rotation}deg)`,
           }}
           animate={{
-            x: [0, 20, -20, 10, -10, 0],
-            y: [0, -20, 20, -10, 10, 0],
-            rotate: [shape.rotation, shape.rotation + 20, shape.rotation - 20, shape.rotation],
-            scale: [1, 1.1, 0.9, 1],
+            x: [0, 10, -10, 5, -5, 0], // Reduced movement distance
+            y: [0, -10, 10, -5, 5, 0], // Reduced movement distance
+            rotate: [shape.rotation, shape.rotation + 10, shape.rotation - 10, shape.rotation], // Smaller rotation
+            scale: [1, 1.05, 0.95, 1], // More subtle scaling
           }}
           transition={{
             duration: shape.duration,

@@ -79,7 +79,7 @@ export default function PricingPage() {
                 <div className="p-6 bg-slate-50 dark:bg-slate-800">
                   <h3 className="font-heading font-bold text-xl text-slate-800 dark:text-white">
                     Standard 
-                    <span className="text-primary ml-1 dark:hidden">⭐️⭐️</span>
+                    <span className="text-primary ml-1 dark:hidden">⭐️⭐️⭐️⭐️⭐️</span>
                     <span className="text-primary ml-1 hidden dark:inline">⭐️⭐️</span>
                   </h3>
                   <div className="mt-4 mb-2">
