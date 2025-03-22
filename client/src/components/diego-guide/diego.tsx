@@ -437,7 +437,7 @@ export default function Diego({ isNewUser = false, currentStep = TUTORIAL_STEPS.
   return (
     <>
       {/* Wandering Diego that appears randomly with fun facts */}
-      <AnimatePresence>
+      <AnimatePresence mode="wait">
         {isWandering && !isVisible && !isMobile && (
           <motion.div
             className="fixed z-50 cursor-pointer"
@@ -485,7 +485,7 @@ export default function Diego({ isNewUser = false, currentStep = TUTORIAL_STEPS.
       </AnimatePresence>
 
       {/* Main Diego UI for tutorial and interaction */}
-      <AnimatePresence>
+      <AnimatePresence mode="wait">
         {isVisible && (
           <motion.div 
             className={`fixed ${isMobile ? 'inset-x-2 bottom-2' : 'bottom-5 right-5'} z-50 flex items-end gap-3`}
@@ -515,7 +515,7 @@ export default function Diego({ isNewUser = false, currentStep = TUTORIAL_STEPS.
                 )}
                 
                 {/* Welcome banner shown after tutorial completes */}
-                <AnimatePresence>
+                <AnimatePresence mode="wait">
                   {activeStep === "complete" && isNewUser && (
                     <motion.div 
                       className="fixed inset-x-0 top-0 z-50"

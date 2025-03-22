@@ -1,4 +1,4 @@
-import { motion, Variants } from "framer-motion";
+import { motion, AnimatePresence, Variants } from "framer-motion";
 
 // Define props for our composite component
 interface SideProfileDolphinProps {
@@ -161,14 +161,23 @@ export default function SideProfileDolphin({
           filter="url(#sideGlow)"
         />
       </svg>
-      {showTextBox && (
-        <div className={`absolute top-1/4 ${pointDirection === 'left' ? 'right-full mr-3' : 'left-full ml-3'} px-5 py-4 bg-white/95 rounded-xl shadow-md text-sm max-w-[280px] border-2 border-primary-100`}>
-          <div className={`absolute top-1/2 transform -translate-y-1/2 ${pointDirection === 'left' ? 'right-[-12px]' : 'left-[-12px]'} w-0 h-0 border-solid ${pointDirection === 'left' ? 'border-l-[12px] border-y-[10px] border-y-transparent border-l-white' : 'border-r-[12px] border-y-[10px] border-y-transparent border-r-white'}`}></div>
-          <div className="font-medium text-primary-700">{message}</div>
-          <div className={`absolute bottom-2 ${pointDirection === 'left' ? 'right' : 'left'}-3 w-12 h-3 bg-primary/20 rounded-full filter blur-md`}></div>
-          <div className={`absolute -bottom-1 -${pointDirection === 'left' ? 'right' : 'left'}-1 w-14 h-1 bg-gradient-to-r from-cyan-300 to-primary rounded-full opacity-40`}></div>
-        </div>
-      )}
+      <AnimatePresence mode="wait">
+        {showTextBox && message && (
+          <motion.div 
+            className={`absolute top-1/4 ${pointDirection === 'left' ? 'right-full mr-3' : 'left-full ml-3'} px-5 py-4 bg-white/95 rounded-xl shadow-md text-sm max-w-[280px] border-2 border-primary-100`}
+            initial={{ opacity: 0, y: 10, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -10, scale: 0.9 }}
+            transition={{ duration: 0.4 }}
+            key={`message-${message.substring(0, 20)}`} // Use part of message as key to prevent re-renders of same content
+          >
+            <div className={`absolute top-1/2 transform -translate-y-1/2 ${pointDirection === 'left' ? 'right-[-12px]' : 'left-[-12px]'} w-0 h-0 border-solid ${pointDirection === 'left' ? 'border-l-[12px] border-y-[10px] border-y-transparent border-l-white' : 'border-r-[12px] border-y-[10px] border-y-transparent border-r-white'}`}></div>
+            <div className="font-medium text-primary-700">{message}</div>
+            <div className={`absolute bottom-2 ${pointDirection === 'left' ? 'right' : 'left'}-3 w-12 h-3 bg-primary/20 rounded-full filter blur-md`}></div>
+            <div className={`absolute -bottom-1 -${pointDirection === 'left' ? 'right' : 'left'}-1 w-14 h-1 bg-gradient-to-r from-cyan-300 to-primary rounded-full opacity-40`}></div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       <WaveTransition targetPosition={targetPosition} />
     </motion.div>
   );
