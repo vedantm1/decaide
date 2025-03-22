@@ -440,7 +440,136 @@ export default function SettingsPage() {
                     <Separator />
                     
                     <div>
-                      <h3 className="text-base font-medium text-slate-700 mb-3">UI Theme</h3>
+                      <h3 className="text-base font-medium text-slate-700 mb-3">DECA Cluster Themes</h3>
+                      <div className="grid grid-cols-3 gap-3 mb-6">
+                        <div 
+                          className="relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ring-border hover:scale-[1.02] shadow-sm"
+                          onClick={() => setAppearance(prev => ({...prev, colorScheme: "business"}))}
+                        >
+                          <div className="p-4 h-24 flex flex-col justify-between bg-gradient-to-b from-white to-yellow-50">
+                            <div className="flex flex-col gap-1">
+                              <div className="w-full h-2 rounded-sm bg-yellow-500"></div>
+                              <div className="w-full h-2 rounded-sm bg-yellow-400"></div>
+                              <div className="w-full h-2 rounded-sm bg-yellow-300"></div>
+                            </div>
+                            <div>
+                              <span className="text-xs font-medium text-yellow-700">Business Management</span>
+                              <div className="mt-1 flex items-center gap-1">
+                                <span className="w-3 h-3 rounded-full bg-yellow-500"></span>
+                                <p className="text-xs text-slate-600">BMA, ENT, BLTDM, HRM</p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div 
+                          className="relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ring-border hover:scale-[1.02] shadow-sm"
+                          onClick={() => setAppearance(prev => ({...prev, colorScheme: "finance"}))}
+                        >
+                          <div className="p-4 h-24 flex flex-col justify-between bg-gradient-to-b from-white to-green-50">
+                            <div className="flex flex-col gap-1">
+                              <div className="w-full h-2 rounded-sm bg-green-500"></div>
+                              <div className="w-full h-2 rounded-sm bg-green-400"></div>
+                              <div className="w-full h-2 rounded-sm bg-green-300"></div>
+                            </div>
+                            <div>
+                              <span className="text-xs font-medium text-green-700">Finance</span>
+                              <div className="mt-1 flex items-center gap-1">
+                                <span className="w-3 h-3 rounded-full bg-green-500"></span>
+                                <p className="text-xs text-slate-600">ACT, BFS, FTDM, FCE</p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div 
+                          className="relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ring-border hover:scale-[1.02] shadow-sm"
+                          onClick={() => setAppearance(prev => ({...prev, colorScheme: "hospitality"}))}
+                        >
+                          <div className="p-4 h-24 flex flex-col justify-between bg-gradient-to-b from-white to-blue-50">
+                            <div className="flex flex-col gap-1">
+                              <div className="w-full h-2 rounded-sm bg-blue-500"></div>
+                              <div className="w-full h-2 rounded-sm bg-blue-400"></div>
+                              <div className="w-full h-2 rounded-sm bg-blue-300"></div>
+                            </div>
+                            <div>
+                              <span className="text-xs font-medium text-blue-700">Hospitality & Tourism</span>
+                              <div className="mt-1 flex items-center gap-1">
+                                <span className="w-3 h-3 rounded-full bg-blue-500"></span>
+                                <p className="text-xs text-slate-600">HLM, HTDM, HTPS, RFSM</p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-3 gap-3 mb-2">
+                        <div 
+                          className="relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ring-border hover:scale-[1.02] shadow-sm"
+                          onClick={() => setAppearance(prev => ({...prev, colorScheme: "marketing"}))}
+                        >
+                          <div className="p-4 h-24 flex flex-col justify-between bg-gradient-to-b from-white to-red-50">
+                            <div className="flex flex-col gap-1">
+                              <div className="w-full h-2 rounded-sm bg-red-500"></div>
+                              <div className="w-full h-2 rounded-sm bg-red-400"></div>
+                              <div className="w-full h-2 rounded-sm bg-red-300"></div>
+                            </div>
+                            <div>
+                              <span className="text-xs font-medium text-red-700">Marketing</span>
+                              <div className="mt-1 flex items-center gap-1">
+                                <span className="w-3 h-3 rounded-full bg-red-500"></span>
+                                <p className="text-xs text-slate-600">AAM, ASM, BSM, FMS, MCS, RMS</p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div 
+                          className="relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ring-border hover:scale-[1.02] shadow-sm"
+                          onClick={() => setAppearance(prev => ({...prev, colorScheme: "entrepreneurship"}))}
+                        >
+                          <div className="p-4 h-24 flex flex-col justify-between bg-gradient-to-b from-white to-gray-50">
+                            <div className="flex flex-col gap-1">
+                              <div className="w-full h-2 rounded-sm bg-gray-500"></div>
+                              <div className="w-full h-2 rounded-sm bg-gray-400"></div>
+                              <div className="w-full h-2 rounded-sm bg-gray-300"></div>
+                            </div>
+                            <div>
+                              <span className="text-xs font-medium text-gray-700">Entrepreneurship</span>
+                              <div className="mt-1 flex items-center gap-1">
+                                <span className="w-3 h-3 rounded-full bg-gray-500"></span>
+                                <p className="text-xs text-slate-600">EIP, ESB, EIB, IBP</p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div 
+                          className="relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ring-border hover:scale-[1.02] shadow-sm"
+                          onClick={() => setAppearance(prev => ({...prev, colorScheme: "admin"}))}
+                        >
+                          <div className="p-4 h-24 flex flex-col justify-between bg-gradient-to-b from-white to-indigo-50">
+                            <div className="flex flex-col gap-1">
+                              <div className="w-full h-2 rounded-sm bg-indigo-800"></div>
+                              <div className="w-full h-2 rounded-sm bg-indigo-700"></div>
+                              <div className="w-full h-2 rounded-sm bg-indigo-600"></div>
+                            </div>
+                            <div>
+                              <span className="text-xs font-medium text-indigo-800">Business Admin Core</span>
+                              <div className="mt-1 flex items-center gap-1">
+                                <span className="w-3 h-3 rounded-full bg-indigo-800"></span>
+                                <p className="text-xs text-slate-600">PFL, PBM, PMK</p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <Separator />
+                    
+                    <div>
+                      <h3 className="text-base font-medium text-slate-700 mb-3">Additional UI Themes</h3>
                       <div className="grid grid-cols-4 gap-3 mb-2">
                         <div 
                           className="relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ring-border hover:scale-[1.02] shadow-sm"
@@ -454,7 +583,6 @@ export default function SettingsPage() {
                             </div>
                             <div>
                               <span className="text-xs font-medium text-blue-700">Aqua Blue</span>
-                              <p className="text-xs text-slate-600 mt-0.5">Business & Finance</p>
                             </div>
                           </div>
                         </div>
@@ -471,7 +599,6 @@ export default function SettingsPage() {
                             </div>
                             <div>
                               <span className="text-xs font-medium text-pink-700">Coral Pink</span>
-                              <p className="text-xs text-slate-600 mt-0.5">Marketing</p>
                             </div>
                           </div>
                         </div>
@@ -488,7 +615,6 @@ export default function SettingsPage() {
                             </div>
                             <div>
                               <span className="text-xs font-medium text-green-700">Mint Green</span>
-                              <p className="text-xs text-slate-600 mt-0.5">Entrepreneurship</p>
                             </div>
                           </div>
                         </div>
@@ -505,7 +631,6 @@ export default function SettingsPage() {
                             </div>
                             <div>
                               <span className="text-xs font-medium text-purple-700">Royal Purple</span>
-                              <p className="text-xs text-slate-600 mt-0.5">Leadership</p>
                             </div>
                           </div>
                         </div>
