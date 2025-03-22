@@ -489,54 +489,74 @@ export default function AuthPage() {
                             render={({ field }) => (
                               <FormItem>
                                 <FormLabel>UI Theme</FormLabel>
-                                <div className="grid grid-cols-4 gap-3 mb-2">
-                                  {/* Theme options */}
+                                <div className="grid grid-cols-3 gap-3 mb-2">
+                                  {/* Theme options - consistent sizing and improved layout */}
                                   <motion.div 
-                                    className={`relative overflow-hidden rounded-md cursor-pointer transition-all p-3 flex flex-col items-center ${field.value === 'aquaBlue' ? 'ring-2 ring-primary' : 'ring-1 ring-border'}`}
-                                    whileHover={{ scale: 1.05 }}
+                                    className={`relative overflow-hidden rounded-md cursor-pointer transition-all ${field.value === 'aquaBlue' ? 'ring-2 ring-primary' : 'ring-1 ring-border'}`}
+                                    whileHover={{ scale: 1.02 }}
                                     onClick={() => {
                                       field.onChange('aquaBlue');
                                       setSelectedUiTheme('aquaBlue');
                                     }}
                                   >
-                                    <div className="w-full h-10 rounded-md bg-blue-500 mb-2"></div>
-                                    <span className="text-xs">Aqua Blue</span>
+                                    <div className="p-4 h-20 flex flex-col justify-between">
+                                      <div className="w-full h-8 rounded-md bg-blue-500 mb-2"></div>
+                                      <div>
+                                        <span className="text-xs font-medium">Aqua Blue</span>
+                                        <p className="text-xs text-slate-600 mt-0.5">Professional</p>
+                                      </div>
+                                    </div>
                                   </motion.div>
                                   
                                   <motion.div 
-                                    className={`relative overflow-hidden rounded-md cursor-pointer transition-all p-3 flex flex-col items-center ${field.value === 'coralPink' ? 'ring-2 ring-primary' : 'ring-1 ring-border'}`}
-                                    whileHover={{ scale: 1.05 }}
+                                    className={`relative overflow-hidden rounded-md cursor-pointer transition-all ${field.value === 'coralPink' ? 'ring-2 ring-primary' : 'ring-1 ring-border'}`}
+                                    whileHover={{ scale: 1.02 }}
                                     onClick={() => {
                                       field.onChange('coralPink');
                                       setSelectedUiTheme('coralPink');
                                     }}
                                   >
-                                    <div className="w-full h-10 rounded-md bg-pink-500 mb-2"></div>
-                                    <span className="text-xs">Coral Pink</span>
+                                    <div className="p-4 h-20 flex flex-col justify-between">
+                                      <div className="w-full h-8 rounded-md bg-pink-500 mb-2"></div>
+                                      <div>
+                                        <span className="text-xs font-medium">Coral Pink</span>
+                                        <p className="text-xs text-slate-600 mt-0.5">Vibrant</p>
+                                      </div>
+                                    </div>
                                   </motion.div>
                                   
                                   <motion.div 
-                                    className={`relative overflow-hidden rounded-md cursor-pointer transition-all p-3 flex flex-col items-center ${field.value === 'mintGreen' ? 'ring-2 ring-primary' : 'ring-1 ring-border'}`}
-                                    whileHover={{ scale: 1.05 }}
+                                    className={`relative overflow-hidden rounded-md cursor-pointer transition-all ${field.value === 'mintGreen' ? 'ring-2 ring-primary' : 'ring-1 ring-border'}`}
+                                    whileHover={{ scale: 1.02 }}
                                     onClick={() => {
                                       field.onChange('mintGreen');
                                       setSelectedUiTheme('mintGreen');
                                     }}
                                   >
-                                    <div className="w-full h-10 rounded-md bg-green-500 mb-2"></div>
-                                    <span className="text-xs">Mint Green</span>
+                                    <div className="p-4 h-20 flex flex-col justify-between">
+                                      <div className="w-full h-8 rounded-md bg-green-500 mb-2"></div>
+                                      <div>
+                                        <span className="text-xs font-medium">Mint Green</span>
+                                        <p className="text-xs text-slate-600 mt-0.5">Calming</p>
+                                      </div>
+                                    </div>
                                   </motion.div>
                                   
                                   <motion.div 
-                                    className={`relative overflow-hidden rounded-md cursor-pointer transition-all p-3 flex flex-col items-center ${field.value === 'royalPurple' ? 'ring-2 ring-primary' : 'ring-1 ring-border'}`}
-                                    whileHover={{ scale: 1.05 }}
+                                    className={`relative overflow-hidden rounded-md cursor-pointer transition-all ${field.value === 'royalPurple' ? 'ring-2 ring-primary' : 'ring-1 ring-border'}`}
+                                    whileHover={{ scale: 1.02 }}
                                     onClick={() => {
                                       field.onChange('royalPurple');
                                       setSelectedUiTheme('royalPurple');
                                     }}
                                   >
-                                    <div className="w-full h-10 rounded-md bg-purple-500 mb-2"></div>
-                                    <span className="text-xs">Royal Purple</span>
+                                    <div className="p-4 h-20 flex flex-col justify-between">
+                                      <div className="w-full h-8 rounded-md bg-purple-500 mb-2"></div>
+                                      <div>
+                                        <span className="text-xs font-medium">Royal Purple</span>
+                                        <p className="text-xs text-slate-600 mt-0.5">Elegant</p>
+                                      </div>
+                                    </div>
                                   </motion.div>
                                 </div>
                                 <FormMessage />
