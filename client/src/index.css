@@ -16,11 +16,11 @@
 
 @layer components {
   .bubble-text-visible {
-    @apply text-slate-800; /* Improve text contrast */
+    @apply text-slate-900; /* Enhanced text contrast */
   }
 
   .marketing-text {
-    @apply text-slate-800; /* Ensure marketing text is visible */
+    @apply text-slate-900; /* Enhanced marketing text contrast */
   }
 
   .deca-cluster-badge {
@@ -28,6 +28,10 @@
            shadow-sm transform rotate-3 border border-white border-opacity-30
            flex items-center justify-center tracking-wider;
     animation: pulse-subtle 2s infinite;
+  }
+
+  .copyright-text {
+    @apply text-slate-600 text-sm text-center mt-8;
   }
 }
 

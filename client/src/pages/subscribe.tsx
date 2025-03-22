@@ -208,8 +208,9 @@ export default function Subscribe() {
           <p>Your payment is processed securely by Stripe. We don't store your card details.</p>
           <p className="mt-2">15% of all profits are donated to DECA's Emerging Leader Scholarship Fund.</p>
           <p className="mt-2">You can cancel your subscription at any time from your account settings.</p>
+          <p className="copyright-text">© {new Date().getFullYear()} DecA(I)de. All rights reserved.</p>
         </div>
-      </div>
+      </div>>
     </div>
   );
 };
