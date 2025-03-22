@@ -224,9 +224,9 @@ export default function AuthPage() {
                 className="scale-110"
               />
             </div>
-            <CardTitle className="text-2xl text-center">Welcome</CardTitle>
+            <CardTitle className="text-2xl text-center">Welcome to DecA(I)de</CardTitle>
             <CardDescription className="text-center">
-              Log in to your account or create a new one
+              Your AI-powered DECA competition preparation platform
             </CardDescription>
           </CardHeader>
           <CardContent>

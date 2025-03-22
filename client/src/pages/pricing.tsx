@@ -199,31 +199,31 @@ export default function PricingPage() {
                   </div>
                   <p className="text-slate-500 dark:text-slate-400 text-sm">Ultimate preparation for DECA champions</p>
                 </div>
-                <div className="p-6">
+                <div className="p-6 dark:bg-slate-900">
                   <ul className="space-y-3">
                     <li className="flex items-start">
                       <i className="fas fa-check text-primary mt-1 mr-2"></i>
-                      <span>Unlimited roleplay scenario generation</span>
+                      <span className="dark:text-white">Unlimited roleplay scenario generation</span>
                     </li>
                     <li className="flex items-start">
                       <i className="fas fa-check text-primary mt-1 mr-2"></i>
-                      <span>Unlimited monthly test attempts</span>
+                      <span className="dark:text-white">Unlimited monthly test attempts</span>
                     </li>
                     <li className="flex items-start">
                       <i className="fas fa-check text-primary mt-1 mr-2"></i>
-                      <span>Premium, customized PI explanations</span>
+                      <span className="dark:text-white">Premium, customized PI explanations</span>
                     </li>
                     <li className="flex items-start">
                       <i className="fas fa-check text-primary mt-1 mr-2"></i>
-                      <span>Advanced performance analytics and interactive coaching</span>
+                      <span className="dark:text-white">Advanced performance analytics and interactive coaching</span>
                     </li>
                     <li className="flex items-start">
                       <i className="fas fa-check text-primary mt-1 mr-2"></i>
-                      <span>Exclusive automated PDF report generation</span>
+                      <span className="dark:text-white">Exclusive automated PDF report generation</span>
                     </li>
                     <li className="flex items-start">
                       <i className="fas fa-check text-primary mt-1 mr-2"></i>
-                      <span>Fully gamified and adaptive learning experience</span>
+                      <span className="dark:text-white">Fully gamified and adaptive learning experience</span>
                     </li>
                   </ul>
                   <div className="mt-6">
@@ -257,34 +257,34 @@ export default function PricingPage() {
           
           {/* FAQ */}
           <div className="mb-8">
-            <h2 className="text-2xl font-heading font-bold text-slate-800 mb-6 text-center">Frequently Asked Questions</h2>
+            <h2 className="text-2xl font-heading font-bold text-slate-800 dark:text-white mb-6 text-center">Frequently Asked Questions</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-white rounded-xl border border-slate-200 p-6">
-                <h3 className="font-heading font-bold text-lg text-slate-800 mb-3">Can I change my plan later?</h3>
-                <p className="text-slate-600">Yes! You can upgrade or downgrade your plan at any time. Changes will be effective immediately.</p>
+              <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+                <h3 className="font-heading font-bold text-lg text-slate-800 dark:text-white mb-3">Can I change my plan later?</h3>
+                <p className="text-slate-600 dark:text-slate-300">Yes! You can upgrade or downgrade your plan at any time. Changes will be effective immediately.</p>
               </div>
-              <div className="bg-white rounded-xl border border-slate-200 p-6">
-                <h3 className="font-heading font-bold text-lg text-slate-800 mb-3">Is there a refund policy?</h3>
-                <p className="text-slate-600">We offer a 7-day money-back guarantee if you're not satisfied with your subscription.</p>
+              <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+                <h3 className="font-heading font-bold text-lg text-slate-800 dark:text-white mb-3">Is there a refund policy?</h3>
+                <p className="text-slate-600 dark:text-slate-300">We offer a 7-day money-back guarantee if you're not satisfied with your subscription.</p>
               </div>
-              <div className="bg-white rounded-xl border border-slate-200 p-6">
-                <h3 className="font-heading font-bold text-lg text-slate-800 mb-3">How do the practice limits work?</h3>
-                <p className="text-slate-600">Limits reset on the 1st of each month. Unused practice sessions do not roll over to the next month.</p>
+              <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+                <h3 className="font-heading font-bold text-lg text-slate-800 dark:text-white mb-3">How do the practice limits work?</h3>
+                <p className="text-slate-600 dark:text-slate-300">Limits reset on the 1st of each month. Unused practice sessions do not roll over to the next month.</p>
               </div>
-              <div className="bg-white rounded-xl border border-slate-200 p-6">
-                <h3 className="font-heading font-bold text-lg text-slate-800 mb-3">Do you offer team discounts?</h3>
-                <p className="text-slate-600">Yes! Contact us for special pricing for DECA chapters or school teams of 10 or more students.</p>
+              <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+                <h3 className="font-heading font-bold text-lg text-slate-800 dark:text-white mb-3">Do you offer team discounts?</h3>
+                <p className="text-slate-600 dark:text-slate-300">Yes! Contact us for special pricing for DECA chapters or school teams of 10 or more students.</p>
               </div>
             </div>
           </div>
           
           {/* Contact */}
           <div className="text-center mb-12">
-            <p className="text-slate-600">Have more questions? <a href="mailto:support@decade-deca.ai" className="text-primary font-medium">Contact our support team</a></p>
+            <p className="text-slate-600 dark:text-slate-300">Have more questions? <a href="mailto:support@decade-deca.ai" className="text-primary font-medium">Contact our support team</a></p>
           </div>
           
           {/* Footer */}
-          <footer className="border-t border-slate-200 py-6">
+          <footer className="border-t border-slate-200 dark:border-slate-700 py-6">
             <div className="flex flex-col md:flex-row justify-between items-center">
               <div className="flex items-center gap-2 mb-4 md:mb-0">
                 <div className="relative w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
@@ -293,12 +293,12 @@ export default function PricingPage() {
                     AI
                   </span>
                 </div>
-                <span className="font-heading font-bold text-base text-slate-800">DecA<span className="text-primary">(I)</span>de</span>
+                <span className="font-heading font-bold text-base text-slate-800 dark:text-white">DecA<span className="text-primary">(I)</span>de</span>
               </div>
               
               <div className="text-center md:text-right">
-                <div className="text-sm text-slate-500">© 2023 DecA(I)de. All rights reserved.</div>
-                <div className="text-xs text-slate-400 mt-1">Who says there is no I in team?</div>
+                <div className="text-sm text-slate-500 dark:text-slate-400">© 2023 DecA(I)de. All rights reserved.</div>
+                <div className="text-xs text-slate-400 dark:text-slate-500 mt-1">Who says there is no I in team?</div>
               </div>
             </div>
           </footer>
