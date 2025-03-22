@@ -93,14 +93,21 @@ export default function SettingsPage() {
   const updateAppearance = useMutation({
     mutationFn: async (data: any) => {
       try {
+        // Import applyTheme from theme-controller
+        const { applyTheme } = await import('@/lib/theme-controller');
+        
+        // Apply theme immediately
+        applyTheme(data);
+        
         // Save to user profile if authenticated
         if (user?.id) {
           const res = await apiRequest("POST", "/api/user/settings", {
-            uiTheme: data.colorScheme
+            uiTheme: data.colorScheme,
+            visualStyle: data.visualStyle
           });
           return await res.json();
         }
-        // Otherwise just return the data (it's already saved to localStorage)
+        // Otherwise just return the data (it's already applied and saved to localStorage)
         return data;
       } catch (error) {
         console.error("Error saving appearance:", error);
@@ -113,12 +120,9 @@ export default function SettingsPage() {
       
       toast({
         title: "Appearance Updated",
-        description: "Your theme preferences have been saved.",
+        description: "Your theme preferences have been saved and applied.",
       });
       triggerAnimation('confetti', 'Theme Updated!');
-      
-      // ThemeProvider will apply the theme changes automatically
-      // since we've saved to localStorage and the appearance state is already updated
     },
     onError: (error: Error) => {
       toast({
