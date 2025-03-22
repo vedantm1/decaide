@@ -29,16 +29,17 @@ async function comparePasswords(supplied: string, stored: string) {
 }
 
 export function setupAuth(app: Express) {
-  // Session setup
+  // Session setup with enhanced security and persistence
   const sessionSettings: session.SessionOptions = {
     secret: process.env.SESSION_SECRET || "decade-ai-secret-key",
     resave: false,
     saveUninitialized: false,
     store: storage.sessionStore,
     cookie: {
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days for better persistence
       secure: process.env.NODE_ENV === "production",
-      sameSite: "lax"
+      sameSite: "lax",
+      httpOnly: true // Prevent client-side JS from accessing the cookie
     }
   };
 
