@@ -1,11 +1,12 @@
 import { useEffect } from "react";
+import { Link } from "wouter";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import SidebarNavigation from "@/components/sidebar-navigation";
 import MobileHeader from "@/components/mobile-header";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Link } from "wouter";
 
+// Add Stripe Pricing Table declaration for TypeScript
 declare global {
   namespace JSX {
     interface IntrinsicElements {
@@ -20,17 +21,27 @@ declare global {
 export default function PricingPage() {
   const { user } = useAuth();
   
-  // Load Stripe.js
+  // Subscription update mutation
+  const updateSubscriptionMutation = useMutation({
+    mutationFn: async (tier: string) => {
+      const res = await apiRequest("POST", "/api/user/subscription", { tier });
+      return await res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+    },
+    onError: (error: Error) => {
+      console.error("Failed to update subscription:", error);
+    }
+  });
+  
+  // Load Stripe script on component mount
   useEffect(() => {
-    // Create script element for Stripe
     const script = document.createElement('script');
     script.src = 'https://js.stripe.com/v3/pricing-table.js';
     script.async = true;
-    
-    // Add script to document
     document.body.appendChild(script);
     
-    // Cleanup
     return () => {
       document.body.removeChild(script);
     };
@@ -44,103 +55,237 @@ export default function PricingPage() {
         <MobileHeader />
         
         <div className="container mx-auto px-4 py-6 md:py-8 max-w-6xl">
-          <header className="mb-6">
-            <h1 className="text-2xl font-heading font-bold text-slate-800">Subscription Plans</h1>
-            <p className="text-slate-500 mt-1">Choose the perfect plan for your DECA competition preparation</p>
+          {/* Pricing Header */}
+          <header className="mb-8 text-center">
+            <h1 className="text-3xl font-heading font-bold text-slate-800 mb-3">Subscription Plans</h1>
+            <p className="text-slate-500 max-w-2xl mx-auto">
+              Choose the plan that's right for you and take your DECA preparation to the next level.
+            </p>
+            
+            {user?.subscriptionTier && (
+              <div className="mt-4 p-3 bg-primary-50 border border-primary-100 rounded-lg inline-block">
+                <p className="text-primary-700 font-medium">
+                  Your current plan: <span className="font-bold capitalize">{user.subscriptionTier}</span>
+                </p>
+              </div>
+            )}
           </header>
           
-          <Card className="mb-8">
-            <CardHeader>
-              <CardTitle>Current Plan: {user?.subscriptionTier || "Standard"}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="mb-8">
-                <h2 className="text-xl font-bold text-center mb-6">Choose Your DecA(I)de Plan</h2>
-                <p className="text-center text-slate-600 mb-8 max-w-2xl mx-auto">
-                  Unlock premium features to maximize your DECA competition performance. All plans include access to our core practice platform.
-                </p>
-                
-                {/* Stripe Pricing Table */}
-                <div className="w-full">
-                  <stripe-pricing-table 
-                    pricing-table-id="prctbl_1R5Jhc2fAXktF0IPTDZ03BYv"
-                    publishable-key={import.meta.env.VITE_STRIPE_PUBLIC_KEY as string}>
-                  </stripe-pricing-table>
+          {/* Pricing Table */}
+          <div className="bg-white rounded-xl border border-slate-200 p-6 mb-8 shadow-sm">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Standard Plan */}
+              <div className="border border-slate-200 rounded-xl overflow-hidden">
+                <div className="p-6 bg-slate-50">
+                  <h3 className="font-heading font-bold text-xl text-slate-800">Standard <span className="text-primary">⭐️⭐️</span></h3>
+                  <div className="mt-4 mb-2">
+                    <span className="text-3xl font-bold text-slate-800">$12.99</span>
+                    <span className="text-slate-500">/month</span>
+                  </div>
+                  <p className="text-slate-500 text-sm">For students just starting their DECA journey</p>
+                </div>
+                <div className="p-6">
+                  <ul className="space-y-3">
+                    <li className="flex items-start">
+                      <i className="fas fa-check text-primary mt-1 mr-2"></i>
+                      <span>Basic set of roleplays (1 per instructional area)</span>
+                    </li>
+                    <li className="flex items-start">
+                      <i className="fas fa-check text-primary mt-1 mr-2"></i>
+                      <span>5 practice tests per month</span>
+                    </li>
+                    <li className="flex items-start">
+                      <i className="fas fa-check text-primary mt-1 mr-2"></i>
+                      <span>Fundamental PI explanations</span>
+                    </li>
+                    <li className="flex items-start">
+                      <i className="fas fa-check text-primary mt-1 mr-2"></i>
+                      <span>Basic progress tracking</span>
+                    </li>
+                  </ul>
+                  <div className="mt-6">
+                    {user?.subscriptionTier === "standard" ? (
+                      <button disabled className="w-full py-2 px-4 bg-slate-200 text-slate-600 rounded-lg text-center font-medium">
+                        Current Plan
+                      </button>
+                    ) : (
+                      <button 
+                        onClick={() => updateSubscriptionMutation.mutate("standard")}
+                        className="w-full py-2 px-4 bg-primary hover:bg-primary/90 text-white rounded-lg text-center font-medium transition"
+                      >
+                        Select Plan
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
               
-              <div className="mt-8 border border-primary-100 bg-primary-50 rounded-xl p-6">
-                <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
-                  <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <i className="fas fa-gift text-primary-600 text-xl"></i>
+              {/* Plus Plan */}
+              <div className="border-2 border-primary rounded-xl overflow-hidden relative">
+                <div className="absolute top-0 right-0 bg-primary text-white text-xs px-3 py-1 rounded-bl-lg font-medium">
+                  MOST POPULAR
+                </div>
+                <div className="p-6 bg-primary-50">
+                  <h3 className="font-heading font-bold text-xl text-slate-800">Plus <span className="text-primary">⭐️⭐️⭐️</span></h3>
+                  <div className="mt-4 mb-2">
+                    <span className="text-3xl font-bold text-slate-800">$19.99</span>
+                    <span className="text-slate-500">/month</span>
                   </div>
-                  <div className="flex-1">
-                    <h3 className="text-lg font-bold text-slate-800">Special Offer for Teams</h3>
-                    <p className="text-slate-600 mt-1">
-                      Are you a DECA advisor or club leader? Get special discounts for group subscriptions with 5+ members.
-                    </p>
+                  <p className="text-slate-500 text-sm">For dedicated competitors looking to advance</p>
+                </div>
+                <div className="p-6">
+                  <ul className="space-y-3">
+                    <li className="flex items-start">
+                      <i className="fas fa-check text-primary mt-1 mr-2"></i>
+                      <span>10 roleplay scenarios per month</span>
+                    </li>
+                    <li className="flex items-start">
+                      <i className="fas fa-check text-primary mt-1 mr-2"></i>
+                      <span>15 practice tests per month</span>
+                    </li>
+                    <li className="flex items-start">
+                      <i className="fas fa-check text-primary mt-1 mr-2"></i>
+                      <span>In-depth PI explanations with examples</span>
+                    </li>
+                    <li className="flex items-start">
+                      <i className="fas fa-check text-primary mt-1 mr-2"></i>
+                      <span>Advanced progress analytics</span>
+                    </li>
+                    <li className="flex items-start">
+                      <i className="fas fa-check text-primary mt-1 mr-2"></i>
+                      <span>Basic written event templates</span>
+                    </li>
+                  </ul>
+                  <div className="mt-6">
+                    {user?.subscriptionTier === "plus" ? (
+                      <button disabled className="w-full py-2 px-4 bg-slate-200 text-slate-600 rounded-lg text-center font-medium">
+                        Current Plan
+                      </button>
+                    ) : (
+                      <button 
+                        onClick={() => updateSubscriptionMutation.mutate("plus")}
+                        className="w-full py-2 px-4 bg-primary hover:bg-primary/90 text-white rounded-lg text-center font-medium transition"
+                      >
+                        Upgrade to Plus
+                      </button>
+                    )}
                   </div>
-                  <Link href="/contact">
-                    <Button className="mt-4 md:mt-0">Contact Us</Button>
-                  </Link>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-          
-          <div className="grid md:grid-cols-3 gap-6 mt-10">
-            <Card>
-              <CardContent className="p-6">
-                <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center mb-4">
-                  <i className="fas fa-medal text-primary-600 text-xl"></i>
+              
+              {/* Pro Plan */}
+              <div className="border border-slate-200 rounded-xl overflow-hidden">
+                <div className="p-6 bg-slate-50">
+                  <h3 className="font-heading font-bold text-xl text-slate-800">Pro <span className="text-primary">⭐️⭐️⭐️⭐️⭐️</span></h3>
+                  <div className="mt-4 mb-2">
+                    <span className="text-3xl font-bold text-slate-800">$39.99</span>
+                    <span className="text-slate-500">/month</span>
+                  </div>
+                  <p className="text-slate-500 text-sm">For serious competitors aiming for ICDC</p>
                 </div>
-                <h3 className="font-bold text-lg mb-2">Money-Back Guarantee</h3>
-                <p className="text-slate-600">Not satisfied with your subscription? Get a full refund within 14 days of purchase.</p>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardContent className="p-6">
-                <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center mb-4">
-                  <i className="fas fa-lock text-primary-600 text-xl"></i>
+                <div className="p-6">
+                  <ul className="space-y-3">
+                    <li className="flex items-start">
+                      <i className="fas fa-check text-primary mt-1 mr-2"></i>
+                      <span>Unlimited roleplay scenarios</span>
+                    </li>
+                    <li className="flex items-start">
+                      <i className="fas fa-check text-primary mt-1 mr-2"></i>
+                      <span>Unlimited practice tests</span>
+                    </li>
+                    <li className="flex items-start">
+                      <i className="fas fa-check text-primary mt-1 mr-2"></i>
+                      <span>Complete PI library with custom examples</span>
+                    </li>
+                    <li className="flex items-start">
+                      <i className="fas fa-check text-primary mt-1 mr-2"></i>
+                      <span>Comprehensive written event guidance</span>
+                    </li>
+                    <li className="flex items-start">
+                      <i className="fas fa-check text-primary mt-1 mr-2"></i>
+                      <span>Detailed performance analytics</span>
+                    </li>
+                    <li className="flex items-start">
+                      <i className="fas fa-check text-primary mt-1 mr-2"></i>
+                      <span>Priority customer support</span>
+                    </li>
+                  </ul>
+                  <div className="mt-6">
+                    {user?.subscriptionTier === "pro" ? (
+                      <button disabled className="w-full py-2 px-4 bg-slate-200 text-slate-600 rounded-lg text-center font-medium">
+                        Current Plan
+                      </button>
+                    ) : (
+                      <button 
+                        onClick={() => updateSubscriptionMutation.mutate("pro")}
+                        className="w-full py-2 px-4 bg-accent hover:bg-accent/90 text-white rounded-lg text-center font-medium transition"
+                      >
+                        Upgrade to Pro
+                      </button>
+                    )}
+                  </div>
                 </div>
-                <h3 className="font-bold text-lg mb-2">Secure Payments</h3>
-                <p className="text-slate-600">All payments are processed securely through Stripe with bank-level encryption.</p>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardContent className="p-6">
-                <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center mb-4">
-                  <i className="fas fa-headset text-primary-600 text-xl"></i>
-                </div>
-                <h3 className="font-bold text-lg mb-2">Dedicated Support</h3>
-                <p className="text-slate-600">All paid plans include priority customer support to answer your questions.</p>
-              </CardContent>
-            </Card>
-          </div>
-          
-          <div className="mt-10">
-            <h2 className="text-xl font-bold mb-4">Frequently Asked Questions</h2>
-            <div className="space-y-4">
-              <div className="border border-slate-200 rounded-lg p-4">
-                <h3 className="font-medium text-slate-800">Can I switch plans later?</h3>
-                <p className="text-slate-600 mt-2">Yes, you can upgrade or downgrade your plan at any time. Your billing will be prorated accordingly.</p>
-              </div>
-              <div className="border border-slate-200 rounded-lg p-4">
-                <h3 className="font-medium text-slate-800">Do you offer refunds?</h3>
-                <p className="text-slate-600 mt-2">Yes, we offer a 14-day money-back guarantee if you're not satisfied with our service.</p>
-              </div>
-              <div className="border border-slate-200 rounded-lg p-4">
-                <h3 className="font-medium text-slate-800">How do I cancel my subscription?</h3>
-                <p className="text-slate-600 mt-2">You can cancel your subscription anytime from your account settings. Your access will continue until the end of your billing period.</p>
-              </div>
-              <div className="border border-slate-200 rounded-lg p-4">
-                <h3 className="font-medium text-slate-800">Do you offer educational discounts?</h3>
-                <p className="text-slate-600 mt-2">Yes, we offer special discounts for schools and DECA chapters. Contact us for more information.</p>
               </div>
             </div>
           </div>
+          
+          {/* Stripe Pricing Table - Enable when ready */}
+          {false && (
+            <div className="mb-8">
+              <stripe-pricing-table
+                pricing-table-id="prctbl_1R5Jhc2fAXktF0IPTDZ03BYv"
+                publishable-key={import.meta.env.VITE_STRIPE_PUBLIC_KEY || ""}
+              ></stripe-pricing-table>
+            </div>
+          )}
+          
+          {/* FAQ */}
+          <div className="mb-8">
+            <h2 className="text-2xl font-heading font-bold text-slate-800 mb-6 text-center">Frequently Asked Questions</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-white rounded-xl border border-slate-200 p-6">
+                <h3 className="font-heading font-bold text-lg text-slate-800 mb-3">Can I change my plan later?</h3>
+                <p className="text-slate-600">Yes! You can upgrade or downgrade your plan at any time. Changes will be effective immediately.</p>
+              </div>
+              <div className="bg-white rounded-xl border border-slate-200 p-6">
+                <h3 className="font-heading font-bold text-lg text-slate-800 mb-3">Is there a refund policy?</h3>
+                <p className="text-slate-600">We offer a 7-day money-back guarantee if you're not satisfied with your subscription.</p>
+              </div>
+              <div className="bg-white rounded-xl border border-slate-200 p-6">
+                <h3 className="font-heading font-bold text-lg text-slate-800 mb-3">How do the practice limits work?</h3>
+                <p className="text-slate-600">Limits reset on the 1st of each month. Unused practice sessions do not roll over to the next month.</p>
+              </div>
+              <div className="bg-white rounded-xl border border-slate-200 p-6">
+                <h3 className="font-heading font-bold text-lg text-slate-800 mb-3">Do you offer team discounts?</h3>
+                <p className="text-slate-600">Yes! Contact us for special pricing for DECA chapters or school teams of 10 or more students.</p>
+              </div>
+            </div>
+          </div>
+          
+          {/* Contact */}
+          <div className="text-center mb-12">
+            <p className="text-slate-600">Have more questions? <a href="mailto:support@decade-deca.ai" className="text-primary font-medium">Contact our support team</a></p>
+          </div>
+          
+          {/* Footer */}
+          <footer className="border-t border-slate-200 py-6">
+            <div className="flex flex-col md:flex-row justify-between items-center">
+              <div className="flex items-center gap-2 mb-4 md:mb-0">
+                <div className="relative w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                  <span className="text-white font-heading font-bold text-base">D</span>
+                  <span className="absolute -top-1 -right-1 bg-accent text-white text-xs font-bold rounded-full h-4 w-4 flex items-center justify-center">
+                    AI
+                  </span>
+                </div>
+                <span className="font-heading font-bold text-base text-slate-800">DecA<span className="text-primary">(I)</span>de</span>
+              </div>
+              
+              <div className="text-center md:text-right">
+                <div className="text-sm text-slate-500">© 2023 DecA(I)de. All rights reserved.</div>
+                <div className="text-xs text-slate-400 mt-1">Who says there is no I in team?</div>
+              </div>
+            </div>
+          </footer>
         </div>
       </main>
     </div>
