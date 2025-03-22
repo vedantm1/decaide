@@ -1,109 +1,122 @@
-/* Force Dark Mode for DecA(I)de */
+/* 
+ * Force Dark Mode Styles
+ * These styles override default styling to ensure dark mode works properly
+ */
 
-/* This overwrites core styling to force dark mode */
-html[data-theme="dark"],
-html.dark {
-  /* Core UI colors */
-  --background: 222.2 84% 4.9% !important;
-  --foreground: 210 40% 98% !important;
-  --card: 222.2 84% 4.9% !important;
-  --card-foreground: 210 40% 98% !important;
-  --popover: 222.2 84% 4.9% !important;
-  --popover-foreground: 210 40% 98% !important;
-  --muted: 217.2 32.6% 17.5% !important;
-  --muted-foreground: 215 20.2% 65.1% !important;
-  --accent: 217.2 32.6% 17.5% !important;
-  --accent-foreground: 210 40% 98% !important;
-  --border: 217.2 32.6% 17.5% !important;
-  --input: 217.2 32.6% 17.5% !important;
+/* Dark mode base styles with !important to override any other styles */
+html.dark,
+html[data-theme="dark"] {
+  color-scheme: dark !important;
 }
 
-html[data-theme="dark"] body,
-html.dark body {
-  background-color: hsl(222.2 84% 4.9%) !important;
+/* Card backgrounds in dark mode - specifically fixes Why DecA(I)de cards */
+html.dark .bg-white,
+html[data-theme="dark"] .bg-white {
+  background-color: hsl(222.2 84% 8%) !important;
   color: hsl(210 40% 98%) !important;
 }
 
-html[data-theme="dark"] .card,
-html[data-theme="dark"] [class*="card"],
-html.dark .card,
-html.dark [class*="card"] {
-  background-color: hsl(222.2 84% 10%) !important;
-  color: hsl(210 40% 98%) !important;
-  border-color: hsl(217.2 32.6% 17.5%) !important;
-}
-
-html[data-theme="dark"] header,
-html.dark header {
-  background-color: hsl(222.2 84% 4.9%) !important;
+/* Card content in dark mode */
+html.dark .bg-white p,
+html[data-theme="dark"] .bg-white p {
   color: hsl(210 40% 98%) !important;
 }
 
-html[data-theme="dark"] main,
-html.dark main {
-  background-color: hsl(222.2 84% 4.9%) !important;
+/* Written Events template cards */
+html.dark .bg-white h3,
+html[data-theme="dark"] .bg-white h3 {
+  color: hsl(210 40% 98%) !important;
 }
 
-html[data-theme="dark"] .bg-slate-50,
-html.dark .bg-slate-50 {
-  background-color: hsl(222.2 84% 4.9%) !important;
-}
-
-html[data-theme="dark"] .text-slate-500,
-html.dark .text-slate-500 {
+/* Login/Register page footer text */
+html.dark .text-slate-600,
+html[data-theme="dark"] .text-slate-600 {
   color: hsl(215 20.2% 65.1%) !important;
 }
 
-html[data-theme="dark"] .text-slate-800,
-html.dark .text-slate-800 {
+/* Why DecA(I)de page heading */
+html.dark .text-slate-900,
+html[data-theme="dark"] .text-slate-900 {
   color: hsl(210 40% 98%) !important;
 }
 
-/* Sidebar elements */
-html[data-theme="dark"] aside,
-html.dark aside {
-  background-color: hsl(222.2 84% 8%) !important;
-  border-color: hsl(217.2 32.6% 17.5%) !important;
+/* Force subscription table to have light text */
+html.dark .bg-white th,
+html.dark .bg-white td,
+html[data-theme="dark"] .bg-white th,
+html[data-theme="dark"] .bg-white td {
+  color: hsl(210 40% 98%) !important;
 }
 
-/* Input elements */
-html[data-theme="dark"] input,
-html[data-theme="dark"] select,
-html[data-theme="dark"] textarea,
+/* Text inputs in dark mode */
 html.dark input,
+html.dark textarea,
 html.dark select,
-html.dark textarea {
-  background-color: hsl(222.2 84% 8%) !important;
+html[data-theme="dark"] input,
+html[data-theme="dark"] textarea,
+html[data-theme="dark"] select {
+  background-color: hsl(222.2 84% 12%) !important;
+  color: hsl(210 40% 98%) !important;
   border-color: hsl(217.2 32.6% 17.5%) !important;
+}
+
+/* Input placeholders */
+html.dark input::placeholder,
+html.dark textarea::placeholder,
+html[data-theme="dark"] input::placeholder,
+html[data-theme="dark"] textarea::placeholder {
+  color: hsl(215 20.2% 65.1%) !important;
+}
+
+/* Headers on darker pages */
+html.dark h1, html.dark h2, html.dark h3, 
+html.dark h4, html.dark h5, html.dark h6,
+html[data-theme="dark"] h1, html[data-theme="dark"] h2, html[data-theme="dark"] h3,
+html[data-theme="dark"] h4, html[data-theme="dark"] h5, html[data-theme="dark"] h6 {
   color: hsl(210 40% 98%) !important;
 }
 
-/* Buttons */
-html[data-theme="dark"] button,
-html.dark button {
+/* Labels in forms */
+html.dark label,
+html[data-theme="dark"] label {
   color: hsl(210 40% 98%) !important;
 }
 
-/* Force light mode when explicitly set */
-html[data-theme="light"] body {
-  background-color: hsl(0 0% 100%) !important;
-  color: hsl(222.2 84% 4.9%) !important;
+/* Fix Practice Tests page */
+html.dark .text-gray-700,
+html[data-theme="dark"] .text-gray-700 {
+  color: hsl(215 20.2% 75%) !important;
 }
 
-html[data-theme="light"] .card,
-html[data-theme="light"] [class*="card"] {
-  background-color: hsl(0 0% 100%) !important;
-  color: hsl(222.2 84% 4.9%) !important;
+/* Fix slider track in dark mode */
+html.dark .rc-slider-track,
+html[data-theme="dark"] .rc-slider-track {
+  background-color: hsl(var(--primary)) !important;
 }
 
-html[data-theme="light"] .bg-slate-50 {
-  background-color: hsl(210 40% 98%) !important;
+html.dark .rc-slider-rail,
+html[data-theme="dark"] .rc-slider-rail {
+  background-color: hsl(217.2 32.6% 17.5%) !important;
 }
 
-html[data-theme="light"] .text-slate-500 {
-  color: hsl(215.4 16.3% 46.9%) !important;
+/* Fix table dark mode in subscription */
+html.dark table,
+html[data-theme="dark"] table {
+  border-color: hsl(217.2 32.6% 17.5%) !important;
 }
 
-html[data-theme="light"] .text-slate-800 {
-  color: hsl(222.2 84% 4.9%) !important;
+/* Subtle background differentiation for UI elements */
+html.dark .dark-surface-1,
+html[data-theme="dark"] .dark-surface-1 {
+  background-color: hsl(222.2 84% 7%) !important;
+}
+
+html.dark .dark-surface-2,
+html[data-theme="dark"] .dark-surface-2 {
+  background-color: hsl(222.2 84% 9%) !important;
+}
+
+html.dark .dark-surface-3,
+html[data-theme="dark"] .dark-surface-3 {
+  background-color: hsl(222.2 84% 11%) !important;
 }

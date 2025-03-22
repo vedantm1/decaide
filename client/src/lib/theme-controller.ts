@@ -18,11 +18,20 @@ const defaultAppearance: AppearanceSettings = {
   visualStyle: 'memphis'
 };
 
-// Get the current theme from localStorage or use the default
+// Get the current theme from sessionStorage (user session) or localStorage (device) or use the default
 export function getCurrentTheme(): AppearanceSettings {
   try {
+    // First check sessionStorage (user-specific for current session)
+    const sessionAppearance = sessionStorage.getItem('diegoAppearance');
+    if (sessionAppearance) {
+      return { ...defaultAppearance, ...JSON.parse(sessionAppearance) };
+    }
+    
+    // Then fallback to localStorage (device-specific)
     const savedAppearance = localStorage.getItem('diegoAppearance');
     if (savedAppearance) {
+      // Copy to sessionStorage for future use
+      sessionStorage.setItem('diegoAppearance', savedAppearance);
       return { ...defaultAppearance, ...JSON.parse(savedAppearance) };
     }
   } catch (e) {
@@ -34,7 +43,11 @@ export function getCurrentTheme(): AppearanceSettings {
 
 // Apply the theme to the document
 export function applyTheme(appearance: AppearanceSettings): AppearanceSettings {
-  // Save to localStorage first
+  // Save to sessionStorage (user session specific)
+  sessionStorage.setItem('diegoAppearance', JSON.stringify(appearance));
+  
+  // Also save to localStorage for device persistence 
+  // This is a fallback for users who aren't logged in
   localStorage.setItem('diegoAppearance', JSON.stringify(appearance));
   
   // 1. Handle dark/light/system mode

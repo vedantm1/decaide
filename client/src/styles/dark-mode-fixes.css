@@ -1,0 +1,134 @@
+/* Dark Mode Text Fixes - Ensuring text is visible in dark mode */
+
+/* Global text color fixes in dark mode */
+html.dark, 
+html[data-theme="dark"] {
+  /* Base colors with different gradients of black */
+  --dark-bg-primary: hsl(222.2 84% 4.9%);      /* Darkest background */
+  --dark-bg-secondary: hsl(222.2 84% 8%);      /* Slightly lighter for cards */
+  --dark-bg-tertiary: hsl(222.2 84% 12%);      /* Even lighter for inputs */
+  --dark-border: hsl(217.2 32.6% 17.5%);       /* Border color */
+  --dark-text-primary: hsl(210 40% 98%);       /* Primary text */
+  --dark-text-secondary: hsl(215 20.2% 65.1%); /* Secondary text */
+}
+
+/* Body background */
+html.dark body,
+html[data-theme="dark"] body {
+  background-color: var(--dark-bg-primary) !important;
+  color: var(--dark-text-primary) !important;
+}
+
+/* Main container background */
+html.dark main,
+html[data-theme="dark"] main {
+  background-color: var(--dark-bg-primary) !important;
+}
+
+/* Cards in dark mode */
+html.dark .card,
+html.dark [class*="card"],
+html[data-theme="dark"] .card,
+html[data-theme="dark"] [class*="card"] {
+  background-color: var(--dark-bg-secondary) !important;
+  color: var(--dark-text-primary) !important;
+  border-color: var(--dark-border) !important;
+}
+
+/* Headings and descriptive text */
+html.dark h1, html.dark h2, html.dark h3, html.dark h4, html.dark h5, html.dark h6,
+html[data-theme="dark"] h1, html[data-theme="dark"] h2, html[data-theme="dark"] h3, 
+html[data-theme="dark"] h4, html[data-theme="dark"] h5, html[data-theme="dark"] h6 {
+  color: var(--dark-text-primary) !important;
+}
+
+/* Fix for text-slate-800 and similar dark text */
+html.dark .text-slate-800, html.dark .text-slate-900, html.dark .text-slate-700,
+html[data-theme="dark"] .text-slate-800, html[data-theme="dark"] .text-slate-900, html[data-theme="dark"] .text-slate-700 {
+  color: var(--dark-text-primary) !important;
+}
+
+/* Fix for text-slate-500 and similar mid-tone text */
+html.dark .text-slate-500, html.dark .text-slate-600, 
+html[data-theme="dark"] .text-slate-500, html[data-theme="dark"] .text-slate-600 {
+  color: var(--dark-text-secondary) !important;
+}
+
+/* Sidebar fixes */
+html.dark aside, html[data-theme="dark"] aside {
+  background-color: var(--dark-bg-secondary) !important;
+  border-color: var(--dark-border) !important;
+}
+
+/* Input elements */
+html.dark input, html.dark select, html.dark textarea,
+html[data-theme="dark"] input, html[data-theme="dark"] select, html[data-theme="dark"] textarea {
+  background-color: var(--dark-bg-tertiary) !important;
+  border-color: var(--dark-border) !important;
+  color: var(--dark-text-primary) !important;
+}
+
+/* Table cells and rows */
+html.dark table, html.dark tr, html.dark td, html.dark th,
+html[data-theme="dark"] table, html[data-theme="dark"] tr, html[data-theme="dark"] td, html[data-theme="dark"] th {
+  border-color: var(--dark-border) !important;
+  color: var(--dark-text-primary) !important;
+}
+
+/* White card backgrounds - specifically fixes the cards in Why DecA(I)de */
+html.dark .bg-white, html[data-theme="dark"] .bg-white {
+  background-color: var(--dark-bg-secondary) !important;
+  color: var(--dark-text-primary) !important;
+}
+
+/* Fix slate backgrounds */
+html.dark .bg-slate-50, html.dark .bg-slate-100, html.dark .bg-slate-200,
+html[data-theme="dark"] .bg-slate-50, html[data-theme="dark"] .bg-slate-100, html[data-theme="dark"] .bg-slate-200 {
+  background-color: var(--dark-bg-primary) !important;
+}
+
+/* Fix slate border colors */
+html.dark .border-slate-200, html.dark .border-slate-300,
+html[data-theme="dark"] .border-slate-200, html[data-theme="dark"] .border-slate-300 {
+  border-color: var(--dark-border) !important;
+}
+
+/* Fix buttons in dark mode */
+html.dark button, html[data-theme="dark"] button {
+  color: inherit !important;
+}
+
+/* Fix form labels in dark mode */
+html.dark label, html[data-theme="dark"] label {
+  color: var(--dark-text-primary) !important;
+}
+
+/* Fix descriptions in dark mode */
+html.dark [class*="description"], html[data-theme="dark"] [class*="description"] {
+  color: var(--dark-text-secondary) !important;
+}
+
+/* Tables in Subscription view */
+html.dark .bg-white th, html[data-theme="dark"] .bg-white th {
+  color: var(--dark-text-primary) !important;
+}
+
+/* Core theme styling for headers and paragraphs */
+html.dark p, html[data-theme="dark"] p {
+  color: var(--dark-text-primary) !important;
+}
+
+/* Accent colors from current theme */
+html.dark .accent-color, html[data-theme="dark"] .accent-color {
+  color: hsl(var(--primary)) !important;
+}
+
+/* Icons and UI elements in dark mode */
+html.dark svg, html[data-theme="dark"] svg {
+  color: inherit;
+}
+
+/* Chart backgrounds */
+html.dark [class*="chart"], html[data-theme="dark"] [class*="chart"] {
+  background-color: var(--dark-bg-secondary) !important;
+}

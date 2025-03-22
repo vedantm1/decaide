@@ -1,0 +1,217 @@
+/* 
+ * Theme Color Variables for DecA(I)de
+ * This file defines all color variables for the different cluster themes
+ */
+
+/* Business Management Cluster Theme - Yellow/Gold */
+html.theme-business {
+  --primary: 45 100% 50%; /* Vibrant gold */
+  --primary-foreground: 20 10% 10%; /* Dark text for contrast */
+  
+  /* Accent colors for UI elements */
+  --accent-color: hsl(45, 100%, 50%);
+  --accent-highlight: hsl(40, 100%, 65%);
+  --accent-muted: hsl(43, 80%, 80%);
+  
+  /* Change micro-interaction colors */
+  --success-color: hsl(120, 70%, 45%);
+  --error-color: hsl(0, 80%, 50%);
+  --info-color: hsl(200, 80%, 50%);
+  --warning-color: hsl(40, 100%, 50%);
+}
+
+/* Finance Cluster Theme - Green */
+html.theme-finance {
+  --primary: 142 76% 36%; /* Money green */
+  --primary-foreground: 355 100% 100%; /* White text for contrast */
+  
+  /* Accent colors for UI elements */
+  --accent-color: hsl(142, 76%, 36%);
+  --accent-highlight: hsl(142, 76%, 46%);
+  --accent-muted: hsl(142, 60%, 85%);
+  
+  /* Change micro-interaction colors */
+  --success-color: hsl(120, 70%, 45%);
+  --error-color: hsl(0, 80%, 50%);
+  --info-color: hsl(200, 80%, 50%);
+  --warning-color: hsl(40, 100%, 50%);
+}
+
+/* Hospitality Cluster Theme - Blue */
+html.theme-hospitality {
+  --primary: 210 100% 50%; /* Welcoming blue */
+  --primary-foreground: 0 0% 100%; /* White text for contrast */
+  
+  /* Accent colors for UI elements */
+  --accent-color: hsl(210, 100%, 50%);
+  --accent-highlight: hsl(210, 100%, 65%);
+  --accent-muted: hsl(210, 70%, 85%);
+  
+  /* Change micro-interaction colors */
+  --success-color: hsl(120, 70%, 45%);
+  --error-color: hsl(0, 80%, 50%);
+  --info-color: hsl(200, 80%, 50%);
+  --warning-color: hsl(40, 100%, 50%);
+}
+
+/* Marketing Cluster Theme - Red */
+html.theme-marketing {
+  --primary: 0 85% 50%; /* Attention-grabbing red */
+  --primary-foreground: 0 0% 100%; /* White text for contrast */
+  
+  /* Accent colors for UI elements */
+  --accent-color: hsl(0, 85%, 50%);
+  --accent-highlight: hsl(0, 85%, 65%);
+  --accent-muted: hsl(0, 70%, 85%);
+  
+  /* Change micro-interaction colors */
+  --success-color: hsl(120, 70%, 45%);
+  --error-color: hsl(0, 80%, 50%);
+  --info-color: hsl(200, 80%, 50%);
+  --warning-color: hsl(40, 100%, 50%);
+}
+
+/* Entrepreneurship Cluster Theme - Silver/Gray */
+html.theme-entrepreneurship {
+  --primary: 210 17% 60%; /* Professional silver/gray */
+  --primary-foreground: 0 0% 100%; /* White text for contrast */
+  
+  /* Accent colors for UI elements */
+  --accent-color: hsl(210, 17%, 60%);
+  --accent-highlight: hsl(210, 17%, 75%);
+  --accent-muted: hsl(210, 15%, 90%);
+  
+  /* Change micro-interaction colors */
+  --success-color: hsl(120, 70%, 45%);
+  --error-color: hsl(0, 80%, 50%);
+  --info-color: hsl(200, 80%, 50%);
+  --warning-color: hsl(40, 100%, 50%);
+}
+
+/* Business Admin Core Cluster Theme - Navy Blue */
+html.theme-admin {
+  --primary: 220 70% 30%; /* Professional navy blue */
+  --primary-foreground: 0 0% 100%; /* White text for contrast */
+  
+  /* Accent colors for UI elements */
+  --accent-color: hsl(220, 70%, 30%);
+  --accent-highlight: hsl(220, 70%, 45%);
+  --accent-muted: hsl(220, 50%, 85%);
+  
+  /* Change micro-interaction colors */
+  --success-color: hsl(120, 70%, 45%);
+  --error-color: hsl(0, 80%, 50%);
+  --info-color: hsl(200, 80%, 50%);
+  --warning-color: hsl(40, 100%, 50%);
+}
+
+/* Additional UI Themes (not directly tied to clusters) */
+
+/* Aqua Blue Theme */
+html.theme-aquaBlue {
+  --primary: 195 100% 50%; /* Vibrant aqua blue */
+  --primary-foreground: 0 0% 100%; /* White text for contrast */
+  
+  /* Accent colors for UI elements */
+  --accent-color: hsl(195, 100%, 50%);
+  --accent-highlight: hsl(195, 100%, 65%);
+  --accent-muted: hsl(195, 70%, 85%);
+  
+  /* Change micro-interaction colors */
+  --success-color: hsl(120, 70%, 45%);
+  --error-color: hsl(0, 80%, 50%);
+  --info-color: hsl(200, 80%, 50%);
+  --warning-color: hsl(40, 100%, 50%);
+}
+
+/* Coral Pink Theme */
+html.theme-coralPink {
+  --primary: 350 100% 68%; /* Energetic coral pink */
+  --primary-foreground: 0 0% 100%; /* White text for contrast */
+  
+  /* Accent colors for UI elements */
+  --accent-color: hsl(350, 100%, 68%);
+  --accent-highlight: hsl(350, 100%, 78%);
+  --accent-muted: hsl(350, 80%, 90%);
+  
+  /* Change micro-interaction colors */
+  --success-color: hsl(120, 70%, 45%);
+  --error-color: hsl(0, 80%, 50%);
+  --info-color: hsl(200, 80%, 50%);
+  --warning-color: hsl(40, 100%, 50%);
+}
+
+/* Mint Green Theme */
+html.theme-mintGreen {
+  --primary: 160 100% 40%; /* Refreshing mint green */
+  --primary-foreground: 0 0% 100%; /* White text for contrast */
+  
+  /* Accent colors for UI elements */
+  --accent-color: hsl(160, 100%, 40%);
+  --accent-highlight: hsl(160, 100%, 55%);
+  --accent-muted: hsl(160, 70%, 85%);
+  
+  /* Change micro-interaction colors */
+  --success-color: hsl(120, 70%, 45%);
+  --error-color: hsl(0, 80%, 50%);
+  --info-color: hsl(200, 80%, 50%);
+  --warning-color: hsl(40, 100%, 50%);
+}
+
+/* Royal Purple Theme */
+html.theme-royalPurple {
+  --primary: 270 76% 50%; /* Majestic royal purple */
+  --primary-foreground: 0 0% 100%; /* White text for contrast */
+  
+  /* Accent colors for UI elements */
+  --accent-color: hsl(270, 76%, 50%);
+  --accent-highlight: hsl(270, 76%, 65%);
+  --accent-muted: hsl(270, 50%, 85%);
+  
+  /* Change micro-interaction colors */
+  --success-color: hsl(120, 70%, 45%);
+  --error-color: hsl(0, 80%, 50%);
+  --info-color: hsl(200, 80%, 50%);
+  --warning-color: hsl(40, 100%, 50%);
+}
+
+/* Apply theme colors to specific UI elements in both light and dark mode */
+html.theme-business .accent-color, 
+html.theme-finance .accent-color,
+html.theme-hospitality .accent-color,
+html.theme-marketing .accent-color,
+html.theme-entrepreneurship .accent-color,
+html.theme-admin .accent-color,
+html.theme-aquaBlue .accent-color,
+html.theme-coralPink .accent-color,
+html.theme-mintGreen .accent-color,
+html.theme-royalPurple .accent-color {
+  color: var(--accent-color);
+}
+
+/* Apply accent color to specific elements */
+html [class*="theme-"] .themed-icon svg,
+html [class*="theme-"] .themed-accent {
+  color: var(--accent-color) !important;
+}
+
+/* Apply accent hover state */
+html [class*="theme-"] .themed-hover:hover {
+  color: var(--accent-highlight) !important;
+}
+
+/* Progress bars and similar UI elements */
+html [class*="theme-"] .themed-progress-bar {
+  background-color: var(--accent-color) !important;
+}
+
+/* Button hover effects */
+html [class*="theme-"] button.themed-button:hover {
+  background-color: var(--accent-highlight) !important;
+}
+
+/* Dark mode adjustments for all themes */
+html.dark [class*="theme-"] .accent-color,
+html[data-theme="dark"] [class*="theme-"] .accent-color {
+  color: var(--accent-highlight) !important; /* Brighter color in dark mode for better contrast */
+}

@@ -2,6 +2,7 @@
 @import './styles/visual-styles.css';
 @import './lib/theme-colors.css';
 @import './styles/force-dark-mode.css';
+@import './styles/dark-mode-fixes.css';
 
 @tailwind base;
 @tailwind components;

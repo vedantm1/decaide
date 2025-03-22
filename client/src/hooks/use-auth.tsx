@@ -134,7 +134,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await apiRequest("POST", "/api/logout");
     },
     onSuccess: () => {
+      // Clear user data
       queryClient.setQueryData(["/api/user"], null);
+      
+      // Clear all user-specific session storage
+      sessionStorage.removeItem('diegoAppearance');
+      sessionStorage.removeItem('justLoggedIn');
+      
+      // Clear other user-session related stored data
+      // This ensures theme and settings don't persist between accounts
+      sessionStorage.clear();
+      
       toast({
         title: "Logged out",
         description: "You have been logged out successfully.",
