@@ -115,16 +115,16 @@ export default function PracticeTestsPage() {
   };
   
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-50 font-sans">
+    <div className="flex h-screen overflow-hidden bg-slate-50 dark:bg-[var(--dark-gradient-v-default)] font-sans">
       <SidebarNavigation />
       
-      <main className="flex-1 overflow-y-auto bg-slate-50 pt-0 md:pt-0">
+      <main className="flex-1 overflow-y-auto bg-slate-50 dark:bg-transparent pt-0 md:pt-0">
         <MobileHeader />
         
         <div className="container mx-auto px-4 py-6 md:py-8 max-w-6xl">
           <header className="mb-6">
-            <h1 className="text-2xl font-heading font-bold text-slate-800">Practice Tests</h1>
-            <p className="text-slate-500 mt-1">Practice with exam-style questions to prepare for your DECA test</p>
+            <h1 className="text-2xl font-heading font-bold text-slate-800 dark:text-slate-100">Practice Tests</h1>
+            <p className="text-slate-500 dark:text-slate-400 mt-1">Practice with exam-style questions to prepare for your DECA test</p>
           </header>
           
           {!generatedTest ? (
@@ -177,7 +177,7 @@ export default function PracticeTestsPage() {
                           />
                           <label 
                             htmlFor={`category-${category.name}`} 
-                            className="ml-2 text-sm text-slate-700"
+                            className="ml-2 text-sm text-slate-700 dark:text-slate-300"
                           >
                             {category.name} ({category.count})
                           </label>
@@ -200,7 +200,7 @@ export default function PracticeTestsPage() {
                         onValueChange={(value) => setValue("numQuestions", value[0])}
                         className="w-full"
                       />
-                      <span className="ml-3 text-sm text-slate-600 min-w-[40px]">{numQuestions}</span>
+                      <span className="ml-3 text-sm text-slate-600 dark:text-slate-400 min-w-[40px]">{numQuestions}</span>
                     </div>
                   </div>
                   
@@ -248,8 +248,8 @@ export default function PracticeTestsPage() {
                   </span>
                 </CardHeader>
                 <CardContent>
-                  <div className="bg-slate-50 p-4 rounded-lg">
-                    <p className="text-slate-700">
+                  <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-lg">
+                    <p className="text-slate-700 dark:text-slate-200">
                       {generatedTest.questions[currentQuestion].question}
                     </p>
                     
@@ -261,7 +261,7 @@ export default function PracticeTestsPage() {
                         {generatedTest.questions[currentQuestion].options.map((option: string, index: number) => (
                           <div key={index} className="flex items-center">
                             <RadioGroupItem value={index.toString()} id={`option-${index}`} />
-                            <Label htmlFor={`option-${index}`} className="ml-2 text-slate-700">
+                            <Label htmlFor={`option-${index}`} className="ml-2 text-slate-700 dark:text-slate-300">
                               {String.fromCharCode(65 + index)}) {option}
                             </Label>
                           </div>
@@ -291,7 +291,7 @@ export default function PracticeTestsPage() {
                   
                   {/* Question navigation */}
                   <div className="mt-8">
-                    <h3 className="text-sm font-medium text-slate-700 mb-2">Question Navigator</h3>
+                    <h3 className="text-sm font-medium text-slate-700 dark:text-slate-200 mb-2">Question Navigator</h3>
                     <div className="grid grid-cols-10 gap-1">
                       {generatedTest.questions.map((_: any, index: number) => (
                         <Button

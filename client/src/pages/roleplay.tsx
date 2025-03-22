@@ -117,16 +117,16 @@ export default function RoleplayPage() {
   };
   
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-50 font-sans">
+    <div className="flex h-screen overflow-hidden bg-slate-50 dark:bg-[var(--dark-gradient-v-default)] font-sans">
       <SidebarNavigation />
       
-      <main className="flex-1 overflow-y-auto bg-slate-50 pt-0 md:pt-0">
+      <main className="flex-1 overflow-y-auto bg-slate-50 dark:bg-transparent pt-0 md:pt-0">
         <MobileHeader />
         
         <div className="container mx-auto px-4 py-6 md:py-8 max-w-6xl">
           <header className="mb-6">
-            <h1 className="text-2xl font-heading font-bold text-slate-800">Roleplay Practice</h1>
-            <p className="text-slate-500 mt-1">Generate custom roleplays to practice your presentation skills</p>
+            <h1 className="text-2xl font-heading font-bold text-slate-800 dark:text-slate-100">Roleplay Practice</h1>
+            <p className="text-slate-500 dark:text-slate-400 mt-1">Generate custom roleplays to practice your presentation skills</p>
           </header>
           
           {!generatedRoleplay ? (
@@ -254,15 +254,15 @@ export default function RoleplayPage() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="bg-slate-50 p-4 rounded-lg mb-4">
-                    <h3 className="font-bold text-slate-700">{generatedRoleplay.title}</h3>
-                    <p className="text-sm text-slate-600 mt-2">
+                  <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-lg mb-4">
+                    <h3 className="font-bold text-slate-700 dark:text-slate-200">{generatedRoleplay.title}</h3>
+                    <p className="text-sm text-slate-600 dark:text-slate-300 mt-2">
                       {generatedRoleplay.scenario}
                     </p>
                     
                     <div className="mt-4">
-                      <h4 className="font-medium text-slate-700 text-sm">Performance Indicators:</h4>
-                      <ul className="list-disc list-inside text-sm text-slate-600 mt-1 space-y-1">
+                      <h4 className="font-medium text-slate-700 dark:text-slate-200 text-sm">Performance Indicators:</h4>
+                      <ul className="list-disc list-inside text-sm text-slate-600 dark:text-slate-300 mt-1 space-y-1">
                         {generatedRoleplay.performanceIndicators.map((pi: string, index: number) => (
                           <li key={index}>{pi}</li>
                         ))}
@@ -270,22 +270,22 @@ export default function RoleplayPage() {
                     </div>
                     
                     <div className="mt-4">
-                      <h4 className="font-medium text-slate-700 text-sm">You will meet with:</h4>
-                      <p className="text-sm text-slate-600 mt-1">{generatedRoleplay.meetWith}</p>
+                      <h4 className="font-medium text-slate-700 dark:text-slate-200 text-sm">You will meet with:</h4>
+                      <p className="text-sm text-slate-600 dark:text-slate-300 mt-1">{generatedRoleplay.meetWith}</p>
                     </div>
                   </div>
                   
                   <div className="flex flex-col md:flex-row gap-4 mt-8">
                     <div className="md:w-1/2">
-                      <h3 className="font-medium text-slate-700 mb-2">Prep Timer</h3>
-                      <div className="bg-slate-50 p-4 rounded-lg">
+                      <h3 className="font-medium text-slate-700 dark:text-slate-200 mb-2">Prep Timer</h3>
+                      <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-lg">
                         <div className="flex items-center justify-between">
-                          <span className="text-slate-700 font-medium">{formatTime(prepTimeRemaining)}</span>
+                          <span className="text-slate-700 dark:text-slate-200 font-medium">{formatTime(prepTimeRemaining)}</span>
                           <div className="flex items-center gap-2">
                             <Button 
                               size="icon" 
                               variant={prepTimerActive ? "outline" : "default"}
-                              className={prepTimerActive ? "bg-slate-200 text-slate-600" : "bg-primary text-white"}
+                              className={prepTimerActive ? "bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300" : "bg-primary text-white"}
                               onClick={prepTimerActive ? stopPrepTimer : startPrepTimer}
                             >
                               <i className={`fas fa-${prepTimerActive ? 'pause' : 'play'} text-xs`}></i>
@@ -293,7 +293,7 @@ export default function RoleplayPage() {
                             <Button 
                               size="icon" 
                               variant="outline" 
-                              className="bg-slate-200 text-slate-600"
+                              className="bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300"
                               onClick={stopPrepTimer}
                             >
                               <i className="fas fa-stop text-xs"></i>
@@ -301,14 +301,14 @@ export default function RoleplayPage() {
                             <Button 
                               size="icon" 
                               variant="outline" 
-                              className="bg-slate-200 text-slate-600"
+                              className="bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300"
                               onClick={resetPrepTimer}
                             >
                               <i className="fas fa-redo text-xs"></i>
                             </Button>
                           </div>
                         </div>
-                        <div className="w-full h-2 bg-slate-200 rounded-full mt-3">
+                        <div className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-full mt-3">
                           <div
                             className="bg-primary h-2 rounded-full transition-all duration-300"
                             style={{ width: `${(prepTimeRemaining / 600) * 100}%` }}
@@ -318,9 +318,9 @@ export default function RoleplayPage() {
                     </div>
                     
                     <div className="md:w-1/2">
-                      <h3 className="font-medium text-slate-700 mb-2">Presentation Tips</h3>
-                      <div className="bg-slate-50 p-4 rounded-lg">
-                        <ul className="space-y-2 text-sm text-slate-600">
+                      <h3 className="font-medium text-slate-700 dark:text-slate-200 mb-2">Presentation Tips</h3>
+                      <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-lg">
+                        <ul className="space-y-2 text-sm text-slate-600 dark:text-slate-300">
                           <li className="flex items-start gap-2">
                             <i className="fas fa-check-circle text-secondary mt-0.5"></i>
                             <span>Focus on how your solution addresses each performance indicator</span>
