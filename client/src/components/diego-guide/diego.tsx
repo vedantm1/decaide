@@ -61,7 +61,9 @@ const TUTORIAL_CONTENT = {
     buttonText: "Next",
     avatarType: "pointing",
     pointDirection: "down",
-    position: { top: "20%", left: "35%" }
+    position: { top: "20%", left: "35%" },
+    swimming: true,
+    targetPosition: { x: 150, y: 20 }
   },
   [TUTORIAL_STEPS.NAVIGATION]: {
     title: "Navigating DecA(I)de",
@@ -69,7 +71,9 @@ const TUTORIAL_CONTENT = {
     buttonText: "Show Me More",
     avatarType: "pointing",
     pointDirection: "left",
-    position: { top: "30%", left: "15%" }
+    position: { top: "30%", left: "15%" },
+    swimming: true,
+    targetPosition: { x: -100, y: 0 }
   },
   [TUTORIAL_STEPS.ROLEPLAY]: {
     title: "Roleplay Practice",
@@ -84,7 +88,9 @@ const TUTORIAL_CONTENT = {
     buttonText: "Next",
     avatarType: "pointing",
     pointDirection: "up",
-    position: { top: "50%", left: "60%" }
+    position: { top: "50%", left: "60%" },
+    swimming: true,
+    targetPosition: { x: 0, y: -80 }
   },
   [TUTORIAL_STEPS.PRACTICE_TESTS]: {
     title: "Practice Tests",
@@ -99,7 +105,9 @@ const TUTORIAL_CONTENT = {
     buttonText: "Next",
     avatarType: "pointing",
     pointDirection: "right",
-    position: { top: "40%", right: "15%" }
+    position: { top: "40%", right: "15%" },
+    swimming: true,
+    targetPosition: { x: 100, y: 0 }
   },
   [TUTORIAL_STEPS.PROGRESS]: {
     title: "Track Your Progress",
@@ -114,7 +122,9 @@ const TUTORIAL_CONTENT = {
     buttonText: "Next",
     avatarType: "pointing",
     pointDirection: "left",
-    position: { bottom: "20%", left: "20%" }
+    position: { bottom: "20%", left: "20%" },
+    swimming: true,
+    targetPosition: { x: -50, y: 50 }
   },
   [TUTORIAL_STEPS.COMPLETE]: {
     title: "You're All Set!",
