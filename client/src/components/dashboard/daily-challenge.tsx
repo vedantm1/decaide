@@ -23,13 +23,13 @@ export default function DailyChallenge({ challenge }: DailyChallengeProps) {
           
           <div className="mt-4 flex gap-3">
             <Button 
-              className="bg-white text-primary-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-white/90 transition duration-200 transform hover:scale-[1.03]"
+              className="bg-white text-black px-4 py-2 rounded-lg text-sm font-medium hover:bg-white/90 transition duration-200 transform hover:scale-[1.03]"
             >
               Start Now
             </Button>
             <Button 
               variant="ghost"
-              className="bg-primary-700/30 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-700/50 transition duration-200 transform hover:scale-[1.03]"
+              className="bg-primary-700/30 text-black px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-700/50 transition duration-200 transform hover:scale-[1.03]"
             >
               Details
             </Button>
