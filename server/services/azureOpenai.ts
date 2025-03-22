@@ -6,7 +6,7 @@ dotenv.config();
 // Environment variables for Azure OpenAI
 const AZURE_OPENAI_KEY = process.env.AZURE_OPENAI_KEY;
 const AZURE_OPENAI_ENDPOINT = process.env.AZURE_OPENAI_ENDPOINT;
-const AZURE_OPENAI_DEPLOYMENT = process.env.AZURE_OPENAI_DEPLOYMENT || "gpt-4o-mini";
+const AZURE_OPENAI_DEPLOYMENT = "gpt-4o-mini";
 
 // Check if required environment variables are set
 if (!AZURE_OPENAI_KEY || !AZURE_OPENAI_ENDPOINT) {
@@ -318,13 +318,13 @@ You should be critical but constructive, focusing on helping the student improve
     // Make the API call
     const response = await client.getChatCompletions(
       AZURE_OPENAI_DEPLOYMENT,
+      [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt }
+      ],
       {
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt }
-        ],
         temperature: 0.4,
-        max_tokens: 1500
+        maxTokens: 1500
       }
     );
     
@@ -389,7 +389,7 @@ function extractSection(content: string, sectionStart: string, sectionEnd: strin
   const startMatch = sectionStart ? content.match(startPattern) : { index: 0 };
   if (!startMatch) return "";
   
-  const startIndex = startMatch.index! + startMatch[0].length;
+  const startIndex = (startMatch.index ?? 0) + (startMatch[0]?.length ?? 0);
   const endMatch = sectionEnd ? content.slice(startIndex).match(endPattern) : null;
   const endIndex = endMatch ? startIndex + endMatch.index! : content.length;
   

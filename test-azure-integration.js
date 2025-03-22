@@ -11,7 +11,8 @@ async function testAzureOpenAI() {
     console.log("Client created successfully!");
     
     console.log("Testing chat completions...");
-    const deployment = process.env.AZURE_OPENAI_DEPLOYMENT || "gpt-4o-mini";
+    // Try the environment variable first, then fall back to model name
+    const deployment = "gpt-4o-mini";
     
     const response = await client.getChatCompletions(
       deployment,
