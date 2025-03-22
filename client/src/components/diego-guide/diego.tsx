@@ -4,6 +4,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from "@/components/ui/button";
 import { useMicroInteractions } from "@/hooks/use-micro-interactions";
 import { TutorialStep } from "@/hooks/use-diego-guide";
+import DiegoAvatar from "./diego-avatar";
 
 interface DiegoProps {
   isNewUser?: boolean;
@@ -13,16 +14,16 @@ interface DiegoProps {
 
 // Define all possible tutorial steps
 const TUTORIAL_STEPS = {
-  WELCOME: "welcome",
-  DASHBOARD: "dashboard",
-  NAVIGATION: "navigation",
-  ROLEPLAY: "roleplay",
-  PERFORMANCE_INDICATORS: "performance_indicators",
-  PRACTICE_TESTS: "practice_tests",
-  WRITTEN_EVENTS: "written_events",
-  PROGRESS: "progress",
-  SETTINGS: "settings",
-  COMPLETE: "complete",
+  WELCOME: "welcome" as const,
+  DASHBOARD: "dashboard" as const,
+  NAVIGATION: "navigation" as const,
+  ROLEPLAY: "roleplay" as const,
+  PERFORMANCE_INDICATORS: "performance_indicators" as const,
+  PRACTICE_TESTS: "practice_tests" as const,
+  WRITTEN_EVENTS: "written_events" as const,
+  PROGRESS: "progress" as const,
+  SETTINGS: "settings" as const,
+  COMPLETE: "complete" as const,
 };
 
 // Diego's message content for each tutorial step
@@ -150,11 +151,11 @@ export default function Diego({ isNewUser = false, currentStep = TUTORIAL_STEPS.
 
   // Progress to the next tutorial step
   const handleNextStep = () => {
-    const steps = Object.values(TUTORIAL_STEPS);
-    const currentIndex = steps.indexOf(activeStep);
+    const steps = Object.values(TUTORIAL_STEPS) as TutorialStep[];
+    const currentIndex = steps.indexOf(activeStep as TutorialStep);
     
     if (currentIndex < steps.length - 1) {
-      setActiveStep(steps[currentIndex + 1]);
+      setActiveStep(steps[currentIndex + 1] as TutorialStep);
       
       // Add some fun microinteractions when progressing through the tutorial
       if (currentIndex > 0 && currentIndex % 2 === 0) {
@@ -189,12 +190,7 @@ export default function Diego({ isNewUser = false, currentStep = TUTORIAL_STEPS.
         onClick={toggleDiego}
       >
         <div className="bg-primary text-white p-3 rounded-full shadow-lg">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2Z" fill="#4F46E5"/>
-            <circle cx="8" cy="9" r="1.5" fill="white"/>
-            <circle cx="16" cy="9" r="1.5" fill="white"/>
-            <path d="M8.5 15C8.5 15 10 17 12 17C14 17 15.5 15 15.5 15" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
-          </svg>
+          <DiegoAvatar emotion="happy" size="sm" />
         </div>
       </motion.div>
     );
@@ -202,6 +198,33 @@ export default function Diego({ isNewUser = false, currentStep = TUTORIAL_STEPS.
 
   // Get content for current step
   const content = TUTORIAL_CONTENT[activeStep as keyof typeof TUTORIAL_CONTENT];
+
+  // Animation for the tropical banner
+  const tropicalBannerVariants = {
+    hidden: { opacity: 0, y: 10 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: { delay: 0.5, duration: 0.3 }
+    },
+    exit: { opacity: 0, y: 10 }
+  };
+
+  // Animation for the dolphin avatar on top
+  const avatarVariants = {
+    hidden: { opacity: 0, y: -20, scale: 0.5 },
+    visible: { 
+      opacity: 1, 
+      y: -25, 
+      scale: 1,
+      transition: { 
+        type: "spring",
+        stiffness: 300,
+        damping: 15,
+        delay: 0.1
+      }
+    }
+  };
 
   return (
     <AnimatePresence>
@@ -215,9 +238,35 @@ export default function Diego({ isNewUser = false, currentStep = TUTORIAL_STEPS.
         >
           {!isDiegoMinimized && (
             <motion.div 
-              className={`bg-white rounded-lg shadow-xl border border-primary-100 max-w-sm ${isMobile ? 'w-full' : 'w-96'}`}
+              className={`bg-white rounded-lg shadow-xl border border-primary-100 max-w-sm ${isMobile ? 'w-full' : 'w-96'} relative`}
               variants={bubbleVariants}
             >
+              {/* Animated dolphin avatar on top */}
+              <motion.div 
+                className="absolute"
+                style={{ 
+                  left: '50%', 
+                  top: 0, 
+                  transform: 'translate(-50%, -50%)' 
+                }}
+                variants={avatarVariants}
+              >
+                <DiegoAvatar emotion="excited" size="md" />
+              </motion.div>
+
+              {/* Trial banner */}
+              <motion.div 
+                className="bg-gradient-to-r from-teal-500 to-blue-500 text-white text-xs py-1 px-3 rounded-full absolute -top-2 right-2 shadow-md"
+                variants={tropicalBannerVariants}
+              >
+                <span className="flex items-center gap-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                  </svg>
+                  Pro features - 3 day trial on us! 🏝️
+                </span>
+              </motion.div>
+
               <div className="flex items-center justify-between bg-primary text-white rounded-t-lg p-3">
                 <h3 className="font-medium text-sm">{content.title}</h3>
                 <div className="flex items-center gap-2">
@@ -240,7 +289,7 @@ export default function Diego({ isNewUser = false, currentStep = TUTORIAL_STEPS.
                 </Button>
               </div>
               <div className="text-xs text-center text-slate-400 pb-2">
-                Step {Object.values(TUTORIAL_STEPS).indexOf(activeStep) + 1} of {Object.values(TUTORIAL_STEPS).length}
+                Step {Object.values(TUTORIAL_STEPS).indexOf(activeStep as keyof typeof TUTORIAL_STEPS) + 1} of {Object.values(TUTORIAL_STEPS).length}
               </div>
             </motion.div>
           )}
@@ -252,12 +301,7 @@ export default function Diego({ isNewUser = false, currentStep = TUTORIAL_STEPS.
             whileHover={{ scale: 1.1 }}
             onClick={() => setIsDiegoMinimized(false)}
           >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2Z" fill="#4F46E5"/>
-              <circle cx="8" cy="9" r="1.5" fill="white"/>
-              <circle cx="16" cy="9" r="1.5" fill="white"/>
-              <path d="M8.5 15C8.5 15 10 17 12 17C14 17 15.5 15 15.5 15" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
-            </svg>
+            <DiegoAvatar emotion={isDiegoMinimized ? "excited" : "happy"} size="sm" />
           </motion.div>
         </motion.div>
       )}
