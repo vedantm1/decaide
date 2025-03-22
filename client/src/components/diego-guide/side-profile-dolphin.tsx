@@ -162,7 +162,8 @@ export default function SideProfileDolphin({
         />
       </svg>
       {showTextBox && (
-        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 mt-2 px-3 py-1 bg-white rounded shadow text-sm">
+        <div className={`absolute top-1/4 ${pointDirection === 'left' ? 'right-full mr-2' : 'left-full ml-2'} px-3 py-2 bg-white rounded-lg shadow-md text-sm max-w-[200px] border border-blue-100`}>
+          <div className={`absolute top-1/2 transform -translate-y-1/2 ${pointDirection === 'left' ? 'right-[-8px]' : 'left-[-8px]'} w-0 h-0 border-solid ${pointDirection === 'left' ? 'border-l-8 border-y-[6px] border-y-transparent border-l-white' : 'border-r-8 border-y-[6px] border-y-transparent border-r-white'}`}></div>
           {message || "I'm swimming over!"}
         </div>
       )}

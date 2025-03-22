@@ -536,7 +536,9 @@ export default function Diego({ isNewUser = false, currentStep = TUTORIAL_STEPS.
                     <DiegoAvatar 
                       emotion="pointing" 
                       size="xl" 
-                      pointDirection={content.pointDirection as any} 
+                      pointDirection={content.pointDirection as any}
+                      message={content.message}
+                      showTextBox={true}
                     />
                   </motion.div>
                 )}
