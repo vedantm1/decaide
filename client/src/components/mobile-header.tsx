@@ -35,6 +35,10 @@ export default function MobileHeader() {
         return "My Progress";
       case "/settings":
         return "Settings";
+      case "/why-decade":
+        return "Why DecA(I)de";
+      case "/pricing":
+        return "Subscription Plans";
       default:
         return "DecA(I)de";
     }
@@ -195,6 +199,21 @@ export default function MobileHeader() {
                       }`}></i>
                       <span>My Progress</span>
                       <span className="ml-auto bg-primary text-white text-xs px-1.5 py-0.5 rounded-md">New</span>
+                    </a>
+                  </Link>
+                  <Link href="/why-decade">
+                    <a 
+                      onClick={() => setIsOpen(false)}
+                      className={`flex items-center gap-3 px-4 py-2.5 rounded-lg font-medium text-sm ${
+                        isActive("/why-decade") 
+                          ? "text-slate-800 bg-slate-100" 
+                          : "text-slate-600 hover:bg-slate-100"
+                      }`}
+                    >
+                      <i className={`fas fa-info-circle w-5 text-center ${
+                        isActive("/why-decade") ? "text-primary" : "text-slate-400"
+                      }`}></i>
+                      <span>Why DecA(I)de</span>
                     </a>
                   </Link>
                   <Link href="/pricing">
