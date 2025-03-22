@@ -18,8 +18,7 @@ export default function SidebarNavigation() {
     <aside className="hidden md:flex md:flex-col w-64 bg-white border-r border-slate-200">
       {/* Logo Area */}
       <div className="flex items-center justify-center p-5 border-b border-slate-200">
-        <Link href="/">
-          <a className="flex items-center gap-2">
+        <div className="flex items-center gap-2">
             <div className="relative w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
               <span className="text-white font-heading font-bold text-xl">D</span>
               <span className="absolute -top-1 -right-1 bg-accent text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
@@ -27,8 +26,7 @@ export default function SidebarNavigation() {
               </span>
             </div>
             <span className="font-heading font-bold text-xl text-slate-800">DecA<span className="text-primary">(I)</span>de</span>
-          </a>
-        </Link>
+          </div>
       </div>
       
       {/* User Profile Summary */}
