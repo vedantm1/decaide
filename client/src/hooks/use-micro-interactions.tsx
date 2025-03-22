@@ -1,8 +1,6 @@
 import { createContext, ReactNode, useContext, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import SuccessAnimation from '@/components/animations/success-animation';
 import BreakTimer from '@/components/break-timer';
-import { useIsMobile } from '@/hooks/use-mobile';
 
 type AnimationType = 'confetti' | 'stars' | 'circles' | 'fireworks' | 'random';
 
@@ -12,7 +10,7 @@ type MicroInteractionsContextType = {
   hideBreakTimer: () => void;
   showMascot: (message: string, position?: 'bottom-right' | 'top-right' | 'bottom-left' | 'top-left') => void;
   hideMascot: () => void;
-  startOnboarding: () => void; // New guided tour function
+  startOnboarding: () => void;
 };
 
 export const MicroInteractionsContext = createContext<MicroInteractionsContextType | null>(null);
@@ -29,16 +27,6 @@ export function MicroInteractionsProvider({ children }: { children: ReactNode })
 
   const [showBreakTimerState, setShowBreakTimerState] = useState(false);
   
-  const [mascotDetails, setMascotDetails] = useState<{
-    show: boolean;
-    message: string;
-    position: 'bottom-right' | 'top-right' | 'bottom-left' | 'top-left';
-  }>({
-    show: false,
-    message: '',
-    position: 'bottom-right',
-  });
-
   // Trigger a success animation
   const triggerAnimation = (type: AnimationType = 'random', message?: string) => {
     setAnimationDetails({
@@ -66,75 +54,25 @@ export function MicroInteractionsProvider({ children }: { children: ReactNode })
     setShowBreakTimerState(false);
   };
 
-  // Show mascot
+  // Show mascot - TEMPORARILY DISABLED
   const showMascot = (
     message: string,
     position: 'bottom-right' | 'top-right' | 'bottom-left' | 'top-left' = 'bottom-right'
   ) => {
-    setMascotDetails({
-      show: true,
-      message,
-      position,
-    });
+    // Temporarily disabled
+    console.log('Diego mascot temporarily disabled');
   };
 
-  // Hide mascot - completely reset mascot state to ensure it disappears properly
+  // Hide mascot - TEMPORARILY DISABLED
   const hideMascot = () => {
-    // Reset completely to default state instead of just toggling show
-    setMascotDetails({
-      show: false,
-      message: '',
-      position: 'bottom-right',
-    });
+    // Temporarily disabled
+    console.log('Diego mascot temporarily disabled');
   };
 
-  // Implement onboarding tour with Diego the Dolphin
+  // Implement onboarding tour - TEMPORARILY DISABLED
   const startOnboarding = () => {
-    // Array of onboarding steps with messages and positions
-    const onboardingSteps = [
-      {
-        message: "Welcome to DecA(I)de! Let me guide you through our platform. We'll help you prepare for your DECA competition!",
-        position: 'bottom-right' as const
-      },
-      {
-        message: "The Dashboard shows your progress, daily challenges, and recommended practice activities.",
-        position: 'top-right' as const
-      },
-      {
-        message: "Practice roleplays to improve your business presentation skills with real-time AI feedback.",
-        position: 'bottom-left' as const
-      },
-      {
-        message: "Take practice tests to prepare for the exam portion of your DECA event.",
-        position: 'top-left' as const
-      },
-      {
-        message: "Track your progress on performance indicators - master these to excel in your competition!",
-        position: 'bottom-right' as const
-      }
-    ];
-    
-    // Show first step
-    let currentStep = 0;
-    showMascot(onboardingSteps[currentStep].message, onboardingSteps[currentStep].position);
-    
-    // Set up listener for the "Got it!" button clicks
-    const moveToNextStep = () => {
-      currentStep++;
-      if (currentStep < onboardingSteps.length) {
-        setTimeout(() => {
-          showMascot(onboardingSteps[currentStep].message, onboardingSteps[currentStep].position);
-        }, 500);
-      }
-    };
-    
-    // Use a custom event to connect the mascot's "Got it" button with moving to next step
-    document.addEventListener('mascot-acknowledged', moveToNextStep, { once: false });
-    
-    // Clean up after the tour is done
-    if (currentStep >= onboardingSteps.length - 1) {
-      document.removeEventListener('mascot-acknowledged', moveToNextStep);
-    }
+    // Temporarily disabled
+    console.log('Onboarding tour temporarily disabled');
   };
 
   return (
@@ -163,115 +101,7 @@ export function MicroInteractionsProvider({ children }: { children: ReactNode })
         <BreakTimer onClose={hideBreakTimer} />
       )}
       
-      {/* Diego the Dolphin Mascot - TEMPORARILY DISABLED
-      {mascotDetails.show && (
-        <motion.div 
-          initial={{ opacity: 0, y: 50, scale: 0.8 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 20, scale: 0.9 }}
-          transition={{ type: "spring", damping: 15 }}
-          className={`fixed z-50 max-w-sm ${
-            mascotDetails.position === 'bottom-right' ? 'bottom-5 right-5' :
-            mascotDetails.position === 'top-right' ? 'top-5 right-5' :
-            mascotDetails.position === 'bottom-left' ? 'bottom-5 left-5' :
-            'top-5 left-5'
-          }`}
-        > */}
-          <div className="relative bg-white p-5 rounded-2xl border border-blue-200 shadow-xl">
-            {/* Mascot visuals */}
-            <div className="absolute -top-16 -left-8 w-24 h-24 rounded-full bg-blue-400 border-4 border-white shadow-md flex items-center justify-center overflow-hidden">
-              <svg viewBox="0 0 100 100" className="w-28 h-28">
-                <g transform="translate(50 50)">
-                  {/* Proper dolphin shape */}
-                  <path 
-                    d="M-25,-10 C-40,-25 -20,-40 0,-35 C20,-40 35,-20 30,0 C25,20 5,35 -10,25 C-25,15 -30,0 -25,-10 Z" 
-                    fill="#60A5FA" 
-                  />
-                  
-                  {/* Dolphin fin */}
-                  <path 
-                    d="M20,-15 C30,-25 35,-15 30,-5 C25,-8 20,-10 20,-15 Z" 
-                    fill="#3B82F6" 
-                  />
-                  
-                  {/* Dolphin snout */}
-                  <path 
-                    d="M-25,-10 C-35,-5 -40,5 -30,10 C-25,12 -20,10 -15,5 C-20,0 -25,-5 -25,-10 Z" 
-                    fill="#93C5FD" 
-                  />
-                  
-                  {/* Dolphin smile */}
-                  <path 
-                    d="M-20,5 Q-10,15 5,5" 
-                    fill="none" 
-                    stroke="white" 
-                    strokeWidth="2.5" 
-                    strokeLinecap="round" 
-                  />
-                  
-                  {/* Eyes */}
-                  <circle cx="-15" cy="-5" r="4" fill="white" />
-                  <circle cx="0" cy="-10" r="4" fill="white" />
-                  <circle cx="-15" cy="-5" r="2" fill="black" />
-                  <circle cx="0" cy="-10" r="2" fill="black" />
-                  
-                  {/* Water splash effect */}
-                  <path 
-                    d="M-30,20 C-25,15 -15,25 -10,20 C-5,25 5,15 10,20 C15,15 25,25 30,20" 
-                    fill="none" 
-                    stroke="#BAE6FD" 
-                    strokeWidth="2" 
-                    strokeDasharray="2,2" 
-                    opacity="0.8" 
-                  />
-                </g>
-              </svg>
-            </div>
-            
-            {/* Memphis-style decoration elements */}
-            <div className="absolute top-3 right-3 w-5 h-5 rounded-full bg-yellow-300 opacity-70"></div>
-            <div className="absolute bottom-3 right-14 w-7 h-2 bg-pink-400 opacity-60 rotate-12"></div>
-            
-            <div className="pl-16">
-              <div className="text-left">
-                <p className="font-bold text-xl text-blue-700">
-                  {mascotDetails.message.length > 50 ? "Diego says:" : "Hi, I'm Diego the DecA(I)de Dolphin!"}
-                </p>
-                <div className="relative">
-                  <p className="text-sm text-slate-800 font-medium mt-2 leading-relaxed">
-                    {mascotDetails.message}
-                  </p>
-                  <div className="absolute -left-4 -top-6 text-5xl text-blue-200 opacity-20">"</div>
-                  <div className="absolute -right-4 -bottom-6 text-5xl text-blue-200 opacity-20">"</div>
-                </div>
-                <div className="flex justify-start mt-4 space-x-2">
-                  <motion.button 
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => {
-                      // Dispatch custom event for onboarding tour
-                      document.dispatchEvent(new CustomEvent('mascot-acknowledged'));
-                      // Add a tiny delay to make the animation feel more natural
-                      setTimeout(hideMascot, 120);
-                    }}
-                    className="px-5 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium rounded-full shadow-md hover:shadow-lg transition-all duration-200"
-                  >
-                    Got it!
-                  </motion.button>
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={hideMascot}
-                    className="px-3 py-2 bg-transparent text-blue-600 font-medium rounded-full hover:bg-blue-50 transition-all duration-200"
-                  >
-                    Dismiss
-                  </motion.button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-      )}
+      {/* Diego the Dolphin Mascot - TEMPORARILY REMOVED */}
     </MicroInteractionsContext.Provider>
   );
 }
