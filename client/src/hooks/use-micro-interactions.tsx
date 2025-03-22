@@ -163,7 +163,7 @@ export function MicroInteractionsProvider({ children }: { children: ReactNode })
         <BreakTimer onClose={hideBreakTimer} />
       )}
       
-      {/* Diego the Dolphin Mascot - Advanced interactive version */}
+      {/* Diego the Dolphin Mascot - TEMPORARILY DISABLED
       {mascotDetails.show && (
         <motion.div 
           initial={{ opacity: 0, y: 50, scale: 0.8 }}
@@ -176,7 +176,7 @@ export function MicroInteractionsProvider({ children }: { children: ReactNode })
             mascotDetails.position === 'bottom-left' ? 'bottom-5 left-5' :
             'top-5 left-5'
           }`}
-        >
+        > */}
           <div className="relative bg-white p-5 rounded-2xl border border-blue-200 shadow-xl">
             {/* Mascot visuals */}
             <div className="absolute -top-16 -left-8 w-24 h-24 rounded-full bg-blue-400 border-4 border-white shadow-md flex items-center justify-center overflow-hidden">
