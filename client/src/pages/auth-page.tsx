@@ -224,9 +224,9 @@ export default function AuthPage() {
                 className="scale-110"
               />
             </div>
-            <CardTitle className="text-2xl text-center">Welcome to DecA(I)de</CardTitle>
-            <CardDescription className="text-center">
-              Your AI-powered DECA competition preparation platform
+            <CardTitle className="text-2xl text-center font-bold">Welcome to DecA(I)de</CardTitle>
+            <CardDescription className="text-center px-4">
+              The ultimate AI-powered platform for DECA competition excellence
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -584,7 +584,7 @@ export default function AuthPage() {
                                       setSelectedColorScheme('memphis');
                                     }}
                                   >
-                                    <div className="p-4 h-32 bg-white bg-opacity-90 relative rounded-md overflow-hidden">
+                                    <div className="p-4 h-40 bg-white bg-opacity-90 relative rounded-md overflow-hidden">
                                       {/* Memphis-style patterns with actual colors based on the selected theme */}
                                       <div className={`absolute -right-2 -top-2 w-10 h-10 rounded-full bg-${selectedUiTheme === 'aquaBlue' ? 'blue' : selectedUiTheme === 'coralPink' ? 'pink' : selectedUiTheme === 'mintGreen' ? 'green' : 'purple'}-300`}></div>
                                       <div className={`absolute top-6 left-2 w-12 h-2 rounded-md bg-${selectedUiTheme === 'aquaBlue' ? 'blue' : selectedUiTheme === 'coralPink' ? 'pink' : selectedUiTheme === 'mintGreen' ? 'green' : 'purple'}-400`}></div>
@@ -602,11 +602,11 @@ export default function AuthPage() {
                                       </svg>
                                       
                                       {/* Text with enough space */}
-                                      <div className="absolute bottom-1 left-3 right-3">
-                                        <span className={`text-xs font-bold block text-${selectedUiTheme === 'aquaBlue' ? 'blue' : selectedUiTheme === 'coralPink' ? 'pink' : selectedUiTheme === 'mintGreen' ? 'green' : 'purple'}-600`}>
+                                      <div className="absolute bottom-4 left-3 right-3">
+                                        <span className={`text-sm font-bold block text-${selectedUiTheme === 'aquaBlue' ? 'blue' : selectedUiTheme === 'coralPink' ? 'pink' : selectedUiTheme === 'mintGreen' ? 'green' : 'purple'}-600`}>
                                           Memphis Style
                                         </span>
-                                        <p className="text-xs text-slate-700">Playful geometric patterns</p>
+                                        <p className="text-xs text-slate-700 mt-1">Playful geometric patterns with interactive elements</p>
                                       </div>
                                     </div>
                                   </motion.div>
@@ -619,18 +619,21 @@ export default function AuthPage() {
                                       setSelectedColorScheme('minimalist');
                                     }}
                                   >
-                                    <div className="p-4 h-32 bg-white relative rounded-md overflow-hidden">
+                                    <div className="p-4 h-40 bg-white relative rounded-md overflow-hidden">
                                       {/* Clean minimalist design that adapts to selected theme */}
                                       <div className={`absolute top-4 left-4 w-12 h-0.5 bg-${selectedUiTheme === 'aquaBlue' ? 'blue' : selectedUiTheme === 'coralPink' ? 'pink' : selectedUiTheme === 'mintGreen' ? 'green' : 'purple'}-400`}></div>
                                       <div className={`absolute top-7 left-4 w-8 h-0.5 bg-${selectedUiTheme === 'aquaBlue' ? 'blue' : selectedUiTheme === 'coralPink' ? 'pink' : selectedUiTheme === 'mintGreen' ? 'green' : 'purple'}-300`}></div>
                                       <div className={`absolute top-10 left-4 w-5 h-0.5 bg-${selectedUiTheme === 'aquaBlue' ? 'blue' : selectedUiTheme === 'coralPink' ? 'pink' : selectedUiTheme === 'mintGreen' ? 'green' : 'purple'}-200`}></div>
                                       
+                                      {/* Add a subtle design element */}
+                                      <div className={`absolute bottom-8 right-4 w-16 h-16 rounded-full bg-${selectedUiTheme === 'aquaBlue' ? 'blue' : selectedUiTheme === 'coralPink' ? 'pink' : selectedUiTheme === 'mintGreen' ? 'green' : 'purple'}-100`}></div>
+                                      
                                       {/* Text positioned with better spacing */}
-                                      <div className="absolute bottom-1 left-3 right-3">
-                                        <span className={`text-xs font-bold block text-${selectedUiTheme === 'aquaBlue' ? 'blue' : selectedUiTheme === 'coralPink' ? 'pink' : selectedUiTheme === 'mintGreen' ? 'green' : 'purple'}-600`}>
+                                      <div className="absolute bottom-4 left-3 right-3">
+                                        <span className={`text-sm font-bold block text-${selectedUiTheme === 'aquaBlue' ? 'blue' : selectedUiTheme === 'coralPink' ? 'pink' : selectedUiTheme === 'mintGreen' ? 'green' : 'purple'}-600`}>
                                           Minimalist
                                         </span>
-                                        <p className="text-xs text-slate-700">Clean, focused design</p>
+                                        <p className="text-xs text-slate-700 mt-1">Clean, focused design with subtle elements</p>
                                       </div>
                                     </div>
                                   </motion.div>
