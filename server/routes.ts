@@ -10,6 +10,7 @@ import {
   SUBSCRIPTION_LIMITS 
 } from "@shared/schema";
 import aiRoutes from "./routes/aiRoutes";
+import { getOpenAIClient } from "./services/azureOpenai";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Set up authentication routes
@@ -36,6 +37,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get PI categories
   app.get("/api/pi-categories", (req, res) => {
     res.json(PI_CATEGORIES);
+  });
+  
+  // Test Azure OpenAI integration
+  app.get("/api/test-azure-openai", async (req, res) => {
+    try {
+      const client = getOpenAIClient();
+      const deployment = "gpt-4o-mini";
+      
+      const response = await client.getChatCompletions(
+        deployment,
+        [
+          { role: "system", content: "You are a helpful DECA assistant." },
+          { role: "user", content: "What is DECA and why is it important for high school students?" }
+        ],
+        {
+          temperature: 0.7,
+          maxTokens: 300
+        }
+      );
+      
+      const content = response.choices[0]?.message?.content || "No response generated";
+      res.json({ success: true, content });
+    } catch (error: any) {
+      console.error("Error testing Azure OpenAI:", error);
+      res.status(500).json({ 
+        success: false, 
+        error: error.message,
+        details: error.toString()
+      });
+    }
   });
 
   // Get user stats

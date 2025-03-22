@@ -386,12 +386,12 @@ function extractSection(content: string, sectionStart: string, sectionEnd: strin
   let startPattern = sectionStart ? new RegExp(`#+\\s*${sectionStart}:?|${sectionStart}:`, 'i') : /^/;
   let endPattern = sectionEnd ? new RegExp(`#+\\s*${sectionEnd}:?|${sectionEnd}:`, 'i') : /$/;
   
-  const startMatch = sectionStart ? content.match(startPattern) : { index: 0 };
+  const startMatch = sectionStart ? content.match(startPattern) : { index: 0, [0]: "" };
   if (!startMatch) return "";
   
   const startIndex = (startMatch.index ?? 0) + (startMatch[0]?.length ?? 0);
   const endMatch = sectionEnd ? content.slice(startIndex).match(endPattern) : null;
-  const endIndex = endMatch ? startIndex + endMatch.index! : content.length;
+  const endIndex = endMatch ? startIndex + (endMatch.index ?? 0) : content.length;
   
   return content.slice(startIndex, endIndex).trim();
 }
