@@ -17,8 +17,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { EVENT_TYPE_GROUPS } from "@shared/schema";
+import { EVENT_TYPE_GROUPS, DECA_EVENTS } from "@shared/schema";
 import { useMicroInteractions } from "@/hooks/use-micro-interactions";
+import { CheckIcon } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 // Profile form schema
 const profileSchema = z.object({
@@ -45,17 +47,97 @@ export default function SettingsPage() {
   // Appearance settings state
   const [appearance, setAppearance] = useState({
     theme: "light",
-    colorScheme: "aquaBlue",
+    colorScheme: user?.uiTheme || "aquaBlue", // Default to aquaBlue if no user preference is set
     fontSize: "medium",
     visualStyle: "memphis"
   });
+
+  // Load appearance settings from local storage
+  useEffect(() => {
+    const savedAppearance = localStorage.getItem('diegoAppearance');
+    if (savedAppearance) {
+      try {
+        setAppearance(JSON.parse(savedAppearance));
+      } catch (e) {
+        console.error('Error parsing saved appearance settings:', e);
+      }
+    }
+  }, []);
+
+  // Apply appearance settings to the document body
+  useEffect(() => {
+    // Apply theme (light/dark/system)
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const isDarkMode = appearance.theme === 'dark' || (appearance.theme === 'system' && prefersDark);
+    
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    
+    // Apply color scheme
+    document.documentElement.style.setProperty('--theme-color', getColorForScheme(appearance.colorScheme));
+    
+    // Apply font size
+    if (appearance.fontSize === 'small') {
+      document.documentElement.style.fontSize = '14px';
+    } else if (appearance.fontSize === 'medium') {
+      document.documentElement.style.fontSize = '16px';
+    } else if (appearance.fontSize === 'large') {
+      document.documentElement.style.fontSize = '18px';
+    }
+    
+    // Apply visual style
+    if (appearance.visualStyle === 'memphis') {
+      document.documentElement.classList.add('memphis-style');
+      document.documentElement.classList.remove('minimalist-style');
+    } else {
+      document.documentElement.classList.add('minimalist-style');
+      document.documentElement.classList.remove('memphis-style');
+    }
+    
+    // Save to localStorage
+    localStorage.setItem('diegoAppearance', JSON.stringify(appearance));
+  }, [appearance]);
+
+  // Helper function to get color based on scheme
+  const getColorForScheme = (scheme: string): string => {
+    switch (scheme) {
+      // DECA Cluster Colors
+      case 'business': return '#ffd700'; // Yellow
+      case 'finance': return '#22c55e'; // Green
+      case 'hospitality': return '#3b82f6'; // Blue
+      case 'marketing': return '#ef4444'; // Red
+      case 'entrepreneurship': return '#9ca3af'; // Gray
+      case 'admin': return '#312e81'; // Navy Blue
+      
+      // Regular UI Colors
+      case 'aquaBlue': return '#3b82f6';
+      case 'coralPink': return '#ec4899';
+      case 'mintGreen': return '#22c55e';
+      case 'royalPurple': return '#8b5cf6';
+      default: return '#3b82f6';
+    }
+  };
   
   // Update appearance settings mutation
   const updateAppearance = useMutation({
     mutationFn: async (data: any) => {
-      // This would connect to a real endpoint in production
-      // For now we'll just return the data to simulate a successful update
-      return data;
+      try {
+        // Save to user profile if authenticated
+        if (user?.id) {
+          const res = await apiRequest("POST", "/api/user/appearance", {
+            uiTheme: data.colorScheme
+          });
+          return await res.json();
+        }
+        // Otherwise just return the data (it's already saved to localStorage)
+        return data;
+      } catch (error) {
+        console.error("Error saving appearance:", error);
+        return data; // Still return data so UI updates
+      }
     },
     onSuccess: () => {
       toast({
@@ -63,6 +145,13 @@ export default function SettingsPage() {
         description: "Your theme preferences have been saved.",
       });
       triggerAnimation('confetti', 'Theme Updated!');
+      
+      // Apply theme settings
+      if (appearance.theme === 'system') {
+        document.documentElement.setAttribute('data-theme', 'system');
+      } else {
+        document.documentElement.setAttribute('data-theme', appearance.theme);
+      }
     },
     onError: (error: Error) => {
       toast({
@@ -441,124 +530,183 @@ export default function SettingsPage() {
                     
                     <div>
                       <h3 className="text-base font-medium text-slate-700 mb-3">DECA Cluster Themes</h3>
-                      <div className="grid grid-cols-3 gap-3 mb-6">
+                      <p className="text-xs text-slate-500 mb-4">Select a DECA event cluster for a specialized color scheme</p>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
                         <div 
-                          className="relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ring-border hover:scale-[1.02] shadow-sm"
+                          className={`relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ${appearance.colorScheme === "business" ? 'ring-yellow-500 ring-2' : 'ring-border'} hover:scale-[1.02] shadow-sm`}
                           onClick={() => setAppearance(prev => ({...prev, colorScheme: "business"}))}
                         >
-                          <div className="p-4 h-24 flex flex-col justify-between bg-gradient-to-b from-white to-yellow-50">
+                          <div className="p-4 h-28 flex flex-col justify-between bg-gradient-to-b from-white to-yellow-50 relative">
+                            {appearance.colorScheme === "business" && (
+                              <div className="absolute top-2 right-2">
+                                <CheckIcon className="h-4 w-4 text-yellow-500" />
+                              </div>
+                            )}
                             <div className="flex flex-col gap-1">
-                              <div className="w-full h-2 rounded-sm bg-yellow-500"></div>
-                              <div className="w-full h-2 rounded-sm bg-yellow-400"></div>
-                              <div className="w-full h-2 rounded-sm bg-yellow-300"></div>
+                              <div className="w-full h-2 rounded-sm bg-yellow-500 opacity-70"></div>
+                              <div className="w-full h-2 rounded-sm bg-yellow-400 opacity-70"></div>
+                              <div className="w-full h-2 rounded-sm bg-yellow-300 opacity-70"></div>
                             </div>
                             <div>
                               <span className="text-xs font-medium text-yellow-700">Business Management</span>
-                              <div className="mt-1 flex items-center gap-1">
-                                <span className="w-3 h-3 rounded-full bg-yellow-500"></span>
-                                <p className="text-xs text-slate-600">BMA, ENT, BLTDM, HRM</p>
+                              <div className="mt-1 space-y-1">
+                                <div className="flex flex-wrap gap-1">
+                                  {['BMA', 'ENT', 'BLTDM', 'HRM'].map(code => (
+                                    <Badge key={code} variant="outline" className="text-[10px] py-0 h-4 bg-yellow-100 text-yellow-800 hover:bg-yellow-100 border-yellow-200">
+                                      {code}
+                                    </Badge>
+                                  ))}
+                                </div>
                               </div>
                             </div>
                           </div>
                         </div>
                         
                         <div 
-                          className="relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ring-border hover:scale-[1.02] shadow-sm"
+                          className={`relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ${appearance.colorScheme === "finance" ? 'ring-green-500 ring-2' : 'ring-border'} hover:scale-[1.02] shadow-sm`}
                           onClick={() => setAppearance(prev => ({...prev, colorScheme: "finance"}))}
                         >
-                          <div className="p-4 h-24 flex flex-col justify-between bg-gradient-to-b from-white to-green-50">
+                          <div className="p-4 h-28 flex flex-col justify-between bg-gradient-to-b from-white to-green-50 relative">
+                            {appearance.colorScheme === "finance" && (
+                              <div className="absolute top-2 right-2">
+                                <CheckIcon className="h-4 w-4 text-green-500" />
+                              </div>
+                            )}
                             <div className="flex flex-col gap-1">
-                              <div className="w-full h-2 rounded-sm bg-green-500"></div>
-                              <div className="w-full h-2 rounded-sm bg-green-400"></div>
-                              <div className="w-full h-2 rounded-sm bg-green-300"></div>
+                              <div className="w-full h-2 rounded-sm bg-green-500 opacity-70"></div>
+                              <div className="w-full h-2 rounded-sm bg-green-400 opacity-70"></div>
+                              <div className="w-full h-2 rounded-sm bg-green-300 opacity-70"></div>
                             </div>
                             <div>
                               <span className="text-xs font-medium text-green-700">Finance</span>
-                              <div className="mt-1 flex items-center gap-1">
-                                <span className="w-3 h-3 rounded-full bg-green-500"></span>
-                                <p className="text-xs text-slate-600">ACT, BFS, FTDM, FCE</p>
+                              <div className="mt-1 space-y-1">
+                                <div className="flex flex-wrap gap-1">
+                                  {['ACT', 'BFS', 'FTDM', 'FCE'].map(code => (
+                                    <Badge key={code} variant="outline" className="text-[10px] py-0 h-4 bg-green-100 text-green-800 hover:bg-green-100 border-green-200">
+                                      {code}
+                                    </Badge>
+                                  ))}
+                                </div>
                               </div>
                             </div>
                           </div>
                         </div>
                         
                         <div 
-                          className="relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ring-border hover:scale-[1.02] shadow-sm"
+                          className={`relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ${appearance.colorScheme === "hospitality" ? 'ring-blue-500 ring-2' : 'ring-border'} hover:scale-[1.02] shadow-sm`}
                           onClick={() => setAppearance(prev => ({...prev, colorScheme: "hospitality"}))}
                         >
-                          <div className="p-4 h-24 flex flex-col justify-between bg-gradient-to-b from-white to-blue-50">
+                          <div className="p-4 h-28 flex flex-col justify-between bg-gradient-to-b from-white to-blue-50 relative">
+                            {appearance.colorScheme === "hospitality" && (
+                              <div className="absolute top-2 right-2">
+                                <CheckIcon className="h-4 w-4 text-blue-500" />
+                              </div>
+                            )}
                             <div className="flex flex-col gap-1">
-                              <div className="w-full h-2 rounded-sm bg-blue-500"></div>
-                              <div className="w-full h-2 rounded-sm bg-blue-400"></div>
-                              <div className="w-full h-2 rounded-sm bg-blue-300"></div>
+                              <div className="w-full h-2 rounded-sm bg-blue-500 opacity-70"></div>
+                              <div className="w-full h-2 rounded-sm bg-blue-400 opacity-70"></div>
+                              <div className="w-full h-2 rounded-sm bg-blue-300 opacity-70"></div>
                             </div>
                             <div>
                               <span className="text-xs font-medium text-blue-700">Hospitality & Tourism</span>
-                              <div className="mt-1 flex items-center gap-1">
-                                <span className="w-3 h-3 rounded-full bg-blue-500"></span>
-                                <p className="text-xs text-slate-600">HLM, HTDM, HTPS, RFSM</p>
+                              <div className="mt-1 space-y-1">
+                                <div className="flex flex-wrap gap-1">
+                                  {['HLM', 'HTDM', 'HTPS', 'RFSM'].map(code => (
+                                    <Badge key={code} variant="outline" className="text-[10px] py-0 h-4 bg-blue-100 text-blue-800 hover:bg-blue-100 border-blue-200">
+                                      {code}
+                                    </Badge>
+                                  ))}
+                                </div>
                               </div>
                             </div>
                           </div>
                         </div>
-                      </div>
                       
-                      <div className="grid grid-cols-3 gap-3 mb-2">
                         <div 
-                          className="relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ring-border hover:scale-[1.02] shadow-sm"
+                          className={`relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ${appearance.colorScheme === "marketing" ? 'ring-red-500 ring-2' : 'ring-border'} hover:scale-[1.02] shadow-sm`}
                           onClick={() => setAppearance(prev => ({...prev, colorScheme: "marketing"}))}
                         >
-                          <div className="p-4 h-24 flex flex-col justify-between bg-gradient-to-b from-white to-red-50">
+                          <div className="p-4 h-28 flex flex-col justify-between bg-gradient-to-b from-white to-red-50 relative">
+                            {appearance.colorScheme === "marketing" && (
+                              <div className="absolute top-2 right-2">
+                                <CheckIcon className="h-4 w-4 text-red-500" />
+                              </div>
+                            )}
                             <div className="flex flex-col gap-1">
-                              <div className="w-full h-2 rounded-sm bg-red-500"></div>
-                              <div className="w-full h-2 rounded-sm bg-red-400"></div>
-                              <div className="w-full h-2 rounded-sm bg-red-300"></div>
+                              <div className="w-full h-2 rounded-sm bg-red-500 opacity-70"></div>
+                              <div className="w-full h-2 rounded-sm bg-red-400 opacity-70"></div>
+                              <div className="w-full h-2 rounded-sm bg-red-300 opacity-70"></div>
                             </div>
                             <div>
                               <span className="text-xs font-medium text-red-700">Marketing</span>
-                              <div className="mt-1 flex items-center gap-1">
-                                <span className="w-3 h-3 rounded-full bg-red-500"></span>
-                                <p className="text-xs text-slate-600">AAM, ASM, BSM, FMS, MCS, RMS</p>
+                              <div className="mt-1 space-y-1">
+                                <div className="flex flex-wrap gap-1">
+                                  {['AAM', 'ASM', 'BSM', 'FMS', 'MCS', 'RMS'].map(code => (
+                                    <Badge key={code} variant="outline" className="text-[10px] py-0 h-4 bg-red-100 text-red-800 hover:bg-red-100 border-red-200">
+                                      {code}
+                                    </Badge>
+                                  ))}
+                                </div>
                               </div>
                             </div>
                           </div>
                         </div>
                         
                         <div 
-                          className="relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ring-border hover:scale-[1.02] shadow-sm"
+                          className={`relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ${appearance.colorScheme === "entrepreneurship" ? 'ring-gray-500 ring-2' : 'ring-border'} hover:scale-[1.02] shadow-sm`}
                           onClick={() => setAppearance(prev => ({...prev, colorScheme: "entrepreneurship"}))}
                         >
-                          <div className="p-4 h-24 flex flex-col justify-between bg-gradient-to-b from-white to-gray-50">
+                          <div className="p-4 h-28 flex flex-col justify-between bg-gradient-to-b from-white to-gray-50 relative">
+                            {appearance.colorScheme === "entrepreneurship" && (
+                              <div className="absolute top-2 right-2">
+                                <CheckIcon className="h-4 w-4 text-gray-500" />
+                              </div>
+                            )}
                             <div className="flex flex-col gap-1">
-                              <div className="w-full h-2 rounded-sm bg-gray-500"></div>
-                              <div className="w-full h-2 rounded-sm bg-gray-400"></div>
-                              <div className="w-full h-2 rounded-sm bg-gray-300"></div>
+                              <div className="w-full h-2 rounded-sm bg-gray-500 opacity-70"></div>
+                              <div className="w-full h-2 rounded-sm bg-gray-400 opacity-70"></div>
+                              <div className="w-full h-2 rounded-sm bg-gray-300 opacity-70"></div>
                             </div>
                             <div>
                               <span className="text-xs font-medium text-gray-700">Entrepreneurship</span>
-                              <div className="mt-1 flex items-center gap-1">
-                                <span className="w-3 h-3 rounded-full bg-gray-500"></span>
-                                <p className="text-xs text-slate-600">EIP, ESB, EIB, IBP</p>
+                              <div className="mt-1 space-y-1">
+                                <div className="flex flex-wrap gap-1">
+                                  {['EIP', 'ESB', 'EIB', 'IBP'].map(code => (
+                                    <Badge key={code} variant="outline" className="text-[10px] py-0 h-4 bg-gray-100 text-gray-800 hover:bg-gray-100 border-gray-200">
+                                      {code}
+                                    </Badge>
+                                  ))}
+                                </div>
                               </div>
                             </div>
                           </div>
                         </div>
                         
                         <div 
-                          className="relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ring-border hover:scale-[1.02] shadow-sm"
+                          className={`relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ${appearance.colorScheme === "admin" ? 'ring-indigo-700 ring-2' : 'ring-border'} hover:scale-[1.02] shadow-sm`}
                           onClick={() => setAppearance(prev => ({...prev, colorScheme: "admin"}))}
                         >
-                          <div className="p-4 h-24 flex flex-col justify-between bg-gradient-to-b from-white to-indigo-50">
+                          <div className="p-4 h-28 flex flex-col justify-between bg-gradient-to-b from-white to-indigo-50 relative">
+                            {appearance.colorScheme === "admin" && (
+                              <div className="absolute top-2 right-2">
+                                <CheckIcon className="h-4 w-4 text-indigo-700" />
+                              </div>
+                            )}
                             <div className="flex flex-col gap-1">
-                              <div className="w-full h-2 rounded-sm bg-indigo-800"></div>
-                              <div className="w-full h-2 rounded-sm bg-indigo-700"></div>
-                              <div className="w-full h-2 rounded-sm bg-indigo-600"></div>
+                              <div className="w-full h-2 rounded-sm bg-indigo-800 opacity-70"></div>
+                              <div className="w-full h-2 rounded-sm bg-indigo-700 opacity-70"></div>
+                              <div className="w-full h-2 rounded-sm bg-indigo-600 opacity-70"></div>
                             </div>
                             <div>
                               <span className="text-xs font-medium text-indigo-800">Business Admin Core</span>
-                              <div className="mt-1 flex items-center gap-1">
-                                <span className="w-3 h-3 rounded-full bg-indigo-800"></span>
-                                <p className="text-xs text-slate-600">PFL, PBM, PMK</p>
+                              <div className="mt-1 space-y-1">
+                                <div className="flex flex-wrap gap-1">
+                                  {['PFL', 'PBM', 'PMK'].map(code => (
+                                    <Badge key={code} variant="outline" className="text-[10px] py-0 h-4 bg-indigo-100 text-indigo-800 hover:bg-indigo-100 border-indigo-200">
+                                      {code}
+                                    </Badge>
+                                  ))}
+                                </div>
                               </div>
                             </div>
                           </div>
@@ -641,37 +789,48 @@ export default function SettingsPage() {
                     
                     <div>
                       <h3 className="text-base font-medium text-slate-700 mb-3">Visual Style</h3>
+                      <p className="text-xs text-slate-500 mb-4">Choose between playful or simplified UI design</p>
                       <div className="grid grid-cols-2 gap-4">
                         <div 
-                          className="relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ring-border hover:scale-[1.02] shadow-sm"
+                          className={`relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 hover:scale-[1.02] shadow-sm ${appearance.visualStyle === "memphis" ? 'ring-2 ring-primary' : 'ring-border'}`}
                           onClick={() => setAppearance(prev => ({...prev, visualStyle: "memphis"}))}
                         >
-                          <div className="p-4 h-24 bg-white bg-opacity-90 relative rounded-md overflow-hidden">
+                          <div className="p-4 h-28 bg-white bg-opacity-90 relative rounded-md overflow-hidden">
                             {/* Memphis-style patterns */}
                             <div className="absolute -right-2 -top-2 w-10 h-10 rounded-full bg-blue-300"></div>
                             <div className="absolute top-6 left-2 w-12 h-2 rounded-md bg-blue-400"></div>
                             <div className="absolute bottom-3 right-8 w-6 h-6 border-2 border-yellow-400"></div>
                             <div className="absolute bottom-10 left-10 w-3 h-3 bg-pink-300 rotate-45"></div>
                             <div className="absolute top-1/2 right-1/3 w-8 h-1 bg-green-300"></div>
-                            <div className="mt-14">
-                              <span className="text-sm font-medium text-slate-800">Memphis Style</span>
-                              <p className="text-xs text-slate-600">Vibrant & playful design</p>
+                            {appearance.visualStyle === "memphis" && (
+                              <div className="absolute top-2 right-2 bg-white rounded-full shadow">
+                                <CheckIcon className="h-4 w-4 text-primary" />
+                              </div>
+                            )}
+                            <div className="mt-16">
+                              <span className="text-sm font-medium text-slate-800">Playful Style</span>
+                              <p className="text-xs text-slate-600 mt-1">Vibrant design with Memphis-style elements for a fun experience</p>
                             </div>
                           </div>
                         </div>
                         <div 
-                          className="relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ring-border hover:scale-[1.02] shadow-sm"
+                          className={`relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 hover:scale-[1.02] shadow-sm ${appearance.visualStyle === "minimalist" ? 'ring-2 ring-primary' : 'ring-border'}`}
                           onClick={() => setAppearance(prev => ({...prev, visualStyle: "minimalist"}))}
                         >
-                          <div className="p-4 h-24 bg-white relative rounded-md overflow-hidden">
+                          <div className="p-4 h-28 bg-white relative rounded-md overflow-hidden">
                             {/* Clean minimalist design */}
                             <div className="absolute top-4 left-4 w-12 h-0.5 bg-blue-400"></div>
                             <div className="absolute top-7 left-4 w-8 h-0.5 bg-blue-300"></div>
                             <div className="absolute top-10 left-4 w-5 h-0.5 bg-blue-200"></div>
                             <div className="absolute top-16 left-4 w-3 h-3 rounded-full border border-slate-300"></div>
-                            <div className="mt-14">
-                              <span className="text-sm font-medium text-slate-800">Minimalist</span>
-                              <p className="text-xs text-slate-600">Clean & focused design</p>
+                            {appearance.visualStyle === "minimalist" && (
+                              <div className="absolute top-2 right-2 bg-white rounded-full shadow">
+                                <CheckIcon className="h-4 w-4 text-primary" />
+                              </div>
+                            )}
+                            <div className="mt-16">
+                              <span className="text-sm font-medium text-slate-800">Simplified Style</span>
+                              <p className="text-xs text-slate-600 mt-1">Clean layout with focused design for improved readability</p>
                             </div>
                           </div>
                         </div>
@@ -682,24 +841,66 @@ export default function SettingsPage() {
                     
                     <div>
                       <h3 className="text-base font-medium text-slate-700 mb-3">Font Size</h3>
-                      <RadioGroup
-                        value={appearance.fontSize}
-                        onValueChange={(value) => setAppearance(prev => ({...prev, fontSize: value}))}
-                        className="space-y-2"
-                      >
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="small" id="fontSize-small" />
-                          <label htmlFor="fontSize-small" className="text-sm text-slate-700 cursor-pointer">Small</label>
+                      <p className="text-xs text-slate-500 mb-4">Adjust the text size for better readability</p>
+                      <div className="grid grid-cols-3 gap-3">
+                        <div 
+                          className={`relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 p-4 ${appearance.fontSize === "small" ? 'ring-2 ring-primary bg-primary/5' : 'ring-border'} hover:scale-[1.02] shadow-sm`}
+                          onClick={() => setAppearance(prev => ({...prev, fontSize: "small"}))}
+                        >
+                          <div className="flex flex-col items-center space-y-2">
+                            <div className="text-xs font-medium">Sample</div>
+                            <div className="h-1 w-8 bg-primary/40 rounded-full"></div>
+                            <div className="h-1 w-6 bg-primary/30 rounded-full"></div>
+                            {appearance.fontSize === "small" && (
+                              <div className="absolute top-2 right-2">
+                                <CheckIcon className="h-3 w-3 text-primary" />
+                              </div>
+                            )}
+                          </div>
+                          <div className="text-center mt-2">
+                            <span className="text-xs font-medium">Small</span>
+                          </div>
                         </div>
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="medium" id="fontSize-medium" />
-                          <label htmlFor="fontSize-medium" className="text-sm text-slate-700 cursor-pointer">Medium (Default)</label>
+                        
+                        <div 
+                          className={`relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 p-4 ${appearance.fontSize === "medium" ? 'ring-2 ring-primary bg-primary/5' : 'ring-border'} hover:scale-[1.02] shadow-sm`}
+                          onClick={() => setAppearance(prev => ({...prev, fontSize: "medium"}))}
+                        >
+                          <div className="flex flex-col items-center space-y-2">
+                            <div className="text-sm font-medium">Sample</div>
+                            <div className="h-1.5 w-10 bg-primary/40 rounded-full"></div>
+                            <div className="h-1.5 w-8 bg-primary/30 rounded-full"></div>
+                            {appearance.fontSize === "medium" && (
+                              <div className="absolute top-2 right-2">
+                                <CheckIcon className="h-3 w-3 text-primary" />
+                              </div>
+                            )}
+                          </div>
+                          <div className="text-center mt-2">
+                            <span className="text-xs font-medium">Medium</span>
+                            <p className="text-[10px] text-muted-foreground">(Default)</p>
+                          </div>
                         </div>
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="large" id="fontSize-large" />
-                          <label htmlFor="fontSize-large" className="text-sm text-slate-700 cursor-pointer">Large</label>
+                        
+                        <div 
+                          className={`relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 p-4 ${appearance.fontSize === "large" ? 'ring-2 ring-primary bg-primary/5' : 'ring-border'} hover:scale-[1.02] shadow-sm`}
+                          onClick={() => setAppearance(prev => ({...prev, fontSize: "large"}))}
+                        >
+                          <div className="flex flex-col items-center space-y-2">
+                            <div className="text-base font-medium">Sample</div>
+                            <div className="h-2 w-12 bg-primary/40 rounded-full"></div>
+                            <div className="h-2 w-10 bg-primary/30 rounded-full"></div>
+                            {appearance.fontSize === "large" && (
+                              <div className="absolute top-2 right-2">
+                                <CheckIcon className="h-3 w-3 text-primary" />
+                              </div>
+                            )}
+                          </div>
+                          <div className="text-center mt-2">
+                            <span className="text-xs font-medium">Large</span>
+                          </div>
                         </div>
-                      </RadioGroup>
+                      </div>
                     </div>
                     
                     <Button 
