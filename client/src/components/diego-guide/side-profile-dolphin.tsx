@@ -1,8 +1,5 @@
-// SideProfileDolphin component with wave transition effect
-import React from "react";
-import { motion, Variants } from "framer-motion";
+import { motion, AnimatePresence, Variants } from "framer-motion";
 
-// Define props for our composite component
 interface SideProfileDolphinProps {
   dimensions: { width: number; height: number };
   targetPosition?: { x: number; y: number };
@@ -27,7 +24,7 @@ const dolphinVariants: Variants = {
   })
 };
 
-// Variants for individual dolphin parts (customize these as needed)
+// Variants for individual dolphin parts
 const bodyVariants: Variants = {
   idle: { y: 0 },
   swimming: { y: [0, -2, 0, 2, 0], transition: { repeat: Infinity, duration: 2, ease: "easeInOut" } }
@@ -43,7 +40,6 @@ const finVariants: Variants = {
   swimming: { rotate: [0, 10, 0, -10, 0], transition: { repeat: Infinity, duration: 1.8, ease: "easeInOut" } }
 };
 
-// The main composite component
 export default function SideProfileDolphin({
   dimensions,
   targetPosition,
@@ -51,7 +47,7 @@ export default function SideProfileDolphin({
   pointDirection = 'right',
   onArrival,
   showTextBox = false,
-  message = "I'm swimming over!"
+  message = "I'm here to help!"
 }: SideProfileDolphinProps) {
   return (
     <motion.div
@@ -59,7 +55,7 @@ export default function SideProfileDolphin({
       animate={swimming ? "swimming" : "idle"}
       custom={targetPosition}
       variants={dolphinVariants}
-      onAnimationComplete={() => { if (swimming && onArrival) onArrival(); }}
+      onAnimationComplete={() => { if (onArrival) onArrival(); }}
       style={{ 
         width: dimensions.width, 
         height: dimensions.height, 
@@ -162,56 +158,12 @@ export default function SideProfileDolphin({
           strokeLinecap="round"
           filter="url(#sideGlow)"
         />
-        
-        {/* Add water highlights and subtle bubbles */}
-        <motion.circle
-          cx="75" 
-          cy="25" 
-          r="0.5" 
-          fill="white" 
-          opacity="0.6"
-          animate={{
-            opacity: [0.6, 0.2, 0.6],
-            transition: { repeat: Infinity, duration: 2, ease: "easeInOut" }
-          }}
-        />
-        <motion.circle
-          cx="50" 
-          cy="15" 
-          r="0.4" 
-          fill="white" 
-          opacity="0.5"
-          animate={{
-            opacity: [0.5, 0.1, 0.5],
-            transition: { repeat: Infinity, duration: 2.5, ease: "easeInOut" }
-          }}
-        />
-        <motion.circle
-          cx="30" 
-          cy="30" 
-          r="0.3" 
-          fill="white" 
-          opacity="0.4"
-          animate={{
-            opacity: [0.4, 0.1, 0.4],
-            transition: { repeat: Infinity, duration: 3, ease: "easeInOut" }
-          }}
-        />
       </svg>
-      
-      {/* Text bubble that conditionally appears */}
       {showTextBox && (
-        <motion.div 
-          className="absolute top-0 left-1/2 transform -translate-x-1/2 mt-2 px-3 py-1 bg-white rounded shadow text-sm"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
+        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-full mt-2 px-3 py-1 bg-white rounded shadow text-sm max-w-[200px] z-10">
           {message}
-        </motion.div>
+        </div>
       )}
-      
-      {/* Water wave effect for transitions */}
       {swimming && <WaveTransition />}
     </motion.div>
   );
@@ -250,30 +202,16 @@ function WaveTransition({ duration = 5 }: WaveTransitionProps) {
           <stop offset="100%" stopColor="#3182CE" />
         </linearGradient>
       </defs>
-      
-      {/* Primary wave path */}
+      {/* A curved wave path */}
       <motion.path
         d="M0,10 C30,0 90,20 120,10 L120,20 L0,20 Z"
         fill="url(#waveGradient)"
-        opacity={0.7}
         animate={{
           x: [0, -10, 0, 10, 0],
           transition: { repeat: Infinity, duration: 6, ease: "easeInOut" }
         }}
       />
-      
-      {/* Secondary wave for additional effect */}
-      <motion.path
-        d="M0,12 C20,5 60,15 120,8 L120,20 L0,20 Z"
-        fill="url(#waveGradient)"
-        opacity={0.5}
-        animate={{
-          x: [0, 10, 0, -10, 0],
-          transition: { repeat: Infinity, duration: 5, ease: "easeInOut" }
-        }}
-      />
-      
-      {/* Bubbles and splash effects */}
+      {/* Optional bubbles/splashes */}
       <motion.circle
         cx="30"
         cy="5"
@@ -296,18 +234,6 @@ function WaveTransition({ duration = 5 }: WaveTransitionProps) {
           y: [0, -3, 0],
           opacity: [0.7, 0.3, 0.7],
           transition: { repeat: Infinity, duration: 2.5, ease: "easeInOut" }
-        }}
-      />
-      <motion.circle
-        cx="50"
-        cy="6"
-        r="0.8"
-        fill="white"
-        opacity="0.6"
-        animate={{
-          y: [0, -4, 0],
-          opacity: [0.6, 0.2, 0.6],
-          transition: { repeat: Infinity, duration: 2.8, ease: "easeInOut" }
         }}
       />
     </motion.svg>

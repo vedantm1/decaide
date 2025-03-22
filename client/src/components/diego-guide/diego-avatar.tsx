@@ -1,4 +1,6 @@
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { useState } from "react";
+import SideProfileDolphin from "./side-profile-dolphin";
 
 interface DiegoAvatarProps {
   emotion?: 'happy' | 'excited' | 'thinking' | 'neutral' | 'pointing';
@@ -6,6 +8,10 @@ interface DiegoAvatarProps {
   className?: string;
   pointDirection?: 'left' | 'right' | 'up' | 'down';
   swimming?: boolean;
+  targetPosition?: { x: number, y: number };
+  onArrival?: () => void;
+  message?: string;
+  showTextBox?: boolean;
 }
 
 // Size variants
@@ -75,207 +81,67 @@ const avatarVariants = {
   }
 };
 
-// Water wave animation for swimming
-const waveVariants = {
-  animate: {
-    y: [0, -2, 0, 2, 0],
-    transition: {
-      repeat: Infinity,
-      duration: 2,
-      ease: "easeInOut"
-    }
-  }
+// Emotions for the front-facing dolphin
+const EMOTIONS = {
+  happy: {
+    eyes: 'M7 8C7 9.1046 7.44772 10 8 10C8.55228 10 9 9.1046 9 8C9 6.89543 8.55228 6 8 6C7.44772 6 7 6.89543 7 8ZM15 8C15 9.1046 15.4477 10 16 10C16.5523 10 17 9.1046 17 8C17 6.89543 16.5523 6 16 6C15.4477 6 15 6.89543 15 8Z',
+    mouth: 'M8.5 14C8.5 14 10 16 12 16C14 16 15.5 14 15.5 14',
+  },
+  excited: {
+    eyes: 'M7 8C7 9.1046 7.44772 10 8 10C8.55228 10 9 9.1046 9 8C9 6.89543 8.55228 6 8 6C7.44772 6 7 6.89543 7 8ZM15 8C15 9.1046 15.4477 10 16 10C16.5523 10 17 9.1046 17 8C17 6.89543 16.5523 6 16 6C15.4477 6 15 6.89543 15 8Z',
+    mouth: 'M7.5 14C7.5 14 10 17 12 17C14 17 16.5 14 16.5 14',
+  },
+  thinking: {
+    eyes: 'M7 8C7 9.1046 7.44772 10 8 10C8.55228 10 9 9.1046 9 8C9 6.89543 8.55228 6 8 6C7.44772 6 7 6.89543 7 8ZM15 8C15 9.1046 15.4477 10 16 10C16.5523 10 17 9.1046 17 8C17 6.89543 16.5523 6 16 6C15.4477 6 15 6.89543 15 8Z',
+    mouth: 'M9 14H15',
+  },
+  neutral: {
+    eyes: 'M7 8C7 9.1046 7.44772 10 8 10C8.55228 10 9 9.1046 9 8C9 6.89543 8.55228 6 8 6C7.44772 6 7 6.89543 7 8ZM15 8C15 9.1046 15.4477 10 16 10C16.5523 10 17 9.1046 17 8C17 6.89543 16.5523 6 16 6C15.4477 6 15 6.89543 15 8Z',
+    mouth: 'M9 14H15',
+  },
 };
 
 export default function DiegoAvatar({ 
   emotion = 'happy', 
   size = 'md',
   className = '',
-  pointDirection,
-  swimming = false
+  pointDirection = 'right',
+  swimming = false,
+  targetPosition,
+  onArrival,
+  message = "I'm here to help with your DECA preparation!",
+  showTextBox = true
 }: DiegoAvatarProps) {
   const dimensions = SIZE_VARIANTS[size];
+  const [isTransitioning, setIsTransitioning] = useState(false);
   
-  // Choose the animation based on pointing direction or swimming
-  const animationVariant = swimming ? "swimming" : 
-    pointDirection ? `pointing${pointDirection.charAt(0).toUpperCase() + pointDirection.slice(1)}` : "idle";
+  // Handle animation completion
+  const handleArrival = () => {
+    if (onArrival) {
+      onArrival();
+    }
+  };
   
-  // Dolphin emoji-like side profile (pointing or swimming)
+  // Use enhanced side profile dolphin component when pointing or swimming
   if (emotion === 'pointing' || swimming) {
     return (
-      <motion.div
-        className={`relative ${className}`}
-        variants={avatarVariants}
-        animate={animationVariant}
-        whileHover="hover"
-      >
-        <svg 
-          width={dimensions.width} 
-          height={dimensions.height} 
-          viewBox="0 0 120 80" 
-          fill="none" 
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          {/* Define gradients for the side profile dolphin */}
-          <defs>
-            <linearGradient id="sideBodyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#4FD1C5" />
-              <stop offset="50%" stopColor="#35A0DE" />
-              <stop offset="100%" stopColor="#3182CE" />
-            </linearGradient>
-            <linearGradient id="sideBellyGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#79C3F1" />
-              <stop offset="100%" stopColor="#A7D8FF" />
-            </linearGradient>
-            <linearGradient id="sideFinGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#2D8BC7" />
-              <stop offset="100%" stopColor="#1A5F9E" />
-            </linearGradient>
-            <filter id="sideGlow" x="-20%" y="-20%" width="140%" height="140%">
-              <feGaussianBlur stdDeviation="0.8" result="blur" />
-              <feComposite in="SourceGraphic" in2="blur" operator="over" />
-            </filter>
-            <filter id="shineEffect" x="-20%" y="-20%" width="140%" height="140%">
-              <feGaussianBlur stdDeviation="0.5" result="blur" />
-              <feSpecularLighting in="blur" specularConstant="1" specularExponent="20" lighting-color="white">
-                <fePointLight x="50" y="10" z="40"/>
-              </feSpecularLighting>
-              <feComposite in="SourceGraphic" in2="blur" operator="arithmetic" k1="0" k2="1" k3="1" k4="0"/>
-            </filter>
-          </defs>
-          
-          {/* Enhanced dolphin body with fluid curvature */}
-          <motion.path 
-            d="M95 35C95 46 85 60 70 65C55 70 40 65 30 60C20 55 10 45 5 40C0 35 0 30 5 25C10 20 20 15 30 10C40 5 55 5 70 10C85 15 95 24 95 35Z" 
-            fill="url(#sideBodyGradient)"
-            stroke="#2D8BC7"
-            strokeWidth="0.3"
-            animate={{
-              y: [0, -2, 0, 2, 0],
-              transition: { repeat: Infinity, duration: 2, ease: "easeInOut" }
-            }}
-          />
-          
-          {/* Enhanced belly with gradient and subtle shine */}
-          <path 
-            d="M60 40C45 45 30 45 20 40C10 35 15 30 25 25C35 20 50 20 65 25C80 30 75 35 60 40Z" 
-            fill="url(#sideBellyGradient)"
-            filter="url(#shineEffect)"
-          />
-          
-          {/* Enhanced dorsal fin with better shape and animation */}
-          <motion.path 
-            d="M60 10C63 6 68 5 70 11C70 15 65 17 60 14C58 12 58 10 60 10Z" 
-            fill="url(#sideFinGradient)"
-            stroke="#2D8BC7"
-            strokeWidth="0.3"
-            animate={{
-              rotate: [0, 3, 0, -3, 0],
-              originX: 0.5, 
-              originY: 1,
-              transition: { repeat: Infinity, duration: 1.5, ease: "easeInOut" }
-            }}
-          />
-          
-          {/* Enhanced tail with fluid animation */}
-          <motion.path 
-            d="M10 35C5 32 0 36 0 40C0 44 5 47 10 45C15 43 15 37 10 35Z" 
-            fill="url(#sideFinGradient)"
-            stroke="#2D8BC7"
-            strokeWidth="0.3"
-            animate={{
-              rotate: [0, 8, 0, -5, 0],
-              originX: 1,
-              originY: 0.5,
-              transition: { repeat: Infinity, duration: 1.2, ease: "easeInOut" }
-            }}
-          />
-          
-          {/* Enhanced eye with depth and shine */}
-          <circle cx="85" cy="30" r="4" fill="white"/>
-          <circle cx="85" cy="30" r="2" fill="black"/>
-          <circle cx="84" cy="29" r="0.8" fill="white" filter="url(#sideGlow)"/>
-          
-          {/* Enhanced smile with glow effect */}
-          <path 
-            d="M85 40C85 40 80 43 75 40" 
-            stroke="white" 
-            strokeWidth="1.5" 
-            strokeLinecap="round"
-            filter="url(#sideGlow)"
-          />
-          
-          {/* Enhanced pectoral flipper with better shape */}
-          <motion.path 
-            d="M45 45C40 48 35 53 40 55C45 57 50 50 45 45Z" 
-            fill="url(#sideFinGradient)"
-            stroke="#2D8BC7"
-            strokeWidth="0.3"
-            animate={{
-              rotate: [0, 10, 0, -10, 0],
-              originX: 0.5,
-              originY: 0,
-              transition: { repeat: Infinity, duration: 1.8, ease: "easeInOut" }
-            }}
-          />
-          
-          {/* Add subtle water highlights */}
-          <circle cx="75" cy="25" r="0.5" fill="white" opacity="0.6"/>
-          <circle cx="50" cy="15" r="0.4" fill="white" opacity="0.5"/>
-          <circle cx="30" cy="30" r="0.3" fill="white" opacity="0.4"/>
-          
-          {/* Water splashes for swimming effect */}
-          {swimming && (
-            <>
-              <motion.path
-                d="M100 40C105 40 110 43 108 40C106 37 104 39 100 40Z"
-                fill="#79C3F1"
-                variants={waveVariants}
-                animate="animate"
-                style={{ opacity: 0.7 }}
-              />
-              <motion.path
-                d="M105 45C110 45 115 48 113 45C111 42 109 44 105 45Z"
-                fill="#79C3F1"
-                variants={waveVariants}
-                animate="animate"
-                style={{ opacity: 0.5, animationDelay: "0.2s" }}
-              />
-              <motion.path
-                d="M102 50C107 50 112 53 110 50C108 47 106 49 102 50Z"
-                fill="#79C3F1"
-                variants={waveVariants}
-                animate="animate"
-                style={{ opacity: 0.3, animationDelay: "0.4s" }}
-              />
-            </>
-          )}
-        </svg>
-      </motion.div>
+      <AnimatePresence>
+        <SideProfileDolphin 
+          dimensions={dimensions}
+          swimming={swimming}
+          pointDirection={pointDirection as 'left' | 'right'}
+          targetPosition={targetPosition}
+          onArrival={handleArrival}
+          showTextBox={showTextBox}
+          message={message}
+        />
+      </AnimatePresence>
     );
   }
   
-  // Front-facing dolphin with emoji-like appearance for other emotions
-  const EMOTIONS = {
-    happy: {
-      eyes: 'M7 8C7 9.1046 7.44772 10 8 10C8.55228 10 9 9.1046 9 8C9 6.89543 8.55228 6 8 6C7.44772 6 7 6.89543 7 8ZM15 8C15 9.1046 15.4477 10 16 10C16.5523 10 17 9.1046 17 8C17 6.89543 16.5523 6 16 6C15.4477 6 15 6.89543 15 8Z',
-      mouth: 'M8.5 14C8.5 14 10 16 12 16C14 16 15.5 14 15.5 14',
-    },
-    excited: {
-      eyes: 'M7 8C7 9.1046 7.44772 10 8 10C8.55228 10 9 9.1046 9 8C9 6.89543 8.55228 6 8 6C7.44772 6 7 6.89543 7 8ZM15 8C15 9.1046 15.4477 10 16 10C16.5523 10 17 9.1046 17 8C17 6.89543 16.5523 6 16 6C15.4477 6 15 6.89543 15 8Z',
-      mouth: 'M7.5 14C7.5 14 10 17 12 17C14 17 16.5 14 16.5 14',
-    },
-    thinking: {
-      eyes: 'M7 8C7 9.1046 7.44772 10 8 10C8.55228 10 9 9.1046 9 8C9 6.89543 8.55228 6 8 6C7.44772 6 7 6.89543 7 8ZM15 8C15 9.1046 15.4477 10 16 10C16.5523 10 17 9.1046 17 8C17 6.89543 16.5523 6 16 6C15.4477 6 15 6.89543 15 8Z',
-      mouth: 'M9 14H15',
-    },
-    neutral: {
-      eyes: 'M7 8C7 9.1046 7.44772 10 8 10C8.55228 10 9 9.1046 9 8C9 6.89543 8.55228 6 8 6C7.44772 6 7 6.89543 7 8ZM15 8C15 9.1046 15.4477 10 16 10C16.5523 10 17 9.1046 17 8C17 6.89543 16.5523 6 16 6C15.4477 6 15 6.89543 15 8Z',
-      mouth: 'M9 14H15',
-    },
-  };
-  
-  const emotionPaths = EMOTIONS[emotion];
+  // For the front-facing dolphin, use the appropriate emotion
+  const currentEmotion = emotion as keyof typeof EMOTIONS;
+  const emotionPaths = EMOTIONS[currentEmotion];
   
   return (
     <motion.div
