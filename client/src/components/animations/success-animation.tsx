@@ -1,8 +1,17 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback, lazy, Suspense } from 'react';
 import { motion, AnimatePresence, useAnimationControls } from 'framer-motion';
-import confetti from 'canvas-confetti';
 import { useToast } from '@/hooks/use-toast';
 import { useIsMobile } from '@/hooks/use-mobile';
+import ConfettiExplosion from './confetti-explosion';
+
+// Use lazy loading for Lottie animations
+const LottieAnimation = lazy(() => import('./lottie-animation'));
+
+// Import celebration animations
+const celebrationLottie = { 
+  // The Lottie data will be fetched dynamically to avoid bundling large JSON files
+  // These would contain real Lottie animation data in production
+};
 
 export interface SuccessAnimationProps {
   trigger: boolean;
@@ -12,98 +21,35 @@ export interface SuccessAnimationProps {
   duration?: number;
 }
 
-const animations: Record<string, () => void> = {
-  confetti: () => {
-    // Single burst instead of continuous animation
-    const colors = ['#4f46e5', '#3b82f6', '#0ea5e9', '#06b6d4'];
-    
-    // Left side burst
-    confetti({
-      particleCount: 15,
-      angle: 60,
-      spread: 40,
-      origin: { x: 0.2, y: 0.6 },
-      colors: colors,
-      scalar: 0.8, // Smaller particles
-      disableForReducedMotion: true // Accessibility
-    });
-    
-    // Right side burst
-    confetti({
-      particleCount: 15,
-      angle: 120,
-      spread: 40,
-      origin: { x: 0.8, y: 0.6 },
-      colors: colors,
-      scalar: 0.8,
-      disableForReducedMotion: true
-    });
+// Configuration for different animation types
+const animationConfigs = {
+  confetti: {
+    particleCount: 100,
+    spread: 70,
+    origin: { x: 0.5, y: 0.5 },
+    colors: ['#4f46e5', '#3b82f6', '#0ea5e9', '#06b6d4'],
   },
-  
-  stars: () => {
-    // Simplified stars effect
-    const colors = ['#f59e0b', '#facc15', '#eab308'];
-    
-    confetti({
-      particleCount: 10,
-      spread: 70,
-      shapes: ['star'],
-      origin: { x: 0.5, y: 0.5 },
-      colors: colors,
-      scalar: 0.7,
-      disableForReducedMotion: true
-    });
+  stars: {
+    particleCount: 60,
+    spread: 100,
+    origin: { x: 0.5, y: 0.4 },
+    colors: ['#f59e0b', '#facc15', '#eab308', '#ffedd5'],
   },
-  
-  circles: () => {
-    // Lightweight circles effect
-    confetti({
-      particleCount: 30, // Reduced from 100
-      spread: 50,
-      origin: { y: 0.6 },
-      colors: ['#ec4899', '#8b5cf6', '#3b82f6'],
-      shapes: ['circle'],
-      scalar: 0.8,
-      disableForReducedMotion: true
-    });
+  circles: {
+    particleCount: 80,
+    spread: 50,
+    origin: { x: 0.5, y: 0.6 },
+    colors: ['#ec4899', '#8b5cf6', '#3b82f6', '#f8fafc'],
   },
-  
-  fireworks: () => {
-    // Simplified fireworks - just two bursts
-    const defaults = { 
-      startVelocity: 25, 
-      spread: 360, 
-      ticks: 50, 
-      zIndex: 0,
-      disableForReducedMotion: true
-    };
-    
-    // First burst
-    confetti({
-      ...defaults,
-      particleCount: 25,
-      origin: { x: 0.3, y: 0.5 }
-    });
-    
-    // Second burst with delay
-    setTimeout(() => {
-      confetti({
-        ...defaults,
-        particleCount: 25,
-        origin: { x: 0.7, y: 0.5 }
-      });
-    }, 250);
-  },
-
-  // Random will be handled in the component logic
-  random: () => {
-    const types = ['confetti', 'stars', 'circles', 'fireworks'];
-    const randomType = types[Math.floor(Math.random() * types.length)];
-    animations[randomType]();
+  fireworks: {
+    particleCount: 200,
+    spread: 360,
+    origin: { x: 0.5, y: 0.5 },
+    colors: ['#ef4444', '#f97316', '#f59e0b', '#84cc16', '#06b6d4', '#8b5cf6'],
   }
 };
 
-// Add a tropical drink animation for special celebrations
+// Enhanced drink animation using MotionOne for smoother performance
 const TropicalDrink = () => {
   return (
     <motion.div 
@@ -205,6 +151,7 @@ export default function SuccessAnimation({
   const { toast } = useToast();
   const isMobile = useIsMobile();
   const [showCelebration, setShowCelebration] = useState(false);
+  const [animationType, setAnimationType] = useState(type);
   const controls = useAnimationControls();
   
   // Emojis for the floating animation including tropical elements
@@ -225,13 +172,21 @@ export default function SuccessAnimation({
 
   const [floatingEmojis, setFloatingEmojis] = useState(getRandomEmojis());
   
+  // Randomize animation type if 'random' is selected
+  useEffect(() => {
+    if (type === 'random') {
+      const types = ['confetti', 'stars', 'circles', 'fireworks'];
+      const randomType = types[Math.floor(Math.random() * types.length)] as typeof type;
+      setAnimationType(randomType);
+    } else {
+      setAnimationType(type);
+    }
+  }, [type, trigger]);
+  
   // The main animation sequence
   const runAnimation = useCallback(() => {
     // First show the animation overlay
     setShowCelebration(true);
-    
-    // Run the particle animation based on the selected type
-    animations[type]();
     
     // Update emojis with new random positions
     setFloatingEmojis(getRandomEmojis());
@@ -263,7 +218,7 @@ export default function SuccessAnimation({
       setShowCelebration(false);
       onComplete();
     }, duration);
-  }, [type, message, duration, onComplete, toast, controls, getRandomEmojis]);
+  }, [animationType, message, duration, onComplete, toast, controls, getRandomEmojis]);
   
   useEffect(() => {
     if (trigger) {
@@ -295,6 +250,17 @@ export default function SuccessAnimation({
             exit={{ opacity: 0 }}
           />
           
+          {/* Confetti explosion using our enhanced component */}
+          {animationType !== 'random' && (
+            <ConfettiExplosion
+              duration={duration * 0.8}
+              particleCount={animationConfigs[animationType].particleCount}
+              spread={animationConfigs[animationType].spread}
+              origin={animationConfigs[animationType].origin}
+              colors={animationConfigs[animationType].colors}
+            />
+          )}
+          
           {/* Floating emojis */}
           {floatingEmojis.map((item) => (
             <motion.div
@@ -322,7 +288,7 @@ export default function SuccessAnimation({
           ))}
           
           {/* Central success badge - show for certain animation types */}
-          {(type === 'fireworks' || type === 'stars') && (
+          {(animationType === 'fireworks' || animationType === 'stars') && (
             <motion.div 
               animate={controls}
               className="relative rounded-full bg-white shadow-xl p-8 flex items-center justify-center"
@@ -367,7 +333,7 @@ export default function SuccessAnimation({
           )}
           
           {/* Show tropical drink animation for some celebration types */}
-          {(type === 'confetti' || type === 'random') && (
+          {(animationType === 'confetti' || animationType === 'random') && (
             <TropicalDrink />
           )}
         </motion.div>
