@@ -425,8 +425,8 @@ export default function AuthPage() {
                                   }} 
                                   defaultValue={field.value}
                                 >
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Select your specific event (required)" />
+                                  <SelectTrigger className="bg-muted/80 dark:bg-slate-800/90 text-foreground dark:text-white border-input">
+                                    <SelectValue placeholder="Select your specific event (required)" className="text-foreground dark:text-white" />
                                   </SelectTrigger>
                                   <SelectContent className="max-h-80">
                                     {/* Group events by type */}
