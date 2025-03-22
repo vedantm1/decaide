@@ -266,14 +266,15 @@ export default function SuccessAnimation({
   }, [type, message, duration, onComplete, toast, controls, getRandomEmojis]);
   
   useEffect(() => {
-    if (trigger && !hasAnimated.current) {
+    if (trigger) {
       hasAnimated.current = true;
       runAnimation();
     }
     
-    return () => {
+    // Only reset hasAnimated when trigger is false
+    if (!trigger) {
       hasAnimated.current = false;
-    };
+    }
   }, [trigger, runAnimation]);
   
   // Create a more elaborate celebration overlay

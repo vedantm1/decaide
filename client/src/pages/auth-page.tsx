@@ -693,12 +693,57 @@ export default function AuthPage() {
           </svg>
         </div>
         
-        {/* Dolphin mascot */}
+        {/* Proper Dolphin mascot */}
         <div className="absolute bottom-10 right-8 w-40 h-40">
           <div className="w-full h-full relative">
             <div className="absolute inset-0 bg-blue-500 rounded-full opacity-20 animate-pulse"></div>
-            <div className="absolute inset-2 bg-blue-400 rounded-full flex items-center justify-center">
-              <span className="text-white text-5xl">🐬</span>
+            <div className="absolute inset-2 bg-blue-400 rounded-full flex items-center justify-center overflow-hidden">
+              <svg viewBox="0 0 100 100" className="w-28 h-28">
+                <g transform="translate(50 50)">
+                  {/* Proper dolphin shape */}
+                  <path 
+                    d="M-25,-10 C-40,-25 -20,-40 0,-35 C20,-40 35,-20 30,0 C25,20 5,35 -10,25 C-25,15 -30,0 -25,-10 Z" 
+                    fill="#60A5FA" 
+                  />
+                  
+                  {/* Dolphin fin */}
+                  <path 
+                    d="M20,-15 C30,-25 35,-15 30,-5 C25,-8 20,-10 20,-15 Z" 
+                    fill="#3B82F6" 
+                  />
+                  
+                  {/* Dolphin snout */}
+                  <path 
+                    d="M-25,-10 C-35,-5 -40,5 -30,10 C-25,12 -20,10 -15,5 C-20,0 -25,-5 -25,-10 Z" 
+                    fill="#93C5FD" 
+                  />
+                  
+                  {/* Dolphin smile */}
+                  <path 
+                    d="M-20,5 Q-10,15 5,5" 
+                    fill="none" 
+                    stroke="white" 
+                    strokeWidth="2.5" 
+                    strokeLinecap="round" 
+                  />
+                  
+                  {/* Eyes */}
+                  <circle cx="-15" cy="-5" r="4" fill="white" />
+                  <circle cx="0" cy="-10" r="4" fill="white" />
+                  <circle cx="-15" cy="-5" r="2" fill="black" />
+                  <circle cx="0" cy="-10" r="2" fill="black" />
+                  
+                  {/* Water splash effect */}
+                  <path 
+                    d="M-30,20 C-25,15 -15,25 -10,20 C-5,25 5,15 10,20 C15,15 25,25 30,20" 
+                    fill="none" 
+                    stroke="#BAE6FD" 
+                    strokeWidth="2" 
+                    strokeDasharray="2,2" 
+                    opacity="0.8" 
+                  />
+                </g>
+              </svg>
             </div>
           </div>
         </div>
