@@ -116,65 +116,113 @@ export default function DiegoAvatar({
           fill="none" 
           xmlns="http://www.w3.org/2000/svg"
         >
-          {/* Dolphin body - curved back like the emoji */}
+          {/* Define gradients for the side profile dolphin */}
+          <defs>
+            <linearGradient id="sideBodyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#4FD1C5" />
+              <stop offset="50%" stopColor="#35A0DE" />
+              <stop offset="100%" stopColor="#3182CE" />
+            </linearGradient>
+            <linearGradient id="sideBellyGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#79C3F1" />
+              <stop offset="100%" stopColor="#A7D8FF" />
+            </linearGradient>
+            <linearGradient id="sideFinGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#2D8BC7" />
+              <stop offset="100%" stopColor="#1A5F9E" />
+            </linearGradient>
+            <filter id="sideGlow" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="0.8" result="blur" />
+              <feComposite in="SourceGraphic" in2="blur" operator="over" />
+            </filter>
+            <filter id="shineEffect" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="0.5" result="blur" />
+              <feSpecularLighting in="blur" specularConstant="1" specularExponent="20" lighting-color="white">
+                <fePointLight x="50" y="10" z="40"/>
+              </feSpecularLighting>
+              <feComposite in="SourceGraphic" in2="blur" operator="arithmetic" k1="0" k2="1" k3="1" k4="0"/>
+            </filter>
+          </defs>
+          
+          {/* Enhanced dolphin body with fluid curvature */}
           <motion.path 
             d="M95 35C95 46 85 60 70 65C55 70 40 65 30 60C20 55 10 45 5 40C0 35 0 30 5 25C10 20 20 15 30 10C40 5 55 5 70 10C85 15 95 24 95 35Z" 
-            fill="#35A0DE"
+            fill="url(#sideBodyGradient)"
+            stroke="#2D8BC7"
+            strokeWidth="0.3"
             animate={{
               y: [0, -2, 0, 2, 0],
               transition: { repeat: Infinity, duration: 2, ease: "easeInOut" }
             }}
           />
           
-          {/* Lighter belly color */}
+          {/* Enhanced belly with gradient and subtle shine */}
           <path 
             d="M60 40C45 45 30 45 20 40C10 35 15 30 25 25C35 20 50 20 65 25C80 30 75 35 60 40Z" 
-            fill="#79C3F1"
+            fill="url(#sideBellyGradient)"
+            filter="url(#shineEffect)"
           />
           
-          {/* Dolphin fin on top - more triangular like emoji */}
+          {/* Enhanced dorsal fin with better shape and animation */}
           <motion.path 
-            d="M60 10C65 5 70 5 70 15C65 20 55 15 60 10Z" 
-            fill="#2D8BC7"
+            d="M60 10C63 6 68 5 70 11C70 15 65 17 60 14C58 12 58 10 60 10Z" 
+            fill="url(#sideFinGradient)"
+            stroke="#2D8BC7"
+            strokeWidth="0.3"
             animate={{
               rotate: [0, 3, 0, -3, 0],
+              originX: 0.5, 
+              originY: 1,
               transition: { repeat: Infinity, duration: 1.5, ease: "easeInOut" }
             }}
           />
           
-          {/* Dolphin tail - more horizontal like emoji */}
+          {/* Enhanced tail with fluid animation */}
           <motion.path 
-            d="M10 35C5 33 0 38 0 40C0 42 5 45 10 45C15 45 15 37 10 35Z" 
-            fill="#2D8BC7"
+            d="M10 35C5 32 0 36 0 40C0 44 5 47 10 45C15 43 15 37 10 35Z" 
+            fill="url(#sideFinGradient)"
+            stroke="#2D8BC7"
+            strokeWidth="0.3"
             animate={{
-              rotate: [0, 5, 0, -5, 0],
+              rotate: [0, 8, 0, -5, 0],
               originX: 1,
               originY: 0.5,
               transition: { repeat: Infinity, duration: 1.2, ease: "easeInOut" }
             }}
           />
           
-          {/* Eye - white with black pupil */}
+          {/* Enhanced eye with depth and shine */}
           <circle cx="85" cy="30" r="4" fill="white"/>
           <circle cx="85" cy="30" r="2" fill="black"/>
+          <circle cx="84" cy="29" r="0.8" fill="white" filter="url(#sideGlow)"/>
           
-          {/* Smile - subtle curve */}
+          {/* Enhanced smile with glow effect */}
           <path 
             d="M85 40C85 40 80 43 75 40" 
             stroke="white" 
             strokeWidth="1.5" 
             strokeLinecap="round"
+            filter="url(#sideGlow)"
           />
           
-          {/* Small pectoral flipper */}
+          {/* Enhanced pectoral flipper with better shape */}
           <motion.path 
             d="M45 45C40 48 35 53 40 55C45 57 50 50 45 45Z" 
-            fill="#2D8BC7"
+            fill="url(#sideFinGradient)"
+            stroke="#2D8BC7"
+            strokeWidth="0.3"
             animate={{
               rotate: [0, 10, 0, -10, 0],
+              originX: 0.5,
+              originY: 0,
               transition: { repeat: Infinity, duration: 1.8, ease: "easeInOut" }
             }}
           />
+          
+          {/* Add subtle water highlights */}
+          <circle cx="75" cy="25" r="0.5" fill="white" opacity="0.6"/>
+          <circle cx="50" cy="15" r="0.4" fill="white" opacity="0.5"/>
+          <circle cx="30" cy="30" r="0.3" fill="white" opacity="0.4"/>
           
           {/* Water splashes for swimming effect */}
           {swimming && (
