@@ -9,6 +9,7 @@ import {
   PI_CATEGORIES, 
   SUBSCRIPTION_LIMITS 
 } from "@shared/schema";
+import aiRoutes from "./routes/aiRoutes";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Set up authentication routes
