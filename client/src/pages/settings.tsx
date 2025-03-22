@@ -477,7 +477,7 @@ export default function SettingsPage() {
                           className={`border ${appearance.theme === "light" ? 'border-primary ring-2 ring-primary/30' : 'border-slate-200'} rounded-lg overflow-hidden cursor-pointer shadow-sm transition-all hover:scale-[1.02] bg-white`}
                           onClick={() => setAppearance(prev => ({...prev, theme: "light"}))}
                         >
-                          <div className="w-full h-20 bg-gradient-to-b from-white to-blue-50 mb-0 rounded-t relative">
+                          <div className="w-full h-24 bg-gradient-to-b from-white to-blue-50 mb-0 rounded-t relative">
                             {appearance.theme === "light" && (
                               <div className="absolute top-2 right-2 bg-white rounded-full shadow p-0.5">
                                 <CheckIcon className="h-4 w-4 text-primary" />
@@ -490,7 +490,7 @@ export default function SettingsPage() {
                           className={`border ${appearance.theme === "dark" ? 'border-primary ring-2 ring-primary/30' : 'border-slate-200 dark:border-[var(--dark-border)]'} rounded-lg overflow-hidden cursor-pointer shadow-sm transition-all hover:scale-[1.02]`}
                           onClick={() => setAppearance(prev => ({...prev, theme: "dark"}))}
                         >
-                          <div className="w-full h-20 bg-gradient-to-b from-slate-700 to-slate-900 mb-0 rounded-t relative">
+                          <div className="w-full h-24 bg-gradient-to-b from-slate-700 to-slate-900 mb-0 rounded-t relative">
                             {appearance.theme === "dark" && (
                               <div className="absolute top-2 right-2 bg-white dark:bg-[var(--dark-bg-tertiary)] rounded-full shadow p-0.5">
                                 <CheckIcon className="h-4 w-4 text-primary" />
@@ -503,7 +503,7 @@ export default function SettingsPage() {
                           className={`border ${appearance.theme === "system" ? 'border-primary ring-2 ring-primary/30' : 'border-slate-200 dark:border-[var(--dark-border)]'} rounded-lg overflow-hidden cursor-pointer shadow-sm transition-all hover:scale-[1.02]`}
                           onClick={() => setAppearance(prev => ({...prev, theme: "system"}))}
                         >
-                          <div className="w-full h-20 bg-gradient-to-b from-white to-slate-800 mb-0 rounded-t relative">
+                          <div className="w-full h-24 bg-gradient-to-b from-white to-slate-800 mb-0 rounded-t relative">
                             <div className="absolute top-0 left-0 w-1/2 h-full bg-white"></div>
                             {appearance.theme === "system" && (
                               <div className="absolute top-2 right-2 bg-white dark:bg-[var(--dark-bg-tertiary)] rounded-full shadow p-0.5">
