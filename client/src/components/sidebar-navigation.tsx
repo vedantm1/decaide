@@ -8,6 +8,16 @@ export default function SidebarNavigation() {
 
   const subscriptionTier = user?.subscriptionTier || "standard";
   const stars = SUBSCRIPTION_LIMITS[subscriptionTier as keyof typeof SUBSCRIPTION_LIMITS]?.stars || 2;
+  // Function to determine the number of visible stars based on mode
+  const getVisibleStars = () => {
+    const isDarkMode = document.documentElement.classList.contains('dark');
+    // In dark mode, show filled stars only (2 for standard, 3 for plus, 5 for pro)
+    if (isDarkMode) {
+      return stars;
+    }
+    // In light mode, show all 5 stars with some filled based on tier
+    return 5;
+  };
 
   // Check if the current path matches the link path
   const isActive = (path: string) => {
@@ -42,13 +52,18 @@ export default function SidebarNavigation() {
         </div>
 
         {/* Subscription Badge */}
-        <div className="mt-3 flex items-center gap-1.5 text-xs bg-slate-100 rounded-full px-3 py-1 w-fit">
+        <div className="mt-3 flex items-center gap-1.5 text-xs bg-slate-100 dark:bg-slate-800 rounded-full px-3 py-1 w-fit">
           <div className="flex">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <span key={i} className={i < stars ? "text-accent" : "text-slate-300"}>★</span>
+            {Array.from({ length: getVisibleStars() }).map((_, i) => (
+              <span key={i} className="text-accent">★</span>
             ))}
+            {!document.documentElement.classList.contains('dark') && 
+              Array.from({ length: 5 - stars }).map((_, i) => (
+                <span key={i + stars} className="text-slate-300 dark:text-slate-700">★</span>
+              ))
+            }
           </div>
-          <span className="font-medium text-slate-600 capitalize">{subscriptionTier} Plan</span>
+          <span className="font-medium text-slate-600 dark:text-slate-300 capitalize">{subscriptionTier} Plan</span>
         </div>
       </div>
 
