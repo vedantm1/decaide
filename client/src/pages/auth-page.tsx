@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -12,6 +12,8 @@ import { useAuth } from "@/hooks/use-auth";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { useMicroInteractions } from "@/hooks/use-micro-interactions";
+import { motion } from "framer-motion";
 import { 
   Accordion,
   AccordionContent,
@@ -34,7 +36,7 @@ const loginSchema = z.object({
   }),
 });
 
-// Registration form schema with required event selection
+// Registration form schema with enhanced event selection and customization options
 const registerSchema = z.object({
   username: z.string().min(3, {
     message: "Username must be at least 3 characters",
@@ -42,18 +44,26 @@ const registerSchema = z.object({
   password: z.string().min(6, {
     message: "Password must be at least 6 characters",
   }),
+  email: z.string().email({
+    message: "Please enter a valid email address",
+  }).optional().nullable(),
   eventFormat: z.enum(["roleplay", "written"], {
     required_error: "Please select either roleplay or written event format",
   }),
   eventCode: z.string().min(1, {
     message: "Please select a specific DECA event",
   }),
+  eventType: z.string().optional(),
+  instructionalArea: z.string().optional(),
+  uiTheme: z.string().default("aquaBlue"),
+  colorScheme: z.string().default("memphis"),
 });
 
 export default function AuthPage() {
   const [activeTab, setActiveTab] = useState<string>("login");
   const [_, navigate] = useLocation();
   const { user, loginMutation, registerMutation } = useAuth();
+  const { showMascot, hideMascot, triggerAnimation } = useMicroInteractions();
 
   // Form setup for login
   const loginForm = useForm<z.infer<typeof loginSchema>>({
@@ -70,10 +80,19 @@ export default function AuthPage() {
     defaultValues: {
       username: "",
       password: "",
+      email: "",
       eventFormat: undefined,
       eventCode: "",
+      eventType: "",
+      instructionalArea: "",
+      uiTheme: "aquaBlue",
+      colorScheme: "memphis"
     },
   });
+  
+  // For managing UI theme selection
+  const [selectedUiTheme, setSelectedUiTheme] = useState<string>("aquaBlue");
+  const [selectedColorScheme, setSelectedColorScheme] = useState<string>("memphis");
   
   // State to track event format selection for filtering the event list
   const [selectedEventFormat, setSelectedEventFormat] = useState<"roleplay" | "written" | null>(null);
@@ -84,6 +103,40 @@ export default function AuthPage() {
       navigate("/");
     }
   }, [user, navigate]);
+  
+  // Show Diego the Dolphin mascot when tab changes to register
+  useEffect(() => {
+    if (activeTab === "register") {
+      showMascot("Hi there! I'm Diego, your DecA(I)de guide. Let's create your account so you can start preparing for DECA success!", "bottom-right");
+      
+      // Auto-hide Diego after 10 seconds
+      const timer = setTimeout(() => {
+        hideMascot();
+      }, 10000);
+      
+      return () => clearTimeout(timer);
+    } else {
+      hideMascot();
+    }
+  }, [activeTab, showMascot, hideMascot]);
+  
+  // Show mascot with tips when event format is selected
+  useEffect(() => {
+    if (selectedEventFormat) {
+      const message = selectedEventFormat === "roleplay" 
+        ? "Great choice! Role-play events are all about thinking on your feet. I'll help you practice scenarios for your specific event."
+        : "Excellent! Written events require detailed business plans. I'll help you structure and perfect your submission.";
+      
+      showMascot(message, "bottom-right");
+      triggerAnimation("stars");
+      
+      const timer = setTimeout(() => {
+        hideMascot();
+      }, 8000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [selectedEventFormat, showMascot, hideMascot, triggerAnimation]);
 
   const onLoginSubmit = (values: z.infer<typeof loginSchema>) => {
     loginMutation.mutate(values);
@@ -200,6 +253,23 @@ export default function AuthPage() {
                         </FormItem>
                       )}
                     />
+                    
+                    <FormField
+                      control={registerForm.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Email (Optional)</FormLabel>
+                          <FormControl>
+                            <Input type="email" placeholder="Enter your email address" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Email is optional but recommended for account recovery and notifications
+                          </p>
+                        </FormItem>
+                      )}
+                    />
 
                     <FormField
                       control={registerForm.control}
@@ -268,60 +338,189 @@ export default function AuthPage() {
 
                     {/* Show event code selection after format is chosen */}
                     {selectedEventFormat && (
-                      <FormField
-                        control={registerForm.control}
-                        name="eventCode"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>
-                              <span className="flex items-center">
-                                DECA Event
-                                <span className="text-destructive ml-1">*</span>
-                              </span>
-                            </FormLabel>
-                            <FormControl>
-                              <Select 
-                                onValueChange={field.onChange} 
-                                defaultValue={field.value}
-                              >
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Select your specific event (required)" />
-                                </SelectTrigger>
-                                <SelectContent className="max-h-80">
-                                  {/* Group events by type */}
-                                  {EVENT_TYPE_GROUPS.map(group => {
-                                    // Only show events from the selected format and current group
-                                    const events = DECA_EVENTS[selectedEventFormat].filter(event => event.type === group);
-                                    
-                                    // If no events in this group, skip
-                                    if (events.length === 0) return null;
-                                    
-                                    return (
-                                      <div key={group} className="px-1 mb-3">
-                                        <h4 className="text-sm font-semibold mb-1">{group}</h4>
-                                        {events.map(event => {
-                                          // Get category color
-                                          const categoryColor = DECA_CATEGORIES[event.category as keyof typeof DECA_CATEGORIES]?.colorClass || "bg-gray-300";
-                                          
-                                          return (
-                                            <SelectItem key={event.code} value={event.code} className="flex items-center">
-                                              <div className="flex items-center">
-                                                <div className={`w-2 h-2 rounded-full mr-2 ${categoryColor}`}></div>
-                                                <span className="font-medium mr-1">{event.code}</span> - <span className="ml-1">{event.name}</span>
-                                              </div>
-                                            </SelectItem>
-                                          );
-                                        })}
+                      <>
+                        <FormField
+                          control={registerForm.control}
+                          name="eventCode"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>
+                                <span className="flex items-center">
+                                  DECA Event
+                                  <span className="text-destructive ml-1">*</span>
+                                </span>
+                              </FormLabel>
+                              <FormControl>
+                                <Select 
+                                  onValueChange={(value) => {
+                                    field.onChange(value);
+                                    // Find the selected event to set eventType
+                                    const selectedEvent = DECA_EVENTS[selectedEventFormat].find(event => event.code === value);
+                                    if (selectedEvent) {
+                                      registerForm.setValue('eventType', selectedEvent.type);
+                                      registerForm.setValue('instructionalArea', selectedEvent.category);
+                                    }
+                                  }} 
+                                  defaultValue={field.value}
+                                >
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Select your specific event (required)" />
+                                  </SelectTrigger>
+                                  <SelectContent className="max-h-80">
+                                    {/* Group events by type */}
+                                    {EVENT_TYPE_GROUPS.map(group => {
+                                      // Only show events from the selected format and current group
+                                      const events = DECA_EVENTS[selectedEventFormat].filter(event => event.type === group);
+                                      
+                                      // If no events in this group, skip
+                                      if (events.length === 0) return null;
+                                      
+                                      return (
+                                        <div key={group} className="px-1 mb-3">
+                                          <h4 className="text-sm font-semibold mb-1">{group}</h4>
+                                          {events.map(event => {
+                                            // Get category color
+                                            const categoryColor = DECA_CATEGORIES[event.category as keyof typeof DECA_CATEGORIES]?.colorClass || "bg-gray-300";
+                                            
+                                            return (
+                                              <SelectItem key={event.code} value={event.code} className="flex items-center">
+                                                <div className="flex items-center">
+                                                  <div className={`w-2 h-2 rounded-full mr-2 ${categoryColor}`}></div>
+                                                  <span className="font-medium mr-1">{event.code}</span> - <span className="ml-1">{event.name}</span>
+                                                </div>
+                                              </SelectItem>
+                                            );
+                                          })}
+                                        </div>
+                                      );
+                                    })}
+                                  </SelectContent>
+                                </Select>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        
+                        {/* UI Theme Selection */}
+                        <div className="mt-6">
+                          <h3 className="text-md font-medium mb-2">Personalize Your Experience</h3>
+                          <p className="text-sm text-muted-foreground mb-4">
+                            Choose a theme that matches your style. You can change this later in settings.
+                          </p>
+                          
+                          <FormField
+                            control={registerForm.control}
+                            name="uiTheme"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>UI Theme</FormLabel>
+                                <div className="grid grid-cols-4 gap-3 mb-2">
+                                  {/* Theme options */}
+                                  <motion.div 
+                                    className={`relative overflow-hidden rounded-md cursor-pointer transition-all p-3 flex flex-col items-center ${field.value === 'aquaBlue' ? 'ring-2 ring-primary' : 'ring-1 ring-border'}`}
+                                    whileHover={{ scale: 1.05 }}
+                                    onClick={() => {
+                                      field.onChange('aquaBlue');
+                                      setSelectedUiTheme('aquaBlue');
+                                    }}
+                                  >
+                                    <div className="w-full h-10 rounded-md bg-blue-500 mb-2"></div>
+                                    <span className="text-xs">Aqua Blue</span>
+                                  </motion.div>
+                                  
+                                  <motion.div 
+                                    className={`relative overflow-hidden rounded-md cursor-pointer transition-all p-3 flex flex-col items-center ${field.value === 'coralPink' ? 'ring-2 ring-primary' : 'ring-1 ring-border'}`}
+                                    whileHover={{ scale: 1.05 }}
+                                    onClick={() => {
+                                      field.onChange('coralPink');
+                                      setSelectedUiTheme('coralPink');
+                                    }}
+                                  >
+                                    <div className="w-full h-10 rounded-md bg-pink-500 mb-2"></div>
+                                    <span className="text-xs">Coral Pink</span>
+                                  </motion.div>
+                                  
+                                  <motion.div 
+                                    className={`relative overflow-hidden rounded-md cursor-pointer transition-all p-3 flex flex-col items-center ${field.value === 'mintGreen' ? 'ring-2 ring-primary' : 'ring-1 ring-border'}`}
+                                    whileHover={{ scale: 1.05 }}
+                                    onClick={() => {
+                                      field.onChange('mintGreen');
+                                      setSelectedUiTheme('mintGreen');
+                                    }}
+                                  >
+                                    <div className="w-full h-10 rounded-md bg-green-500 mb-2"></div>
+                                    <span className="text-xs">Mint Green</span>
+                                  </motion.div>
+                                  
+                                  <motion.div 
+                                    className={`relative overflow-hidden rounded-md cursor-pointer transition-all p-3 flex flex-col items-center ${field.value === 'royalPurple' ? 'ring-2 ring-primary' : 'ring-1 ring-border'}`}
+                                    whileHover={{ scale: 1.05 }}
+                                    onClick={() => {
+                                      field.onChange('royalPurple');
+                                      setSelectedUiTheme('royalPurple');
+                                    }}
+                                  >
+                                    <div className="w-full h-10 rounded-md bg-purple-500 mb-2"></div>
+                                    <span className="text-xs">Royal Purple</span>
+                                  </motion.div>
+                                </div>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          
+                          {/* Visual Style Selection */}
+                          <FormField
+                            control={registerForm.control}
+                            name="colorScheme"
+                            render={({ field }) => (
+                              <FormItem className="mt-4">
+                                <FormLabel>Visual Style</FormLabel>
+                                <div className="grid grid-cols-2 gap-3">
+                                  <motion.div 
+                                    className={`relative overflow-hidden rounded-md cursor-pointer transition-all ${field.value === 'memphis' ? 'ring-2 ring-primary' : 'ring-1 ring-border'}`}
+                                    whileHover={{ scale: 1.02 }}
+                                    onClick={() => {
+                                      field.onChange('memphis');
+                                      setSelectedColorScheme('memphis');
+                                    }}
+                                  >
+                                    <div className="p-4 h-24 bg-gradient-to-br from-blue-100 to-green-100 relative">
+                                      <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-yellow-400"></div>
+                                      <div className="absolute bottom-4 left-4 w-10 h-2 bg-pink-400"></div>
+                                      <div className="absolute top-10 left-10 w-4 h-4 rounded-md bg-purple-400 rotate-45"></div>
+                                      <div className="mt-12">
+                                        <span className="text-xs font-medium">Memphis Style</span>
+                                        <p className="text-xs text-slate-600">Fun geometric patterns</p>
                                       </div>
-                                    );
-                                  })}
-                                </SelectContent>
-                              </Select>
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                                    </div>
+                                  </motion.div>
+
+                                  <motion.div 
+                                    className={`relative overflow-hidden rounded-md cursor-pointer transition-all ${field.value === 'minimalist' ? 'ring-2 ring-primary' : 'ring-1 ring-border'}`}
+                                    whileHover={{ scale: 1.02 }}
+                                    onClick={() => {
+                                      field.onChange('minimalist');
+                                      setSelectedColorScheme('minimalist');
+                                    }}
+                                  >
+                                    <div className="p-4 h-24 bg-gradient-to-br from-gray-50 to-gray-100 relative">
+                                      <div className="absolute top-4 left-4 w-12 h-1 bg-gray-400"></div>
+                                      <div className="absolute top-8 left-4 w-8 h-1 bg-gray-300"></div>
+                                      <div className="mt-12">
+                                        <span className="text-xs font-medium">Minimalist</span>
+                                        <p className="text-xs text-slate-600">Clean, focused design</p>
+                                      </div>
+                                    </div>
+                                  </motion.div>
+                                </div>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                      </>
                     )}
 
                     <Button type="submit" className="w-full" disabled={isSubmitting}>
