@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useMicroInteractions } from "@/hooks/use-micro-interactions";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { motion } from "framer-motion";
 import { 
   Accordion,
@@ -139,21 +140,63 @@ export default function AuthPage() {
   }, [selectedEventFormat, showMascot, hideMascot, triggerAnimation]);
 
   const onLoginSubmit = (values: z.infer<typeof loginSchema>) => {
-    loginMutation.mutate(values);
+    // Subtle animation for login
+    triggerAnimation("random");
+    
+    loginMutation.mutate(values, {
+      onSuccess: () => {
+        // Show success animation
+        triggerAnimation("stars", "Welcome back!");
+        showMascot("Welcome back! Let's continue your DECA preparation journey!", "bottom-right");
+      }
+    });
   };
 
   const onRegisterSubmit = (values: z.infer<typeof registerSchema>) => {
-    registerMutation.mutate(values);
+    // Show Diego with registration message
+    showMascot("Creating your account! I'm excited to start helping you prepare for DECA success!", "bottom-right");
+    
+    // Trigger animation when form is submitted
+    triggerAnimation("confetti");
+    
+    // Submit the form data
+    registerMutation.mutate(values, {
+      onSuccess: () => {
+        // Show success animation
+        triggerAnimation("fireworks", "Welcome to DecA(I)de!");
+      },
+      onError: () => {
+        // Hide mascot on error
+        hideMascot();
+      }
+    });
   };
 
   // Show loading state during authentication
   const isSubmitting = loginMutation.isPending || registerMutation.isPending;
 
+  // For handling mobile-specific behavior
+  const { isMobile } = useIsMobile();
+  const formRef = useRef<HTMLDivElement>(null);
+  
+  // Use this effect to scroll the form into view on mobile when errors occur
+  useEffect(() => {
+    if (isMobile && (loginForm.formState.errors.username || loginForm.formState.errors.password || 
+        registerForm.formState.errors.username || registerForm.formState.errors.password || 
+        registerForm.formState.errors.eventFormat || registerForm.formState.errors.eventCode)) {
+      formRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [
+    isMobile,
+    loginForm.formState.errors,
+    registerForm.formState.errors
+  ]);
+
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex flex-col lg:flex-row">
       {/* Left side - Auth form */}
-      <div className="w-full lg:w-1/2 p-4 flex items-center justify-center bg-slate-50">
-        <Card className="w-full max-w-md">
+      <div className="w-full lg:w-1/2 p-4 flex items-center justify-center bg-slate-50 order-2 lg:order-1">
+        <Card className="w-full max-w-md shadow-lg" ref={formRef}>
           <CardHeader className="space-y-1">
             <div className="flex items-center justify-center mb-6">
               <div className="relative w-12 h-12 bg-primary rounded-lg flex items-center justify-center">
@@ -546,47 +589,78 @@ export default function AuthPage() {
         </Card>
       </div>
       
-      {/* Right side - Hero section */}
-      <div className="hidden lg:block lg:w-1/2 bg-gradient-to-br from-primary-600 to-primary-800 text-white p-12">
-        <div className="h-full flex flex-col justify-center max-w-lg mx-auto">
-          <h1 className="text-4xl font-bold font-heading mb-6">Master DECA with AI-Powered Practice</h1>
-          <ul className="space-y-4">
-            <li className="flex items-start">
-              <div className="bg-white/20 rounded-full p-1 mr-3 mt-1">
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
-                </svg>
-              </div>
-              <div>
-                <h3 className="font-medium text-lg">Custom Roleplay Generation</h3>
-                <p className="text-white/80 mt-1">Practice with unlimited roleplay scenarios tailored to your event</p>
-              </div>
-            </li>
-            <li className="flex items-start">
-              <div className="bg-white/20 rounded-full p-1 mr-3 mt-1">
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
-                </svg>
-              </div>
-              <div>
-                <h3 className="font-medium text-lg">Performance Indicator Mastery</h3>
-                <p className="text-white/80 mt-1">Learn and practice essential performance indicators with real-world examples</p>
-              </div>
-            </li>
-            <li className="flex items-start">
-              <div className="bg-white/20 rounded-full p-1 mr-3 mt-1">
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
-                </svg>
-              </div>
-              <div>
-                <h3 className="font-medium text-lg">Practice Tests & Analytics</h3>
-                <p className="text-white/80 mt-1">Take exam-style tests and track your progress to identify areas for improvement</p>
-              </div>
-            </li>
-          </ul>
+      {/* Right side - Hero section - Memphis Style */}
+      <div className="hidden lg:flex lg:w-1/2 relative flex-col order-1 lg:order-2 bg-cyan-50 text-slate-900 p-12 overflow-hidden">
+        {/* Memphis style background patterns */}
+        <div className="absolute top-10 left-16 w-32 h-32 bg-primary/20 rounded-full" />
+        <div className="absolute bottom-20 right-14 w-40 h-40 bg-secondary/20 rounded-lg rotate-12" />
+        <div className="absolute top-40 right-12 w-24 h-24 bg-accent/20 rounded-full" />
+        <div className="absolute bottom-60 left-10 w-28 h-28 bg-yellow-200 rounded-lg -rotate-12" />
+        
+        {/* Zigzag pattern */}
+        <div className="absolute top-40 left-1/2 transform -translate-x-1/2 w-48 h-8">
+          <svg viewBox="0 0 160 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0 0L20 24L40 0L60 24L80 0L100 24L120 0L140 24L160 0" stroke="rgba(59, 130, 246, 0.5)" strokeWidth="3" fill="none" />
+          </svg>
+        </div>
+        
+        {/* Dolphin mascot */}
+        <div className="absolute bottom-10 right-8 w-40 h-40">
+          <div className="w-full h-full relative">
+            <div className="absolute inset-0 bg-blue-500 rounded-full opacity-20 animate-pulse"></div>
+            <div className="absolute inset-2 bg-blue-400 rounded-full flex items-center justify-center">
+              <span className="text-white text-5xl">🐬</span>
+            </div>
+          </div>
+        </div>
+        
+        <div className="h-full flex flex-col justify-center max-w-lg mx-auto z-10">
+          <div className="inline-flex items-center mb-6 bg-primary/10 px-4 py-2 rounded-lg">
+            <span className="inline-block mr-2 w-3 h-3 bg-primary rounded-full"></span>
+            <h2 className="text-xl font-heading font-bold text-slate-800 drop-shadow-sm">DECA AI Preparation</h2>
+          </div>
           
-          <div className="mt-12 bg-white/10 rounded-xl p-6">
+          <h1 className="text-4xl md:text-5xl font-heading font-bold mb-8 text-slate-800">
+            <span className="block">Master DECA with</span>
+            <span className="relative">
+              <span className="relative z-10">AI-Powered Practice</span>
+              <span className="absolute bottom-1 left-0 w-full h-4 bg-accent/30 -rotate-1"></span>
+            </span>
+          </h1>
+          
+          <div className="space-y-6 mb-10">
+            <div className="flex items-start">
+              <div className="mr-4 flex-shrink-0 w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><line x1="10" y1="9" x2="8" y2="9"></line></svg>
+              </div>
+              <div>
+                <h3 className="font-semibold text-lg text-slate-800">Custom Roleplay Generation</h3>
+                <p className="text-slate-700">Practice with unlimited roleplay scenarios tailored to your event</p>
+              </div>
+            </div>
+            
+            <div className="flex items-start">
+              <div className="mr-4 flex-shrink-0 w-12 h-12 bg-accent/20 rounded-lg flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-accent"><path d="M16 6H3"></path><path d="M11 12H3"></path><path d="M7 18H3"></path><path d="M12 18a5 5 0 0 0 9-3 4.5 4.5 0 0 0-4.5-4.5c-1.33 0-2.54.54-3.41 1.41L11 14"></path></svg>
+              </div>
+              <div>
+                <h3 className="font-semibold text-lg text-slate-800">Performance Indicator Mastery</h3>
+                <p className="text-slate-700">Learn and practice essential performance indicators with real-world examples</p>
+              </div>
+            </div>
+            
+            <div className="flex items-start">
+              <div className="mr-4 flex-shrink-0 w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-yellow-600"><path d="M12 20v-6"></path><path d="M6 20v-6"></path><path d="M18 20v-6"></path><path d="M17 14h1a2 2 0 0 0 2-2V5a1 1 0 0 0-1-1h-6V2.12c0-.59-.26-1.05-.59-1.06-.32 0-.59.45-.59 1.04L11.97 4H5.95a.94.94 0 0 0-.9.94c0 .13.05.25.09.36C5.11 5.73 5.95 8 9 8h7.33a2 2 0 0 0 1.9-1.37"></path><path d="M12 20a2 2 0 0 0 4 0"></path><path d="M6 20a2 2 0 0 0 4 0"></path><path d="M18 20a2 2 0 0 0 4 0"></path></svg>
+              </div>
+              <div>
+                <h3 className="font-semibold text-lg text-slate-800">Practice Tests & Analytics</h3>
+                <p className="text-slate-700">Take exam-style tests and track your progress to identify areas for improvement</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="inline-block relative bg-white rounded-lg px-6 py-3 border border-primary/30 shadow-sm">
             <div className="flex items-center space-x-4">
               <div className="rounded-full bg-white/20 h-12 w-12 flex items-center justify-center">
                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
