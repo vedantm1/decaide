@@ -65,16 +65,16 @@ export default function PerformanceIndicatorsPage() {
   };
   
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-50 font-sans">
+    <div className="flex h-screen overflow-hidden bg-slate-50 dark:bg-[var(--dark-gradient-v-default)] font-sans">
       <SidebarNavigation />
       
-      <main className="flex-1 overflow-y-auto bg-slate-50 pt-0 md:pt-0">
+      <main className="flex-1 overflow-y-auto bg-slate-50 dark:bg-transparent pt-0 md:pt-0">
         <MobileHeader />
         
         <div className="container mx-auto px-4 py-6 md:py-8 max-w-6xl">
           <header className="mb-6">
-            <h1 className="text-2xl font-heading font-bold text-slate-800">Performance Indicators</h1>
-            <p className="text-slate-500 mt-1">Master the essential performance indicators for your DECA event</p>
+            <h1 className="text-2xl font-heading font-bold text-slate-800 dark:text-slate-100">Performance Indicators</h1>
+            <p className="text-slate-500 dark:text-slate-400 mt-1">Master the essential performance indicators for your DECA event</p>
           </header>
           
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -99,16 +99,16 @@ export default function PerformanceIndicatorsPage() {
                   </div>
                   
                   <div className="mt-6">
-                    <h3 className="font-medium text-slate-700 mb-2">Your Progress</h3>
-                    <div className="bg-slate-50 p-3 rounded-lg">
+                    <h3 className="font-medium text-slate-700 dark:text-slate-200 mb-2">Your Progress</h3>
+                    <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-lg">
                       <div className="flex justify-between text-sm mb-1">
-                        <span className="text-slate-600">{selectedCategory}</span>
-                        <span className="text-slate-800 font-medium">
+                        <span className="text-slate-600 dark:text-slate-400">{selectedCategory}</span>
+                        <span className="text-slate-800 dark:text-slate-200 font-medium">
                           {performanceIndicators?.filter((pi: any) => pi.status === "completed").length || 0}/
                           {performanceIndicators?.length || 0}
                         </span>
                       </div>
-                      <div className="w-full h-2 bg-slate-200 rounded-full">
+                      <div className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-full">
                         <div 
                           className="bg-primary h-2 rounded-full" 
                           style={{ 
@@ -119,12 +119,12 @@ export default function PerformanceIndicatorsPage() {
                       </div>
                       
                       <div className="flex justify-between text-sm mb-1 mt-3">
-                        <span className="text-slate-600">Overall Progress</span>
-                        <span className="text-slate-800 font-medium">
+                        <span className="text-slate-600 dark:text-slate-400">Overall Progress</span>
+                        <span className="text-slate-800 dark:text-slate-200 font-medium">
                           {stats?.completedPIs || 0}/{stats?.totalPIs || 0}
                         </span>
                       </div>
-                      <div className="w-full h-2 bg-slate-200 rounded-full">
+                      <div className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-full">
                         <div 
                           className="bg-primary h-2 rounded-full" 
                           style={{ 
@@ -164,19 +164,19 @@ export default function PerformanceIndicatorsPage() {
                           key={pi.id} 
                           className={`mb-4 border rounded-lg overflow-hidden ${
                             pi.status === "completed" 
-                              ? "border-primary-200 bg-primary-50" 
+                              ? "border-primary-200 bg-primary-50 dark:bg-primary-900/20 dark:border-primary-700/30" 
                               : pi.status === "in_progress"
-                              ? "border-accent-200 bg-accent-50"
-                              : "border-slate-200"
+                              ? "border-accent-200 bg-accent-50 dark:bg-accent-900/20 dark:border-accent-700/30"
+                              : "border-slate-200 dark:border-slate-700"
                           }`}
                         >
                           <div 
                             className={`p-4 flex items-center justify-between cursor-pointer ${
                               pi.status === "completed" 
-                                ? "bg-primary-100" 
+                                ? "bg-primary-100 dark:bg-primary-900/30" 
                                 : pi.status === "in_progress"
-                                ? "bg-accent-100"
-                                : "bg-white hover:bg-slate-50"
+                                ? "bg-accent-100 dark:bg-accent-900/30"
+                                : "bg-white hover:bg-slate-50 dark:bg-slate-800 dark:hover:bg-slate-700/60"
                             }`}
                             onClick={() => setExpandedPI(expandedPI === pi.id ? null : pi.id)}
                           >
@@ -203,10 +203,10 @@ export default function PerformanceIndicatorsPage() {
                               <h3 
                                 className={`font-medium ${
                                   pi.status === "completed" 
-                                    ? "text-primary-800" 
+                                    ? "text-primary-800 dark:text-primary-300" 
                                     : pi.status === "in_progress"
-                                    ? "text-accent-800"
-                                    : "text-slate-700"
+                                    ? "text-accent-800 dark:text-accent-300"
+                                    : "text-slate-700 dark:text-slate-200"
                                 }`}
                               >
                                 {pi.indicator}
@@ -230,21 +230,21 @@ export default function PerformanceIndicatorsPage() {
                           </div>
                           
                           {expandedPI === pi.id && (
-                            <div className="p-4">
-                              <p className="text-slate-600 text-sm">
+                            <div className="p-4 dark:bg-slate-800/50">
+                              <p className="text-slate-600 dark:text-slate-300 text-sm">
                                 {pi.indicator} is a key concept in {selectedCategory}. It involves understanding the principles and applying them in business scenarios.
                               </p>
                               
                               <div className="mt-4">
-                                <h4 className="font-medium text-slate-700 text-sm">Real-World Example:</h4>
-                                <p className="text-slate-600 text-sm mt-1">
+                                <h4 className="font-medium text-slate-700 dark:text-slate-200 text-sm">Real-World Example:</h4>
+                                <p className="text-slate-600 dark:text-slate-300 text-sm mt-1">
                                   At Tesla, this performance indicator was applied when the company needed to make strategic decisions about production scaling. The finance team analyzed various data points to ensure the company could maintain cash flow while expanding operations.
                                 </p>
                               </div>
                               
                               <div className="mt-4">
-                                <h4 className="font-medium text-slate-700 text-sm">Key Points to Remember:</h4>
-                                <ul className="list-disc list-inside text-sm text-slate-600 mt-1 space-y-1">
+                                <h4 className="font-medium text-slate-700 dark:text-slate-200 text-sm">Key Points to Remember:</h4>
+                                <ul className="list-disc list-inside text-sm text-slate-600 dark:text-slate-300 mt-1 space-y-1">
                                   <li>Focus on practical applications rather than just theoretical knowledge</li>
                                   <li>Connect this PI to the overall business strategy</li>
                                   <li>Be prepared to cite specific examples during your roleplay</li>
@@ -282,7 +282,7 @@ export default function PerformanceIndicatorsPage() {
                     </div>
                   ) : (
                     <div className="py-12 text-center">
-                      <p className="text-slate-500">No performance indicators found for this category.</p>
+                      <p className="text-slate-500 dark:text-slate-400">No performance indicators found for this category.</p>
                     </div>
                   )}
                 </CardContent>
