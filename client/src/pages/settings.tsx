@@ -64,43 +64,8 @@ export default function SettingsPage() {
     }
   }, []);
 
-  // Apply appearance settings to the document body
+  // Save appearance settings to localStorage when they change
   useEffect(() => {
-    // Apply theme (light/dark/system)
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const isDarkMode = appearance.theme === 'dark' || (appearance.theme === 'system' && prefersDark);
-    
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-    
-    // Remove all theme classes first
-    const themeClasses = [
-      'theme-business', 'theme-finance', 'theme-hospitality', 
-      'theme-marketing', 'theme-entrepreneurship', 'theme-admin',
-      'theme-aquaBlue', 'theme-coralPink', 'theme-mintGreen', 'theme-royalPurple'
-    ];
-    
-    document.documentElement.classList.remove(...themeClasses);
-    
-    // Apply new color scheme class
-    document.documentElement.classList.add(`theme-${appearance.colorScheme}`);
-    
-    // Apply font size using data attribute instead of direct style
-    document.documentElement.setAttribute('data-font-size', appearance.fontSize);
-    
-    // Apply visual style
-    if (appearance.visualStyle === 'memphis') {
-      document.documentElement.classList.add('memphis-style');
-      document.documentElement.classList.remove('minimalist-style');
-    } else {
-      document.documentElement.classList.add('minimalist-style');
-      document.documentElement.classList.remove('memphis-style');
-    }
-    
-    // Save to localStorage
     localStorage.setItem('diegoAppearance', JSON.stringify(appearance));
   }, [appearance]);
 
@@ -152,27 +117,8 @@ export default function SettingsPage() {
       });
       triggerAnimation('confetti', 'Theme Updated!');
       
-      // Apply theme (light/dark/system)
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const isDarkMode = appearance.theme === 'dark' || (appearance.theme === 'system' && prefersDark);
-      
-      if (isDarkMode) {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
-      
-      // Remove all theme classes first
-      const themeClasses = [
-        'theme-business', 'theme-finance', 'theme-hospitality', 
-        'theme-marketing', 'theme-entrepreneurship', 'theme-admin',
-        'theme-aquaBlue', 'theme-coralPink', 'theme-mintGreen', 'theme-royalPurple'
-      ];
-      
-      document.documentElement.classList.remove(...themeClasses);
-      
-      // Apply new color scheme class
-      document.documentElement.classList.add(`theme-${appearance.colorScheme}`);
+      // ThemeProvider will apply the theme changes automatically
+      // since we've saved to localStorage and the appearance state is already updated
     },
     onError: (error: Error) => {
       toast({
