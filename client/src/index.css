@@ -1,5 +1,6 @@
 @import './styles/theme-variables.css';
 @import './styles/visual-styles.css';
+@import './lib/theme-colors.css';
 
 @tailwind base;
 @tailwind components;
