@@ -72,15 +72,15 @@ export type InsertSession = z.infer<typeof insertSessionSchema>;
 // Subscription tier limits
 export const SUBSCRIPTION_LIMITS = {
   standard: {
-    roleplays: 5,
-    tests: 5,
+    roleplays: 3,            // Updated from 5 to 3
+    tests: 2,                // Updated from 5 to 2
     piExplanations: 10,
     stars: 2,
     price: 12.99
   },
   plus: {
-    roleplays: 15,
-    tests: 15,
+    roleplays: 10,           // Updated from 15 to 10
+    tests: 8,                // Updated from 15 to 8
     piExplanations: 30,
     stars: 3,
     price: 19.99
