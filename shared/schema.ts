@@ -10,6 +10,11 @@ export const users = pgTable("users", {
   email: text("email"),
   eventFormat: text("event_format"), // roleplay or written
   eventCode: text("event_code"),     // event code like PBM, ACT, etc.
+  eventType: text("event_type"),     // Principles, Individual Series, etc.
+  instructionalArea: text("instructional_area"), // Business Management, Marketing, etc.
+  sessionId: text("session_id"),     // Current session ID for multi-device control
+  uiTheme: text("ui_theme").default("aquaBlue"), // UI theme preference
+  colorScheme: text("color_scheme").default("memphis"), // UI color scheme (memphis, modern, classic)
   subscriptionTier: text("subscription_tier").default("standard"),
   streak: integer("streak").default(0),
   lastLoginDate: timestamp("last_login_date"),
@@ -24,6 +29,10 @@ export const insertUserSchema = createInsertSchema(users).pick({
   email: true,
   eventFormat: true,
   eventCode: true,
+  eventType: true,
+  instructionalArea: true,
+  uiTheme: true,
+  colorScheme: true,
 });
 
 // Performance Indicators model
@@ -72,24 +81,54 @@ export type InsertSession = z.infer<typeof insertSessionSchema>;
 // Subscription tier limits
 export const SUBSCRIPTION_LIMITS = {
   standard: {
-    roleplays: 3,            // Updated from 5 to 3
-    tests: 2,                // Updated from 5 to 2
-    piExplanations: 10,
-    stars: 2,
+    roleplays: 3,              // Limited roleplay scenarios per month
+    tests: 2,                  // Limited practice tests per month
+    piExplanations: 10,        // Limited performance indicator explanations
+    examplePapers: 2,          // Limited example written event papers
+    exampleDialogues: 2,       // Limited example roleplay dialogues
+    customFeedback: false,     // No detailed feedback on written events
+    aiImageGeneration: false,  // No AI image generation for props/graphs
+    speechToText: false,       // No speech-to-text features
+    pdfGeneration: true,       // Basic PDF generation
+    dataAnalytics: false,      // No advanced analytics
+    accessDuration: 30,        // Access to generated content (days)
+    prioritySupport: false,    // No priority support
+    stars: 2,                  // Rating/quality
+    customizationOptions: 3,   // Limited UI customization options
     price: 12.99
   },
   plus: {
-    roleplays: 10,           // Updated from 15 to 10
-    tests: 8,                // Updated from 15 to 8
-    piExplanations: 30,
-    stars: 3,
+    roleplays: 10,             // More roleplay scenarios per month
+    tests: 8,                  // More practice tests per month
+    piExplanations: 30,        // More performance indicator explanations
+    examplePapers: 7,          // More example written event papers
+    exampleDialogues: 7,       // More example roleplay dialogues
+    customFeedback: true,      // Basic feedback on written events
+    aiImageGeneration: false,  // No AI image generation for props/graphs
+    speechToText: true,        // Basic speech-to-text features
+    pdfGeneration: true,       // Enhanced PDF generation
+    dataAnalytics: true,       // Basic analytics
+    accessDuration: 90,        // Longer access to generated content (days)
+    prioritySupport: false,    // No priority support
+    stars: 3,                  // Rating/quality
+    customizationOptions: 7,   // More UI customization options
     price: 19.99
   },
   pro: {
-    roleplays: -1, // unlimited
-    tests: -1, // unlimited
-    piExplanations: -1, // unlimited
-    stars: 5,
+    roleplays: -1,             // Unlimited roleplay scenarios
+    tests: -1,                 // Unlimited practice tests
+    piExplanations: -1,        // Unlimited performance indicator explanations
+    examplePapers: -1,         // Unlimited example written event papers
+    exampleDialogues: -1,      // Unlimited example roleplay dialogues
+    customFeedback: true,      // Advanced feedback on written events
+    aiImageGeneration: true,   // AI image generation for props/graphs
+    speechToText: true,        // Advanced speech-to-text features
+    pdfGeneration: true,       // Premium PDF generation with branding
+    dataAnalytics: true,       // Advanced analytics and insights
+    accessDuration: -1,        // Permanent access to generated content
+    prioritySupport: true,     // Priority support
+    stars: 5,                  // Premium rating/quality
+    customizationOptions: -1,  // Full UI customization options
     price: 39.99
   }
 };

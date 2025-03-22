@@ -121,14 +121,31 @@ export class MemStorage implements IStorage {
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = this.currentId++;
     const now = new Date();
+    // Generate a unique session ID for this user
+    const sessionId = `session_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
+    
     const user: User = { 
       ...insertUser, 
       id,
       subscriptionTier: "standard",
       streak: 0,
       lastLoginDate: now,
-      points: 0
+      points: 0,
+      sessionId,
+      eventType: insertUser.eventType || null,
+      instructionalArea: insertUser.instructionalArea || null,
+      uiTheme: insertUser.uiTheme || "aquaBlue",
+      colorScheme: insertUser.colorScheme || "memphis",
+      stripeCustomerId: null,
+      stripeSubscriptionId: null
     };
+    
+    // Store the session information
+    this.userSessions.set(id, {
+      id: sessionId,
+      createdAt: now,
+      lastActive: now
+    });
     this.users.set(id, user);
     
     // Create default PIs for the user
@@ -193,12 +210,23 @@ export class MemStorage implements IStorage {
     return user;
   }
 
-  async updateUserSettings(id: number, settings: { eventFormat?: string, eventCode?: string }): Promise<User | undefined> {
+  async updateUserSettings(id: number, settings: { 
+    eventFormat?: string, 
+    eventCode?: string,
+    eventType?: string,
+    instructionalArea?: string,
+    uiTheme?: string,
+    colorScheme?: string
+  }): Promise<User | undefined> {
     const user = await this.getUser(id);
     if (!user) return undefined;
     
     if (settings.eventFormat) user.eventFormat = settings.eventFormat;
     if (settings.eventCode) user.eventCode = settings.eventCode;
+    if (settings.eventType) user.eventType = settings.eventType;
+    if (settings.instructionalArea) user.instructionalArea = settings.instructionalArea;
+    if (settings.uiTheme) user.uiTheme = settings.uiTheme;
+    if (settings.colorScheme) user.colorScheme = settings.colorScheme;
     
     this.users.set(id, user);
     return user;
