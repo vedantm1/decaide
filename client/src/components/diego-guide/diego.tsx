@@ -569,7 +569,7 @@ export default function Diego({ isNewUser = false, currentStep = TUTORIAL_STEPS.
                 </div>
                 <div className="text-xs text-center text-slate-400 pb-2">
                   {/* Calculate step number by finding which step we're on */}
-                  Step {Object.keys(TUTORIAL_CONTENT).indexOf(activeStep) + 1} of {Object.keys(TUTORIAL_CONTENT).length}
+                  Step {activeStep ? Object.keys(TUTORIAL_CONTENT).indexOf(activeStep) + 1 : 1} of {Object.keys(TUTORIAL_CONTENT).length}
                 </div>
               </motion.div>
             )}

@@ -55,21 +55,22 @@ export default function SidebarNavigation() {
       {/* Navigation Links */}
       <nav className="flex-1 overflow-y-auto py-4 px-3">
         <div className="space-y-1">
-          <Link href="/">
-            <a className={`flex items-center gap-3 px-4 py-2.5 rounded-lg font-medium text-sm ${
+          <div
+            onClick={() => window.location.href = '/'}
+            className={`flex items-center gap-3 px-4 py-2.5 rounded-lg font-medium text-sm cursor-pointer ${
               isActive("/") 
                 ? "text-slate-800 bg-slate-100" 
                 : "text-slate-600 hover:bg-slate-100"
             }`}>
-              <i className="fas fa-chart-line w-5 text-center text-primary"></i>
-              <span>Dashboard</span>
-            </a>
-          </Link>
+            <i className="fas fa-chart-line w-5 text-center text-primary"></i>
+            <span>Dashboard</span>
+          </div>
           
           <div className="pt-2">
             <p className="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Practice</p>
-            <Link href="/roleplay">
-              <a className={`flex items-center gap-3 px-4 py-2.5 rounded-lg font-medium text-sm ${
+            <div
+              onClick={() => window.location.href = '/roleplay'}
+              className={`flex items-center gap-3 px-4 py-2.5 rounded-lg font-medium text-sm cursor-pointer ${
                 isActive("/roleplay") 
                   ? "text-slate-800 bg-slate-100" 
                   : "text-slate-600 hover:bg-slate-100"
@@ -78,10 +79,10 @@ export default function SidebarNavigation() {
                   isActive("/roleplay") ? "text-primary" : "text-slate-400"
                 }`}></i>
                 <span>Roleplay Scenarios</span>
-              </a>
-            </Link>
-            <Link href="/performance-indicators">
-              <a className={`flex items-center gap-3 px-4 py-2.5 rounded-lg font-medium text-sm ${
+              </div>
+            <div
+              onClick={() => window.location.href = '/performance-indicators'}
+              className={`flex items-center gap-3 px-4 py-2.5 rounded-lg font-medium text-sm cursor-pointer ${
                 isActive("/performance-indicators") 
                   ? "text-slate-800 bg-slate-100" 
                   : "text-slate-600 hover:bg-slate-100"
@@ -90,10 +91,10 @@ export default function SidebarNavigation() {
                   isActive("/performance-indicators") ? "text-primary" : "text-slate-400"
                 }`}></i>
                 <span>Performance Indicators</span>
-              </a>
-            </Link>
-            <Link href="/tests">
-              <a className={`flex items-center gap-3 px-4 py-2.5 rounded-lg font-medium text-sm ${
+              </div>
+            <div
+              onClick={() => window.location.href = '/tests'}
+              className={`flex items-center gap-3 px-4 py-2.5 rounded-lg font-medium text-sm cursor-pointer ${
                 isActive("/tests") 
                   ? "text-slate-800 bg-slate-100" 
                   : "text-slate-600 hover:bg-slate-100"
@@ -102,8 +103,7 @@ export default function SidebarNavigation() {
                   isActive("/tests") ? "text-primary" : "text-slate-400"
                 }`}></i>
                 <span>Practice Tests</span>
-              </a>
-            </Link>
+              </div>
             <Link href="/written-events">
               <a className={`flex items-center gap-3 px-4 py-2.5 rounded-lg font-medium text-sm ${
                 isActive("/written-events") 
