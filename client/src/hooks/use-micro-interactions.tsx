@@ -1,4 +1,5 @@
 import { createContext, ReactNode, useContext, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import SuccessAnimation from '@/components/animations/success-animation';
 import BreakTimer from '@/components/break-timer';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -162,38 +163,87 @@ export function MicroInteractionsProvider({ children }: { children: ReactNode })
         <BreakTimer onClose={hideBreakTimer} />
       )}
       
-      {/* Diego the Dolphin Mascot - Simple version */}
+      {/* Diego the Dolphin Mascot - Advanced interactive version */}
       {mascotDetails.show && (
-        <div 
-          className={`fixed z-50 max-w-xs ${
+        <motion.div 
+          initial={{ opacity: 0, y: 50, scale: 0.8 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: 20, scale: 0.9 }}
+          transition={{ type: "spring", damping: 15 }}
+          className={`fixed z-50 max-w-sm ${
             mascotDetails.position === 'bottom-right' ? 'bottom-5 right-5' :
             mascotDetails.position === 'top-right' ? 'top-5 right-5' :
             mascotDetails.position === 'bottom-left' ? 'bottom-5 left-5' :
             'top-5 left-5'
           }`}
         >
-          <div className="bg-blue-50 p-5 rounded-xl border border-blue-200 shadow-lg">
-            <div className="text-center">
-              <p className="font-bold text-blue-800 text-lg">Hi, I'm Diego the Dolphin!</p>
-              <p className="text-sm text-blue-700 mt-2">
-                {mascotDetails.message}
-              </p>
-              <div className="flex justify-center mt-3">
-                <button 
-                  onClick={() => {
-                    // Dispatch custom event for onboarding tour
-                    document.dispatchEvent(new CustomEvent('mascot-acknowledged'));
-                    // Ensure it fully disappears
-                    hideMascot();
-                  }}
-                  className="px-4 py-1.5 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-full"
-                >
-                  Got it!
-                </button>
+          <div className="relative bg-gradient-to-br from-blue-50 to-cyan-50 p-5 rounded-2xl border border-blue-200 shadow-xl">
+            {/* Mascot visuals */}
+            <div className="absolute -top-16 -left-8 w-24 h-24 rounded-full bg-blue-500 border-4 border-white shadow-md flex items-center justify-center overflow-hidden">
+              <svg viewBox="0 0 100 100" className="w-20 h-20">
+                <g transform="translate(50 50)">
+                  {/* Dolphin head */}
+                  <ellipse cx="0" cy="0" rx="35" ry="40" fill="#3B82F6" />
+                  
+                  {/* Dolphin smile */}
+                  <path d="M-15,10 Q0,25 15,10" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" />
+                  
+                  {/* Eyes */}
+                  <circle cx="-10" cy="-5" r="6" fill="white" />
+                  <circle cx="10" cy="-5" r="6" fill="white" />
+                  <circle cx="-10" cy="-5" r="3" fill="black" />
+                  <circle cx="10" cy="-5" r="3" fill="black" />
+                  
+                  {/* Blush */}
+                  <circle cx="-18" cy="8" r="5" fill="#F87171" opacity="0.5" />
+                  <circle cx="18" cy="8" r="5" fill="#F87171" opacity="0.5" />
+                </g>
+              </svg>
+            </div>
+            
+            {/* Memphis-style decoration elements */}
+            <div className="absolute top-3 right-3 w-5 h-5 rounded-full bg-yellow-300 opacity-70"></div>
+            <div className="absolute bottom-3 right-14 w-7 h-2 bg-pink-400 opacity-60 rotate-12"></div>
+            
+            <div className="pl-16">
+              <div className="text-left">
+                <p className="font-bold text-blue-800 text-xl bg-gradient-to-r from-blue-600 to-cyan-600 text-transparent bg-clip-text">
+                  {mascotDetails.message.length > 50 ? "Diego says:" : "Hi, I'm Diego!"}
+                </p>
+                <div className="relative">
+                  <p className="text-sm text-blue-700 mt-2 leading-relaxed">
+                    {mascotDetails.message}
+                  </p>
+                  <div className="absolute -left-4 -top-6 text-5xl text-blue-200 opacity-20">"</div>
+                  <div className="absolute -right-4 -bottom-6 text-5xl text-blue-200 opacity-20">"</div>
+                </div>
+                <div className="flex justify-start mt-4 space-x-2">
+                  <motion.button 
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => {
+                      // Dispatch custom event for onboarding tour
+                      document.dispatchEvent(new CustomEvent('mascot-acknowledged'));
+                      // Add a tiny delay to make the animation feel more natural
+                      setTimeout(hideMascot, 120);
+                    }}
+                    className="px-5 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium rounded-full shadow-md hover:shadow-lg transition-all duration-200"
+                  >
+                    Got it!
+                  </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={hideMascot}
+                    className="px-3 py-2 bg-transparent text-blue-600 font-medium rounded-full hover:bg-blue-50 transition-all duration-200"
+                  >
+                    Dismiss
+                  </motion.button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
       )}
     </MicroInteractionsContext.Provider>
   );
