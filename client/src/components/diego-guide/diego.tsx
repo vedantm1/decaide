@@ -514,24 +514,26 @@ export default function Diego({ isNewUser = false, currentStep = TUTORIAL_STEPS.
                   </motion.div>
                 )}
                 
-                {/* Show welcome banner only for the first step */}
-                {activeStep === "welcome" && isNewUser && (
-                  <motion.div 
-                    className="fixed inset-x-0 top-0 z-50"
-                    variants={welcomeBannerVariants}
-                    initial="hidden"
-                    animate="visible"
-                    exit="exit"
-                  >
-                    <div className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white p-4 shadow-lg">
-                      <div className="container mx-auto flex items-center justify-center gap-2 text-center">
-                        <span className="animate-pulse text-yellow-200">🏝️</span>
-                        <span className="font-medium">Welcome to DecA(I)de! 3-day trial activated - enjoy our tropical dolphin assistant!</span>
-                        <span className="animate-pulse text-yellow-200">🏝️</span>
+                {/* Welcome banner shown after tutorial completes */}
+                <AnimatePresence>
+                  {activeStep === "complete" && isNewUser && (
+                    <motion.div 
+                      className="fixed inset-x-0 top-0 z-50"
+                      variants={welcomeBannerVariants}
+                      initial="hidden"
+                      animate="visible"
+                      exit="exit"
+                    >
+                      <div className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white p-4 shadow-lg">
+                        <div className="container mx-auto flex items-center justify-center gap-2 text-center">
+                          <span className="animate-pulse text-yellow-200">🏝️</span>
+                          <span className="font-medium">Welcome to DecA(I)de! 3-day trial activated - enjoy our tropical dolphin assistant!</span>
+                          <span className="animate-pulse text-yellow-200">🏝️</span>
+                        </div>
                       </div>
-                    </div>
-                  </motion.div>
-                )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
                 
                 {/* Pointing dolphin avatar for interactive tutorial steps */}
                 {content.avatarType === "pointing" && (

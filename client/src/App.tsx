@@ -23,6 +23,8 @@ import { DiegoGuideProvider, useDiegoGuide } from "@/hooks/use-diego-guide";
 import Diego from "@/components/diego-guide/diego";
 import DiegoChat from "@/components/diego-guide/diego-chat";
 import ThemeProvider from "@/lib/theme-provider";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 function Router() {
   return (
@@ -75,18 +77,68 @@ function DiegoGuideManager() {
     hasTutorialCompleted 
   } = useDiegoGuide();
   const [location] = window.location.pathname.split('?');
+  const [showWelcomeBanner, setShowWelcomeBanner] = useState(false);
+  
+  // Show welcome banner after tutorial is completed
+  useEffect(() => {
+    if (hasTutorialCompleted && isNewUser) {
+      setShowWelcomeBanner(true);
+      
+      // Hide banner after 5 seconds
+      const timer = setTimeout(() => {
+        setShowWelcomeBanner(false);
+      }, 5000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [hasTutorialCompleted, isNewUser]);
   
   // Hide Diego on the auth page
   if (location === '/auth') {
     return null;
   }
   
+  // Custom onComplete handler
+  const handleTutorialComplete = () => {
+    completeTutorial();
+    setShowWelcomeBanner(true);
+  };
+  
   return (
     <>
+      {/* Persistent welcome banner that appears after tutorial completion */}
+      <AnimatePresence>
+        {showWelcomeBanner && (
+          <motion.div 
+            className="fixed inset-x-0 top-0 z-50"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0, transition: { duration: 0.5 } }}
+            exit={{ opacity: 0, y: -20, transition: { duration: 0.3 } }}
+          >
+            <div className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white p-4 shadow-lg">
+              <div className="container mx-auto flex items-center justify-center gap-2 text-center">
+                <span className="animate-pulse text-yellow-200">🏝️</span>
+                <span className="font-medium">Welcome to DecA(I)de! 3-day trial activated - enjoy our tropical dolphin assistant!</span>
+                <span className="animate-pulse text-yellow-200">🏝️</span>
+                <button 
+                  onClick={() => setShowWelcomeBanner(false)}
+                  className="ml-2 text-white/80 hover:text-white"
+                  aria-label="Close welcome banner"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M6 18L18 6M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <Diego 
         isNewUser={isNewUser} 
         currentStep={currentStep || undefined} 
-        onComplete={completeTutorial} 
+        onComplete={handleTutorialComplete} 
       />
       {isChatOpen && <DiegoChat isOpen={isChatOpen} onClose={closeChat} />}
       
