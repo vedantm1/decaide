@@ -2,14 +2,9 @@
   className={`bg-white rounded-lg shadow-xl border border-primary-100 max-w-sm ${isMobile ? 'w-full' : 'w-96'} relative`}
   variants={bubbleVariants}
 >
-  {/* Add the class bubble-text-visible here */}
   <p className="text-xs font-medium bubble-text-visible">Practice a Roleplay Scenario</p>
   <p className="text-xs bubble-text-visible">Complete a practice format to reflect on your last live.</p>
-</motion.div>@layer components {
-  .bubble-text-visible {
-    @apply text-black; /* Ensure text is black */
-  }
-}<motion.div 
+</motion.div><motion.div 
   className={`bg-white rounded-lg shadow-xl border border-primary-100 max-w-sm ${isMobile ? 'w-full' : 'w-96'} relative`}
   variants={bubbleVariants}
 >

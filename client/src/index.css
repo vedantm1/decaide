@@ -1,3 +1,10 @@
+
+@layer components {
+  .bubble-text-visible {
+    @apply text-black; /* Ensure text is black */
+  }
+}
+
 @layer components {
   .bubble-text-visible {
     @apply text-black; /* Ensure text is black */
