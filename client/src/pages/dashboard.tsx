@@ -105,16 +105,17 @@ export default function Dashboard() {
         
         if (user.subscriptionTier === 'free') {
           // Welcome new trial user with a tropical theme
-          showMascot(`Aloha ${user.username || 'there'}! I'm Diego the DecA(I)de Dolphin! 🌴 You've started your 3-day free trial. Let's dive in and make waves at your next DECA competition!`, 'bottom-right');
+          triggerAnimation('confetti');
+          showAchievement("Welcome!", `You've started your 3-day free trial. Let's get started with DECA preparation!`, 50);
         } else {
-          showMascot(`Hi ${user.username || 'there'}! I'm Diego the DecA(I)de Dolphin, your DECA companion. Ready to practice today?`, 'bottom-right');
+          showAchievement("Welcome Back!", `Ready to practice for your next DECA competition?`, 10);
         }
         
         // Remove the login flag so animation doesn't show again until next login
         sessionStorage.removeItem('justLoggedIn');
       }, 800);
     }
-  }, [triggerAnimation, showMascot, user]);
+  }, [triggerAnimation, showAchievement, user]);
   
   // Set a timer to show the break dialog after 5 minutes for demo purposes
   // (would be 25 minutes in production)

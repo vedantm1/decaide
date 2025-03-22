@@ -10,10 +10,10 @@ export default function InteractionShowcase() {
   const [streakCount, setStreakCount] = useState(0);
   const [showBadge, setShowBadge] = useState(false);
   const [showBreakTimerState, setShowBreakTimerState] = useState(false);
-  const [showMascotState, setShowMascotState] = useState(false);
+  const [showAchievementState, setShowAchievementState] = useState(false);
   
   const { toast } = useToast();
-  const { triggerAnimation, showBreakTimer, hideBreakTimer, showMascot, hideMascot } = useMicroInteractions();
+  const { triggerAnimation, showBreakTimer, hideBreakTimer, showAchievement } = useMicroInteractions();
   
   // Handler for playing success animation
   const playAnimation = () => {
@@ -35,14 +35,14 @@ export default function InteractionShowcase() {
     }
   };
   
-  // Handler for showing mascot
-  const toggleMascot = () => {
-    if (showMascotState) {
-      hideMascot();
-      setShowMascotState(false);
+  // Handler for toggling achievement notification
+  const toggleAchievement = () => {
+    if (showAchievementState) {
+      setShowAchievementState(false);
     } else {
-      showMascot("I'm here to help you achieve your DECA goals. Let's work together!");
-      setShowMascotState(true);
+      showAchievement("DECA Achievement", "I'm here to help you achieve your DECA goals!", 20);
+      triggerAnimation('stars');
+      setShowAchievementState(true);
     }
   };
   
@@ -241,31 +241,31 @@ export default function InteractionShowcase() {
           </CardContent>
         </Card>
         
-        {/* Mascot Section */}
+        {/* Achievement Notifications Section */}
         <Card>
           <CardHeader>
-            <CardTitle>Diego the Dolphin</CardTitle>
+            <CardTitle>Achievement Notifications</CardTitle>
             <CardDescription>
-              Friendly mascot provides guidance and personality
+              Celebrate accomplishments with achievement notifications
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex flex-col gap-4">
               <div className="flex justify-center">
                 <div className="h-20 flex items-center justify-center">
-                  {showMascotState && (
+                  {showAchievementState && (
                     <div className="text-center">
-                      <p className="font-medium text-primary">Diego is currently visible!</p>
+                      <p className="font-medium text-primary">Achievement triggered!</p>
                       <p className="text-sm text-muted-foreground">
-                        Check the bottom right corner of your screen
+                        Check the notification toast that appeared
                       </p>
                     </div>
                   )}
                 </div>
               </div>
               
-              <Button onClick={toggleMascot}>
-                {showMascotState ? 'Hide Diego' : 'Show Diego'}
+              <Button onClick={toggleAchievement}>
+                {showAchievementState ? 'Hide Achievement' : 'Show Achievement'}
               </Button>
             </div>
           </CardContent>
