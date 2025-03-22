@@ -21,7 +21,14 @@ export interface IStorage {
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateLastLogin(id: number, date: Date): Promise<User | undefined>;
-  updateUserSettings(id: number, settings: { eventFormat?: string, eventCode?: string }): Promise<User | undefined>;
+  updateUserSettings(id: number, settings: { 
+    eventFormat?: string, 
+    eventCode?: string,
+    eventType?: string,
+    instructionalArea?: string,
+    uiTheme?: string,
+    colorScheme?: string
+  }): Promise<User | undefined>;
   updateSubscription(id: number, tier: string): Promise<User | undefined>;
   
   // Session management methods

@@ -309,6 +309,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to update user settings" });
     }
   });
+  
+  // Update appearance settings
+  app.post("/api/user/appearance", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+    
+    try {
+      const userId = req.user!.id;
+      const { uiTheme } = req.body;
+      
+      const updated = await storage.updateUserSettings(userId, { uiTheme });
+      res.json(updated);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update appearance settings" });
+    }
+  });
 
   // Update subscription (manual for testing)
   app.post("/api/user/subscription", async (req, res) => {

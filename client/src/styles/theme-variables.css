@@ -1,0 +1,146 @@
+:root {
+  /* Default theme variables */
+  --theme-color: #3b82f6; /* default blue */
+  --font-size-base: 16px;
+  
+  /* Light mode colors */
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 222.2 84% 4.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 84% 4.9%;
+  --primary: 221.2 83.2% 53.3%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 210 40% 96.1%;
+  --secondary-foreground: 222.2 47.4% 11.2%;
+  --muted: 210 40% 96.1%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+  --accent: 210 40% 96.1%;
+  --accent-foreground: 222.2 47.4% 11.2%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 221.2 83.2% 53.3%;
+  --radius: 0.5rem;
+}
+
+/* Dark mode colors - activated when .dark class is added to HTML root */
+.dark {
+  --background: 222.2 84% 4.9%;
+  --foreground: 210 40% 98%;
+  --card: 222.2 84% 4.9%;
+  --card-foreground: 210 40% 98%;
+  --popover: 222.2 84% 4.9%;
+  --popover-foreground: 210 40% 98%;
+  --primary: 217.2 91.2% 59.8%;
+  --primary-foreground: 222.2 47.4% 11.2%;
+  --secondary: 217.2 32.6% 17.5%;
+  --secondary-foreground: 210 40% 98%;
+  --muted: 217.2 32.6% 17.5%;
+  --muted-foreground: 215 20.2% 65.1%;
+  --accent: 217.2 32.6% 17.5%;
+  --accent-foreground: 210 40% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 217.2 32.6% 17.5%;
+  --input: 217.2 32.6% 17.5%;
+  --ring: 224.3 76.3% 48%;
+}
+
+/* DECA Cluster Theme Styles */
+.theme-business {
+  --theme-color: #ffd700;
+  --primary: 50 100% 50%;
+  --primary-foreground: 20 10% 10%;
+  --ring: 50 100% 50%;
+}
+
+.theme-finance {
+  --theme-color: #22c55e;
+  --primary: 142 70% 45%;
+  --primary-foreground: 210 40% 98%;
+  --ring: 142 70% 45%;
+}
+
+.theme-hospitality {
+  --theme-color: #3b82f6;
+  --primary: 221.2 83.2% 53.3%;
+  --primary-foreground: 210 40% 98%;
+  --ring: 221.2 83.2% 53.3%;
+}
+
+.theme-marketing {
+  --theme-color: #ef4444;
+  --primary: 0 84.2% 60.2%;
+  --primary-foreground: 210 40% 98%;
+  --ring: 0 84.2% 60.2%;
+}
+
+.theme-entrepreneurship {
+  --theme-color: #9ca3af;
+  --primary: 220 14% 65%;
+  --primary-foreground: 220 10% 15%;
+  --ring: 220 14% 65%;
+}
+
+.theme-admin {
+  --theme-color: #312e81;
+  --primary: 243 75% 34%;
+  --primary-foreground: 210 40% 98%;
+  --ring: 243 75% 34%;
+}
+
+/* Standard UI themes */
+.theme-aquaBlue {
+  --theme-color: #3b82f6;
+  --primary: 221.2 83.2% 53.3%;
+  --primary-foreground: 210 40% 98%;
+  --ring: 221.2 83.2% 53.3%;
+}
+
+.theme-coralPink {
+  --theme-color: #ec4899;
+  --primary: 331.3 89.5% 60.8%;
+  --primary-foreground: 210 40% 98%;
+  --ring: 331.3 89.5% 60.8%;
+}
+
+.theme-mintGreen {
+  --theme-color: #22c55e;
+  --primary: 142 70% 45%;
+  --primary-foreground: 210 40% 98%;
+  --ring: 142 70% 45%;
+}
+
+.theme-royalPurple {
+  --theme-color: #8b5cf6;
+  --primary: 262.1 83.3% 57.8%;
+  --primary-foreground: 210 40% 98%;
+  --ring: 262.1 83.3% 57.8%;
+}
+
+/* Memphis Style (default) */
+.memphis-style {
+  /* Add any specific Memphis style overrides */
+}
+
+/* Minimalist Style */
+.minimalist-style {
+  --radius: 0.25rem;
+  /* More minimal style overrides */
+}
+
+/* Font sizes */
+html[data-font-size="small"] {
+  font-size: 14px;
+}
+
+html[data-font-size="medium"] {
+  font-size: 16px;
+}
+
+html[data-font-size="large"] {
+  font-size: 18px;
+}
