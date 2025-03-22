@@ -3,7 +3,9 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth } from "./auth";
 import { 
-  EVENT_TYPES, 
+  DECA_CATEGORIES,
+  DECA_EVENTS,
+  EVENT_TYPE_GROUPS,
   PI_CATEGORIES, 
   SUBSCRIPTION_LIMITS 
 } from "@shared/schema";
@@ -18,9 +20,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(SUBSCRIPTION_LIMITS);
   });
 
-  // Get event types
-  app.get("/api/event-types", (req, res) => {
-    res.json(EVENT_TYPES);
+  // Get DECA events data
+  app.get("/api/deca-events", (req, res) => {
+    res.json({
+      categories: DECA_CATEGORIES,
+      events: DECA_EVENTS,
+      eventTypeGroups: EVENT_TYPE_GROUPS
+    });
   });
 
   // Get PI categories
@@ -247,9 +253,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     
     try {
       const userId = req.user!.id;
-      const { eventType, instructionalArea } = req.body;
+      const { eventFormat, eventCode } = req.body;
       
-      const updated = await storage.updateUserSettings(userId, { eventType, instructionalArea });
+      const updated = await storage.updateUserSettings(userId, { eventFormat, eventCode });
       res.json(updated);
     } catch (error) {
       res.status(500).json({ error: "Failed to update user settings" });

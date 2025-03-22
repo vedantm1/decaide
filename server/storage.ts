@@ -3,7 +3,8 @@ import {
   PerformanceIndicator, InsertPI,
   PracticeSession, InsertSession,
   SUBSCRIPTION_LIMITS,
-  PI_CATEGORIES
+  PI_CATEGORIES,
+  DECA_EVENTS
 } from "@shared/schema";
 import session from "express-session";
 import createMemoryStore from "memorystore";
@@ -20,7 +21,7 @@ export interface IStorage {
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateLastLogin(id: number, date: Date): Promise<User | undefined>;
-  updateUserSettings(id: number, settings: { eventType?: string, instructionalArea?: string }): Promise<User | undefined>;
+  updateUserSettings(id: number, settings: { eventFormat?: string, eventCode?: string }): Promise<User | undefined>;
   updateSubscription(id: number, tier: string): Promise<User | undefined>;
   
   // Performance Indicators methods
@@ -178,12 +179,12 @@ export class MemStorage implements IStorage {
     return user;
   }
 
-  async updateUserSettings(id: number, settings: { eventType?: string, instructionalArea?: string }): Promise<User | undefined> {
+  async updateUserSettings(id: number, settings: { eventFormat?: string, eventCode?: string }): Promise<User | undefined> {
     const user = await this.getUser(id);
     if (!user) return undefined;
     
-    if (settings.eventType) user.eventType = settings.eventType;
-    if (settings.instructionalArea) user.instructionalArea = settings.instructionalArea;
+    if (settings.eventFormat) user.eventFormat = settings.eventFormat;
+    if (settings.eventCode) user.eventCode = settings.eventCode;
     
     this.users.set(id, user);
     return user;
@@ -410,15 +411,24 @@ export class MemStorage implements IStorage {
     const user = await this.getUser(userId);
     if (!user) throw new Error("User not found");
     
-    // Generate a challenge based on user's instructional area
-    const area = user.instructionalArea || "Finance";
-    const category = PI_CATEGORIES.find(c => c.includes(area)) || "Financial Analysis";
+    // Find the event details from the user's eventCode
+    let category = "Finance";
+    if (user.eventCode) {
+      const format = user.eventFormat === "roleplay" ? "roleplay" : "written";
+      const event = DECA_EVENTS[format as keyof typeof DECA_EVENTS]?.find(e => e.code === user.eventCode);
+      if (event) {
+        category = event.category;
+      }
+    }
+    
+    // Find a matching PI category
+    const piCategory = PI_CATEGORIES.find(c => c.includes(category)) || "Financial Analysis";
     
     return {
       id: `challenge-${Date.now()}`,
-      title: `Master 5 ${category} Performance Indicators`,
+      title: `Master 5 ${piCategory} Performance Indicators`,
       description: "Complete today's challenge to earn 50 extra points!",
-      category,
+      category: piCategory,
       points: 50,
       completed: false
     };

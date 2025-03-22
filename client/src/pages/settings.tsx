@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
-import { EVENT_TYPES } from "@shared/schema";
+import { EVENT_TYPE_GROUPS } from "@shared/schema";
 
 // Profile form schema
 const profileSchema = z.object({
@@ -196,7 +196,7 @@ export default function SettingsPage() {
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                {EVENT_TYPES.map((type) => (
+                                {EVENT_TYPE_GROUPS.map((type) => (
                                   <SelectItem key={type} value={type}>{type}</SelectItem>
                                 ))}
                               </SelectContent>

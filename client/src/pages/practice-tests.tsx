@@ -14,7 +14,7 @@ import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { EVENT_TYPES } from "@shared/schema";
+import { EVENT_TYPE_GROUPS } from "@shared/schema";
 
 // Form schema for test generation
 const testSchema = z.object({
@@ -144,7 +144,7 @@ export default function PracticeTestsPage() {
                         <SelectValue placeholder="Select test type" />
                       </SelectTrigger>
                       <SelectContent>
-                        {EVENT_TYPES.map((type) => (
+                        {EVENT_TYPE_GROUPS.map((type) => (
                           <SelectItem key={type} value={type}>{type}</SelectItem>
                         ))}
                       </SelectContent>

@@ -9,9 +9,20 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/hooks/use-auth";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { EVENT_TYPES } from "@shared/schema";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { 
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { 
+  DECA_EVENTS, 
+  DECA_CATEGORIES,
+  EVENT_TYPE_GROUPS
+} from "@shared/schema";
 
 // Login form schema
 const loginSchema = z.object({
@@ -31,11 +42,11 @@ const registerSchema = z.object({
   password: z.string().min(6, {
     message: "Password must be at least 6 characters",
   }),
-  eventType: z.string().min(1, {
-    message: "Event type is required",
+  eventFormat: z.enum(["roleplay", "written"], {
+    required_error: "Please select either roleplay or written event format",
   }),
-  instructionalArea: z.string().min(1, {
-    message: "Instructional area is required",
+  eventCode: z.string().min(1, {
+    message: "Please select a specific DECA event",
   }),
 });
 
@@ -59,10 +70,13 @@ export default function AuthPage() {
     defaultValues: {
       username: "",
       password: "",
-      eventType: "",
-      instructionalArea: "",
+      eventFormat: undefined,
+      eventCode: "",
     },
   });
+  
+  // State to track event format selection for filtering the event list
+  const [selectedEventFormat, setSelectedEventFormat] = useState<"roleplay" | "written" | null>(null);
 
   // If user is already logged in, redirect to dashboard
   useEffect(() => {
@@ -189,67 +203,126 @@ export default function AuthPage() {
 
                     <FormField
                       control={registerForm.control}
-                      name="eventType"
+                      name="eventFormat"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>
                             <span className="flex items-center">
-                              DECA Event Type 
+                              DECA Event Format
                               <span className="text-destructive ml-1">*</span>
                             </span>
                           </FormLabel>
-                          <FormControl>
-                            <Select 
-                              onValueChange={field.onChange} 
-                              defaultValue={field.value}
+                          <div className="grid grid-cols-2 gap-4 mb-3">
+                            <div
+                              className={`relative overflow-hidden rounded-lg border-2 transition-all cursor-pointer ${
+                                field.value === "roleplay" 
+                                  ? "border-primary bg-primary/10" 
+                                  : "border-gray-200 hover:border-gray-300"
+                              }`}
+                              onClick={() => {
+                                field.onChange("roleplay");
+                                setSelectedEventFormat("roleplay");
+                              }}
                             >
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select your event (required)" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {EVENT_TYPES.map((type) => (
-                                  <SelectItem key={type} value={type}>{type}</SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </FormControl>
+                              <div className="p-4">
+                                <h3 className="font-medium text-lg mb-1">Role-Play</h3>
+                                <p className="text-sm text-muted-foreground">Interactive scenarios with live evaluation</p>
+                                <div className="absolute top-0 right-0 p-2">
+                                  {field.value === "roleplay" && (
+                                    <svg width="20" height="20" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                      <path d="M7.49991 0.876892C3.84222 0.876892 0.877075 3.84204 0.877075 7.49972C0.877075 11.1574 3.84222 14.1226 7.49991 14.1226C11.1576 14.1226 14.1227 11.1574 14.1227 7.49972C14.1227 3.84204 11.1576 0.876892 7.49991 0.876892ZM7.49988 1.82689C10.6296 1.82689 13.1727 4.36997 13.1727 7.49972C13.1727 10.6295 10.6296 13.1726 7.49988 13.1726C4.37013 13.1726 1.82707 10.6295 1.82707 7.49972C1.82707 4.36997 4.37013 1.82689 7.49988 1.82689ZM10.1589 5.53975L6.49988 9.19872L4.84091 7.53975C4.65338 7.35223 4.34677 7.35223 4.15924 7.53975C3.97172 7.72728 3.97172 8.03389 4.15924 8.22142L6.15924 10.2214C6.34677 10.409 6.65338 10.409 6.84091 10.2214L10.8409 6.22142C11.0284 6.03389 11.0284 5.72728 10.8409 5.53975C10.6534 5.35223 10.3467 5.35223 10.1592 5.53975H10.1589Z" fill="currentColor" fillRule="evenodd" clipRule="evenodd"></path>
+                                    </svg>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                            
+                            <div
+                              className={`relative overflow-hidden rounded-lg border-2 transition-all cursor-pointer ${
+                                field.value === "written" 
+                                  ? "border-primary bg-primary/10" 
+                                  : "border-gray-200 hover:border-gray-300"
+                              }`}
+                              onClick={() => {
+                                field.onChange("written");
+                                setSelectedEventFormat("written");
+                              }}
+                            >
+                              <div className="p-4">
+                                <h3 className="font-medium text-lg mb-1">Written</h3>
+                                <p className="text-sm text-muted-foreground">Business plans and prepared projects</p>
+                                <div className="absolute top-0 right-0 p-2">
+                                  {field.value === "written" && (
+                                    <svg width="20" height="20" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                      <path d="M7.49991 0.876892C3.84222 0.876892 0.877075 3.84204 0.877075 7.49972C0.877075 11.1574 3.84222 14.1226 7.49991 14.1226C11.1576 14.1226 14.1227 11.1574 14.1227 7.49972C14.1227 3.84204 11.1576 0.876892 7.49991 0.876892ZM7.49988 1.82689C10.6296 1.82689 13.1727 4.36997 13.1727 7.49972C13.1727 10.6295 10.6296 13.1726 7.49988 13.1726C4.37013 13.1726 1.82707 10.6295 1.82707 7.49972C1.82707 4.36997 4.37013 1.82689 7.49988 1.82689ZM10.1589 5.53975L6.49988 9.19872L4.84091 7.53975C4.65338 7.35223 4.34677 7.35223 4.15924 7.53975C3.97172 7.72728 3.97172 8.03389 4.15924 8.22142L6.15924 10.2214C6.34677 10.409 6.65338 10.409 6.84091 10.2214L10.8409 6.22142C11.0284 6.03389 11.0284 5.72728 10.8409 5.53975C10.6534 5.35223 10.3467 5.35223 10.1592 5.53975H10.1589Z" fill="currentColor" fillRule="evenodd" clipRule="evenodd"></path>
+                                    </svg>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
 
-                    <FormField
-                      control={registerForm.control}
-                      name="instructionalArea"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>
-                            <span className="flex items-center">
-                              Instructional Area
-                              <span className="text-destructive ml-1">*</span>
-                            </span>
-                          </FormLabel>
-                          <FormControl>
-                            <Select 
-                              onValueChange={field.onChange} 
-                              defaultValue={field.value}
-                            >
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select an area (required)" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="Financial Analysis">Financial Analysis</SelectItem>
-                                <SelectItem value="Marketing">Marketing</SelectItem>
-                                <SelectItem value="Hospitality">Hospitality & Tourism</SelectItem>
-                                <SelectItem value="Management">Business Management</SelectItem>
-                                <SelectItem value="Entrepreneurship">Entrepreneurship</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    {/* Show event code selection after format is chosen */}
+                    {selectedEventFormat && (
+                      <FormField
+                        control={registerForm.control}
+                        name="eventCode"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>
+                              <span className="flex items-center">
+                                DECA Event
+                                <span className="text-destructive ml-1">*</span>
+                              </span>
+                            </FormLabel>
+                            <FormControl>
+                              <Select 
+                                onValueChange={field.onChange} 
+                                defaultValue={field.value}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select your specific event (required)" />
+                                </SelectTrigger>
+                                <SelectContent className="max-h-80">
+                                  {/* Group events by type */}
+                                  {EVENT_TYPE_GROUPS.map(group => {
+                                    // Only show events from the selected format and current group
+                                    const events = DECA_EVENTS[selectedEventFormat].filter(event => event.type === group);
+                                    
+                                    // If no events in this group, skip
+                                    if (events.length === 0) return null;
+                                    
+                                    return (
+                                      <div key={group} className="px-1 mb-3">
+                                        <h4 className="text-sm font-semibold mb-1">{group}</h4>
+                                        {events.map(event => {
+                                          // Get category color
+                                          const categoryColor = DECA_CATEGORIES[event.category as keyof typeof DECA_CATEGORIES]?.colorClass || "bg-gray-300";
+                                          
+                                          return (
+                                            <SelectItem key={event.code} value={event.code} className="flex items-center">
+                                              <div className="flex items-center">
+                                                <div className={`w-2 h-2 rounded-full mr-2 ${categoryColor}`}></div>
+                                                <span className="font-medium mr-1">{event.code}</span> - <span className="ml-1">{event.name}</span>
+                                              </div>
+                                            </SelectItem>
+                                          );
+                                        })}
+                                      </div>
+                                    );
+                                  })}
+                                </SelectContent>
+                              </Select>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )}
 
                     <Button type="submit" className="w-full" disabled={isSubmitting}>
                       {isSubmitting ? (
