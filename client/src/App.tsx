@@ -12,6 +12,7 @@ import WrittenEventsPage from "@/pages/written-events";
 import MyProgressPage from "@/pages/my-progress";
 import SettingsPage from "@/pages/settings";
 import PricingPage from "@/pages/pricing";
+import WhyDecadePage from "@/pages/why-decade";
 import { ProtectedRoute } from "./lib/protected-route";
 import { AuthProvider } from "@/hooks/use-auth";
 
@@ -26,6 +27,7 @@ function Router() {
       <ProtectedRoute path="/progress" component={MyProgressPage} />
       <ProtectedRoute path="/settings" component={SettingsPage} />
       <ProtectedRoute path="/pricing" component={PricingPage} />
+      <Route path="/why-decade" component={WhyDecadePage} />
       <Route path="/auth" component={AuthPage} />
       <Route component={NotFound} />
     </Switch>

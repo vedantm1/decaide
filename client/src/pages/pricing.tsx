@@ -82,25 +82,29 @@ export default function PricingPage() {
                     <span className="text-3xl font-bold text-slate-800">$12.99</span>
                     <span className="text-slate-500">/month</span>
                   </div>
-                  <p className="text-slate-500 text-sm">For students just starting their DECA journey</p>
+                  <p className="text-slate-500 text-sm">Essential DECA preparation for beginners</p>
                 </div>
                 <div className="p-6">
                   <ul className="space-y-3">
                     <li className="flex items-start">
                       <i className="fas fa-check text-primary mt-1 mr-2"></i>
-                      <span>Basic set of roleplays (1 per instructional area)</span>
+                      <span>AI-generated roleplay scenarios for each instructional area</span>
                     </li>
                     <li className="flex items-start">
                       <i className="fas fa-check text-primary mt-1 mr-2"></i>
-                      <span>5 practice tests per month</span>
+                      <span>Fifteen monthly test attempts for exam practice</span>
                     </li>
                     <li className="flex items-start">
                       <i className="fas fa-check text-primary mt-1 mr-2"></i>
-                      <span>Fundamental PI explanations</span>
+                      <span>Fundamental PI explanations with real-world examples</span>
                     </li>
                     <li className="flex items-start">
                       <i className="fas fa-check text-primary mt-1 mr-2"></i>
-                      <span>Basic progress tracking</span>
+                      <span>Standard progress tracking with leaderboard display</span>
+                    </li>
+                    <li className="flex items-start">
+                      <i className="fas fa-check text-primary mt-1 mr-2"></i>
+                      <span>Gamified experience with points and achievement badges</span>
                     </li>
                   </ul>
                   <div className="mt-6">
@@ -131,29 +135,29 @@ export default function PricingPage() {
                     <span className="text-3xl font-bold text-slate-800">$19.99</span>
                     <span className="text-slate-500">/month</span>
                   </div>
-                  <p className="text-slate-500 text-sm">For dedicated competitors looking to advance</p>
+                  <p className="text-slate-500 text-sm">Enhanced features for competitive advantage</p>
                 </div>
                 <div className="p-6">
                   <ul className="space-y-3">
                     <li className="flex items-start">
                       <i className="fas fa-check text-primary mt-1 mr-2"></i>
-                      <span>10 roleplay scenarios per month</span>
+                      <span>Additional roleplay scenarios per instructional area with PI customization</span>
                     </li>
                     <li className="flex items-start">
                       <i className="fas fa-check text-primary mt-1 mr-2"></i>
-                      <span>15 practice tests per month</span>
+                      <span>Twenty-five monthly test attempts</span>
                     </li>
                     <li className="flex items-start">
                       <i className="fas fa-check text-primary mt-1 mr-2"></i>
-                      <span>In-depth PI explanations with examples</span>
+                      <span>In-depth PI explanations with real-world insights</span>
                     </li>
                     <li className="flex items-start">
                       <i className="fas fa-check text-primary mt-1 mr-2"></i>
-                      <span>Advanced progress analytics</span>
+                      <span>Advanced progress tracking and personalized study recommendations</span>
                     </li>
                     <li className="flex items-start">
                       <i className="fas fa-check text-primary mt-1 mr-2"></i>
-                      <span>Basic written event templates</span>
+                      <span>Gamified experience with expanded achievements</span>
                     </li>
                   </ul>
                   <div className="mt-6">
@@ -181,33 +185,33 @@ export default function PricingPage() {
                     <span className="text-3xl font-bold text-slate-800">$39.99</span>
                     <span className="text-slate-500">/month</span>
                   </div>
-                  <p className="text-slate-500 text-sm">For serious competitors aiming for ICDC</p>
+                  <p className="text-slate-500 text-sm">Ultimate preparation for DECA champions</p>
                 </div>
                 <div className="p-6">
                   <ul className="space-y-3">
                     <li className="flex items-start">
                       <i className="fas fa-check text-primary mt-1 mr-2"></i>
-                      <span>Unlimited roleplay scenarios</span>
+                      <span>Unlimited roleplay scenario generation</span>
                     </li>
                     <li className="flex items-start">
                       <i className="fas fa-check text-primary mt-1 mr-2"></i>
-                      <span>Unlimited practice tests</span>
+                      <span>Unlimited monthly test attempts</span>
                     </li>
                     <li className="flex items-start">
                       <i className="fas fa-check text-primary mt-1 mr-2"></i>
-                      <span>Complete PI library with custom examples</span>
+                      <span>Premium, customized PI explanations</span>
                     </li>
                     <li className="flex items-start">
                       <i className="fas fa-check text-primary mt-1 mr-2"></i>
-                      <span>Comprehensive written event guidance</span>
+                      <span>Advanced performance analytics and interactive coaching</span>
                     </li>
                     <li className="flex items-start">
                       <i className="fas fa-check text-primary mt-1 mr-2"></i>
-                      <span>Detailed performance analytics</span>
+                      <span>Exclusive automated PDF report generation</span>
                     </li>
                     <li className="flex items-start">
                       <i className="fas fa-check text-primary mt-1 mr-2"></i>
-                      <span>Priority customer support</span>
+                      <span>Fully gamified and adaptive learning experience</span>
                     </li>
                   </ul>
                   <div className="mt-6">
