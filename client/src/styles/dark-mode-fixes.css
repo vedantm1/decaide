@@ -51,20 +51,34 @@ html[data-theme="dark"] [class*="card"] {
 /* Headings and descriptive text */
 html.dark h1, html.dark h2, html.dark h3, html.dark h4, html.dark h5, html.dark h6,
 html[data-theme="dark"] h1, html[data-theme="dark"] h2, html[data-theme="dark"] h3, 
-html[data-theme="dark"] h4, html[data-theme="dark"] h5, html[data-theme="dark"] h6 {
+html[data-theme="dark"] h4, html[data-theme="dark"] h5, html[data-theme="dark"] h6,
+html.dark [class*="heading"], html[data-theme="dark"] [class*="heading"],
+html.dark [class*="title"], html[data-theme="dark"] [class*="title"],
+html.dark [class*="header"], html[data-theme="dark"] [class*="header"] {
   color: var(--dark-text-primary) !important;
 }
 
 /* Fix for text-slate-800 and similar dark text */
 html.dark .text-slate-800, html.dark .text-slate-900, html.dark .text-slate-700,
-html[data-theme="dark"] .text-slate-800, html[data-theme="dark"] .text-slate-900, html[data-theme="dark"] .text-slate-700 {
+html.dark .text-black, html.dark .text-gray-800, html.dark .text-gray-900, 
+html[data-theme="dark"] .text-slate-800, html[data-theme="dark"] .text-slate-900, 
+html[data-theme="dark"] .text-slate-700, html[data-theme="dark"] .text-black,
+html[data-theme="dark"] .text-gray-800, html[data-theme="dark"] .text-gray-900 {
   color: var(--dark-text-primary) !important;
 }
 
 /* Fix for text-slate-500 and similar mid-tone text */
-html.dark .text-slate-500, html.dark .text-slate-600, 
-html[data-theme="dark"] .text-slate-500, html[data-theme="dark"] .text-slate-600 {
+html.dark .text-slate-500, html.dark .text-slate-600, html.dark .text-gray-500,
+html.dark .text-gray-600, html.dark .text-slate-400, html.dark .text-gray-400,
+html[data-theme="dark"] .text-slate-500, html[data-theme="dark"] .text-slate-600,
+html[data-theme="dark"] .text-gray-500, html[data-theme="dark"] .text-gray-600,
+html[data-theme="dark"] .text-slate-400, html[data-theme="dark"] .text-gray-400 {
   color: var(--dark-text-secondary) !important;
+}
+
+/* Force text visibility on any elements with color classes */
+html.dark [class*="text-"], html[data-theme="dark"] [class*="text-"] {
+  color: var(--dark-text-primary) !important;
 }
 
 /* Sidebar fixes */
@@ -98,6 +112,25 @@ html.dark .bg-white, html[data-theme="dark"] .bg-white {
 html.dark .bg-slate-50, html.dark .bg-slate-100, html.dark .bg-slate-200,
 html[data-theme="dark"] .bg-slate-50, html[data-theme="dark"] .bg-slate-100, html[data-theme="dark"] .bg-slate-200 {
   background-color: var(--dark-bg-primary) !important;
+}
+
+/* Settings page fixes */
+html.dark .bg-white, 
+html.dark [class*="bg-white"],
+html.dark div[class*="from-white"], 
+html[data-theme="dark"] .bg-white,
+html[data-theme="dark"] [class*="bg-white"],
+html[data-theme="dark"] div[class*="from-white"] {
+  background-color: var(--dark-bg-secondary) !important;
+  background-image: none !important;
+  color: var(--dark-text-primary) !important;
+}
+
+/* All color scheme boxes in settings to use dark mode proper styling */
+html.dark div[class*="bg-gradient-to-b"],
+html[data-theme="dark"] div[class*="bg-gradient-to-b"] {
+  background-image: none !important;
+  background-color: var(--surface-1) !important;
 }
 
 /* Fix slate border colors */
