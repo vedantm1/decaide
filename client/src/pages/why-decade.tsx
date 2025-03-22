@@ -100,7 +100,7 @@ export default function WhyDecadePage() {
                   </div>
                   <h3 className="text-xl font-heading font-bold text-slate-800 mb-3 text-center">15% to Nonprofit Partners</h3>
                   <p className="text-slate-600">
-                    We donate 15% of our profits to educational nonprofits focused on business education for underserved communities, helping expand access to quality business education. We believe every student deserves the opportunity to excel.
+                    We donate 15% of our profits to DECA's Emerging Leader Scholarship Fund, which provides financial support to outstanding DECA members who demonstrate exceptional leadership potential and academic achievement but face financial barriers. As proud DECA alumni, we're committed to expanding access to high-quality business education.
                   </p>
                 </div>
                 
