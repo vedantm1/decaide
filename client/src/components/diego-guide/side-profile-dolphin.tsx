@@ -162,10 +162,11 @@ export default function SideProfileDolphin({
         />
       </svg>
       {showTextBox && (
-        <div className={`absolute top-1/4 ${pointDirection === 'left' ? 'right-full mr-3' : 'left-full ml-3'} px-4 py-3 bg-white rounded-xl shadow-lg text-sm max-w-[250px] border border-blue-200`}>
-          <div className={`absolute top-1/2 transform -translate-y-1/2 ${pointDirection === 'left' ? 'right-[-10px]' : 'left-[-10px]'} w-0 h-0 border-solid ${pointDirection === 'left' ? 'border-l-10 border-y-[7px] border-y-transparent border-l-white' : 'border-r-10 border-y-[7px] border-y-transparent border-r-white'}`}></div>
-          <div className="font-medium text-blue-800">{message || "I'm swimming over!"}</div>
-          <div className={`absolute -bottom-1 -${pointDirection === 'left' ? 'right' : 'left'}-1 w-10 h-3 bg-primary/10 rounded-full filter blur-sm`}></div>
+        <div className={`absolute top-1/4 ${pointDirection === 'left' ? 'right-full mr-3' : 'left-full ml-3'} px-5 py-4 bg-white/95 rounded-xl shadow-md text-sm max-w-[280px] border-2 border-primary-100`}>
+          <div className={`absolute top-1/2 transform -translate-y-1/2 ${pointDirection === 'left' ? 'right-[-12px]' : 'left-[-12px]'} w-0 h-0 border-solid ${pointDirection === 'left' ? 'border-l-[12px] border-y-[10px] border-y-transparent border-l-white' : 'border-r-[12px] border-y-[10px] border-y-transparent border-r-white'}`}></div>
+          <div className="font-medium text-primary-700">{message}</div>
+          <div className={`absolute bottom-2 ${pointDirection === 'left' ? 'right' : 'left'}-3 w-12 h-3 bg-primary/20 rounded-full filter blur-md`}></div>
+          <div className={`absolute -bottom-1 -${pointDirection === 'left' ? 'right' : 'left'}-1 w-14 h-1 bg-gradient-to-r from-cyan-300 to-primary rounded-full opacity-40`}></div>
         </div>
       )}
       <WaveTransition targetPosition={targetPosition} />

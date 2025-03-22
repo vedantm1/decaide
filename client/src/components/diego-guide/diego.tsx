@@ -499,7 +499,7 @@ export default function Diego({ isNewUser = false, currentStep = TUTORIAL_STEPS.
                 className={`bg-white rounded-lg shadow-xl border border-primary-100 max-w-sm ${isMobile ? 'w-full' : 'w-96'} relative`}
                 variants={bubbleVariants}
               >
-                {/* Standard floating avatar for normal mode */}
+                {/* Standard floating avatar for normal mode - only render if we're not in pointing mode */}
                 {content.avatarType === "normal" && (
                   <motion.div 
                     className="absolute"
@@ -549,6 +549,8 @@ export default function Diego({ isNewUser = false, currentStep = TUTORIAL_STEPS.
                       emotion="pointing" 
                       size="xl" 
                       pointDirection={content.pointDirection as any}
+                      swimming={(content as any).swimming || false}
+                      targetPosition={(content as any).targetPosition}
                       message={content.message}
                       showTextBox={true}
                     />
