@@ -177,7 +177,7 @@ export function MicroInteractionsProvider({ children }: { children: ReactNode })
             'top-5 left-5'
           }`}
         >
-          <div className="relative bg-gradient-to-br from-blue-50 to-cyan-50 p-5 rounded-2xl border border-blue-200 shadow-xl">
+          <div className="relative bg-white p-5 rounded-2xl border border-blue-200 shadow-xl">
             {/* Mascot visuals */}
             <div className="absolute -top-16 -left-8 w-24 h-24 rounded-full bg-blue-400 border-4 border-white shadow-md flex items-center justify-center overflow-hidden">
               <svg viewBox="0 0 100 100" className="w-28 h-28">
@@ -234,11 +234,11 @@ export function MicroInteractionsProvider({ children }: { children: ReactNode })
             
             <div className="pl-16">
               <div className="text-left">
-                <p className="font-bold text-blue-800 text-xl bg-gradient-to-r from-blue-600 to-cyan-600 text-transparent bg-clip-text">
+                <p className="font-bold text-xl text-blue-700">
                   {mascotDetails.message.length > 50 ? "Diego says:" : "Hi, I'm Diego the DecA(I)de Dolphin!"}
                 </p>
                 <div className="relative">
-                  <p className="text-sm text-blue-700 mt-2 leading-relaxed">
+                  <p className="text-sm text-slate-800 font-medium mt-2 leading-relaxed">
                     {mascotDetails.message}
                   </p>
                   <div className="absolute -left-4 -top-6 text-5xl text-blue-200 opacity-20">"</div>
