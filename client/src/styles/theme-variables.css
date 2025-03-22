@@ -257,3 +257,46 @@
   --memphis-dots-size: 0;
   --memphis-squiggle-width: 0;
 }
+
+/* DECA Cluster Badge Styles */
+.deca-cluster-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  color: white;
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.7);
+}
+
+.theme-business .deca-cluster-badge {
+  background-color: hsl(45 100% 50%);
+}
+
+.theme-finance .deca-cluster-badge {
+  background-color: hsl(142 76% 36%);
+}
+
+.theme-hospitality .deca-cluster-badge {
+  background-color: hsl(217 91% 60%);
+}
+
+.theme-marketing .deca-cluster-badge {
+  background-color: hsl(0 84% 60%);
+}
+
+.theme-entrepreneurship .deca-cluster-badge {
+  background-color: hsl(220 14% 60%);
+}
+
+.theme-admin .deca-cluster-badge {
+  background-color: hsl(225 73% 20%);
+}
