@@ -240,7 +240,26 @@ html[data-theme="dark"] .panel-bg {
               0 2px 4px -2px rgba(0, 0, 0, 0.1) !important;
 }
 
-/* Login page exception - keep the original styling */
-.auth-page {
-  /* The auth page will have its own styling that overrides these rules */
+/* Auth page exception - keep the original styling */
+html.dark .auth-page .card,
+html.dark .auth-page [class*="card"],
+html.dark .auth-page [role="dialog"],
+html.dark .auth-page [role="menu"],
+html.dark .auth-page [role="listbox"],
+html[data-theme="dark"] .auth-page .card,
+html[data-theme="dark"] .auth-page [class*="card"],
+html[data-theme="dark"] .auth-page [role="dialog"],
+html[data-theme="dark"] .auth-page [role="menu"],
+html[data-theme="dark"] .auth-page [role="listbox"] {
+  background-image: none !important;
+}
+
+/* Ensure inputs are properly styled in auth page too */
+html.dark .auth-page input, 
+html.dark .auth-page select, 
+html.dark .auth-page textarea,
+html[data-theme="dark"] .auth-page input, 
+html[data-theme="dark"] .auth-page select, 
+html[data-theme="dark"] .auth-page textarea {
+  background-color: var(--dark-bg-tertiary) !important;
 }

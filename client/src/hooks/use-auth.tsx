@@ -116,8 +116,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       sessionStorage.setItem('justLoggedIn', 'true');
       
       toast({
-        title: "Registration successful",
-        description: "Your account has been created!",
+        title: "Welcome to DecA(I)de!",
+        description: `Your account has been created successfully. Let's start your DECA journey!`,
+        variant: "welcome",
       });
     },
     onError: (error: Error) => {
