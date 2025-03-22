@@ -4,6 +4,7 @@
 @import './lib/color-variables.css';
 @import './styles/force-dark-mode.css';
 @import './styles/dark-mode-fixes.css';
+@import './styles/dark-mode-gradients.css';
 
 @tailwind base;
 @tailwind components;

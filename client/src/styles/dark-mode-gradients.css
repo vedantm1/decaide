@@ -1,0 +1,246 @@
+/* 
+ * Dark Mode Gradient Backgrounds
+ *
+ * This file implements the universal rule that in dark mode, all boxes/containers 
+ * should use black gradient backgrounds rather than plain white or solid colors.
+ *
+ * Exceptions:
+ * - Login page (handled separately)
+ * - White UI option in settings (handled by theme controller)
+ */
+
+/* Base gradient definitions */
+html.dark,
+html[data-theme="dark"] {
+  /* Vertical gradients (top to bottom) */
+  --dark-gradient-v-subtle: linear-gradient(to bottom, 
+    hsl(222.2 84% 6%) 0%, 
+    hsl(222.2 84% 4.9%) 100%
+  );
+  
+  --dark-gradient-v-default: linear-gradient(to bottom, 
+    hsl(222.2 84% 9%) 0%, 
+    hsl(222.2 84% 4.9%) 100%
+  );
+  
+  --dark-gradient-v-pronounced: linear-gradient(to bottom, 
+    hsl(222.2 84% 12%) 0%, 
+    hsl(222.2 84% 4.9%) 100%
+  );
+  
+  /* Diagonal gradients */
+  --dark-gradient-diag-subtle: linear-gradient(135deg, 
+    hsl(222.2 84% 6%) 0%, 
+    hsl(222.2 84% 4.9%) 100%
+  );
+  
+  --dark-gradient-diag-default: linear-gradient(135deg, 
+    hsl(222.2 84% 9%) 0%, 
+    hsl(222.2 84% 4.9%) 100%
+  );
+  
+  --dark-gradient-diag-pronounced: linear-gradient(135deg, 
+    hsl(222.2 84% 12%) 0%, 
+    hsl(222.2 84% 4.9%) 100%
+  );
+  
+  /* Radial gradients */
+  --dark-gradient-radial-subtle: radial-gradient(
+    circle at center,
+    hsl(222.2 84% 6%) 0%,
+    hsl(222.2 84% 4.9%) 70%
+  );
+  
+  --dark-gradient-radial-default: radial-gradient(
+    circle at center,
+    hsl(222.2 84% 9%) 0%,
+    hsl(222.2 84% 4.9%) 70%
+  );
+  
+  --dark-gradient-radial-pronounced: radial-gradient(
+    circle at center,
+    hsl(222.2 84% 12%) 0%,
+    hsl(222.2 84% 4.9%) 70%
+  );
+}
+
+/* Apply the universal rule to all card-like components */
+html.dark .card,
+html.dark [class*="card"],
+html[data-theme="dark"] .card,
+html[data-theme="dark"] [class*="card"] {
+  background-image: var(--dark-gradient-v-default) !important;
+  background-color: transparent !important;
+}
+
+/* Dialog/Modal components */
+html.dark [role="dialog"],
+html[data-theme="dark"] [role="dialog"] {
+  background-image: var(--dark-gradient-diag-pronounced) !important;
+  background-color: transparent !important;
+}
+
+/* Primary UI containers */
+html.dark .container,
+html.dark [class*="container"],
+html[data-theme="dark"] .container,
+html[data-theme="dark"] [class*="container"] {
+  background-image: var(--dark-gradient-v-subtle) !important;
+  background-color: transparent !important;
+}
+
+/* Sidebar and navigation elements */
+html.dark aside,
+html.dark nav,
+html[data-theme="dark"] aside,
+html[data-theme="dark"] nav {
+  background-image: var(--dark-gradient-v-default) !important;
+  background-color: transparent !important;
+}
+
+/* Dropdown and popover components */
+html.dark [role="menu"],
+html.dark [role="listbox"],
+html.dark [role="tooltip"],
+html[data-theme="dark"] [role="menu"],
+html[data-theme="dark"] [role="listbox"],
+html[data-theme="dark"] [role="tooltip"] {
+  background-image: var(--dark-gradient-diag-default) !important;
+  background-color: transparent !important;
+}
+
+/* Dashboard cards and stats boxes */
+html.dark .dashboard-card,
+html.dark .stats-box,
+html[data-theme="dark"] .dashboard-card,
+html[data-theme="dark"] .stats-box {
+  background-image: var(--dark-gradient-diag-default) !important;
+  background-color: transparent !important;
+}
+
+/* Panels and sections */
+html.dark .panel-bg,
+html.dark .section-bg,
+html[data-theme="dark"] .panel-bg,
+html[data-theme="dark"] .section-bg {
+  background-image: var(--dark-gradient-v-default) !important;
+  background-color: transparent !important;
+}
+
+/* Form elements and inputs remain solid colors for readability */
+html.dark input, 
+html.dark select, 
+html.dark textarea,
+html[data-theme="dark"] input, 
+html[data-theme="dark"] select, 
+html[data-theme="dark"] textarea {
+  background-color: var(--dark-bg-tertiary) !important;
+  background-image: none !important;
+}
+
+/* Tables */
+html.dark table,
+html[data-theme="dark"] table {
+  background-image: var(--dark-gradient-v-subtle) !important;
+  background-color: transparent !important;
+}
+
+/* Table rows (alternate rows) */
+html.dark tr:nth-child(even),
+html[data-theme="dark"] tr:nth-child(even) {
+  background-image: var(--dark-gradient-diag-subtle) !important;
+  background-color: transparent !important;
+}
+
+/* White backgrounds - override any white backgrounds with gradients */
+html.dark .bg-white,
+html.dark [class*="bg-white"],
+html[data-theme="dark"] .bg-white,
+html[data-theme="dark"] [class*="bg-white"] {
+  background-image: var(--dark-gradient-v-default) !important;
+  background-color: transparent !important;
+}
+
+/* Slate backgrounds - reuse the variables to avoid duplicating code */
+html.dark .bg-slate-50, 
+html.dark .bg-slate-100, 
+html.dark .bg-slate-200,
+html[data-theme="dark"] .bg-slate-50, 
+html[data-theme="dark"] .bg-slate-100, 
+html[data-theme="dark"] .bg-slate-200 {
+  background-image: var(--dark-gradient-v-subtle) !important;
+  background-color: transparent !important;
+}
+
+/* Utility classes for applying specific gradients manually */
+html.dark .dark-gradient-v-subtle,
+html[data-theme="dark"] .dark-gradient-v-subtle {
+  background-image: var(--dark-gradient-v-subtle) !important;
+  background-color: transparent !important;
+}
+
+html.dark .dark-gradient-v-default,
+html[data-theme="dark"] .dark-gradient-v-default {
+  background-image: var(--dark-gradient-v-default) !important;
+  background-color: transparent !important;
+}
+
+html.dark .dark-gradient-v-pronounced,
+html[data-theme="dark"] .dark-gradient-v-pronounced {
+  background-image: var(--dark-gradient-v-pronounced) !important;
+  background-color: transparent !important;
+}
+
+html.dark .dark-gradient-diag-subtle,
+html[data-theme="dark"] .dark-gradient-diag-subtle {
+  background-image: var(--dark-gradient-diag-subtle) !important;
+  background-color: transparent !important;
+}
+
+html.dark .dark-gradient-diag-default,
+html[data-theme="dark"] .dark-gradient-diag-default {
+  background-image: var(--dark-gradient-diag-default) !important;
+  background-color: transparent !important;
+}
+
+html.dark .dark-gradient-diag-pronounced,
+html[data-theme="dark"] .dark-gradient-diag-pronounced {
+  background-image: var(--dark-gradient-diag-pronounced) !important;
+  background-color: transparent !important;
+}
+
+html.dark .dark-gradient-radial-subtle,
+html[data-theme="dark"] .dark-gradient-radial-subtle {
+  background-image: var(--dark-gradient-radial-subtle) !important;
+  background-color: transparent !important;
+}
+
+html.dark .dark-gradient-radial-default,
+html[data-theme="dark"] .dark-gradient-radial-default {
+  background-image: var(--dark-gradient-radial-default) !important;
+  background-color: transparent !important;
+}
+
+html.dark .dark-gradient-radial-pronounced,
+html[data-theme="dark"] .dark-gradient-radial-pronounced {
+  background-image: var(--dark-gradient-radial-pronounced) !important;
+  background-color: transparent !important;
+}
+
+/* Shadow enhancements for dark mode elements to create depth */
+html.dark .card,
+html.dark [class*="card"],
+html.dark .dashboard-card,
+html.dark .panel-bg,
+html[data-theme="dark"] .card,
+html[data-theme="dark"] [class*="card"],
+html[data-theme="dark"] .dashboard-card,
+html[data-theme="dark"] .panel-bg {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 
+              0 2px 4px -2px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Login page exception - keep the original styling */
+.auth-page {
+  /* The auth page will have its own styling that overrides these rules */
+}
