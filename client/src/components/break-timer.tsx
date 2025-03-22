@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import ProgressRing from "@/components/ui/progress-ring";
+import { useState, useEffect } from 'react';
+import { useToast } from '@/hooks/use-toast';
+import BreakGameModal from './break-timer/break-game-modal';
+import { Button } from '@/components/ui/button';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface BreakTimerProps {
   onClose: () => void;
@@ -9,156 +10,177 @@ interface BreakTimerProps {
 }
 
 export default function BreakTimer({ onClose, duration = 300 }: BreakTimerProps) {
-  const [timeRemaining, setTimeRemaining] = useState(duration);
-  const [breakOption, setBreakOption] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [timeUntilBreak, setTimeUntilBreak] = useState(25 * 60); // 25 minutes in seconds
+  const [isActive, setIsActive] = useState(true);
+  const [sessionCount, setSessionCount] = useState(0);
+  const [breakSkipped, setBreakSkipped] = useState(false);
+  const [reminderInterval, setReminderInterval] = useState<NodeJS.Timeout | null>(null);
   
-  // Calculate progress percentage
-  const progress = ((duration - timeRemaining) / duration) * 100;
+  const { toast } = useToast();
   
-  // Format time for display (mm:ss)
+  // Initialize timer on mount
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    
+    if (isActive && timeUntilBreak > 0) {
+      timer = setInterval(() => {
+        setTimeUntilBreak(prev => prev - 1);
+      }, 1000);
+    } else if (timeUntilBreak === 0) {
+      // Time for a break
+      setIsModalOpen(true);
+      setSessionCount(prev => prev + 1);
+    }
+    
+    return () => {
+      if (timer) clearInterval(timer);
+    };
+  }, [isActive, timeUntilBreak]);
+  
+  // Format time as mm:ss
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
   
-  // Timer countdown effect
-  useEffect(() => {
-    if (timeRemaining <= 0) {
-      onClose();
-      return;
+  // Handle session completion
+  const handleBreakCompleted = () => {
+    setIsModalOpen(false);
+    setTimeUntilBreak(25 * 60); // Reset timer for next session
+    setIsActive(true);
+    setBreakSkipped(false);
+    
+    // Clear any pending reminders
+    if (reminderInterval) {
+      clearInterval(reminderInterval);
+      setReminderInterval(null);
     }
     
-    const timer = setInterval(() => {
-      setTimeRemaining((prev) => prev - 1);
-    }, 1000);
+    // Show toast for session completion based on count
+    let toastMessage = '';
     
-    return () => clearInterval(timer);
-  }, [timeRemaining, onClose]);
-  
-  // Break option selection
-  const handleBreakOptionSelect = (option: string) => {
-    setBreakOption(option);
-  };
-  
-  // Render different break content based on selected option
-  const renderBreakContent = () => {
-    if (!breakOption) return null;
-    
-    switch (breakOption) {
-      case "game":
-        return (
-          <div className="text-center py-4">
-            <h4 className="font-medium text-lg text-slate-800 mb-3">Quick Break Game</h4>
-            <div className="bg-slate-100 rounded-lg p-6 flex items-center justify-center h-44">
-              <p className="text-slate-600">Simple game would appear here</p>
-            </div>
-          </div>
-        );
-      case "mindfulness":
-        return (
-          <div className="text-center py-4">
-            <h4 className="font-medium text-lg text-slate-800 mb-3">Mindfulness Break</h4>
-            <div className="bg-primary-50 rounded-lg p-6 flex flex-col items-center justify-center h-44">
-              <p className="text-slate-600 mb-4">Take 5 deep breaths. Focus on your breathing.</p>
-              <div className="h-16 w-16 rounded-full bg-primary-100 flex items-center justify-center animate-pulse">
-                <i className="fas fa-lungs text-primary-600 text-xl"></i>
-              </div>
-            </div>
-          </div>
-        );
-      case "video":
-        return (
-          <div className="text-center py-4">
-            <h4 className="font-medium text-lg text-slate-800 mb-3">Educational Moment</h4>
-            <div className="bg-slate-100 rounded-lg p-6 flex items-center justify-center h-44">
-              <p className="text-slate-600">Short educational video would appear here</p>
-            </div>
-          </div>
-        );
-      default:
-        return null;
+    if (sessionCount === 1) {
+      toastMessage = 'First session complete! Keep up the good work.';
+    } else if (sessionCount === 3) {
+      toastMessage = 'You\'re on a roll! 3 sessions completed.';
+    } else if (sessionCount === 5) {
+      toastMessage = 'Amazing focus! You\'ve completed 5 sessions today.';
+    } else if (sessionCount % 5 === 0) {
+      toastMessage = `Incredible discipline! ${sessionCount} sessions completed.`;
+    } else {
+      toastMessage = 'Break completed. Back to work!';
     }
+    
+    toast({
+      title: `Session ${sessionCount} Complete`,
+      description: toastMessage,
+    });
   };
-
+  
+  // Skip the break
+  const handleSkipBreak = () => {
+    setIsModalOpen(false);
+    setTimeUntilBreak(25 * 60); // Reset timer for next session
+    setIsActive(true);
+    setBreakSkipped(true);
+    
+    // Set up reminder interval if break was skipped
+    if (!reminderInterval) {
+      const interval = setInterval(() => {
+        toast({
+          title: 'Break Reminder',
+          description: 'Taking regular breaks improves retention and focus. Consider a short break soon.',
+          duration: 5000,
+        });
+      }, 5 * 60 * 1000); // Remind every 5 minutes
+      
+      setReminderInterval(interval);
+    }
+    
+    toast({
+      title: 'Break Skipped',
+      description: 'Remember that regular breaks improve learning effectiveness.',
+      variant: 'destructive',
+    });
+  };
+  
+  // Pause timer
+  const toggleTimer = () => {
+    setIsActive(prev => !prev);
+  };
+  
+  // Reset timer
+  const resetTimer = () => {
+    setTimeUntilBreak(25 * 60);
+    setIsActive(true);
+  };
+  
   return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-slate-900/70 z-50 flex items-center justify-center"
-        onClick={(e) => {
-          // Only close if clicking the background
-          if (e.target === e.currentTarget) onClose();
-        }}
-      >
-        <motion.div
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.9, opacity: 0 }}
-          transition={{ type: "spring", damping: 20 }}
-          className="bg-white rounded-xl p-6 max-w-md w-full mx-4 shadow-xl"
-        >
-          <div className="text-center">
-            <div className="w-20 h-20 mx-auto mb-4 animate-[float_3s_ease-in-out_infinite]">
-              <svg width="80" height="80" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="24" cy="24" r="20" fill="#EFF6FF"/>
-                <path d="M16,16 Q24,10 32,16 L32,30 Q24,36 16,30 Z" fill="#3B82F6"/>
-                <circle cx="21" cy="22" r="2" fill="white"/>
-                <circle cx="27" cy="22" r="2" fill="white"/>
-                <path d="M20,28 Q24,31 28,28" stroke="white" strokeWidth="1.5" fill="none"/>
-              </svg>
-            </div>
-            <h3 className="text-xl font-bold text-slate-800 font-heading">Time for a Break!</h3>
-            <p className="text-slate-600 mt-2">You've been working hard! Take 5 minutes to recharge.</p>
-            
-            <div className="mt-6 mb-4 flex justify-center">
-              <ProgressRing progress={progress} radius={50} stroke={4}>
-                <span className="text-3xl font-bold text-slate-800">
-                  {formatTime(timeRemaining)}
-                </span>
-              </ProgressRing>
-            </div>
-            
-            {!breakOption ? (
-              <div className="grid grid-cols-3 gap-4 mt-8 mb-6">
-                <button 
-                  className="flex flex-col items-center bg-slate-100 hover:bg-slate-200 p-3 rounded-lg transition-colors"
-                  onClick={() => handleBreakOptionSelect("game")}
-                >
-                  <i className="fas fa-gamepad text-slate-600 text-xl mb-2"></i>
-                  <span className="text-xs text-slate-700 font-medium">Quick Game</span>
-                </button>
-                <button 
-                  className="flex flex-col items-center bg-slate-100 hover:bg-slate-200 p-3 rounded-lg transition-colors"
-                  onClick={() => handleBreakOptionSelect("mindfulness")}
-                >
-                  <i className="fas fa-brain text-slate-600 text-xl mb-2"></i>
-                  <span className="text-xs text-slate-700 font-medium">Mind Break</span>
-                </button>
-                <button 
-                  className="flex flex-col items-center bg-slate-100 hover:bg-slate-200 p-3 rounded-lg transition-colors"
-                  onClick={() => handleBreakOptionSelect("video")}
-                >
-                  <i className="fas fa-video text-slate-600 text-xl mb-2"></i>
-                  <span className="text-xs text-slate-700 font-medium">Watch Video</span>
-                </button>
+    <>
+      <AnimatePresence>
+        {!isModalOpen && (
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed bottom-5 right-5 p-3 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 max-w-[180px]"
+          >
+            <div className="text-center">
+              <h3 className="text-sm font-semibold mb-1">Focus Timer</h3>
+              <div className="text-xl font-mono font-bold mb-2">
+                {formatTime(timeUntilBreak)}
               </div>
-            ) : (
-              renderBreakContent()
-            )}
-            
-            <Button 
-              className="w-full mt-4"
-              variant={breakOption ? "outline" : "default"}
-              onClick={onClose}
-            >
-              {breakOption ? "Back to Break Options" : "Skip Break & Continue"}
-            </Button>
-          </div>
-        </motion.div>
-      </motion.div>
-    </AnimatePresence>
+              
+              {sessionCount > 0 && (
+                <div className="text-xs text-muted-foreground mb-2">
+                  Sessions: {sessionCount}
+                </div>
+              )}
+              
+              <div className="flex gap-1 justify-center">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="w-8 h-8 p-0" 
+                  onClick={toggleTimer}
+                >
+                  {isActive ? "⏸️" : "▶️"}
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="w-8 h-8 p-0" 
+                  onClick={resetTimer}
+                >
+                  🔄
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="w-8 h-8 p-0 text-red-500" 
+                  onClick={onClose}
+                >
+                  ✖️
+                </Button>
+              </div>
+              
+              {breakSkipped && (
+                <div className="mt-2 text-xs text-amber-600 dark:text-amber-400">
+                  Don't forget to take breaks!
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      
+      <BreakGameModal 
+        isOpen={isModalOpen}
+        onClose={handleBreakCompleted}
+        breakDuration={duration}
+      />
+    </>
   );
 }
