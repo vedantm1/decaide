@@ -131,26 +131,62 @@ export default function Dashboard() {
     return () => clearTimeout(timer);
   }, [toast]);
   
+  // Define types for the data
+  interface Stats {
+    roleplays: number;
+    tests: number;
+    completedPIs: number;
+    totalPIs: number;
+  }
+  
+  interface Activity {
+    id: string;
+    type: "roleplay" | "test" | "pi";
+    title: string;
+    description: string;
+    score?: number;
+    points?: number;
+    date: string;
+  }
+  
+  interface LearningItem {
+    id: string;
+    type: "roleplay" | "written" | "pi" | string;
+    title: string;
+    description: string;
+    progress?: number;
+    category: string;
+  }
+  
+  interface Challenge {
+    id: string;
+    title: string;
+    description: string;
+    points: number;
+    category: string;
+    completed: boolean;
+  }
+  
   // User stats query
-  const { data: stats, isLoading: statsLoading } = useQuery({
+  const { data: stats, isLoading: statsLoading } = useQuery<Stats>({
     queryKey: ["/api/user/stats"],
     enabled: !!user
   });
   
   // Recent activities query
-  const { data: activities, isLoading: activitiesLoading } = useQuery({
+  const { data: activities, isLoading: activitiesLoading } = useQuery<Activity[]>({
     queryKey: ["/api/user/activities"],
     enabled: !!user
   });
   
   // Continue learning items
-  const { data: learningItems, isLoading: learningLoading } = useQuery({
+  const { data: learningItems, isLoading: learningLoading } = useQuery<LearningItem[]>({
     queryKey: ["/api/user/learning"],
     enabled: !!user
   });
   
   // Daily challenge query
-  const { data: dailyChallenge } = useQuery({
+  const { data: dailyChallenge } = useQuery<Challenge>({
     queryKey: ["/api/daily-challenge"],
     enabled: !!user
   });

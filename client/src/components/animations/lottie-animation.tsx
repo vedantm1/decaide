@@ -1,5 +1,5 @@
 import { useRef, useEffect } from 'react';
-import Lottie, { LottieRefCurrentProps } from 'lottie-react';
+import Lottie from 'lottie-react';
 import { cn } from '@/lib/utils';
 
 interface LottieAnimationProps {
@@ -25,18 +25,15 @@ export default function LottieAnimation({
   onComplete,
   playOnHover = false,
 }: LottieAnimationProps) {
-  const lottieRef = useRef<LottieRefCurrentProps>(null);
+  const lottieRef = useRef<any>(null);
 
   useEffect(() => {
     if (!lottieRef.current) return;
     
     // Set up completion callback if provided
     if (onComplete && !loop) {
-      lottieRef.current.addEventListener('complete', onComplete);
-      
-      return () => {
-        lottieRef.current?.removeEventListener('complete', onComplete);
-      };
+      // Use the onComplete prop from lottie-react instead of event listeners
+      // The component will handle passing completion events to this callback
     }
   }, [onComplete, loop]);
 
@@ -69,6 +66,7 @@ export default function LottieAnimation({
         animationData={animationData}
         loop={loop}
         autoplay={playOnHover ? false : autoplay}
+        onComplete={!loop ? onComplete : undefined}
         style={{ width: '100%', height: '100%' }}
       />
     </div>

@@ -104,8 +104,9 @@ export default function SidebarNavigation() {
                 }`}></i>
                 <span>Practice Tests</span>
               </div>
-            <Link href="/written-events">
-              <a className={`flex items-center gap-3 px-4 py-2.5 rounded-lg font-medium text-sm ${
+            <div
+              onClick={() => window.location.href = '/written-events'}
+              className={`flex items-center gap-3 px-4 py-2.5 rounded-lg font-medium text-sm cursor-pointer ${
                 isActive("/written-events") 
                   ? "text-slate-800 bg-slate-100" 
                   : "text-slate-600 hover:bg-slate-100"
@@ -114,14 +115,14 @@ export default function SidebarNavigation() {
                   isActive("/written-events") ? "text-primary" : "text-slate-400"
                 }`}></i>
                 <span>Written Events</span>
-              </a>
-            </Link>
+              </div>
           </div>
           
           <div className="pt-2">
             <p className="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Account</p>
-            <Link href="/progress">
-              <a className={`flex items-center gap-3 px-4 py-2.5 rounded-lg font-medium text-sm ${
+            <div
+              onClick={() => window.location.href = '/progress'}
+              className={`flex items-center gap-3 px-4 py-2.5 rounded-lg font-medium text-sm cursor-pointer ${
                 isActive("/progress") 
                   ? "text-slate-800 bg-slate-100" 
                   : "text-slate-600 hover:bg-slate-100"
@@ -131,10 +132,10 @@ export default function SidebarNavigation() {
                 }`}></i>
                 <span>My Progress</span>
                 <span className="ml-auto bg-primary text-white text-xs px-1.5 py-0.5 rounded-md">New</span>
-              </a>
-            </Link>
-            <Link href="/why-decade">
-              <a className={`flex items-center gap-3 px-4 py-2.5 rounded-lg font-medium text-sm ${
+              </div>
+            <div
+              onClick={() => window.location.href = '/why-decade'}
+              className={`flex items-center gap-3 px-4 py-2.5 rounded-lg font-medium text-sm cursor-pointer ${
                 isActive("/why-decade") 
                   ? "text-slate-800 bg-slate-100" 
                   : "text-slate-600 hover:bg-slate-100"
@@ -143,10 +144,10 @@ export default function SidebarNavigation() {
                   isActive("/why-decade") ? "text-primary" : "text-slate-400"
                 }`}></i>
                 <span>Why DecA(I)de</span>
-              </a>
-            </Link>
-            <Link href="/pricing">
-              <a className={`flex items-center gap-3 px-4 py-2.5 rounded-lg font-medium text-sm ${
+              </div>
+            <div
+              onClick={() => window.location.href = '/pricing'}
+              className={`flex items-center gap-3 px-4 py-2.5 rounded-lg font-medium text-sm cursor-pointer ${
                 isActive("/pricing") 
                   ? "text-slate-800 bg-slate-100" 
                   : "text-slate-600 hover:bg-slate-100"
@@ -158,10 +159,10 @@ export default function SidebarNavigation() {
                 {subscriptionTier === "standard" && (
                   <span className="ml-auto bg-accent text-white text-xs px-1.5 py-0.5 rounded-md">Upgrade</span>
                 )}
-              </a>
-            </Link>
-            <Link href="/settings">
-              <a className={`flex items-center gap-3 px-4 py-2.5 rounded-lg font-medium text-sm ${
+              </div>
+            <div
+              onClick={() => window.location.href = '/settings'}
+              className={`flex items-center gap-3 px-4 py-2.5 rounded-lg font-medium text-sm cursor-pointer ${
                 isActive("/settings") 
                   ? "text-slate-800 bg-slate-100" 
                   : "text-slate-600 hover:bg-slate-100"
@@ -170,8 +171,7 @@ export default function SidebarNavigation() {
                   isActive("/settings") ? "text-primary" : "text-slate-400"
                 }`}></i>
                 <span>Settings</span>
-              </a>
-            </Link>
+              </div>
             <button 
               onClick={() => logoutMutation.mutate()} 
               className="w-full flex items-center gap-3 text-slate-600 hover:bg-slate-100 px-4 py-2.5 rounded-lg font-medium text-sm text-left"
