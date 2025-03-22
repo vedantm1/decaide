@@ -304,7 +304,15 @@ export default function AuthPage() {
                         <FormItem>
                           <FormLabel>Email (Optional)</FormLabel>
                           <FormControl>
-                            <Input type="email" placeholder="Enter your email address" {...field} />
+                            <Input 
+                              type="email" 
+                              placeholder="Enter your email address" 
+                              value={field.value || ''} 
+                              onChange={field.onChange}
+                              onBlur={field.onBlur}
+                              name={field.name}
+                              ref={field.ref}
+                            />
                           </FormControl>
                           <FormMessage />
                           <p className="text-xs text-muted-foreground mt-1">
