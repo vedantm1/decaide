@@ -64,25 +64,75 @@ export default {
       },
       keyframes: {
         "accordion-down": {
-          from: {
-            height: "0",
-          },
-          to: {
-            height: "var(--radix-accordion-content-height)",
-          },
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
         },
         "accordion-up": {
-          from: {
-            height: "var(--radix-accordion-content-height)",
-          },
-          to: {
-            height: "0",
-          },
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
+        },
+        // Animated waves for Diego the Dolphin
+        "wave-1": {
+          "0%": { transform: "translateX(-50%) scaleY(1)" },
+          "50%": { transform: "translateX(-30%) scaleY(0.8)" },
+          "100%": { transform: "translateX(-50%) scaleY(1)" },
+        },
+        "wave-2": {
+          "0%": { transform: "translateX(-40%) scaleY(0.9)" },
+          "50%": { transform: "translateX(-60%) scaleY(1.1)" },
+          "100%": { transform: "translateX(-40%) scaleY(0.9)" },
+        },
+        // Floating animation for Diego the Dolphin
+        "float": {
+          "0%": { transform: "translateY(0) rotate(0deg)" },
+          "25%": { transform: "translateY(-5px) rotate(2deg)" },
+          "50%": { transform: "translateY(0) rotate(0deg)" },
+          "75%": { transform: "translateY(5px) rotate(-2deg)" },
+          "100%": { transform: "translateY(0) rotate(0deg)" },
+        },
+        // Bubbles animations
+        "bubble-1": {
+          "0%": { transform: "translateY(0) scale(1)", opacity: "0.8" },
+          "100%": { transform: "translateY(-20px) scale(1.2)", opacity: "0" },
+        },
+        "bubble-2": {
+          "0%": { transform: "translateY(0) scale(1)", opacity: "0.6" },
+          "100%": { transform: "translateY(-25px) scale(1.4)", opacity: "0" },
+        },
+        "bubble-3": {
+          "0%": { transform: "translateY(0) scale(1)", opacity: "0.7" },
+          "100%": { transform: "translateY(-15px) scale(1.1)", opacity: "0" },
+        },
+        // Slow bounce for mascot
+        "bounce-slow": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-10px)" },
+        },
+        // Memphis-style geometric animations
+        "rotate-slow": {
+          "0%": { transform: "rotate(0deg)" },
+          "100%": { transform: "rotate(360deg)" },
+        },
+        "pulse-grow": {
+          "0%, 100%": { transform: "scale(1)" },
+          "50%": { transform: "scale(1.05)" },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        // Water animations for Diego
+        "wave-1": "wave-1 8s ease-in-out infinite",
+        "wave-2": "wave-2 10s ease-in-out infinite",
+        "float": "float 6s ease-in-out infinite",
+        "bounce-slow": "bounce-slow 6s ease-in-out infinite",
+        // Bubble animations
+        "bubble-1": "bubble-1 3s ease-in-out infinite",
+        "bubble-2": "bubble-2 5s ease-in-out infinite 1s",
+        "bubble-3": "bubble-3 4s ease-in-out infinite 2s",
+        // Memphis-style geometric animations
+        "rotate-slow": "rotate-slow 30s linear infinite",
+        "pulse-grow": "pulse-grow 4s ease-in-out infinite",
       },
     },
   },

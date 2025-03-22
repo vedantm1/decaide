@@ -109,29 +109,46 @@ export function MicroInteractionsProvider({ children }: { children: ReactNode })
         <BreakTimer onClose={hideBreakTimer} />
       )}
       
-      {/* Diego the Mascot */}
+      {/* Diego the Dolphin Mascot */}
       {mascotDetails.show && (
-        <div className={`fixed z-50 max-w-xs ${
-          mascotDetails.position === 'bottom-right' ? 'bottom-5 right-5' :
-          mascotDetails.position === 'top-right' ? 'top-5 right-5' :
-          mascotDetails.position === 'bottom-left' ? 'bottom-5 left-5' :
-          'top-5 left-5'
-        }`}>
-          <div className="relative bg-blue-100 p-4 rounded-lg">
-            <div className="absolute -top-12 left-1/2 -translate-x-1/2 text-5xl">
+        <div 
+          className={`fixed z-50 max-w-xs animate-bounce-slow ${
+            mascotDetails.position === 'bottom-right' ? 'bottom-5 right-5' :
+            mascotDetails.position === 'top-right' ? 'top-5 right-5' :
+            mascotDetails.position === 'bottom-left' ? 'bottom-5 left-5' :
+            'top-5 left-5'
+          }`}
+        >
+          <div className="relative bg-gradient-to-br from-blue-100 to-cyan-50 p-5 rounded-xl border border-blue-200 shadow-lg">
+            {/* Animated water waves */}
+            <div className="absolute inset-0 overflow-hidden rounded-xl opacity-20">
+              <div className="absolute animate-wave-1 h-24 w-[200%] -bottom-10 left-0 right-0 bg-cyan-400 rounded-t-[100%]"></div>
+              <div className="absolute animate-wave-2 h-24 w-[200%] -bottom-10 left-0 right-0 bg-blue-400 rounded-t-[100%]"></div>
+            </div>
+            
+            {/* Diego emoji with animation */}
+            <div className="absolute -top-16 left-1/2 -translate-x-1/2 text-6xl animate-float">
               🐬
             </div>
-            <div className="mt-10 text-center">
-              <p className="font-medium text-blue-800">Hi, I'm Diego!</p>
-              <p className="text-sm text-blue-700 mt-1">
+            
+            <div className="mt-12 text-center relative z-10">
+              <p className="font-bold text-blue-800 text-lg">Hi, I'm Diego the Dolphin!</p>
+              <p className="text-sm text-blue-700 mt-2 leading-relaxed">
                 {mascotDetails.message}
               </p>
               <button 
                 onClick={hideMascot}
-                className="mt-3 text-xs text-blue-600 hover:text-blue-800"
+                className="mt-4 px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white text-xs font-medium rounded-full transition-colors duration-200"
               >
-                Dismiss
+                Got it!
               </button>
+            </div>
+            
+            {/* Bubbles Animation */}
+            <div className="absolute -right-2 top-1/2 transform -translate-y-1/2">
+              <div className="animate-bubble-1 w-2 h-2 rounded-full bg-blue-300 opacity-80"></div>
+              <div className="animate-bubble-2 w-3 h-3 rounded-full bg-blue-300 opacity-60 mt-2"></div>
+              <div className="animate-bubble-3 w-1.5 h-1.5 rounded-full bg-blue-300 opacity-70 mt-2"></div>
             </div>
           </div>
         </div>
