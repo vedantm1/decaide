@@ -76,35 +76,39 @@ export default function PricingPage() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Standard Plan */}
               <div className="border border-slate-200 rounded-xl overflow-hidden">
-                <div className="p-6 bg-slate-50">
-                  <h3 className="font-heading font-bold text-xl text-slate-800">Standard <span className="text-primary">⭐️⭐️</span></h3>
+                <div className="p-6 bg-slate-50 dark:bg-slate-800">
+                  <h3 className="font-heading font-bold text-xl text-slate-800 dark:text-white">
+                    Standard 
+                    <span className="text-primary ml-1 dark:hidden">⭐️⭐️</span>
+                    <span className="text-primary ml-1 hidden dark:inline">⭐️⭐️</span>
+                  </h3>
                   <div className="mt-4 mb-2">
-                    <span className="text-3xl font-bold text-slate-800">$12.99</span>
-                    <span className="text-slate-500">/month</span>
+                    <span className="text-3xl font-bold text-slate-800 dark:text-white">$12.99</span>
+                    <span className="text-slate-500 dark:text-slate-400">/month</span>
                   </div>
-                  <p className="text-slate-500 text-sm">Essential DECA preparation for beginners</p>
+                  <p className="text-slate-500 dark:text-slate-400 text-sm">Essential DECA preparation for beginners</p>
                 </div>
-                <div className="p-6">
+                <div className="p-6 dark:bg-slate-900">
                   <ul className="space-y-3">
                     <li className="flex items-start">
                       <i className="fas fa-check text-primary mt-1 mr-2"></i>
-                      <span>3 AI-generated roleplay scenarios per month</span>
+                      <span className="dark:text-white">3 AI-generated roleplay scenarios per month</span>
                     </li>
                     <li className="flex items-start">
                       <i className="fas fa-check text-primary mt-1 mr-2"></i>
-                      <span>2 monthly test attempts for exam practice</span>
+                      <span className="dark:text-white">2 monthly test attempts for exam practice</span>
                     </li>
                     <li className="flex items-start">
                       <i className="fas fa-check text-primary mt-1 mr-2"></i>
-                      <span>Fundamental PI explanations with real-world examples</span>
+                      <span className="dark:text-white">Fundamental PI explanations with real-world examples</span>
                     </li>
                     <li className="flex items-start">
                       <i className="fas fa-check text-primary mt-1 mr-2"></i>
-                      <span>Standard progress tracking with leaderboard display</span>
+                      <span className="dark:text-white">Standard progress tracking with leaderboard display</span>
                     </li>
                     <li className="flex items-start">
                       <i className="fas fa-check text-primary mt-1 mr-2"></i>
-                      <span>Gamified experience with points and achievement badges</span>
+                      <span className="dark:text-white">Gamified experience with points and achievement badges</span>
                     </li>
                   </ul>
                   <div className="mt-6">
@@ -129,35 +133,39 @@ export default function PricingPage() {
                 <div className="absolute top-0 right-0 bg-primary text-white text-xs px-3 py-1 rounded-bl-lg font-medium">
                   MOST POPULAR
                 </div>
-                <div className="p-6 bg-primary-50">
-                  <h3 className="font-heading font-bold text-xl text-slate-800">Plus <span className="text-primary">⭐️⭐️⭐️</span></h3>
+                <div className="p-6 bg-primary-50 dark:bg-primary-950">
+                  <h3 className="font-heading font-bold text-xl text-slate-800 dark:text-white">
+                    Plus 
+                    <span className="text-primary ml-1 dark:hidden">⭐️⭐️⭐️</span>
+                    <span className="text-primary ml-1 hidden dark:inline">⭐️⭐️⭐️</span>
+                  </h3>
                   <div className="mt-4 mb-2">
-                    <span className="text-3xl font-bold text-slate-800">$19.99</span>
-                    <span className="text-slate-500">/month</span>
+                    <span className="text-3xl font-bold text-slate-800 dark:text-white">$19.99</span>
+                    <span className="text-slate-500 dark:text-slate-400">/month</span>
                   </div>
-                  <p className="text-slate-500 text-sm">Enhanced features for competitive advantage</p>
+                  <p className="text-slate-500 dark:text-slate-400 text-sm">Enhanced features for competitive advantage</p>
                 </div>
-                <div className="p-6">
+                <div className="p-6 dark:bg-slate-900">
                   <ul className="space-y-3">
                     <li className="flex items-start">
                       <i className="fas fa-check text-primary mt-1 mr-2"></i>
-                      <span>10 roleplay scenarios per month with PI customization</span>
+                      <span className="dark:text-white">10 roleplay scenarios per month with PI customization</span>
                     </li>
                     <li className="flex items-start">
                       <i className="fas fa-check text-primary mt-1 mr-2"></i>
-                      <span>8 monthly test attempts</span>
+                      <span className="dark:text-white">8 monthly test attempts</span>
                     </li>
                     <li className="flex items-start">
                       <i className="fas fa-check text-primary mt-1 mr-2"></i>
-                      <span>In-depth PI explanations with real-world insights</span>
+                      <span className="dark:text-white">In-depth PI explanations with real-world insights</span>
                     </li>
                     <li className="flex items-start">
                       <i className="fas fa-check text-primary mt-1 mr-2"></i>
-                      <span>Advanced progress tracking and personalized study recommendations</span>
+                      <span className="dark:text-white">Advanced progress tracking and personalized study recommendations</span>
                     </li>
                     <li className="flex items-start">
                       <i className="fas fa-check text-primary mt-1 mr-2"></i>
-                      <span>Gamified experience with expanded achievements</span>
+                      <span className="dark:text-white">Gamified experience with expanded achievements</span>
                     </li>
                   </ul>
                   <div className="mt-6">
@@ -179,13 +187,17 @@ export default function PricingPage() {
               
               {/* Pro Plan */}
               <div className="border border-slate-200 rounded-xl overflow-hidden">
-                <div className="p-6 bg-slate-50">
-                  <h3 className="font-heading font-bold text-xl text-slate-800">Pro <span className="text-primary">⭐️⭐️⭐️⭐️⭐️</span></h3>
+                <div className="p-6 bg-slate-50 dark:bg-slate-800">
+                  <h3 className="font-heading font-bold text-xl text-slate-800 dark:text-white">
+                    Pro 
+                    <span className="text-primary ml-1 dark:hidden">⭐️⭐️⭐️⭐️⭐️</span>
+                    <span className="text-primary ml-1 hidden dark:inline">⭐️⭐️⭐️⭐️⭐️</span>
+                  </h3>
                   <div className="mt-4 mb-2">
-                    <span className="text-3xl font-bold text-slate-800">$39.99</span>
-                    <span className="text-slate-500">/month</span>
+                    <span className="text-3xl font-bold text-slate-800 dark:text-white">$39.99</span>
+                    <span className="text-slate-500 dark:text-slate-400">/month</span>
                   </div>
-                  <p className="text-slate-500 text-sm">Ultimate preparation for DECA champions</p>
+                  <p className="text-slate-500 dark:text-slate-400 text-sm">Ultimate preparation for DECA champions</p>
                 </div>
                 <div className="p-6">
                   <ul className="space-y-3">
