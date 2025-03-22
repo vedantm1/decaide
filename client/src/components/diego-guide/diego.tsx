@@ -1,16 +1,4 @@
-<motion.div 
-  className={`bg-white rounded-lg shadow-xl border border-primary-100 max-w-sm ${isMobile ? 'w-full' : 'w-96'} relative`}
-  variants={bubbleVariants}
->
-  <p className="text-xs font-medium bubble-text-visible">Practice a Roleplay Scenario</p>
-  <p className="text-xs bubble-text-visible">Complete a practice format to reflect on your last live.</p>
-</motion.div><motion.div 
-  className={`bg-white rounded-lg shadow-xl border border-primary-100 max-w-sm ${isMobile ? 'w-full' : 'w-96'} relative`}
-  variants={bubbleVariants}
->
-  <p className="text-xs font-medium bubble-text-visible">Practice a Roleplay Scenario</p>
-  <p className="text-xs bubble-text-visible">Complete a practice format to reflect on your last live.</p>
-</motion.div>import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from "@/components/ui/button";
@@ -328,27 +316,27 @@ export default function Diego({ isNewUser = false, currentStep = TUTORIAL_STEPS.
   }
 
   // Define content types
-type NormalAvatarContent = {
-  title: string;
-  message: string;
-  buttonText: string;
-  avatarType: "normal";
-  emotion: "happy" | "excited" | "thinking" | "neutral";
-};
+  type NormalAvatarContent = {
+    title: string;
+    message: string;
+    buttonText: string;
+    avatarType: "normal";
+    emotion: "happy" | "excited" | "thinking" | "neutral";
+  };
 
-type PointingAvatarContent = {
-  title: string;
-  message: string;
-  buttonText: string;
-  avatarType: "pointing";
-  pointDirection: "left" | "right" | "up" | "down";
-  position: Record<string, string>;
-};
+  type PointingAvatarContent = {
+    title: string;
+    message: string;
+    buttonText: string;
+    avatarType: "pointing";
+    pointDirection: "left" | "right" | "up" | "down";
+    position: Record<string, string>;
+  };
 
-type StepContent = NormalAvatarContent | PointingAvatarContent;
+  type StepContent = NormalAvatarContent | PointingAvatarContent;
 
-// Get content for current step
-const content = TUTORIAL_CONTENT[activeStep as keyof typeof TUTORIAL_CONTENT] as StepContent;
+  // Get content for current step
+  const content = TUTORIAL_CONTENT[activeStep as keyof typeof TUTORIAL_CONTENT] as StepContent;
 
   // Animation for the welcome banner
   const welcomeBannerVariants = {
