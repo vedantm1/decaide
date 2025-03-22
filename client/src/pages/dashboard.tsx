@@ -18,19 +18,22 @@ export default function Dashboard() {
   const { triggerAnimation, showMascot } = useMicroInteractions();
   const { toast } = useToast();
   const [showBreakTimer, setShowBreakTimer] = useState(false);
-  const [showWelcomeAnimation, setShowWelcomeAnimation] = useState(true);
-  
-  // Trigger welcome animation on first render
+  // Trigger welcome animation only on first login
   useEffect(() => {
-    if (showWelcomeAnimation) {
+    // Check if the user just logged in (flag set in auth hook)
+    const justLoggedIn = sessionStorage.getItem('justLoggedIn') === 'true';
+    
+    if (justLoggedIn && user) {
       // Delay slightly to ensure the animation is seen
       setTimeout(() => {
-        triggerAnimation('stars', 'Welcome back!');
-        showMascot(`Hey ${user?.username || 'there'}! Ready to practice for DECA today?`, 'bottom-right');
-        setShowWelcomeAnimation(false);
+        triggerAnimation('stars', 'Welcome to DecA(I)de!');
+        showMascot(`Hi ${user.username || 'there'}! I'm Diego the Dolphin, your DECA companion. Ready to practice today?`, 'bottom-right');
+        
+        // Remove the login flag so animation doesn't show again until next login
+        sessionStorage.removeItem('justLoggedIn');
       }, 800);
     }
-  }, [triggerAnimation, showMascot, user, showWelcomeAnimation]);
+  }, [triggerAnimation, showMascot, user]);
   
   // Set a timer to show the break dialog after 5 minutes for demo purposes
   // (would be 25 minutes in production)

@@ -88,11 +88,11 @@ export default function PricingPage() {
                   <ul className="space-y-3">
                     <li className="flex items-start">
                       <i className="fas fa-check text-primary mt-1 mr-2"></i>
-                      <span>AI-generated roleplay scenarios for each instructional area</span>
+                      <span>3 AI-generated roleplay scenarios per month</span>
                     </li>
                     <li className="flex items-start">
                       <i className="fas fa-check text-primary mt-1 mr-2"></i>
-                      <span>Fifteen monthly test attempts for exam practice</span>
+                      <span>2 monthly test attempts for exam practice</span>
                     </li>
                     <li className="flex items-start">
                       <i className="fas fa-check text-primary mt-1 mr-2"></i>
@@ -141,11 +141,11 @@ export default function PricingPage() {
                   <ul className="space-y-3">
                     <li className="flex items-start">
                       <i className="fas fa-check text-primary mt-1 mr-2"></i>
-                      <span>Additional roleplay scenarios per instructional area with PI customization</span>
+                      <span>10 roleplay scenarios per month with PI customization</span>
                     </li>
                     <li className="flex items-start">
                       <i className="fas fa-check text-primary mt-1 mr-2"></i>
-                      <span>Twenty-five monthly test attempts</span>
+                      <span>8 monthly test attempts</span>
                     </li>
                     <li className="flex items-start">
                       <i className="fas fa-check text-primary mt-1 mr-2"></i>

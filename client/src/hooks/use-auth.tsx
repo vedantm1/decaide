@@ -38,6 +38,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     onSuccess: (user: SelectUser) => {
       queryClient.setQueryData(["/api/user"], user);
+      
+      // Set flag for welcome animation on dashboard
+      sessionStorage.setItem('justLoggedIn', 'true');
+      
       toast({
         title: "Login successful",
         description: `Welcome back, ${user.username}!`,
@@ -59,6 +63,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     onSuccess: (user: SelectUser) => {
       queryClient.setQueryData(["/api/user"], user);
+      
+      // Set flag for welcome animation on dashboard (first-time login)
+      sessionStorage.setItem('justLoggedIn', 'true');
+      
       toast({
         title: "Registration successful",
         description: "Your account has been created!",
