@@ -3,8 +3,9 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from "@/components/ui/button";
 import { useMicroInteractions } from "@/hooks/use-micro-interactions";
-import { TutorialStep } from "@/hooks/use-diego-guide";
+import { TutorialStep, useDiegoGuide } from "@/hooks/use-diego-guide";
 import DiegoAvatar from "./diego-avatar";
+import DiegoChat from "./diego-chat";
 
 // Fun facts that Diego can share
 const DIEGO_FUN_FACTS = [

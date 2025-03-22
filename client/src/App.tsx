@@ -61,7 +61,7 @@ function App() {
 
 // This component manages the Diego UI using the hook
 function DiegoGuideManager() {
-  const { isNewUser, currentStep, completeTutorial } = useDiegoGuide();
+  const { isNewUser, currentStep, completeTutorial, isChatOpen, closeChat } = useDiegoGuide();
   const [location] = window.location.pathname.split('?');
   
   // Hide Diego on the auth page
@@ -70,11 +70,14 @@ function DiegoGuideManager() {
   }
   
   return (
-    <Diego 
-      isNewUser={isNewUser} 
-      currentStep={currentStep || undefined} 
-      onComplete={completeTutorial} 
-    />
+    <>
+      <Diego 
+        isNewUser={isNewUser} 
+        currentStep={currentStep || undefined} 
+        onComplete={completeTutorial} 
+      />
+      {isChatOpen && <DiegoChat isOpen={isChatOpen} onClose={closeChat} />}
+    </>
   );
 }
 
