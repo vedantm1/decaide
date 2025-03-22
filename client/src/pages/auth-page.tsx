@@ -65,7 +65,7 @@ export default function AuthPage() {
   const [activeTab, setActiveTab] = useState<string>("login");
   const [_, navigate] = useLocation();
   const { user, loginMutation, registerMutation } = useAuth();
-  const { showMascot, hideMascot, triggerAnimation } = useMicroInteractions();
+  const { triggerAnimation } = useMicroInteractions();
 
   // Form setup for login
   const loginForm = useForm<z.infer<typeof loginSchema>>({
@@ -106,34 +106,22 @@ export default function AuthPage() {
     }
   }, [user, navigate]);
   
-  // Show Diego the Dolphin mascot when tab changes to register
-  // Use ref to track previous tab to prevent showing on initial render
+  // Use ref to track previous tab to prevent showing animation on initial render
   const prevTabRef = useRef<string | null>(null);
   
   useEffect(() => {
     // Skip first render (when prevTabRef.current is null)
     if (prevTabRef.current !== null) {
       if (activeTab === "register" && prevTabRef.current !== "register") {
-        // Show mascot only when switching TO register tab
-        showMascot("Hi there! I'm Diego, your DecA(I)de guide. Let's create your account so you can start preparing for DECA success!", "bottom-right");
-        
-        // Auto-hide Diego after 10 seconds
-        const timer = setTimeout(() => {
-          hideMascot();
-        }, 10000);
-        
-        return () => clearTimeout(timer);
-      } else if (activeTab !== "register" && prevTabRef.current === "register") {
-        // Hide mascot when switching away from register tab
-        hideMascot();
+        // Show animation when switching TO register tab
+        triggerAnimation("stars", "Let's create your account!");
       }
     }
     
     // Update previous tab reference
     prevTabRef.current = activeTab;
-  }, [activeTab, showMascot, hideMascot]);
+  }, [activeTab, triggerAnimation]);
   
-  // Show mascot with tips when event format is selected
   // Using a ref to track previous format to prevent infinite loops
   const prevFormatRef = useRef<string | null>(null);
   
@@ -143,26 +131,18 @@ export default function AuthPage() {
     registerForm.setValue('eventFormat', format);
     setSelectedEventFormat(format);
     
-    // Only show mascot if this is a new format selection
+    // Only show animation if this is a new format selection
     if (prevFormatRef.current !== format) {
       prevFormatRef.current = format;
       
       const message = format === "roleplay" 
-        ? "Great choice! Role-play events are all about thinking on your feet. I'll help you practice scenarios for your specific event."
-        : "Excellent! Written events require detailed business plans. I'll help you structure and perfect your submission.";
+        ? "Great choice! Role-play events are all about thinking on your feet."
+        : "Excellent! Written events require detailed business plans.";
       
-      // Show mascot with message
-      showMascot(message, "bottom-right");
-      
-      // Light animation that won't cause performance issues
-      triggerAnimation("stars");
-      
-      // Hide mascot after delay
-      setTimeout(() => {
-        hideMascot();
-      }, 8000);
+      // Trigger animation with message
+      triggerAnimation("stars", message);
     }
-  }, [showMascot, hideMascot, triggerAnimation, registerForm]);
+  }, [triggerAnimation, registerForm]);
 
   const onLoginSubmit = (values: z.infer<typeof loginSchema>) => {
     // Subtle animation for login
@@ -171,18 +151,14 @@ export default function AuthPage() {
     loginMutation.mutate(values, {
       onSuccess: () => {
         // Show success animation
-        triggerAnimation("stars", "Welcome back!");
-        showMascot("Welcome back! Let's continue your DECA preparation journey!", "bottom-right");
+        triggerAnimation("stars", "Welcome back! Let's continue your DECA preparation journey!");
       }
     });
   };
 
   const onRegisterSubmit = (values: z.infer<typeof registerSchema>) => {
-    // Show Diego with registration message
-    showMascot("Creating your account! I'm excited to start helping you prepare for DECA success!", "bottom-right");
-    
     // Trigger animation when form is submitted
-    triggerAnimation("confetti");
+    triggerAnimation("confetti", "Creating your account! I'm excited to help you prepare for DECA success!");
     
     // Submit the form data
     registerMutation.mutate(values, {
@@ -191,8 +167,8 @@ export default function AuthPage() {
         triggerAnimation("fireworks", "Welcome to DecA(I)de!");
       },
       onError: () => {
-        // Hide mascot on error
-        hideMascot();
+        // Show error animation
+        triggerAnimation("circles", "There was an error creating your account. Please try again.");
       }
     });
   };

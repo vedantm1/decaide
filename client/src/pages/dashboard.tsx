@@ -15,7 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 
 export default function Dashboard() {
   const { user } = useAuth();
-  const { triggerAnimation, showMascot } = useMicroInteractions();
+  const { triggerAnimation, showAchievement } = useMicroInteractions();
   const { toast } = useToast();
   const [showBreakTimer, setShowBreakTimer] = useState(false);
   const [showTrialBanner, setShowTrialBanner] = useState(false);
@@ -53,8 +53,8 @@ export default function Dashboard() {
           if (!localStorage.getItem('trialExpiredPromptShown')) {
             localStorage.setItem('trialExpiredPromptShown', 'true');
             setTimeout(() => {
-              triggerAnimation('fireworks');
-              showMascot("Your tropical getaway has ended! Upgrade to keep making waves at your DECA competitions! 🏄‍♂️", 'bottom-right');
+              triggerAnimation('fireworks', "Your tropical getaway has ended! Upgrade to keep making waves at your DECA competitions! 🏄‍♂️");
+              showAchievement("Trial Expired", "Upgrade to keep preparing for DECA competitions!", 0);
             }, 2000);
           }
         } else if (daysLeft <= 0) {
@@ -66,7 +66,7 @@ export default function Dashboard() {
           if (hoursLeft <= 12 && !localStorage.getItem('trialEndingSoonPromptShown')) {
             localStorage.setItem('trialEndingSoonPromptShown', 'true');
             setTimeout(() => {
-              showMascot("Your tropical vacation is almost over! Only a few hours left in your trial. Don't miss the wave of success - upgrade now! 🌊", 'bottom-right');
+              triggerAnimation("stars", "Your tropical vacation is almost over! Only a few hours left in your trial.");
               toast({
                 title: "Trial Ending Soon",
                 description: `Only ${hoursLeft} hours left in your free trial!`,
@@ -82,7 +82,8 @@ export default function Dashboard() {
           if (daysLeft === 1 && !localStorage.getItem('trialOneDayLeftPromptShown')) {
             localStorage.setItem('trialOneDayLeftPromptShown', 'true');
             setTimeout(() => {
-              showMascot("Just 1 day left in your tropical trial! Don't let your DECA preparations wash away - upgrade to keep riding the wave! 🏄‍♂️", 'bottom-right');
+              triggerAnimation("circles", "Just 1 day left in your tropical trial! Don't let your DECA preparations wash away!");
+              showAchievement("Trial Ending Soon", "Only 1 day left in your free trial!", 0);
             }, 1500);
           }
         }
