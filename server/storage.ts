@@ -209,7 +209,7 @@ export class MemStorage implements IStorage {
       
       // If last login was yesterday, increment streak
       if (lastLogin.toDateString() === yesterday.toDateString()) {
-        user.streak += 1;
+        user.streak = (user.streak || 0) + 1;
       } 
       // If last login was before yesterday, reset streak
       else if (lastLogin < yesterday) {
@@ -312,7 +312,7 @@ export class MemStorage implements IStorage {
     if (status === "completed") {
       const user = await this.getUser(userId);
       if (user) {
-        user.points += 10;
+        user.points = (user.points || 0) + 10;
         this.users.set(userId, user);
       }
     }
@@ -323,13 +323,25 @@ export class MemStorage implements IStorage {
   // Practice sessions methods
   async recordPracticeSession(sessionData: InsertSession): Promise<PracticeSession> {
     const id = this.currentSessionId++;
-    const session: PracticeSession = { ...sessionData, id };
+    
+    // Ensure all fields match the PracticeSession type requirements
+    const session: PracticeSession = {
+      id,
+      userId: sessionData.userId,
+      type: sessionData.type,
+      score: sessionData.score || null,
+      completedAt: sessionData.completedAt,
+      details: sessionData.details || null
+    };
+    
     this.practiceSessions.set(id, session);
     
     // Add points to user
     const user = await this.getUser(sessionData.userId);
     if (user) {
-      user.points += sessionData.score || 0;
+      // Convert null or undefined points to 0
+      const pointsToAdd = session.score || 0;
+      user.points = (user.points || 0) + pointsToAdd;
       this.users.set(sessionData.userId, user);
     }
     
@@ -563,7 +575,7 @@ export class MemStorage implements IStorage {
     if (!user) throw new Error("User not found");
     
     // Award points
-    user.points += 50;
+    user.points = (user.points || 0) + 50;
     this.users.set(userId, user);
     
     return {
