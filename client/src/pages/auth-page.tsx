@@ -560,11 +560,14 @@ export default function AuthPage() {
                                     }}
                                   >
                                     <div className="p-4 h-24 bg-gradient-to-br from-blue-100 to-green-100 relative">
+                                      {/* Repositioned shapes to avoid covering text */}
                                       <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-yellow-400"></div>
-                                      <div className="absolute bottom-4 left-4 w-10 h-2 bg-pink-400"></div>
-                                      <div className="absolute top-10 left-10 w-4 h-4 rounded-md bg-purple-400 rotate-45"></div>
-                                      <div className="mt-12">
-                                        <span className="text-xs font-medium">Memphis Style</span>
+                                      <div className="absolute top-4 left-4 w-8 h-2 bg-pink-400"></div>
+                                      <div className="absolute top-2 left-6 w-4 h-4 rounded-md bg-purple-400 rotate-45"></div>
+                                      
+                                      {/* Text moved down with clear space above */}
+                                      <div className="absolute bottom-2 left-4 right-4">
+                                        <span className="text-xs font-medium block">Memphis Style</span>
                                         <p className="text-xs text-slate-600">Fun geometric patterns</p>
                                       </div>
                                     </div>
@@ -579,10 +582,13 @@ export default function AuthPage() {
                                     }}
                                   >
                                     <div className="p-4 h-24 bg-gradient-to-br from-gray-50 to-gray-100 relative">
+                                      {/* Minimalist design elements */}
                                       <div className="absolute top-4 left-4 w-12 h-1 bg-gray-400"></div>
                                       <div className="absolute top-8 left-4 w-8 h-1 bg-gray-300"></div>
-                                      <div className="mt-12">
-                                        <span className="text-xs font-medium">Minimalist</span>
+                                      
+                                      {/* Text positioned consistently with Memphis style */}
+                                      <div className="absolute bottom-2 left-4 right-4">
+                                        <span className="text-xs font-medium block">Minimalist</span>
                                         <p className="text-xs text-slate-600">Clean, focused design</p>
                                       </div>
                                     </div>
