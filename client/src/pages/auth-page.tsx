@@ -45,9 +45,10 @@ const registerSchema = z.object({
   password: z.string().min(6, {
     message: "Password must be at least 6 characters",
   }),
-  email: z.string().email({
-    message: "Please enter a valid email address",
-  }).optional().nullable(),
+  email: z.union([
+    z.string().email({ message: "Please enter a valid email address" }),
+    z.string().length(0) // Allow empty string
+  ]).optional().nullable(),
   eventFormat: z.enum(["roleplay", "written"], {
     required_error: "Please select either roleplay or written event format",
   }),

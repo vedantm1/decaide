@@ -77,12 +77,14 @@ export function MicroInteractionsProvider({ children }: { children: ReactNode })
     });
   };
 
-  // Hide mascot
+  // Hide mascot - completely reset mascot state to ensure it disappears properly
   const hideMascot = () => {
-    setMascotDetails(prev => ({
-      ...prev,
+    // Reset completely to default state instead of just toggling show
+    setMascotDetails({
       show: false,
-    }));
+      message: '',
+      position: 'bottom-right',
+    });
   };
 
   // Implement onboarding tour with Diego the Dolphin
@@ -160,77 +162,36 @@ export function MicroInteractionsProvider({ children }: { children: ReactNode })
         <BreakTimer onClose={hideBreakTimer} />
       )}
       
-      {/* Diego the Dolphin Mascot - Enhanced with more animations */}
+      {/* Diego the Dolphin Mascot - Simple version */}
       {mascotDetails.show && (
         <div 
-          className={`fixed z-50 max-w-xs animate-bounce-slow ${
+          className={`fixed z-50 max-w-xs ${
             mascotDetails.position === 'bottom-right' ? 'bottom-5 right-5' :
             mascotDetails.position === 'top-right' ? 'top-5 right-5' :
             mascotDetails.position === 'bottom-left' ? 'bottom-5 left-5' :
             'top-5 left-5'
           }`}
         >
-          <div className="relative bg-gradient-to-br from-blue-100 to-cyan-50 p-5 rounded-xl border border-blue-200 shadow-lg overflow-hidden">
-            {/* Enhanced animated water waves with multiple layers */}
-            <div className="absolute inset-0 overflow-hidden rounded-xl opacity-30">
-              <div className="absolute animate-wave-1 h-24 w-[200%] -bottom-10 left-0 right-0 bg-cyan-400 rounded-t-[100%]"></div>
-              <div className="absolute animate-wave-2 h-20 w-[200%] -bottom-8 left-0 right-0 bg-blue-400 rounded-t-[100%]"></div>
-              <div className="absolute animate-wave-3 h-16 w-[200%] -bottom-6 left-0 right-0 bg-blue-300 rounded-t-[100%]"></div>
-            </div>
-            
-            {/* Animated water splash effect */}
-            <div className="absolute -left-2 -bottom-1">
-              <div className="animate-splash-left w-6 h-12 bg-blue-200 opacity-50 rounded-full blur-sm"></div>
-            </div>
-            <div className="absolute -right-2 -bottom-1">
-              <div className="animate-splash-right w-6 h-12 bg-blue-200 opacity-50 rounded-full blur-sm"></div>
-            </div>
-            
-            {/* Diego dolphin with enhanced animation */}
-            <div className="absolute -top-16 left-1/2 -translate-x-1/2 text-6xl animate-dolphin-jump">
-              <div className="relative">
-                <span className="block transform rotate-[-5deg]">🐬</span>
-                {/* Water splash particles */}
-                <div className="absolute -bottom-1 left-1/2 -translate-x-1/2">
-                  <div className="animate-splash-out-1 w-1 h-1 bg-blue-300 rounded-full absolute"></div>
-                  <div className="animate-splash-out-2 w-1 h-1 bg-blue-300 rounded-full absolute"></div>
-                  <div className="animate-splash-out-3 w-1 h-1 bg-blue-300 rounded-full absolute"></div>
-                </div>
-              </div>
-            </div>
-            
-            <div className="mt-12 text-center relative z-10">
-              <p className="font-bold text-blue-800 text-lg animate-text-focus-in">Hi, I'm Diego the Dolphin!</p>
-              <p className="text-sm text-blue-700 mt-2 leading-relaxed animate-fade-in">
+          <div className="bg-blue-50 p-5 rounded-xl border border-blue-200 shadow-lg">
+            <div className="text-center">
+              <p className="font-bold text-blue-800 text-lg">Hi, I'm Diego the Dolphin!</p>
+              <p className="text-sm text-blue-700 mt-2">
                 {mascotDetails.message}
               </p>
-              <button 
-                onClick={(e) => {
-                  // Dispatch custom event for onboarding tour
-                  document.dispatchEvent(new CustomEvent('mascot-acknowledged'));
-                  hideMascot();
-                }}
-                className="mt-4 px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white text-xs font-medium rounded-full transition-colors duration-200 animate-pulse-light"
-              >
-                Got it!
-              </button>
+              <div className="flex justify-center mt-3">
+                <button 
+                  onClick={() => {
+                    // Dispatch custom event for onboarding tour
+                    document.dispatchEvent(new CustomEvent('mascot-acknowledged'));
+                    // Ensure it fully disappears
+                    hideMascot();
+                  }}
+                  className="px-4 py-1.5 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-full"
+                >
+                  Got it!
+                </button>
+              </div>
             </div>
-            
-            {/* Enhanced bubbles animation with more bubbles */}
-            <div className="absolute -right-2 top-1/3 transform -translate-y-1/2">
-              <div className="animate-bubble-1 w-2 h-2 rounded-full bg-blue-300 opacity-80"></div>
-              <div className="animate-bubble-2 w-3 h-3 rounded-full bg-blue-300 opacity-60 mt-2"></div>
-              <div className="animate-bubble-3 w-1.5 h-1.5 rounded-full bg-blue-300 opacity-70 mt-1"></div>
-              <div className="animate-bubble-4 w-2.5 h-2.5 rounded-full bg-blue-300 opacity-50 mt-1"></div>
-            </div>
-            <div className="absolute -left-2 top-2/3 transform -translate-y-1/2">
-              <div className="animate-bubble-2 w-2 h-2 rounded-full bg-blue-300 opacity-70"></div>
-              <div className="animate-bubble-3 w-1 h-1 rounded-full bg-blue-300 opacity-80 mt-1"></div>
-              <div className="animate-bubble-1 w-1.5 h-1.5 rounded-full bg-blue-300 opacity-60 mt-1"></div>
-            </div>
-            
-            {/* Shimmer effect overlay */}
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-10 animate-shimmer"></div>
           </div>
         </div>
       )}
