@@ -106,31 +106,52 @@ export default function AuthPage() {
   }, [user, navigate]);
   
   // Show Diego the Dolphin mascot when tab changes to register
+  // Use ref to track previous tab to prevent showing on initial render
+  const prevTabRef = useRef<string | null>(null);
+  
   useEffect(() => {
-    if (activeTab === "register") {
-      showMascot("Hi there! I'm Diego, your DecA(I)de guide. Let's create your account so you can start preparing for DECA success!", "bottom-right");
-      
-      // Auto-hide Diego after 10 seconds
-      const timer = setTimeout(() => {
+    // Skip first render (when prevTabRef.current is null)
+    if (prevTabRef.current !== null) {
+      if (activeTab === "register" && prevTabRef.current !== "register") {
+        // Show mascot only when switching TO register tab
+        showMascot("Hi there! I'm Diego, your DecA(I)de guide. Let's create your account so you can start preparing for DECA success!", "bottom-right");
+        
+        // Auto-hide Diego after 10 seconds
+        const timer = setTimeout(() => {
+          hideMascot();
+        }, 10000);
+        
+        return () => clearTimeout(timer);
+      } else if (activeTab !== "register" && prevTabRef.current === "register") {
+        // Hide mascot when switching away from register tab
         hideMascot();
-      }, 10000);
-      
-      return () => clearTimeout(timer);
-    } else {
-      hideMascot();
+      }
     }
+    
+    // Update previous tab reference
+    prevTabRef.current = activeTab;
   }, [activeTab, showMascot, hideMascot]);
   
   // Show mascot with tips when event format is selected
+  // Using a ref to track previous format to prevent infinite loops
+  const prevFormatRef = useRef<string | null>(null);
+  
   useEffect(() => {
-    if (selectedEventFormat) {
+    // Only trigger animation and mascot when format actually changes
+    if (selectedEventFormat && prevFormatRef.current !== selectedEventFormat) {
+      prevFormatRef.current = selectedEventFormat;
+      
       const message = selectedEventFormat === "roleplay" 
         ? "Great choice! Role-play events are all about thinking on your feet. I'll help you practice scenarios for your specific event."
         : "Excellent! Written events require detailed business plans. I'll help you structure and perfect your submission.";
       
+      // Show mascot with message
       showMascot(message, "bottom-right");
+      
+      // Light animation that won't cause performance issues
       triggerAnimation("stars");
       
+      // Hide mascot after delay
       const timer = setTimeout(() => {
         hideMascot();
       }, 8000);
@@ -176,7 +197,8 @@ export default function AuthPage() {
   const isSubmitting = loginMutation.isPending || registerMutation.isPending;
 
   // For handling mobile-specific behavior
-  const { isMobile } = useIsMobile();
+  // Using useIsMobile hook to handle responsive functionality
+  const isMobile = useIsMobile();
   const formRef = useRef<HTMLDivElement>(null);
   
   // Use this effect to scroll the form into view on mobile when errors occur
