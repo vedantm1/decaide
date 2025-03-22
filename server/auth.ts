@@ -56,10 +56,33 @@ export function setupAuth(app: Express) {
         if (!user || !(await comparePasswords(password, user.password))) {
           return done(null, false);
         } else {
-          // Update last login date for streak tracking
+          // Generate a unique session identifier
+          const sessionId = randomBytes(24).toString('hex');
+          
+          // Update last login date for streak tracking and store session ID
           const now = new Date();
+          
+          // Get client IP and user agent info for session tracking
+          const sessionInfo = {
+            id: sessionId,
+            createdAt: now,
+            lastActive: now
+          };
+          
+          // Update active session for this user
+          await storage.updateUserSession(user.id, sessionInfo);
+          
+          // Update last login date
           await storage.updateLastLogin(user.id, now);
-          return done(null, user);
+          
+          // Set justLoggedIn flag to trigger welcome animation
+          const userWithSessionInfo = {
+            ...user,
+            sessionId,
+            justLoggedIn: true
+          };
+          
+          return done(null, userWithSessionInfo);
         }
       } catch (error) {
         return done(error);
@@ -77,6 +100,42 @@ export function setupAuth(app: Express) {
     }
   });
 
+  // Session validation middleware - protect against multiple logins from different locations
+  const validateSession = async (req: any, res: Response, next: Function) => {
+    // Skip for non-authenticated requests
+    if (!req.isAuthenticated()) {
+      return next();
+    }
+    
+    const user = req.user;
+    const sessionId = user.sessionId;
+    
+    // Skip validation for sessions without a sessionId (older sessions before feature was added)
+    if (!sessionId) {
+      return next();
+    }
+    
+    // Check if the sessionId is valid for this user
+    const isValid = await storage.validateUserSession(user.id, sessionId);
+    
+    if (!isValid) {
+      // Session is invalid, force logout
+      req.logout((err: any) => {
+        if (err) return next(err);
+        return res.status(401).json({
+          error: "Your session has been invalidated because you logged in from another location.",
+          code: "SESSION_INVALIDATED"
+        });
+      });
+    } else {
+      // Session is valid, continue
+      next();
+    }
+  };
+  
+  // Add session validation middleware
+  app.use(validateSession);
+  
   // Authentication routes
   app.post("/api/register", async (req, res, next) => {
     try {
@@ -103,11 +162,22 @@ export function setupAuth(app: Express) {
     res.status(200).json(req.user);
   });
 
-  app.post("/api/logout", (req, res, next) => {
-    req.logout((err) => {
-      if (err) return next(err);
-      res.sendStatus(200);
-    });
+  app.post("/api/logout", async (req, res, next) => {
+    try {
+      // If user is authenticated, invalidate their session
+      if (req.isAuthenticated() && req.user.id && req.user.sessionId) {
+        // Remove the session from storage
+        await storage.invalidateOtherSessions(req.user.id, req.user.sessionId);
+      }
+      
+      // Now perform the logout
+      req.logout((err) => {
+        if (err) return next(err);
+        res.sendStatus(200);
+      });
+    } catch (error) {
+      next(error);
+    }
   });
 
   app.get("/api/user", (req, res) => {

@@ -24,6 +24,12 @@ export interface IStorage {
   updateUserSettings(id: number, settings: { eventFormat?: string, eventCode?: string }): Promise<User | undefined>;
   updateSubscription(id: number, tier: string): Promise<User | undefined>;
   
+  // Session management methods
+  updateUserSession(userId: number, sessionInfo: { id: string, createdAt: Date, lastActive: Date }): Promise<boolean>;
+  validateUserSession(userId: number, sessionId: string): Promise<boolean>;
+  invalidateOtherSessions(userId: number, currentSessionId: string): Promise<boolean>;
+  getUserSession(userId: number): Promise<{ id: string, createdAt: Date, lastActive: Date } | undefined>;
+  
   // Stripe related methods
   updateStripeCustomerId(userId: number, customerId: string): Promise<User | undefined>;
   updateStripeSubscriptionId(userId: number, subscriptionId: string): Promise<User | undefined>;
@@ -59,6 +65,7 @@ export class MemStorage implements IStorage {
   private practiceSessions: Map<number, PracticeSession>;
   private roleplayUsage: Map<number, number>; // userId -> count this month
   private testUsage: Map<number, number>; // userId -> count this month
+  private userSessions: Map<number, { id: string; createdAt: Date; lastActive: Date }>;
   currentId: number;
   currentPIId: number;
   currentSessionId: number;
@@ -70,6 +77,7 @@ export class MemStorage implements IStorage {
     this.practiceSessions = new Map();
     this.roleplayUsage = new Map();
     this.testUsage = new Map();
+    this.userSessions = new Map();
     this.currentId = 1;
     this.currentPIId = 1;
     this.currentSessionId = 1;
@@ -475,6 +483,38 @@ export class MemStorage implements IStorage {
     };
   }
 
+  // Session management methods
+  async updateUserSession(userId: number, sessionInfo: { id: string; createdAt: Date; lastActive: Date }): Promise<boolean> {
+    // First invalidate any existing sessions for this user
+    this.userSessions.set(userId, sessionInfo);
+    return true;
+  }
+  
+  async validateUserSession(userId: number, sessionId: string): Promise<boolean> {
+    const sessionInfo = this.userSessions.get(userId);
+    if (!sessionInfo) return false;
+    
+    // Check if the session ID matches
+    return sessionInfo.id === sessionId;
+  }
+  
+  async invalidateOtherSessions(userId: number, currentSessionId: string): Promise<boolean> {
+    const sessionInfo = this.userSessions.get(userId);
+    if (!sessionInfo) return false;
+    
+    // If current session doesn't match, delete it
+    if (sessionInfo.id !== currentSessionId) {
+      this.userSessions.delete(userId);
+      return true;
+    }
+    
+    return false;
+  }
+  
+  async getUserSession(userId: number): Promise<{ id: string; createdAt: Date; lastActive: Date } | undefined> {
+    return this.userSessions.get(userId);
+  }
+  
   async completeDailyChallenge(userId: number): Promise<any> {
     const user = await this.getUser(userId);
     if (!user) throw new Error("User not found");
