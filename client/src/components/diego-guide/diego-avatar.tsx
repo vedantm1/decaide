@@ -125,7 +125,7 @@ export default function DiegoAvatar({
   // Use enhanced side profile dolphin component when pointing or swimming
   if (emotion === 'pointing' || swimming) {
     return (
-      <AnimatePresence>
+      <AnimatePresence mode="wait">
         <SideProfileDolphin 
           dimensions={dimensions}
           swimming={swimming}
