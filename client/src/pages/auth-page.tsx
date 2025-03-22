@@ -210,7 +210,7 @@ export default function AuthPage() {
   return (
     <div className="min-h-screen flex flex-col lg:flex-row">
       {/* Left side - Auth form */}
-      <div className="w-full lg:w-1/2 p-4 flex items-center justify-center bg-slate-50 order-2 lg:order-1">
+      <div className="w-full lg:w-1/2 p-4 flex items-center justify-center bg-slate-50 dark:bg-[var(--surface-0)] order-2 lg:order-1">
         <Card className="w-full max-w-md shadow-lg" ref={formRef}>
           <CardHeader className="space-y-1">
             <div className="flex items-center justify-center mb-6">

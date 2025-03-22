@@ -474,43 +474,43 @@ export default function SettingsPage() {
                       <h3 className="text-base font-medium text-slate-700 mb-3">Theme</h3>
                       <div className="grid grid-cols-3 gap-4">
                         <div 
-                          className={`border ${appearance.theme === "light" ? 'border-primary ring-2 ring-primary/30' : 'border-slate-200'} rounded-lg overflow-hidden cursor-pointer shadow-sm transition-all hover:scale-[1.02]`}
+                          className={`border ${appearance.theme === "light" ? 'border-primary ring-2 ring-primary/30' : 'border-slate-200 dark:border-[var(--dark-border)]'} rounded-lg overflow-hidden cursor-pointer shadow-sm transition-all hover:scale-[1.02]`}
                           onClick={() => setAppearance(prev => ({...prev, theme: "light"}))}
                         >
                           <div className="w-full h-20 bg-gradient-to-b from-white to-blue-50 mb-0 rounded-t relative">
                             {appearance.theme === "light" && (
-                              <div className="absolute top-2 right-2 bg-white rounded-full shadow p-0.5">
+                              <div className="absolute top-2 right-2 bg-white dark:bg-[var(--dark-bg-tertiary)] rounded-full shadow p-0.5">
                                 <CheckIcon className="h-4 w-4 text-primary" />
                               </div>
                             )}
                           </div>
-                          <div className="text-sm font-medium text-center py-2 bg-white">Light</div>
+                          <div className="text-sm font-medium text-center py-2 bg-white dark:bg-[var(--surface-2)] dark:text-[var(--dark-text-primary)]">Light</div>
                         </div>
                         <div 
-                          className={`border ${appearance.theme === "dark" ? 'border-primary ring-2 ring-primary/30' : 'border-slate-200'} rounded-lg overflow-hidden cursor-pointer shadow-sm transition-all hover:scale-[1.02]`}
+                          className={`border ${appearance.theme === "dark" ? 'border-primary ring-2 ring-primary/30' : 'border-slate-200 dark:border-[var(--dark-border)]'} rounded-lg overflow-hidden cursor-pointer shadow-sm transition-all hover:scale-[1.02]`}
                           onClick={() => setAppearance(prev => ({...prev, theme: "dark"}))}
                         >
                           <div className="w-full h-20 bg-gradient-to-b from-slate-700 to-slate-900 mb-0 rounded-t relative">
                             {appearance.theme === "dark" && (
-                              <div className="absolute top-2 right-2 bg-white rounded-full shadow p-0.5">
+                              <div className="absolute top-2 right-2 bg-white dark:bg-[var(--dark-bg-tertiary)] rounded-full shadow p-0.5">
                                 <CheckIcon className="h-4 w-4 text-primary" />
                               </div>
                             )}
                           </div>
-                          <div className="text-sm font-medium text-center py-2 bg-white">Dark</div>
+                          <div className="text-sm font-medium text-center py-2 bg-white dark:bg-[var(--surface-2)] dark:text-[var(--dark-text-primary)]">Dark</div>
                         </div>
                         <div 
-                          className={`border ${appearance.theme === "system" ? 'border-primary ring-2 ring-primary/30' : 'border-slate-200'} rounded-lg overflow-hidden cursor-pointer shadow-sm transition-all hover:scale-[1.02]`}
+                          className={`border ${appearance.theme === "system" ? 'border-primary ring-2 ring-primary/30' : 'border-slate-200 dark:border-[var(--dark-border)]'} rounded-lg overflow-hidden cursor-pointer shadow-sm transition-all hover:scale-[1.02]`}
                           onClick={() => setAppearance(prev => ({...prev, theme: "system"}))}
                         >
                           <div className="w-full h-20 bg-gradient-to-b from-white to-slate-800 mb-0 rounded-t relative">
                             {appearance.theme === "system" && (
-                              <div className="absolute top-2 right-2 bg-white rounded-full shadow p-0.5">
+                              <div className="absolute top-2 right-2 bg-white dark:bg-[var(--dark-bg-tertiary)] rounded-full shadow p-0.5">
                                 <CheckIcon className="h-4 w-4 text-primary" />
                               </div>
                             )}
                           </div>
-                          <div className="text-sm font-medium text-center py-2 bg-white">System</div>
+                          <div className="text-sm font-medium text-center py-2 bg-white dark:bg-[var(--surface-2)] dark:text-[var(--dark-text-primary)]">System</div>
                         </div>
                       </div>
                     </div>
@@ -518,8 +518,8 @@ export default function SettingsPage() {
                     <Separator />
                     
                     <div>
-                      <h3 className="text-base font-medium text-slate-700 mb-3">DECA Cluster Themes</h3>
-                      <p className="text-xs text-slate-500 mb-4">Select a DECA event cluster for a specialized color scheme</p>
+                      <h3 className="text-base font-medium text-slate-700 dark:text-[var(--dark-text-primary)] mb-3">DECA Cluster Themes</h3>
+                      <p className="text-xs text-slate-500 dark:text-[var(--dark-text-secondary)] mb-4">Select a DECA event cluster for a specialized color scheme</p>
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
                         <div 
                           className={`relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ${appearance.colorScheme === "business" ? 'ring-yellow-500 ring-2' : 'ring-border'} hover:scale-[1.02] shadow-sm`}
