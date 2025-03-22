@@ -25,6 +25,7 @@ import DiegoChat from "@/components/diego-guide/diego-chat";
 import ThemeProvider from "@/lib/theme-provider";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import PlayfulBackground from "@/components/playful-background";
 
 function Router() {
   return (
@@ -79,6 +80,24 @@ function DiegoGuideManager() {
   const [location] = window.location.pathname.split('?');
   const [showWelcomeBanner, setShowWelcomeBanner] = useState(false);
   
+  // For visual customization
+  const [visualStyle, setVisualStyle] = useState('memphis');
+  const [colorScheme, setColorScheme] = useState('aquaBlue');
+  
+  // Check localStorage on mount to get user preferences
+  useEffect(() => {
+    const savedAppearance = localStorage.getItem('appearance');
+    if (savedAppearance) {
+      try {
+        const parsed = JSON.parse(savedAppearance);
+        setVisualStyle(parsed.visualStyle || 'memphis');
+        setColorScheme(parsed.colorScheme || 'aquaBlue');
+      } catch (e) {
+        console.error('Failed to parse appearance settings', e);
+      }
+    }
+  }, []);
+  
   // Show welcome banner after tutorial is completed
   useEffect(() => {
     if (hasTutorialCompleted && isNewUser) {
@@ -106,6 +125,9 @@ function DiegoGuideManager() {
   
   return (
     <>
+      {/* Playful background animation for Memphis style */}
+      <PlayfulBackground enabled={visualStyle === 'memphis'} colorScheme={colorScheme} />
+
       {/* Persistent welcome banner that appears after tutorial completion */}
       <AnimatePresence>
         {showWelcomeBanner && (
