@@ -73,6 +73,13 @@ html[data-theme="dark"] [class*="card"] {
   background-color: transparent !important;
 }
 
+/* Target shadcn/ui Card components by their .bg-card class */
+html.dark .bg-card,
+html[data-theme="dark"] .bg-card {
+  background-image: var(--dark-gradient-v-default) !important;
+  background-color: transparent !important;
+}
+
 /* Dialog/Modal components */
 html.dark [role="dialog"],
 html[data-theme="dark"] [role="dialog"] {
@@ -136,6 +143,17 @@ html[data-theme="dark"] select,
 html[data-theme="dark"] textarea {
   background-color: var(--dark-bg-tertiary) !important;
   background-image: none !important;
+}
+
+/* Form item containers and other shadcn/ui form elements */
+html.dark .rounded-lg.border,
+html.dark .form-container,
+html.dark [class*="form-item"],
+html[data-theme="dark"] .rounded-lg.border,
+html[data-theme="dark"] .form-container,
+html[data-theme="dark"] [class*="form-item"] {
+  background-image: var(--dark-gradient-diag-subtle) !important;
+  background-color: transparent !important;
 }
 
 /* Tables */
@@ -227,15 +245,35 @@ html[data-theme="dark"] .dark-gradient-radial-pronounced {
   background-color: transparent !important;
 }
 
+/* Tabs and tab content */
+html.dark [role="tablist"],
+html.dark [role="tabpanel"],
+html[data-theme="dark"] [role="tablist"],
+html[data-theme="dark"] [role="tabpanel"] {
+  background-image: var(--dark-gradient-v-subtle) !important;
+  background-color: transparent !important;
+}
+
+/* Active tabs */
+html.dark [role="tab"][aria-selected="true"],
+html[data-theme="dark"] [role="tab"][aria-selected="true"] {
+  background-image: var(--dark-gradient-diag-pronounced) !important;
+  background-color: transparent !important;
+}
+
 /* Shadow enhancements for dark mode elements to create depth */
 html.dark .card,
 html.dark [class*="card"],
 html.dark .dashboard-card,
 html.dark .panel-bg,
+html.dark .bg-card,
+html.dark [role="tabpanel"],
 html[data-theme="dark"] .card,
 html[data-theme="dark"] [class*="card"],
 html[data-theme="dark"] .dashboard-card,
-html[data-theme="dark"] .panel-bg {
+html[data-theme="dark"] .panel-bg,
+html[data-theme="dark"] .bg-card,
+html[data-theme="dark"] [role="tabpanel"] {
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 
               0 2px 4px -2px rgba(0, 0, 0, 0.1) !important;
 }
