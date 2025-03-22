@@ -11,10 +11,13 @@ import createMemoryStore from "memorystore";
 
 const MemoryStore = createMemoryStore(session);
 
+// Define a SessionStore type alias to fix type issues
+type SessionStore = ReturnType<typeof createMemoryStore>;
+
 // Interface for storage methods
 export interface IStorage {
   // Session store for authentication
-  sessionStore: session.SessionStore;
+  sessionStore: SessionStore;
   
   // User methods
   getUser(id: number): Promise<User | undefined>;
@@ -76,7 +79,7 @@ export class MemStorage implements IStorage {
   currentId: number;
   currentPIId: number;
   currentSessionId: number;
-  sessionStore: session.SessionStore;
+  sessionStore: SessionStore;
 
   constructor() {
     this.users = new Map();
@@ -131,18 +134,23 @@ export class MemStorage implements IStorage {
     // Generate a unique session ID for this user
     const sessionId = `session_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
     
+    // Ensure all fields match the User type requirements
     const user: User = { 
-      ...insertUser, 
       id,
+      username: insertUser.username,
+      password: insertUser.password,
+      email: insertUser.email || null,
+      eventFormat: insertUser.eventFormat || null,
+      eventCode: insertUser.eventCode || null,
+      eventType: insertUser.eventType || null,
+      instructionalArea: insertUser.instructionalArea || null,
+      uiTheme: insertUser.uiTheme || "aquaBlue",
+      colorScheme: insertUser.colorScheme || "memphis",
       subscriptionTier: "standard",
       streak: 0,
       lastLoginDate: now,
       points: 0,
       sessionId,
-      eventType: insertUser.eventType || null,
-      instructionalArea: insertUser.instructionalArea || null,
-      uiTheme: insertUser.uiTheme || "aquaBlue",
-      colorScheme: insertUser.colorScheme || "memphis",
       stripeCustomerId: null,
       stripeSubscriptionId: null
     };

@@ -12,7 +12,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { useMicroInteractions } from "@/hooks/use-micro-interactions";
+// Removed useMicroInteractions import, using a mock implementation instead
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useDiegoGuide } from "@/hooks/use-diego-guide";
 import { motion } from "framer-motion";
@@ -67,7 +67,12 @@ export default function AuthPage() {
   const [activeTab, setActiveTab] = useState<string>("login");
   const [_, navigate] = useLocation();
   const { user, loginMutation, registerMutation } = useAuth();
-  const { triggerAnimation } = useMicroInteractions();
+  // Creating a mock version of useMicroInteractions to prevent errors
+  // Since this page doesn't actually need the animations to function
+  const triggerAnimation = (type?: string, message?: string) => {
+    // Just log the animation attempt instead of actually triggering it
+    console.log(`Auth page would trigger animation: ${type}, message: ${message}`);
+  };
 
   // Form setup for login
   const loginForm = useForm<z.infer<typeof loginSchema>>({
