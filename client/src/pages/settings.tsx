@@ -44,8 +44,32 @@ export default function SettingsPage() {
   // Appearance settings state
   const [appearance, setAppearance] = useState({
     theme: "light",
-    colorScheme: "default",
-    fontSize: "medium"
+    colorScheme: "aquaBlue",
+    fontSize: "medium",
+    visualStyle: "memphis"
+  });
+  
+  // Update appearance settings mutation
+  const updateAppearance = useMutation({
+    mutationFn: async (data: any) => {
+      // This would connect to a real endpoint in production
+      // For now we'll just return the data to simulate a successful update
+      return data;
+    },
+    onSuccess: () => {
+      toast({
+        title: "Appearance Updated",
+        description: "Your theme preferences have been saved.",
+      });
+      triggerAnimation('confetti', 'Theme Updated!');
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Update Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
   });
   
   // Profile form
@@ -388,17 +412,26 @@ export default function SettingsPage() {
                     <div>
                       <h3 className="text-base font-medium text-slate-700 mb-3">Theme</h3>
                       <div className="grid grid-cols-3 gap-4">
-                        <div className="border border-primary rounded-lg p-4 bg-white cursor-pointer">
-                          <div className="w-full h-20 bg-primary mb-2 rounded"></div>
-                          <div className="text-sm font-medium text-center">Light</div>
+                        <div 
+                          className="border border-primary rounded-lg overflow-hidden cursor-pointer shadow-sm transition-all hover:scale-[1.02]"
+                          onClick={() => setAppearance(prev => ({...prev, theme: "light"}))}
+                        >
+                          <div className="w-full h-20 bg-gradient-to-b from-white to-blue-50 mb-0 rounded-t"></div>
+                          <div className="text-sm font-medium text-center py-2 bg-white">Light</div>
                         </div>
-                        <div className="border border-slate-200 rounded-lg p-4 bg-white cursor-pointer">
-                          <div className="w-full h-20 bg-slate-800 mb-2 rounded"></div>
-                          <div className="text-sm font-medium text-center">Dark</div>
+                        <div 
+                          className="border border-slate-200 rounded-lg overflow-hidden cursor-pointer shadow-sm transition-all hover:scale-[1.02]"
+                          onClick={() => setAppearance(prev => ({...prev, theme: "dark"}))}
+                        >
+                          <div className="w-full h-20 bg-gradient-to-b from-slate-700 to-slate-900 mb-0 rounded-t"></div>
+                          <div className="text-sm font-medium text-center py-2 bg-white">Dark</div>
                         </div>
-                        <div className="border border-slate-200 rounded-lg p-4 bg-white cursor-pointer">
-                          <div className="w-full h-20 bg-gradient-to-b from-white to-slate-800 mb-2 rounded"></div>
-                          <div className="text-sm font-medium text-center">System</div>
+                        <div 
+                          className="border border-slate-200 rounded-lg overflow-hidden cursor-pointer shadow-sm transition-all hover:scale-[1.02]"
+                          onClick={() => setAppearance(prev => ({...prev, theme: "system"}))}
+                        >
+                          <div className="w-full h-20 bg-gradient-to-b from-white to-slate-800 mb-0 rounded-t"></div>
+                          <div className="text-sm font-medium text-center py-2 bg-white">System</div>
                         </div>
                       </div>
                     </div>
@@ -406,25 +439,115 @@ export default function SettingsPage() {
                     <Separator />
                     
                     <div>
-                      <h3 className="text-base font-medium text-slate-700 mb-3">Color Scheme</h3>
-                      <div className="grid grid-cols-3 gap-4">
-                        <div className="border border-primary rounded-lg p-4 bg-white cursor-pointer">
-                          <div className="w-full h-8 bg-primary mb-1 rounded"></div>
-                          <div className="w-full h-8 bg-secondary mb-1 rounded"></div>
-                          <div className="w-full h-8 bg-accent mb-1 rounded"></div>
-                          <div className="text-sm font-medium text-center mt-1">Default</div>
+                      <h3 className="text-base font-medium text-slate-700 mb-3">UI Theme</h3>
+                      <div className="grid grid-cols-4 gap-3 mb-2">
+                        <div 
+                          className="relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ring-border hover:scale-[1.02] shadow-sm"
+                          onClick={() => setAppearance(prev => ({...prev, colorScheme: "aquaBlue"}))}
+                        >
+                          <div className="p-4 h-20 flex flex-col justify-between bg-gradient-to-b from-white to-blue-50">
+                            <div className="flex flex-col gap-1">
+                              <div className="w-full h-2 rounded-sm bg-blue-500"></div>
+                              <div className="w-full h-2 rounded-sm bg-blue-400"></div>
+                              <div className="w-full h-2 rounded-sm bg-blue-300"></div>
+                            </div>
+                            <div>
+                              <span className="text-xs font-medium text-blue-700">Aqua Blue</span>
+                              <p className="text-xs text-slate-600 mt-0.5">Business & Finance</p>
+                            </div>
+                          </div>
                         </div>
-                        <div className="border border-slate-200 rounded-lg p-4 bg-white cursor-pointer">
-                          <div className="w-full h-8 bg-[#8B5CF6] mb-1 rounded"></div>
-                          <div className="w-full h-8 bg-[#EC4899] mb-1 rounded"></div>
-                          <div className="w-full h-8 bg-[#F59E0B] mb-1 rounded"></div>
-                          <div className="text-sm font-medium text-center mt-1">Vibrant</div>
+                        
+                        <div 
+                          className="relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ring-border hover:scale-[1.02] shadow-sm"
+                          onClick={() => setAppearance(prev => ({...prev, colorScheme: "coralPink"}))}
+                        >
+                          <div className="p-4 h-20 flex flex-col justify-between bg-gradient-to-b from-white to-pink-50">
+                            <div className="flex flex-col gap-1">
+                              <div className="w-full h-2 rounded-sm bg-pink-500"></div>
+                              <div className="w-full h-2 rounded-sm bg-pink-400"></div>
+                              <div className="w-full h-2 rounded-sm bg-pink-300"></div>
+                            </div>
+                            <div>
+                              <span className="text-xs font-medium text-pink-700">Coral Pink</span>
+                              <p className="text-xs text-slate-600 mt-0.5">Marketing</p>
+                            </div>
+                          </div>
                         </div>
-                        <div className="border border-slate-200 rounded-lg p-4 bg-white cursor-pointer">
-                          <div className="w-full h-8 bg-[#0F766E] mb-1 rounded"></div>
-                          <div className="w-full h-8 bg-[#4338CA] mb-1 rounded"></div>
-                          <div className="w-full h-8 bg-[#84CC16] mb-1 rounded"></div>
-                          <div className="text-sm font-medium text-center mt-1">Cool</div>
+                        
+                        <div 
+                          className="relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ring-border hover:scale-[1.02] shadow-sm"
+                          onClick={() => setAppearance(prev => ({...prev, colorScheme: "mintGreen"}))}
+                        >
+                          <div className="p-4 h-20 flex flex-col justify-between bg-gradient-to-b from-white to-green-50">
+                            <div className="flex flex-col gap-1">
+                              <div className="w-full h-2 rounded-sm bg-green-500"></div>
+                              <div className="w-full h-2 rounded-sm bg-green-400"></div>
+                              <div className="w-full h-2 rounded-sm bg-green-300"></div>
+                            </div>
+                            <div>
+                              <span className="text-xs font-medium text-green-700">Mint Green</span>
+                              <p className="text-xs text-slate-600 mt-0.5">Entrepreneurship</p>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div 
+                          className="relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ring-border hover:scale-[1.02] shadow-sm"
+                          onClick={() => setAppearance(prev => ({...prev, colorScheme: "royalPurple"}))}
+                        >
+                          <div className="p-4 h-20 flex flex-col justify-between bg-gradient-to-b from-white to-purple-50">
+                            <div className="flex flex-col gap-1">
+                              <div className="w-full h-2 rounded-sm bg-purple-500"></div>
+                              <div className="w-full h-2 rounded-sm bg-purple-400"></div>
+                              <div className="w-full h-2 rounded-sm bg-purple-300"></div>
+                            </div>
+                            <div>
+                              <span className="text-xs font-medium text-purple-700">Royal Purple</span>
+                              <p className="text-xs text-slate-600 mt-0.5">Leadership</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <Separator />
+                    
+                    <div>
+                      <h3 className="text-base font-medium text-slate-700 mb-3">Visual Style</h3>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div 
+                          className="relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ring-border hover:scale-[1.02] shadow-sm"
+                          onClick={() => setAppearance(prev => ({...prev, visualStyle: "memphis"}))}
+                        >
+                          <div className="p-4 h-24 bg-white bg-opacity-90 relative rounded-md overflow-hidden">
+                            {/* Memphis-style patterns */}
+                            <div className="absolute -right-2 -top-2 w-10 h-10 rounded-full bg-blue-300"></div>
+                            <div className="absolute top-6 left-2 w-12 h-2 rounded-md bg-blue-400"></div>
+                            <div className="absolute bottom-3 right-8 w-6 h-6 border-2 border-yellow-400"></div>
+                            <div className="absolute bottom-10 left-10 w-3 h-3 bg-pink-300 rotate-45"></div>
+                            <div className="absolute top-1/2 right-1/3 w-8 h-1 bg-green-300"></div>
+                            <div className="mt-14">
+                              <span className="text-sm font-medium text-slate-800">Memphis Style</span>
+                              <p className="text-xs text-slate-600">Vibrant & playful design</p>
+                            </div>
+                          </div>
+                        </div>
+                        <div 
+                          className="relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ring-border hover:scale-[1.02] shadow-sm"
+                          onClick={() => setAppearance(prev => ({...prev, visualStyle: "minimalist"}))}
+                        >
+                          <div className="p-4 h-24 bg-white relative rounded-md overflow-hidden">
+                            {/* Clean minimalist design */}
+                            <div className="absolute top-4 left-4 w-12 h-0.5 bg-blue-400"></div>
+                            <div className="absolute top-7 left-4 w-8 h-0.5 bg-blue-300"></div>
+                            <div className="absolute top-10 left-4 w-5 h-0.5 bg-blue-200"></div>
+                            <div className="absolute top-16 left-4 w-3 h-3 rounded-full border border-slate-300"></div>
+                            <div className="mt-14">
+                              <span className="text-sm font-medium text-slate-800">Minimalist</span>
+                              <p className="text-xs text-slate-600">Clean & focused design</p>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -449,8 +572,19 @@ export default function SettingsPage() {
                       </div>
                     </div>
                     
-                    <Button className="w-full md:w-auto">
-                      Save Appearance Settings
+                    <Button 
+                      className="w-full md:w-auto"
+                      onClick={() => updateAppearance.mutate(appearance)}
+                      disabled={updateAppearance.isPending}
+                    >
+                      {updateAppearance.isPending ? (
+                        <div className="flex items-center">
+                          <div className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+                          Saving...
+                        </div>
+                      ) : (
+                        "Save Appearance Settings"
+                      )}
                     </Button>
                   </div>
                 </CardContent>
