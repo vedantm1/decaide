@@ -1,11 +1,12 @@
 // Simple test to verify Azure OpenAI setup
-require('dotenv').config();
-const { OpenAIClient, AzureKeyCredential } = require("@azure/openai");
+import 'dotenv/config';
+import { OpenAIClient, AzureKeyCredential } from "@azure/openai";
 
 // Environment variables for Azure OpenAI
 const AZURE_OPENAI_KEY = process.env.AZURE_OPENAI_KEY;
 const AZURE_OPENAI_ENDPOINT = process.env.AZURE_OPENAI_ENDPOINT;
-const AZURE_OPENAI_DEPLOYMENT = process.env.AZURE_OPENAI_DEPLOYMENT;
+// Use "gpt-4o-mini" as we verified this is the correct deployment name
+const AZURE_OPENAI_DEPLOYMENT = "gpt-4o-mini";
 
 async function main() {
   console.log("Testing Azure OpenAI Connection...");

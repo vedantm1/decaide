@@ -1,392 +1,119 @@
-# DecA(I)de Azure OpenAI Integration
+# Azure OpenAI Integration Documentation
 
-This document outlines the integration of Azure OpenAI within the DecA(I)de platform, including setup, implementation, prompt engineering, and best practices.
+This document provides a detailed overview of how Azure OpenAI is integrated into the DecA(I)de platform.
 
-## Overview
+## Environment Variables
 
-DecA(I)de utilizes Azure OpenAI service to power its AI-driven features, including roleplay scenario generation, performance indicator explanations, practice test generation, and written event feedback. The platform uses GPT-4o-mini model for optimal cost-performance balance.
+The platform requires the following environment variables for Azure OpenAI functionality:
 
-## Configuration
+| Variable | Description | Current Value |
+|----------|-------------|---------------|
+| `AZURE_OPENAI_KEY` | API key for accessing Azure OpenAI | [SECURED] |
+| `AZURE_OPENAI_ENDPOINT` | Endpoint URL for the Azure OpenAI service | [SECURED] |
+| `AZURE_OPENAI_DEPLOYMENT` | Deployment name for the model | decaideai |
 
-### Environment Variables
+## Azure OpenAI Integration Structure
 
-The following environment variables are used for Azure OpenAI configuration:
+The integration is structured as follows:
 
+1. **Environment Variable Management**:
+   - Environment variables are loaded using dotenv.
+   - Variables are checked for presence during initialization.
+   - If any required variable is missing, appropriate warnings are logged.
+
+2. **Client Initialization**:
+   - The Azure OpenAI client is created using the OpenAIClient class from the @azure/openai package.
+   - The client is initialized with the endpoint URL and API key.
+   - Error handling is implemented to catch authentication or connection issues.
+
+3. **API Endpoints and Function Calls**:
+   - Four main AI generation functions are implemented:
+     - `generateRoleplayScenario`: Creates realistic DECA roleplay scenarios
+     - `generatePracticeTest`: Creates multiple-choice practice tests
+     - `explainPerformanceIndicator`: Explains DECA performance indicators
+     - `generateWrittenEventFeedback`: Provides feedback on written event sections
+
+4. **System Prompts**:
+   - Each function uses carefully crafted system prompts to guide the AI.
+   - These prompts are designed to produce consistent, high-quality outputs.
+   - Each prompt includes specific instructions for format, tone, and content.
+
+5. **Response Parsing**:
+   - Responses from the API are parsed to extract relevant information.
+   - Helper functions extract specific sections, bullet points, and scores.
+   - Error handling ensures graceful failure if parsing fails.
+
+## Deployment Issues and Troubleshooting
+
+Currently, we are encountering this error:
 ```
-AZURE_OPENAI_KEY=<your-api-key>
-AZURE_OPENAI_ENDPOINT=<your-endpoint-url>
-AZURE_OPENAI_DEPLOYMENT=<your-deployment-name>
+The API deployment for this resource does not exist. If you created the deployment within the last 5 minutes, please wait a moment and try again.
 ```
 
-### Service Setup
+This indicates one of the following issues:
 
-The Azure OpenAI service requires proper configuration in both Azure Portal and our application code:
+1. The deployment name "decaideai" may not exist in the Azure OpenAI resource.
+2. The deployment was recently created and is not yet ready.
+3. The deployment exists but with a different name than what's specified in the environment variable.
 
-1. **Azure Portal Configuration:**
-   - Resource creation in Azure Portal
-   - Model deployment (GPT-4o-mini)
-   - API access key generation
-   - CORS and network settings
+### Deployment Name Verification
 
-2. **Application Configuration:**
-   - Environment variable management
-   - Authentication handling
-   - Error handling and retry logic
-   - Rate limit management
+To resolve this issue:
 
-## Implementation
+1. **Verify deployment name**: Check in the Azure portal that the deployment "decaideai" exists.
+2. **Check deployment model**: Ensure the deployment is using GPT-4o-mini or the intended model.
+3. **Update environment variable**: If the deployment has a different name, update the AZURE_OPENAI_DEPLOYMENT environment variable.
 
-### Client Setup
+## API Call Structure
 
-The Azure OpenAI client is configured in `server/services/azureOpenai.ts`:
+Here's an example of how a typical API call is structured:
 
-```typescript
-import { OpenAIClient, AzureKeyCredential } from "@azure/openai";
-
-/**
- * Get an instance of the OpenAI client
- */
-export function getOpenAIClient(): OpenAIClient {
-  const azureOpenAIKey = process.env.AZURE_OPENAI_KEY;
-  const endpoint = process.env.AZURE_OPENAI_ENDPOINT;
-  
-  if (!azureOpenAIKey || !endpoint) {
-    throw new Error("Azure OpenAI credentials not found in environment variables");
+```javascript
+const response = await client.getChatCompletions(
+  AZURE_OPENAI_DEPLOYMENT,
+  [
+    { role: "system", content: systemPrompt },
+    { role: "user", content: userPrompt }
+  ],
+  {
+    temperature: 0.7,
+    maxTokens: 2000
   }
-  
-  return new OpenAIClient(endpoint, new AzureKeyCredential(azureOpenAIKey));
-}
+);
 ```
 
-### API Functions
-
-The implementation includes several specialized functions for different AI tasks:
-
-#### 1. Roleplay Scenario Generation
-
-```typescript
-/**
- * Generate a roleplay scenario based on event and performance indicators
- */
-export async function generateRoleplayScenario(params: {
-  eventCode: string;
-  performanceIndicators: string[];
-}): Promise<{
-  title: string;
-  scenario: string;
-  requirements: string[];
-  judgeEvaluationCriteria: string[];
-}> {
-  const client = getOpenAIClient();
-  const deployment = process.env.AZURE_OPENAI_DEPLOYMENT;
-  
-  if (!deployment) {
-    throw new Error("Azure OpenAI deployment name not found");
-  }
-  
-  // Implementation details...
-}
-```
-
-#### 2. Practice Test Generation
-
-```typescript
-/**
- * Generate a practice test with questions and answers
- */
-export async function generatePracticeTest(params: {
-  eventCode: string;
-  questionCount: number;
-  difficulty: "beginner" | "intermediate" | "advanced";
-}): Promise<{
-  questions: Array<{
-    id: string;
-    question: string;
-    options: string[];
-    correctAnswer: string;
-    explanation: string;
-  }>;
-}> {
-  // Implementation details...
-}
-```
-
-#### 3. Performance Indicator Explanation
-
-```typescript
-/**
- * Generate an explanation for a performance indicator
- */
-export async function explainPerformanceIndicator(params: {
-  performanceIndicator: string;
-  eventContext?: string;
-  depth: "basic" | "detailed" | "comprehensive";
-}): Promise<{
-  explanation: string;
-  examples: string[];
-  tips: string[];
-}> {
-  // Implementation details...
-}
-```
-
-#### 4. Written Event Feedback
-
-```typescript
-/**
- * Generate feedback for a written event section
- */
-export async function generateWrittenEventFeedback(params: {
-  eventType: string;
-  section: string;
-  content: string;
-}): Promise<{
-  strengths: string[];
-  areas_for_improvement: string[];
-  suggestions: string[];
-  overall_assessment: string;
-}> {
-  // Implementation details...
-}
-```
-
-## Prompt Engineering
-
-### Roleplay Scenario Prompts
-
-The system uses carefully engineered prompts to generate consistent, high-quality roleplay scenarios:
-
-```
-You are a DECA roleplay scenario creator. Your task is to create a realistic, engaging roleplay scenario for the {eventCode} event focusing on these performance indicators: {performanceIndicators}.
-
-Structure your response as follows:
-1. TITLE: A descriptive title for the scenario.
-2. SCENARIO: A detailed business situation (250-300 words) that incorporates all performance indicators naturally.
-3. REQUIREMENTS: List 3-5 specific tasks the participant must complete.
-4. JUDGE EVALUATION CRITERIA: List 5-7 specific points the judge should look for when evaluating.
-
-Ensure the scenario:
-- Is realistic and industry-appropriate
-- Provides clear context and background information
-- Introduces a specific problem or opportunity to address
-- Incorporates all performance indicators organically
-- Has appropriate complexity for high school students
-- Avoids presenting a solution (that's the participant's job)
-```
-
-### Test Question Prompts
-
-For generating accurate test questions with appropriate distractors:
-
-```
-Create {questionCount} multiple-choice questions for the DECA {eventCode} exam at {difficulty} level.
-
-For each question:
-1. Write a clear, concise question based on relevant business concepts
-2. Provide 4 answer options (A, B, C, D) with only one correct answer
-3. Indicate the correct answer
-4. Include a brief explanation of why the answer is correct
-
-Questions should test application of knowledge, not just memorization.
-For {difficulty} level, focus on [specific difficulty parameters].
-```
-
-### Content Extraction
-
-The system uses helper functions to extract and format structured content from AI responses:
-
-```typescript
-/**
- * Extract a section from the generated content
- */
-function extractSection(content: string, sectionStart: string, sectionEnd: string | null): string {
-  const startIndex = content.indexOf(sectionStart);
-  if (startIndex === -1) return "";
-  
-  const actualStartIndex = startIndex + sectionStart.length;
-  
-  if (sectionEnd === null) {
-    return content.substring(actualStartIndex).trim();
-  }
-  
-  const endIndex = content.indexOf(sectionEnd, actualStartIndex);
-  if (endIndex === -1) {
-    return content.substring(actualStartIndex).trim();
-  }
-  
-  return content.substring(actualStartIndex, endIndex).trim();
-}
-
-/**
- * Extract bullet points from text
- */
-function extractBulletPoints(text: string | null): string[] {
-  if (!text) return [];
-  
-  // Parse numbered lists or bullet points
-  const bulletPattern = /(?:^|\n)[\s]*(?:[-•*]|\d+[.)]) +(.*)/g;
-  const matches = [...text.matchAll(bulletPattern)];
-  
-  return matches.map(match => match[1].trim());
-}
-```
+Parameters explained:
+- `AZURE_OPENAI_DEPLOYMENT`: The deployment name in Azure
+- Message array: Contains system and user prompts that guide the AI
+- Options object: Contains settings like temperature (creativity) and token limits
 
 ## Error Handling
 
-The Azure OpenAI integration includes comprehensive error handling:
+The implementation includes robust error handling:
 
-```typescript
-try {
-  // API call logic
-} catch (error) {
-  if (error.statusCode === 429) {
-    // Rate limit handling
-    console.error("Rate limit exceeded for Azure OpenAI API");
-    throw new Error("Service is currently busy. Please try again in a few moments.");
-  } else if (error.statusCode >= 500) {
-    // Server error handling
-    console.error("Azure OpenAI service error:", error);
-    throw new Error("An error occurred with the AI service. Please try again later.");
-  } else {
-    // Other errors
-    console.error("Error calling Azure OpenAI:", error);
-    throw new Error("Unable to generate content. Please try again or contact support.");
-  }
-}
+1. **Missing credentials**: Checks for missing environment variables
+2. **API errors**: Catches and logs errors from the Azure OpenAI service
+3. **Parsing errors**: Handles errors that may occur during response parsing
+4. **Rate limiting**: Will be implemented to handle rate limit errors (TODO)
+
+## Testing
+
+A dedicated test script (`test-azure-openai.js`) is provided to verify Azure OpenAI integration. This script:
+
+1. Loads environment variables
+2. Creates an OpenAI client
+3. Sends a simple test request
+4. Displays the response or error details
+
+Running the test:
+```
+node test-azure-openai.js
 ```
 
-## Rate Limiting and Optimization
+## Additional Documentation
 
-### Token Usage Optimization
+For more details about Azure OpenAI and the concepts used in this integration, refer to:
 
-To minimize costs and improve performance:
-
-1. **Context Length Management:**
-   - Limit prompt lengths to essential information
-   - Use efficient format for structured data
-   - Set appropriate max_tokens for responses
-
-2. **Batch Processing:**
-   - Group related requests when possible
-   - Implement request queuing for high traffic periods
-
-3. **Caching Strategy:**
-   - Cache common responses (e.g., standard PI explanations)
-   - Implement TTL-based cache invalidation
-   - Use content-based cache keys for similar requests
-
-### Rate Limit Handling
-
-The system implements rate limit handling:
-
-```typescript
-// Exponential backoff retry logic
-async function callWithRetry(fn, maxRetries = 3, initialDelay = 1000) {
-  let retries = 0;
-  
-  while (true) {
-    try {
-      return await fn();
-    } catch (error) {
-      if (error.statusCode !== 429 || retries >= maxRetries) {
-        throw error;
-      }
-      
-      retries++;
-      const delay = initialDelay * Math.pow(2, retries - 1);
-      console.log(`Rate limited. Retrying in ${delay}ms (Attempt ${retries})`);
-      await new Promise(resolve => setTimeout(resolve, delay));
-    }
-  }
-}
-```
-
-## Subscription Tier Management
-
-The platform enforces usage limits based on subscription tiers:
-
-```typescript
-// In server/routes/aiRoutes.ts
-const checkSubscriptionAccess = async (req: Request, res: Response, next: Function) => {
-  if (!req.isAuthenticated()) {
-    return res.status(401).json({ error: "Authentication required" });
-  }
-  
-  const user = req.user;
-  const isRoleplay = req.path.includes("/roleplay");
-  
-  // Check allowance based on request type
-  const allowed = isRoleplay 
-    ? await storage.checkRoleplayAllowance(user.id)
-    : await storage.checkTestAllowance(user.id);
-    
-  if (!allowed) {
-    return res.status(403).json({ 
-      error: "Usage limit reached",
-      upgradeRequired: true,
-      currentTier: user.subscriptionTier 
-    });
-  }
-  
-  // Record usage
-  if (isRoleplay) {
-    await storage.recordRoleplayGeneration(user.id);
-  } else {
-    await storage.recordTestGeneration(user.id);
-  }
-  
-  next();
-};
-```
-
-## Security Considerations
-
-1. **API Key Management:**
-   - Store API keys in environment variables
-   - Never expose keys to the client
-   - Rotate keys periodically
-
-2. **Content Filtering:**
-   - Implement pre-processing of user inputs
-   - Apply content moderation on outputs
-   - Define acceptable use policies
-
-3. **Request Validation:**
-   - Validate all parameters before API calls
-   - Implement rate limiting per user
-   - Log abnormal usage patterns
-
-## Testing and Monitoring
-
-1. **Integration Tests:**
-   - Unit tests for API functions
-   - Mock response testing
-   - Error handling verification
-
-2. **Performance Monitoring:**
-   - Track token usage by feature
-   - Monitor response times
-   - Alert on error rate increases
-
-3. **Quality Assurance:**
-   - Review generated content samples
-   - Test with edge cases
-   - Validate against educational standards
-
-## Future Improvements
-
-Planned enhancements to the Azure OpenAI integration:
-
-1. **Model Fine-Tuning:**
-   - Explore fine-tuning for DECA-specific content
-   - Evaluate cost/benefit of custom models
-
-2. **Advanced Features:**
-   - Multi-modal capabilities (image generation)
-   - Real-time feedback during roleplays
-   - Voice interaction for practice sessions
-
-3. **Optimization:**
-   - Implement more sophisticated caching
-   - Explore parallel processing for batch requests
-   - Develop failover mechanisms
+- [Azure OpenAI Service Documentation](https://learn.microsoft.com/en-us/azure/ai-services/openai/)
+- [OpenAI API Reference](https://platform.openai.com/docs/api-reference/introduction)
+- [GPT-4o-mini Model Documentation](https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models#gpt-4o-mini)
