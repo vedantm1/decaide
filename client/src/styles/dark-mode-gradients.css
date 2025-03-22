@@ -109,9 +109,17 @@ html[data-theme="dark"] nav {
 html.dark [role="menu"],
 html.dark [role="listbox"],
 html.dark [role="tooltip"],
+html.dark [data-radix-popper-content-wrapper],
+html.dark .popover-content,
+html.dark .dropdown-content,
+html.dark .tooltip-content,
 html[data-theme="dark"] [role="menu"],
 html[data-theme="dark"] [role="listbox"],
-html[data-theme="dark"] [role="tooltip"] {
+html[data-theme="dark"] [role="tooltip"],
+html[data-theme="dark"] [data-radix-popper-content-wrapper],
+html[data-theme="dark"] .popover-content,
+html[data-theme="dark"] .dropdown-content,
+html[data-theme="dark"] .tooltip-content {
   background-image: var(--dark-gradient-diag-default) !important;
   background-color: transparent !important;
 }
@@ -278,17 +286,44 @@ html[data-theme="dark"] [role="tabpanel"] {
               0 2px 4px -2px rgba(0, 0, 0, 0.1) !important;
 }
 
+/* ShadCN UI specific components */
+html.dark .sheet-content,
+html.dark .dialog-content,
+html.dark .drawer-content,
+html.dark .collapsible-content,
+html.dark .accordion-content,
+html.dark .hover-card-content,
+html.dark .alert-dialog-content,
+html.dark [data-radix-scroll-area-viewport],
+html[data-theme="dark"] .sheet-content,
+html[data-theme="dark"] .dialog-content,
+html[data-theme="dark"] .drawer-content,
+html[data-theme="dark"] .collapsible-content,
+html[data-theme="dark"] .accordion-content,
+html[data-theme="dark"] .hover-card-content,
+html[data-theme="dark"] .alert-dialog-content,
+html[data-theme="dark"] [data-radix-scroll-area-viewport] {
+  background-image: var(--dark-gradient-diag-default) !important;
+  background-color: transparent !important;
+}
+
 /* Auth page exception - keep the original styling */
 html.dark .auth-page .card,
 html.dark .auth-page [class*="card"],
 html.dark .auth-page [role="dialog"],
 html.dark .auth-page [role="menu"],
 html.dark .auth-page [role="listbox"],
+html.dark .auth-page .sheet-content,
+html.dark .auth-page .dialog-content,
+html.dark .auth-page .drawer-content,
 html[data-theme="dark"] .auth-page .card,
 html[data-theme="dark"] .auth-page [class*="card"],
 html[data-theme="dark"] .auth-page [role="dialog"],
 html[data-theme="dark"] .auth-page [role="menu"],
-html[data-theme="dark"] .auth-page [role="listbox"] {
+html[data-theme="dark"] .auth-page [role="listbox"],
+html[data-theme="dark"] .auth-page .sheet-content,
+html[data-theme="dark"] .auth-page .dialog-content,
+html[data-theme="dark"] .auth-page .drawer-content {
   background-image: none !important;
 }
 
@@ -300,4 +335,32 @@ html[data-theme="dark"] .auth-page input,
 html[data-theme="dark"] .auth-page select, 
 html[data-theme="dark"] .auth-page textarea {
   background-color: var(--dark-bg-tertiary) !important;
+}
+
+/* Handle accent backgrounds in dark mode */
+html.dark .bg-accent,
+html.dark .bg-accent-foreground,
+html.dark [class*="bg-muted"],
+html.dark [class*="bg-secondary"],
+html[data-theme="dark"] .bg-accent,
+html[data-theme="dark"] .bg-accent-foreground,
+html[data-theme="dark"] [class*="bg-muted"],
+html[data-theme="dark"] [class*="bg-secondary"] {
+  background-image: var(--dark-gradient-v-subtle) !important;
+  background-color: transparent !important;
+}
+
+/* Additional utilities for specific gradient usage */
+.gradient-text {
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.perspective-1000 {
+  perspective: 1000px;
 }
