@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useLocation } from "wouter";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -137,12 +137,17 @@ export default function AuthPage() {
   // Using a ref to track previous format to prevent infinite loops
   const prevFormatRef = useRef<string | null>(null);
   
-  useEffect(() => {
-    // Only trigger animation and mascot when format actually changes
-    if (selectedEventFormat && prevFormatRef.current !== selectedEventFormat) {
-      prevFormatRef.current = selectedEventFormat;
+  // Event format selection handler - moved outside useEffect to avoid dependency issues
+  const handleEventFormatChange = useCallback((format: "roleplay" | "written") => {
+    // Set the format in the form
+    registerForm.setValue('eventFormat', format);
+    setSelectedEventFormat(format);
+    
+    // Only show mascot if this is a new format selection
+    if (prevFormatRef.current !== format) {
+      prevFormatRef.current = format;
       
-      const message = selectedEventFormat === "roleplay" 
+      const message = format === "roleplay" 
         ? "Great choice! Role-play events are all about thinking on your feet. I'll help you practice scenarios for your specific event."
         : "Excellent! Written events require detailed business plans. I'll help you structure and perfect your submission.";
       
@@ -153,13 +158,11 @@ export default function AuthPage() {
       triggerAnimation("stars");
       
       // Hide mascot after delay
-      const timer = setTimeout(() => {
+      setTimeout(() => {
         hideMascot();
       }, 8000);
-      
-      return () => clearTimeout(timer);
     }
-  }, [selectedEventFormat, showMascot, hideMascot, triggerAnimation]);
+  }, [showMascot, hideMascot, triggerAnimation, registerForm]);
 
   const onLoginSubmit = (values: z.infer<typeof loginSchema>) => {
     // Subtle animation for login
@@ -363,10 +366,7 @@ export default function AuthPage() {
                                   ? "border-primary bg-primary/10" 
                                   : "border-gray-200 hover:border-gray-300"
                               }`}
-                              onClick={() => {
-                                field.onChange("roleplay");
-                                setSelectedEventFormat("roleplay");
-                              }}
+                              onClick={() => handleEventFormatChange("roleplay")}
                             >
                               <div className="p-4">
                                 <h3 className="font-medium text-lg mb-1">Role-Play</h3>
@@ -387,10 +387,7 @@ export default function AuthPage() {
                                   ? "border-primary bg-primary/10" 
                                   : "border-gray-200 hover:border-gray-300"
                               }`}
-                              onClick={() => {
-                                field.onChange("written");
-                                setSelectedEventFormat("written");
-                              }}
+                              onClick={() => handleEventFormatChange("written")}
                             >
                               <div className="p-4">
                                 <h3 className="font-medium text-lg mb-1">Written</h3>
@@ -725,8 +722,8 @@ export default function AuthPage() {
                 </svg>
               </div>
               <div>
-                <h3 className="font-medium">Who says there is no I in team?</h3>
-                <p className="text-white/80 text-sm mt-1">DecA(I)de helps you stand out with personalized AI coaching</p>
+                <h3 className="font-medium text-primary">Who says there is no <span className="font-bold text-accent italic">I</span> in team?</h3>
+                <p className="text-slate-700 text-sm mt-1">With DecA<span className="text-accent font-bold">(I)</span>de, your <span className="italic">individual</span> excellence is what makes your team unstoppable!</p>
               </div>
             </div>
           </div>
