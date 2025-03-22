@@ -1,5 +1,6 @@
-import { motion, AnimatePresence, Variants } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 
+// Define props for our composite component
 interface SideProfileDolphinProps {
   dimensions: { width: number; height: number };
   targetPosition?: { x: number; y: number };
@@ -24,7 +25,7 @@ const dolphinVariants: Variants = {
   })
 };
 
-// Variants for individual dolphin parts
+// Variants for individual dolphin parts (customize these as needed)
 const bodyVariants: Variants = {
   idle: { y: 0 },
   swimming: { y: [0, -2, 0, 2, 0], transition: { repeat: Infinity, duration: 2, ease: "easeInOut" } }
@@ -40,6 +41,7 @@ const finVariants: Variants = {
   swimming: { rotate: [0, 10, 0, -10, 0], transition: { repeat: Infinity, duration: 1.8, ease: "easeInOut" } }
 };
 
+// The main composite component
 export default function SideProfileDolphin({
   dimensions,
   targetPosition,
@@ -47,7 +49,7 @@ export default function SideProfileDolphin({
   pointDirection = 'right',
   onArrival,
   showTextBox = false,
-  message = "I'm here to help!"
+  message = "I'm swimming over!"
 }: SideProfileDolphinProps) {
   return (
     <motion.div
@@ -160,21 +162,21 @@ export default function SideProfileDolphin({
         />
       </svg>
       {showTextBox && (
-        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-full mt-2 px-3 py-1 bg-white rounded shadow text-sm max-w-[200px] z-10">
-          {message}
+        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 mt-2 px-3 py-1 bg-white rounded shadow text-sm">
+          {message || "I'm swimming over!"}
         </div>
       )}
-      {swimming && <WaveTransition />}
+      <WaveTransition targetPosition={targetPosition} />
     </motion.div>
   );
 }
 
 // WaveTransition Component
 interface WaveTransitionProps {
-  duration?: number;
+  targetPosition?: { x: number; y: number };
 }
 
-function WaveTransition({ duration = 5 }: WaveTransitionProps) {
+function WaveTransition({ targetPosition }: WaveTransitionProps) {
   // Variants for entrance/exit wave animation
   const waveVariants: Variants = {
     hidden: { opacity: 0, y: 20 },
