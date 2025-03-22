@@ -1,41 +1,49 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import SuccessAnimation from '../animations/success-animation';
-import BreakTimer from '../break-timer';
+import { useMicroInteractions } from '@/hooks/use-micro-interactions';
 
 export default function InteractionShowcase() {
-  const [showBreakTimer, setShowBreakTimer] = useState(false);
-  const [triggerAnimation, setTriggerAnimation] = useState(false);
-  const [animationType, setAnimationType] = useState<'confetti' | 'stars' | 'circles' | 'fireworks' | 'random'>('random');
-  const [showMascot, setShowMascot] = useState(false);
+  const [currentAnimationType, setCurrentAnimationType] = useState<'confetti' | 'stars' | 'circles' | 'fireworks' | 'random'>('random');
   const [streakCount, setStreakCount] = useState(0);
   const [showBadge, setShowBadge] = useState(false);
+  const [showBreakTimerState, setShowBreakTimerState] = useState(false);
+  const [showMascotState, setShowMascotState] = useState(false);
   
   const { toast } = useToast();
+  const { triggerAnimation, showBreakTimer, hideBreakTimer, showMascot, hideMascot } = useMicroInteractions();
   
   // Handler for playing success animation
   const playAnimation = () => {
-    setTriggerAnimation(true);
-  };
-  
-  // Handler when animation completes
-  const handleAnimationComplete = () => {
-    setTriggerAnimation(false);
+    triggerAnimation(currentAnimationType, 
+      currentAnimationType !== 'random' 
+        ? `${currentAnimationType.charAt(0).toUpperCase() + currentAnimationType.slice(1)} animation completed!` 
+        : undefined
+    );
   };
   
   // Handler for toggling break timer
   const toggleBreakTimer = () => {
-    setShowBreakTimer(prev => !prev);
+    if (showBreakTimerState) {
+      hideBreakTimer();
+      setShowBreakTimerState(false);
+    } else {
+      showBreakTimer();
+      setShowBreakTimerState(true);
+    }
   };
   
   // Handler for showing mascot
   const toggleMascot = () => {
-    setShowMascot(prev => !prev);
+    if (showMascotState) {
+      hideMascot();
+      setShowMascotState(false);
+    } else {
+      showMascot("I'm here to help you achieve your DECA goals. Let's work together!");
+      setShowMascotState(true);
+    }
   };
   
   // Handler for incrementing streak
@@ -52,8 +60,7 @@ export default function InteractionShowcase() {
       });
       
       // Play animation for milestone streaks
-      setAnimationType('fireworks');
-      setTriggerAnimation(true);
+      triggerAnimation('fireworks', `${newStreak} Day Streak! Congratulations!`);
     } else {
       toast({
         title: "Streak Updated",
@@ -105,40 +112,40 @@ export default function InteractionShowcase() {
                 <Button 
                   variant="outline" 
                   size="sm"
-                  onClick={() => setAnimationType('confetti')}
-                  className={animationType === 'confetti' ? 'border-primary' : ''}
+                  onClick={() => setCurrentAnimationType('confetti')}
+                  className={currentAnimationType === 'confetti' ? 'border-primary' : ''}
                 >
                   Confetti
                 </Button>
                 <Button 
                   variant="outline" 
                   size="sm"
-                  onClick={() => setAnimationType('stars')}
-                  className={animationType === 'stars' ? 'border-primary' : ''}
+                  onClick={() => setCurrentAnimationType('stars')}
+                  className={currentAnimationType === 'stars' ? 'border-primary' : ''}
                 >
                   Stars
                 </Button>
                 <Button 
                   variant="outline" 
                   size="sm"
-                  onClick={() => setAnimationType('circles')}
-                  className={animationType === 'circles' ? 'border-primary' : ''}
+                  onClick={() => setCurrentAnimationType('circles')}
+                  className={currentAnimationType === 'circles' ? 'border-primary' : ''}
                 >
                   Circles
                 </Button>
                 <Button 
                   variant="outline" 
                   size="sm"
-                  onClick={() => setAnimationType('fireworks')}
-                  className={animationType === 'fireworks' ? 'border-primary' : ''}
+                  onClick={() => setCurrentAnimationType('fireworks')}
+                  className={currentAnimationType === 'fireworks' ? 'border-primary' : ''}
                 >
                   Fireworks
                 </Button>
                 <Button 
                   variant="outline" 
                   size="sm"
-                  onClick={() => setAnimationType('random')}
-                  className={animationType === 'random' ? 'border-primary' : ''}
+                  onClick={() => setCurrentAnimationType('random')}
+                  className={currentAnimationType === 'random' ? 'border-primary' : ''}
                 >
                   Random
                 </Button>
@@ -228,7 +235,7 @@ export default function InteractionShowcase() {
               </p>
               
               <Button onClick={toggleBreakTimer}>
-                {showBreakTimer ? 'Hide Break Timer' : 'Show Break Timer'}
+                {showBreakTimerState ? 'Hide Break Timer' : 'Show Break Timer'}
               </Button>
             </div>
           </CardContent>
@@ -245,48 +252,25 @@ export default function InteractionShowcase() {
           <CardContent>
             <div className="flex flex-col gap-4">
               <div className="flex justify-center">
-                <AnimatePresence>
-                  {showMascot && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 20 }}
-                      className="relative bg-blue-100 p-4 rounded-lg max-w-xs"
-                    >
-                      <div className="absolute -top-12 left-1/2 -translate-x-1/2 text-5xl">
-                        🐬
-                      </div>
-                      <div className="mt-10 text-center">
-                        <p className="font-medium text-blue-800">Hi, I'm Diego!</p>
-                        <p className="text-sm text-blue-700 mt-1">
-                          I'm here to help you achieve your DECA goals. Let's work together!
-                        </p>
-                      </div>
-                    </motion.div>
+                <div className="h-20 flex items-center justify-center">
+                  {showMascotState && (
+                    <div className="text-center">
+                      <p className="font-medium text-primary">Diego is currently visible!</p>
+                      <p className="text-sm text-muted-foreground">
+                        Check the bottom right corner of your screen
+                      </p>
+                    </div>
                   )}
-                </AnimatePresence>
+                </div>
               </div>
               
               <Button onClick={toggleMascot}>
-                {showMascot ? 'Hide Diego' : 'Show Diego'}
+                {showMascotState ? 'Hide Diego' : 'Show Diego'}
               </Button>
             </div>
           </CardContent>
         </Card>
       </div>
-      
-      {/* Success Animation component */}
-      <SuccessAnimation 
-        trigger={triggerAnimation} 
-        onComplete={handleAnimationComplete}
-        type={animationType}
-        message={animationType !== 'random' ? `${animationType.charAt(0).toUpperCase() + animationType.slice(1)} animation completed!` : undefined}
-      />
-      
-      {/* Break Timer component */}
-      {showBreakTimer && (
-        <BreakTimer onClose={() => setShowBreakTimer(false)} />
-      )}
     </div>
   );
 }

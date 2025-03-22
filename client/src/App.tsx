@@ -16,6 +16,7 @@ import WhyDecadePage from "@/pages/why-decade";
 import InteractionShowcasePage from "@/pages/interaction-showcase";
 import { ProtectedRoute } from "./lib/protected-route";
 import { AuthProvider } from "@/hooks/use-auth";
+import { MicroInteractionsProvider } from "@/hooks/use-micro-interactions";
 
 function Router() {
   return (
@@ -40,8 +41,10 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <Router />
-        <Toaster />
+        <MicroInteractionsProvider>
+          <Router />
+          <Toaster />
+        </MicroInteractionsProvider>
       </AuthProvider>
     </QueryClientProvider>
   );
