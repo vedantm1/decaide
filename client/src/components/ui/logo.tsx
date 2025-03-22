@@ -9,6 +9,7 @@ interface LogoProps {
   height?: number;
   showText?: boolean;
   showTagline?: boolean;
+  cluster?: 'business' | 'finance' | 'hospitality' | 'marketing' | 'entrepreneurship' | 'admin' | null;
 }
 
 /**
@@ -31,7 +32,8 @@ export function Logo({
   width = 40,
   height = 40,
   showText = false,
-  showTagline = false
+  showTagline = false,
+  cluster = null
 }: LogoProps) {
   const getLogoSrc = () => {
     if (variant === 'full') {
@@ -67,6 +69,63 @@ export function Logo({
     );
   }
   
+  // Get cluster-specific colors for DECA
+  const getClusterStyles = () => {
+    switch(cluster) {
+      case 'business':
+        return {
+          bgColor: mode === 'dark' ? 'bg-yellow-600' : 'bg-yellow-500',
+          fillColor: '#FFD700', // Yellow (gold)
+          gradientFrom: '#FFD700', 
+          gradientTo: '#FFC107'
+        };
+      case 'finance':
+        return {
+          bgColor: mode === 'dark' ? 'bg-green-600' : 'bg-green-500',
+          fillColor: '#4CAF50', // Green
+          gradientFrom: '#4CAF50', 
+          gradientTo: '#2E7D32'
+        };
+      case 'hospitality':
+        return {
+          bgColor: mode === 'dark' ? 'bg-blue-600' : 'bg-blue-500',
+          fillColor: '#2196F3', // Blue
+          gradientFrom: '#2196F3', 
+          gradientTo: '#1565C0'
+        };
+      case 'marketing':
+        return {
+          bgColor: mode === 'dark' ? 'bg-red-600' : 'bg-red-500',
+          fillColor: '#F44336', // Red
+          gradientFrom: '#F44336', 
+          gradientTo: '#C62828'
+        };
+      case 'entrepreneurship':
+        return {
+          bgColor: mode === 'dark' ? 'bg-gray-600' : 'bg-gray-500',
+          fillColor: '#9E9E9E', // Gray/Silver
+          gradientFrom: '#9E9E9E', 
+          gradientTo: '#616161'
+        };
+      case 'admin':
+        return {
+          bgColor: mode === 'dark' ? 'bg-indigo-800' : 'bg-indigo-700',
+          fillColor: '#303F9F', // Navy Blue
+          gradientFrom: '#303F9F', 
+          gradientTo: '#1A237E'
+        };
+      default:
+        return {
+          bgColor: mode === 'dark' ? 'bg-blue-600' : 'bg-blue-500',
+          fillColor: '#2196F3', // Default blue
+          gradientFrom: '#2196F3', 
+          gradientTo: '#1565C0'
+        };
+    }
+  };
+  
+  const clusterStyle = getClusterStyles();
+  
   // Other variants may have text optionally added
   return (
     <div className={cn('flex items-center gap-2', className)}>
@@ -74,7 +133,7 @@ export function Logo({
       <div 
         className={cn(
           "rounded-lg flex items-center justify-center",
-          mode === 'dark' ? 'bg-blue-600' : 'bg-blue-500'
+          clusterStyle.bgColor
         )}
         style={{ width: width, height: height }}
       >
@@ -86,12 +145,12 @@ export function Logo({
           />
           <path 
             d="M8 8L16 8C17.1046 8 18 8.89543 18 10L18 14C18 15.1046 17.1046 16 16 16L8 16C6.89543 16 6 15.1046 6 14L6 10C6 8.89543 6.89543 8 8 8Z" 
-            fill="#FFD700"
+            fill={clusterStyle.fillColor}
             fillOpacity="0.2"
           />
           <path 
             d="M10 12L14 14.5V9.5L10 12Z" 
-            fill="#FFD700"
+            fill={clusterStyle.fillColor}
           />
         </svg>
       </div>
