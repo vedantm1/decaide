@@ -82,6 +82,35 @@ export default {
           "50%": { transform: "translateX(-60%) scaleY(1.1)" },
           "100%": { transform: "translateX(-40%) scaleY(0.9)" },
         },
+        "wave-3": {
+          "0%": { transform: "translateX(-45%) scaleY(0.95)" },
+          "50%": { transform: "translateX(-55%) scaleY(1.05)" },
+          "100%": { transform: "translateX(-45%) scaleY(0.95)" },
+        },
+        // Water splash animations
+        "splash-left": {
+          "0%": { transform: "scale(0.7) translateY(0)", opacity: "0.2" },
+          "50%": { transform: "scale(1) translateY(-5px)", opacity: "0.5" },
+          "100%": { transform: "scale(0.7) translateY(0)", opacity: "0.2" },
+        },
+        "splash-right": {
+          "0%": { transform: "scale(0.8) translateY(0)", opacity: "0.3" },
+          "50%": { transform: "scale(1.1) translateY(-3px)", opacity: "0.6" },
+          "100%": { transform: "scale(0.8) translateY(0)", opacity: "0.3" },
+        },
+        // Water splash particles
+        "splash-out-1": {
+          "0%": { transform: "translate(0, 0) scale(1)", opacity: "0.8" },
+          "100%": { transform: "translate(-10px, -15px) scale(0)", opacity: "0" },
+        },
+        "splash-out-2": {
+          "0%": { transform: "translate(0, 0) scale(1)", opacity: "0.8" },
+          "100%": { transform: "translate(8px, -20px) scale(0)", opacity: "0" },
+        },
+        "splash-out-3": {
+          "0%": { transform: "translate(0, 0) scale(1)", opacity: "0.8" },
+          "100%": { transform: "translate(12px, -10px) scale(0)", opacity: "0" },
+        },
         // Floating animation for Diego the Dolphin
         "float": {
           "0%": { transform: "translateY(0) rotate(0deg)" },
@@ -124,15 +153,31 @@ export default {
         // Water animations for Diego
         "wave-1": "wave-1 8s ease-in-out infinite",
         "wave-2": "wave-2 10s ease-in-out infinite",
+        "wave-3": "wave-3 12s ease-in-out infinite",
         "float": "float 6s ease-in-out infinite",
         "bounce-slow": "bounce-slow 6s ease-in-out infinite",
+        // Splash animations
+        "splash-left": "splash-left 6s ease-in-out infinite 1s",
+        "splash-right": "splash-right 7s ease-in-out infinite",
+        "splash-out-1": "splash-out-1 1.5s ease-out forwards",
+        "splash-out-2": "splash-out-2 2s ease-out forwards 0.3s",
+        "splash-out-3": "splash-out-3 1.8s ease-out forwards 0.5s",
+        // Enhanced dolphin animation
+        "dolphin-jump": "float 5s ease-in-out infinite, bounce-slow 8s ease-in-out infinite 1s",
         // Bubble animations
         "bubble-1": "bubble-1 3s ease-in-out infinite",
         "bubble-2": "bubble-2 5s ease-in-out infinite 1s",
         "bubble-3": "bubble-3 4s ease-in-out infinite 2s",
+        "bubble-4": "bubble-1 6s ease-in-out infinite 1.5s",
         // Memphis-style geometric animations
         "rotate-slow": "rotate-slow 30s linear infinite",
         "pulse-grow": "pulse-grow 4s ease-in-out infinite",
+        "pulse-light": "pulse-grow 2s ease-in-out infinite",
+        // Text animations
+        "text-focus-in": "accordion-down 0.5s ease-out",
+        "fade-in": "accordion-down 0.8s ease-out",
+        // Shimmer effect
+        "shimmer": "wave-1 10s linear infinite",
       },
     },
   },
