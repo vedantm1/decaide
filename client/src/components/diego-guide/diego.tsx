@@ -3,10 +3,11 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from "@/components/ui/button";
 import { useMicroInteractions } from "@/hooks/use-micro-interactions";
+import { TutorialStep } from "@/hooks/use-diego-guide";
 
 interface DiegoProps {
   isNewUser?: boolean;
-  currentStep?: string;
+  currentStep?: TutorialStep;
   onComplete?: () => void;
 }
 
@@ -104,7 +105,7 @@ const diegoVariants = {
     transition: {
       duration: 1,
       repeat: Infinity,
-      repeatType: "loop"
+      repeatType: "loop" as const
     }
   }
 };

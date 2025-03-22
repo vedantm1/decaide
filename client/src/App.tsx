@@ -19,6 +19,8 @@ import Subscribe from "@/pages/subscribe";
 import { ProtectedRoute } from "./lib/protected-route";
 import { AuthProvider } from "@/hooks/use-auth";
 import { MicroInteractionsProvider } from "@/hooks/use-micro-interactions";
+import { DiegoGuideProvider, useDiegoGuide } from "@/hooks/use-diego-guide";
+import Diego from "@/components/diego-guide/diego";
 
 function Router() {
   return (
@@ -46,11 +48,27 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <MicroInteractionsProvider>
-          <Router />
-          <Toaster />
+          <DiegoGuideProvider>
+            <Router />
+            <Toaster />
+            <DiegoGuideManager />
+          </DiegoGuideProvider>
         </MicroInteractionsProvider>
       </AuthProvider>
     </QueryClientProvider>
+  );
+}
+
+// This component manages the Diego UI using the hook
+function DiegoGuideManager() {
+  const { isNewUser, currentStep, completeTutorial } = useDiegoGuide();
+  
+  return (
+    <Diego 
+      isNewUser={isNewUser} 
+      currentStep={currentStep || undefined} 
+      onComplete={completeTutorial} 
+    />
   );
 }
 

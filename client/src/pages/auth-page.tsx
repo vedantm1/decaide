@@ -14,8 +14,9 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useMicroInteractions } from "@/hooks/use-micro-interactions";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useDiegoGuide } from "@/hooks/use-diego-guide";
 import { motion } from "framer-motion";
-import Logo from "@/components/ui/logo";
+import { Logo } from "@/components/ui/logo";
 import { 
   Accordion,
   AccordionContent,
@@ -157,6 +158,9 @@ export default function AuthPage() {
     });
   };
 
+  // Access Diego guide context
+  const { setIsNewUser } = useDiegoGuide();
+
   const onRegisterSubmit = (values: z.infer<typeof registerSchema>) => {
     // Trigger animation when form is submitted
     triggerAnimation("confetti", "Creating your account! I'm excited to help you prepare for DECA success!");
@@ -166,6 +170,9 @@ export default function AuthPage() {
       onSuccess: () => {
         // Show success animation
         triggerAnimation("fireworks", "Welcome to DecA(I)de!");
+        
+        // Set user as new to trigger Diego tutorial
+        setIsNewUser(true);
       },
       onError: () => {
         // Show error animation
