@@ -103,6 +103,97 @@ const animations: Record<string, () => void> = {
   }
 };
 
+// Add a tropical drink animation for special celebrations
+const TropicalDrink = () => {
+  return (
+    <motion.div 
+      className="absolute bottom-8 right-8 w-32 h-32"
+      initial={{ opacity: 0, y: 20, rotate: -10 }}
+      animate={{ 
+        opacity: 1, 
+        y: 0,
+        rotate: [0, 5, -5, 0],
+        transition: { duration: 0.8, ease: "easeOut", repeat: 1, repeatType: "reverse" }
+      }}
+      exit={{ opacity: 0, y: 20 }}
+    >
+      <div className="relative w-full h-full">
+        {/* Glass */}
+        <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-20 h-24 bg-cyan-100 opacity-60 rounded-t-lg rounded-b-3xl"></div>
+        
+        {/* Liquid */}
+        <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-16 h-16 bg-gradient-to-b from-cyan-300 to-blue-400 rounded-b-3xl">
+          {/* Liquid surface wave */}
+          <motion.div 
+            className="absolute top-0 left-0 right-0 h-2"
+            animate={{ 
+              y: [0, -1, 1, 0],
+              transition: { repeat: Infinity, duration: 2, ease: "easeInOut" }
+            }}
+          >
+            <svg viewBox="0 0 100 20" preserveAspectRatio="none" className="w-full h-full">
+              <path 
+                d="M0,0 Q25,10 50,0 Q75,10 100,0 L100,20 L0,20 Z" 
+                fill="#4FC3F7" 
+              />
+            </svg>
+          </motion.div>
+        </div>
+        
+        {/* Straw */}
+        <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 rotate-12 w-2 h-28 bg-gradient-to-b from-red-400 to-red-500 rounded-full"></div>
+        
+        {/* Umbrella */}
+        <div className="absolute bottom-20 right-2 w-12 h-8">
+          <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-1 h-12 bg-yellow-700 rounded-full"></div>
+          <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 w-12 h-6 rounded-t-full bg-pink-400"></div>
+        </div>
+        
+        {/* Fruit decoration */}
+        <div className="absolute top-2 left-2 w-6 h-6 rounded-full bg-yellow-300 border-2 border-yellow-400">
+          {/* Lemon slice details */}
+          <div className="absolute inset-1 rounded-full border border-yellow-400 opacity-60"></div>
+        </div>
+      </div>
+      
+      {/* Ice cube */}
+      <motion.div 
+        className="absolute top-10 right-3 w-4 h-4 rounded-md bg-white opacity-70"
+        animate={{
+          y: [0, 8, 0],
+          x: [0, 2, 0],
+          rotate: [0, 10, 20, 30],
+          transition: { duration: 3, repeat: Infinity, repeatType: "reverse" }
+        }}
+      />
+      
+      {/* Bubbles */}
+      {[...Array(5)].map((_, i) => (
+        <motion.div
+          key={i}
+          className="absolute rounded-full bg-white opacity-60"
+          style={{ 
+            width: `${4 + Math.random() * 4}px`, 
+            height: `${4 + Math.random() * 4}px`,
+            left: `${35 + Math.random() * 30}%`, 
+            bottom: `${20 + i * 10}%` 
+          }}
+          animate={{
+            y: [-20, -40],
+            opacity: [0.7, 0],
+            transition: { 
+              duration: 1 + Math.random() * 2, 
+              repeat: Infinity, 
+              delay: i * 0.6,
+              ease: "easeOut" 
+            }
+          }}
+        />
+      ))}
+    </motion.div>
+  );
+};
+
 export default function SuccessAnimation({ 
   trigger,
   onComplete = () => {},
@@ -272,6 +363,11 @@ export default function SuccessAnimation({
                 </motion.p>
               </div>
             </motion.div>
+          )}
+          
+          {/* Show tropical drink animation for some celebration types */}
+          {(type === 'confetti' || type === 'random') && (
+            <TropicalDrink />
           )}
         </motion.div>
       )}

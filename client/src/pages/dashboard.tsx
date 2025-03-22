@@ -48,13 +48,43 @@ export default function Dashboard() {
           // Trial has expired
           setTrialDaysLeft(0);
           setTrialHoursLeft(0);
+          
+          // Show upgrade prompt if this is first visit after expiry
+          if (!localStorage.getItem('trialExpiredPromptShown')) {
+            localStorage.setItem('trialExpiredPromptShown', 'true');
+            setTimeout(() => {
+              triggerAnimation('fireworks');
+              showMascot("Your tropical getaway has ended! Upgrade to keep making waves at your DECA competitions! 🏄‍♂️", 'bottom-right');
+            }, 2000);
+          }
         } else if (daysLeft <= 0) {
           // Less than a day left
           setTrialDaysLeft(0);
           setTrialHoursLeft(hoursLeft);
+          
+          // Show "less than a day left" notification if not shown already
+          if (hoursLeft <= 12 && !localStorage.getItem('trialEndingSoonPromptShown')) {
+            localStorage.setItem('trialEndingSoonPromptShown', 'true');
+            setTimeout(() => {
+              showMascot("Your tropical vacation is almost over! Only a few hours left in your trial. Don't miss the wave of success - upgrade now! 🌊", 'bottom-right');
+              toast({
+                title: "Trial Ending Soon",
+                description: `Only ${hoursLeft} hours left in your free trial!`,
+                variant: "destructive",
+              });
+            }, 1500);
+          }
         } else {
           setTrialDaysLeft(daysLeft);
           setTrialHoursLeft(hoursLeft);
+          
+          // Remind user when 1 day left
+          if (daysLeft === 1 && !localStorage.getItem('trialOneDayLeftPromptShown')) {
+            localStorage.setItem('trialOneDayLeftPromptShown', 'true');
+            setTimeout(() => {
+              showMascot("Just 1 day left in your tropical trial! Don't let your DECA preparations wash away - upgrade to keep riding the wave! 🏄‍♂️", 'bottom-right');
+            }, 1500);
+          }
         }
         
         setShowTrialBanner(true);
