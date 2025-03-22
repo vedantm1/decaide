@@ -43,8 +43,37 @@ export function applyTheme(appearance: AppearanceSettings): AppearanceSettings {
   
   if (isDarkMode) {
     document.documentElement.classList.add('dark');
+    document.documentElement.setAttribute('data-theme', 'dark');
+    // Force apply background color to body and main elements directly
+    document.body.style.backgroundColor = 'hsl(222.2 84% 4.9%)';
+    document.body.style.color = 'hsl(210 40% 98%)';
+    
+    // Try to get the main element and set its background color
+    const mainElement = document.querySelector('main');
+    if (mainElement) {
+      (mainElement as HTMLElement).style.backgroundColor = 'hsl(222.2 84% 4.9%)';
+    }
+    
+    // Force background color on all elements with bg-slate-50 class
+    document.querySelectorAll('.bg-slate-50').forEach(el => {
+      (el as HTMLElement).style.backgroundColor = 'hsl(222.2 84% 4.9%)';
+    });
   } else {
     document.documentElement.classList.remove('dark');
+    document.documentElement.setAttribute('data-theme', 'light');
+    // Reset inline styles
+    document.body.style.backgroundColor = '';
+    document.body.style.color = '';
+    
+    const mainElement = document.querySelector('main');
+    if (mainElement) {
+      (mainElement as HTMLElement).style.backgroundColor = '';
+    }
+    
+    // Reset bg-slate-50 elements
+    document.querySelectorAll('.bg-slate-50').forEach(el => {
+      (el as HTMLElement).style.backgroundColor = '';
+    });
   }
   
   // 2. Remove all theme classes first to prevent conflicts

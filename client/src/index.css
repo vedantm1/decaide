@@ -1,6 +1,7 @@
 @import './styles/theme-variables.css';
 @import './styles/visual-styles.css';
 @import './lib/theme-colors.css';
+@import './styles/force-dark-mode.css';
 
 @tailwind base;
 @tailwind components;
