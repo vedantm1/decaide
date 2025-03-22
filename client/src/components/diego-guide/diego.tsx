@@ -18,6 +18,11 @@ const DIEGO_FUN_FACTS = [
   "I have more neurons in my brain than a Harvard Business School graduate... don't fact-check that.",
   "The 'A' in DECA stands for 'Association,' but I like to think it stands for 'Aquatic' in my honor.",
   "I've never lost a DECA roleplay... mostly because I've never competed, but that's beside the point!",
+  "Standard tier: 3 roleplays and 2 practice tests per month - use them wisely!",
+  "Plus tier: 10 roleplays and 8 practice tests per month - that's serious preparation!",
+  "Pro tier gives you unlimited everything - champions are made with unlimited practice!",
+  "Standard tier includes 2 written event feedback sessions per month.",
+  "Plus tier includes 7 written event feedback sessions per month - enough for a solid paper!",
 ];
 
 interface DiegoProps {
