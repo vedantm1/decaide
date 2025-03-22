@@ -186,20 +186,21 @@ export default function Subscribe() {
           <h3 className="font-medium text-center mb-2">{tier.charAt(0).toUpperCase() + tier.slice(1)} Tier Benefits:</h3>
           {tier === 'plus' && (
             <ul className="space-y-1 text-sm">
-              <li className="flex items-center"><span className="mr-2">✓</span> 15 roleplay scenarios per month</li>
-              <li className="flex items-center"><span className="mr-2">✓</span> 15 practice tests per month</li>
-              <li className="flex items-center"><span className="mr-2">✓</span> 30 performance indicator explanations</li>
-              <li className="flex items-center"><span className="mr-2">✓</span> Priority support</li>
+              <li className="flex items-center"><span className="mr-2">✓</span> Additional roleplay scenarios with PI customization</li>
+              <li className="flex items-center"><span className="mr-2">✓</span> Twenty-five monthly test attempts</li>
+              <li className="flex items-center"><span className="mr-2">✓</span> In-depth PI explanations with insights</li>
+              <li className="flex items-center"><span className="mr-2">✓</span> Advanced tracking with study recommendations</li>
+              <li className="flex items-center"><span className="mr-2">✓</span> Expanded gamification achievements</li>
             </ul>
           )}
           {tier === 'pro' && (
             <ul className="space-y-1 text-sm">
-              <li className="flex items-center"><span className="mr-2">✓</span> Unlimited roleplay scenarios</li>
-              <li className="flex items-center"><span className="mr-2">✓</span> Unlimited practice tests</li>
-              <li className="flex items-center"><span className="mr-2">✓</span> Unlimited performance indicator explanations</li>
-              <li className="flex items-center"><span className="mr-2">✓</span> Written event feedback</li>
-              <li className="flex items-center"><span className="mr-2">✓</span> Priority support</li>
-              <li className="flex items-center"><span className="mr-2">✓</span> Access to all premium content</li>
+              <li className="flex items-center"><span className="mr-2">✓</span> Unlimited roleplay scenario generation</li>
+              <li className="flex items-center"><span className="mr-2">✓</span> Unlimited monthly test attempts</li>
+              <li className="flex items-center"><span className="mr-2">✓</span> Premium, customized PI explanations</li>
+              <li className="flex items-center"><span className="mr-2">✓</span> Advanced performance analytics and coaching</li>
+              <li className="flex items-center"><span className="mr-2">✓</span> Exclusive automated PDF report generation</li>
+              <li className="flex items-center"><span className="mr-2">✓</span> Fully gamified and adaptive learning</li>
             </ul>
           )}
         </div>

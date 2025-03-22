@@ -81,21 +81,13 @@ export type InsertSession = z.infer<typeof insertSessionSchema>;
 // Subscription tier limits
 export const SUBSCRIPTION_LIMITS = {
   standard: {
-    roleplays: 10,             // Limited roleplay scenarios per month
-    tests: 15,                 // Limited practice tests per month
-    piExplanations: 10,        // Limited performance indicator explanations
-    examplePapers: 2,          // Limited example written event papers
-    exampleDialogues: 2,       // Limited example roleplay dialogues
-    customFeedback: false,     // No detailed feedback on written events
-    aiImageGeneration: false,  // No AI image generation for props/graphs
-    speechToText: false,       // No speech-to-text features
-    pdfGeneration: true,       // Basic PDF generation
-    dataAnalytics: false,      // No advanced analytics
-    accessDuration: 30,        // Access to generated content (days)
-    prioritySupport: false,    // No priority support
-    stars: 2,                  // Rating/quality
-    customizationOptions: 3,   // Limited UI customization options
-    price: 12.99
+    roleplays: 15,            // AI-generated roleplay scenarios per area
+    tests: 15,                // Monthly test attempts
+    piExplanations: "fundamental", // Fundamental PI explanations
+    progressTracking: "standard", // Standard progress with leaderboard
+    gamification: "basic",    // Points and achievement badges
+    stars: 2,                 // Rating/quality
+    price: 9.99              // USD per month
   },
   plus: {
     roleplays: 25,             // More roleplay scenarios per month
