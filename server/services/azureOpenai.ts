@@ -6,10 +6,10 @@ dotenv.config();
 // Environment variables for Azure OpenAI
 const AZURE_OPENAI_KEY = process.env.AZURE_OPENAI_KEY;
 const AZURE_OPENAI_ENDPOINT = process.env.AZURE_OPENAI_ENDPOINT;
-const AZURE_OPENAI_DEPLOYMENT = "gpt-4o-mini";
+const AZURE_OPENAI_DEPLOYMENT = process.env.AZURE_OPENAI_DEPLOYMENT;
 
 // Check if required environment variables are set
-if (!AZURE_OPENAI_KEY || !AZURE_OPENAI_ENDPOINT) {
+if (!AZURE_OPENAI_KEY || !AZURE_OPENAI_ENDPOINT || !AZURE_OPENAI_DEPLOYMENT) {
   console.warn("Azure OpenAI credentials are missing. AI features will not work properly.");
 }
 
@@ -17,8 +17,8 @@ if (!AZURE_OPENAI_KEY || !AZURE_OPENAI_ENDPOINT) {
  * Get an instance of the OpenAI client
  */
 export function getOpenAIClient(): OpenAIClient {
-  if (!AZURE_OPENAI_KEY || !AZURE_OPENAI_ENDPOINT) {
-    throw new Error("Azure OpenAI credentials are missing. Please provide AZURE_OPENAI_KEY and AZURE_OPENAI_ENDPOINT.");
+  if (!AZURE_OPENAI_KEY || !AZURE_OPENAI_ENDPOINT || !AZURE_OPENAI_DEPLOYMENT) {
+    throw new Error("Azure OpenAI credentials are missing. Please provide AZURE_OPENAI_KEY, AZURE_OPENAI_ENDPOINT, and AZURE_OPENAI_DEPLOYMENT.");
   }
   
   return new OpenAIClient(
@@ -75,7 +75,7 @@ Your response should include:
     
     // Make the API call
     const response = await client.getChatCompletions(
-      AZURE_OPENAI_DEPLOYMENT,
+      AZURE_OPENAI_DEPLOYMENT!,
       [
         { role: "system", content: systemPrompt },
         { role: "user", content: userPrompt }
@@ -166,7 +166,7 @@ Return the results in JSON format that matches this structure:
     
     // Make the API call
     const response = await client.getChatCompletions(
-      AZURE_OPENAI_DEPLOYMENT,
+      AZURE_OPENAI_DEPLOYMENT!,
       [
         { role: "system", content: systemPrompt },
         { role: "user", content: userPrompt }
@@ -244,7 +244,7 @@ Your tone should be educational, clear, and encouraging to high school DECA stud
     
     // Make the API call
     const response = await client.getChatCompletions(
-      AZURE_OPENAI_DEPLOYMENT,
+      AZURE_OPENAI_DEPLOYMENT!,
       [
         { role: "system", content: systemPrompt },
         { role: "user", content: userPrompt }
@@ -317,7 +317,7 @@ You should be critical but constructive, focusing on helping the student improve
     
     // Make the API call
     const response = await client.getChatCompletions(
-      AZURE_OPENAI_DEPLOYMENT,
+      AZURE_OPENAI_DEPLOYMENT!,
       [
         { role: "system", content: systemPrompt },
         { role: "user", content: userPrompt }
