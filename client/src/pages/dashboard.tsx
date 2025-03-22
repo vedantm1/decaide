@@ -254,8 +254,15 @@ export default function Dashboard() {
             )}
 
           {/* Daily Challenge Card */}
-            {dailyChallenge && (
-              <DailyChallenge challenge={dailyChallenge} />
+            {stats && dailyChallenge && (
+              <DailyChallenge challenge={{
+                id: "daily-1",
+                title: "Practice a Roleplay Scenario",
+                description: "Complete a practice roleplay scenario for your event type.",
+                points: 25,
+                category: "roleplay",
+                completed: false
+              }} />
             )}
           </header>
           

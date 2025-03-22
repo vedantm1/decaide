@@ -1,10 +1,24 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from "@/components/ui/button";
 import { useMicroInteractions } from "@/hooks/use-micro-interactions";
 import { TutorialStep } from "@/hooks/use-diego-guide";
 import DiegoAvatar from "./diego-avatar";
+
+// Fun facts that Diego can share
+const DIEGO_FUN_FACTS = [
+  "Did you know I'm from the San Diego Zoo?",
+  "Fun fact: Dolphins can recognize themselves in mirrors - we're self-aware just like humans!",
+  "Did you know I can swim at speeds of up to 20 miles per hour? That's how I get to all your DECA competitions on time!",
+  "I can hold my breath for up to 10 minutes, which is perfect for those long DECA presentations!",
+  "Dolphins sleep with one eye open - just like DECA competitors the night before a big event!",
+  "My echolocation is so precise I could find a DECA pin in an Olympic-sized pool!",
+  "I've memorized all 1,000+ DECA performance indicators, but sometimes I still forget where I left my lunch.",
+  "I have more neurons in my brain than a Harvard Business School graduate... don't fact-check that.",
+  "The 'A' in DECA stands for 'Association,' but I like to think it stands for 'Aquatic' in my honor.",
+  "I've never lost a DECA roleplay... mostly because I've never competed, but that's beside the point!",
+];
 
 interface DiegoProps {
   isNewUser?: boolean;
@@ -163,6 +177,12 @@ export default function Diego({ isNewUser = false, currentStep = TUTORIAL_STEPS.
   const [isVisible, setIsVisible] = useState(isNewUser);
   const [activeStep, setActiveStep] = useState(currentStep);
   const [isDiegoMinimized, setIsDiegoMinimized] = useState(false);
+  const [isWandering, setIsWandering] = useState(false);
+  const [wanderPosition, setWanderPosition] = useState({ x: 0, y: 0 });
+  const [showFunFact, setShowFunFact] = useState(false);
+  const [currentFunFact, setCurrentFunFact] = useState("");
+  const wanderTimerRef = useRef<number | null>(null);
+  const funFactTimerRef = useRef<number | null>(null);
   const isMobile = useIsMobile();
   const { triggerAnimation } = useMicroInteractions();
 
@@ -173,6 +193,62 @@ export default function Diego({ isNewUser = false, currentStep = TUTORIAL_STEPS.
       setActiveStep(TUTORIAL_STEPS.WELCOME);
     }
   }, [isNewUser]);
+
+  // Initialize wandering behavior when not in tutorial mode
+  useEffect(() => {
+    if (!isNewUser && !activeStep) {
+      startWandering();
+      startFunFactTimer();
+    }
+
+    return () => {
+      // Clean up timers on unmount
+      if (wanderTimerRef.current) window.clearTimeout(wanderTimerRef.current);
+      if (funFactTimerRef.current) window.clearTimeout(funFactTimerRef.current);
+    };
+  }, [isNewUser, activeStep]);
+
+  // Start the wandering behavior
+  const startWandering = useCallback(() => {
+    if (isDiegoMinimized || isVisible || isMobile) return;
+    
+    setIsWandering(true);
+    
+    // Generate a random position within the viewport
+    const maxX = window.innerWidth - 80; // Account for Diego's width
+    const maxY = window.innerHeight - 80; // Account for Diego's height
+    
+    // Don't wander too close to the edges
+    const x = Math.max(20, Math.min(maxX - 20, Math.random() * maxX));
+    const y = Math.max(20, Math.min(maxY - 20, Math.random() * maxY));
+    
+    setWanderPosition({ x, y });
+    
+    // Schedule next wander
+    wanderTimerRef.current = window.setTimeout(() => {
+      setIsWandering(false);
+      wanderTimerRef.current = window.setTimeout(startWandering, Math.random() * 20000 + 10000); // Random time between 10-30 seconds
+    }, 5000); // Visible for 5 seconds
+  }, [isDiegoMinimized, isVisible, isMobile]);
+
+  // Start the fun fact timer
+  const startFunFactTimer = useCallback(() => {
+    if (isDiegoMinimized || isVisible || isMobile) return;
+    
+    // Pick a random fun fact
+    const randomIndex = Math.floor(Math.random() * DIEGO_FUN_FACTS.length);
+    setCurrentFunFact(DIEGO_FUN_FACTS[randomIndex]);
+    
+    // Show the fun fact
+    setShowFunFact(true);
+    
+    // Hide it after a few seconds
+    funFactTimerRef.current = window.setTimeout(() => {
+      setShowFunFact(false);
+      // Schedule next fun fact
+      funFactTimerRef.current = window.setTimeout(startFunFactTimer, Math.random() * 60000 + 30000); // Random time between 30-90 seconds
+    }, 6000);
+  }, [isDiegoMinimized, isVisible, isMobile]);
 
   // Progress to the next tutorial step
   const handleNextStep = () => {
@@ -195,6 +271,17 @@ export default function Diego({ isNewUser = false, currentStep = TUTORIAL_STEPS.
 
   // Toggle Diego's visibility
   const toggleDiego = () => {
+    // Stop wandering when Diego is visible
+    if (!isVisible) {
+      setIsWandering(false);
+      if (wanderTimerRef.current) window.clearTimeout(wanderTimerRef.current);
+      if (funFactTimerRef.current) window.clearTimeout(funFactTimerRef.current);
+    } else {
+      // Resume wandering when Diego is hidden
+      wanderTimerRef.current = window.setTimeout(startWandering, 5000);
+      funFactTimerRef.current = window.setTimeout(startFunFactTimer, 15000);
+    }
+    
     setIsVisible(!isVisible);
     setIsDiegoMinimized(false);
   };
@@ -287,112 +374,221 @@ const content = TUTORIAL_CONTENT[activeStep as keyof typeof TUTORIAL_CONTENT] as
     exit: { opacity: 0, scale: 0, transition: { duration: 0.2 } }
   };
 
+  // Animation for wandering Diego
+  const wanderingDiegoVariants = {
+    hidden: { opacity: 0, scale: 0 },
+    visible: { 
+      opacity: 1, 
+      scale: 1,
+      transition: { 
+        type: "spring",
+        stiffness: 260,
+        damping: 20
+      }
+    },
+    exit: { 
+      opacity: 0, 
+      scale: 0,
+      transition: { 
+        duration: 0.3
+      }
+    }
+  };
+
+  const funFactBubbleVariants = {
+    hidden: { opacity: 0, scale: 0, y: 10 },
+    visible: { 
+      opacity: 1, 
+      scale: 1,
+      y: 0,
+      transition: { 
+        type: "spring",
+        stiffness: 500,
+        damping: 30,
+        delay: 0.1
+      }
+    },
+    exit: { 
+      opacity: 0, 
+      scale: 0,
+      transition: { 
+        duration: 0.2
+      }
+    }
+  };
+
   return (
-    <AnimatePresence>
-      {isVisible && (
-        <motion.div 
-          className={`fixed ${isMobile ? 'inset-x-2 bottom-2' : 'bottom-5 right-5'} z-50 flex items-end gap-3`}
-          initial="hidden"
-          animate="visible"
-          exit="exit"
-          variants={diegoVariants}
-        >
-          {!isDiegoMinimized && (
-            <motion.div 
-              className={`bg-white rounded-lg shadow-xl border border-primary-100 max-w-sm ${isMobile ? 'w-full' : 'w-96'} relative`}
-              variants={bubbleVariants}
-            >
-              {/* Standard floating avatar for normal mode */}
-              {content.avatarType === "normal" && (
-                <motion.div 
-                  className="absolute"
-                  style={{ 
-                    left: '50%', 
-                    top: 0, 
-                    transform: 'translate(-50%, -50%)' 
-                  }}
-                  variants={avatarVariants}
-                >
-                  <DiegoAvatar emotion={content.emotion || "excited"} size="md" />
-                </motion.div>
-              )}
-              
-              {/* Show welcome banner only for the first step */}
-              {activeStep === "welcome" && isNewUser && (
-                <motion.div 
-                  className="fixed inset-x-0 top-0 z-50"
-                  variants={welcomeBannerVariants}
-                  initial="hidden"
-                  animate="visible"
-                  exit="exit"
-                >
-                  <div className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white p-4 shadow-lg">
-                    <div className="container mx-auto flex items-center justify-center gap-2 text-center">
-                      <span className="animate-pulse text-yellow-200">🏝️</span>
-                      <span className="font-medium">Welcome to DecA(I)de! 3-day trial activated - enjoy our tropical dolphin assistant!</span>
-                      <span className="animate-pulse text-yellow-200">🏝️</span>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-              
-              {/* Pointing dolphin avatar for interactive tutorial steps */}
-              {content.avatarType === "pointing" && (
-                <motion.div
-                  className="fixed z-50"
-                  style={content.position as any}
-                  variants={pointerVariants}
-                  initial="hidden"
-                  animate="visible"
-                  exit="exit"
-                >
-                  <DiegoAvatar 
-                    emotion="pointing" 
-                    size="xl" 
-                    pointDirection={content.pointDirection as any} 
-                  />
-                </motion.div>
-              )}
-
-              <div className="flex items-center justify-between bg-primary text-white rounded-t-lg p-3">
-                <h3 className="font-medium text-sm">{content.title}</h3>
-                <div className="flex items-center gap-2">
-                  <button onClick={minimizeDiego} className="text-white/80 hover:text-white">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M19 13H5V11H19V13Z" fill="currentColor"/>
-                    </svg>
-                  </button>
-                  <button onClick={toggleDiego} className="text-white/80 hover:text-white">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M6 18L18 6M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  </button>
-                </div>
-              </div>
-              <div className="p-4">
-                <p className="text-sm text-slate-700 mb-4">{content.message}</p>
-                <Button onClick={handleNextStep} className="w-full">
-                  {content.buttonText}
-                </Button>
-              </div>
-              <div className="text-xs text-center text-slate-400 pb-2">
-                {/* Calculate step number by finding which step we're on */}
-                Step {Object.keys(TUTORIAL_CONTENT).indexOf(activeStep) + 1} of {Object.keys(TUTORIAL_CONTENT).length}
-              </div>
-            </motion.div>
-          )}
-
-          <motion.div 
-            className="bg-primary text-white p-3 rounded-full shadow-lg cursor-pointer"
-            variants={diegoVariants}
-            animate={isDiegoMinimized ? "bounce" : "visible"}
-            whileHover={{ scale: 1.1 }}
-            onClick={() => setIsDiegoMinimized(false)}
+    <>
+      {/* Wandering Diego that appears randomly with fun facts */}
+      <AnimatePresence>
+        {isWandering && !isVisible && !isMobile && (
+          <motion.div
+            className="fixed z-50 cursor-pointer"
+            style={{ 
+              left: `${wanderPosition.x}px`, 
+              top: `${wanderPosition.y}px` 
+            }}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            variants={wanderingDiegoVariants}
+            onClick={toggleDiego}
           >
-            <DiegoAvatar emotion={isDiegoMinimized ? "excited" : "happy"} size="sm" />
+            <div className="relative">
+              {/* Fun fact speech bubble */}
+              {showFunFact && (
+                <motion.div
+                  className="absolute bottom-full mb-2 bg-white rounded-lg p-3 shadow-lg border border-primary-100 w-48 right-0"
+                  initial="hidden"
+                  animate="visible"
+                  exit="exit"
+                  variants={funFactBubbleVariants}
+                >
+                  <div className="text-xs font-medium text-slate-800">{currentFunFact}</div>
+                  {/* Triangle pointer on speech bubble */}
+                  <div className="absolute bottom-[-8px] right-4 w-0 h-0 border-l-[8px] border-l-transparent border-t-[8px] border-t-white border-r-[8px] border-r-transparent"></div>
+                </motion.div>
+              )}
+              
+              <motion.div
+                animate={{
+                  y: [0, -10, 0],
+                  rotate: [0, 5, 0, -5, 0],
+                  transition: { 
+                    y: { repeat: Infinity, duration: 2 },
+                    rotate: { repeat: Infinity, duration: 3 }
+                  }
+                }}
+              >
+                <DiegoAvatar emotion="happy" size="lg" />
+              </motion.div>
+            </div>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Main Diego UI for tutorial and interaction */}
+      <AnimatePresence>
+        {isVisible && (
+          <motion.div 
+            className={`fixed ${isMobile ? 'inset-x-2 bottom-2' : 'bottom-5 right-5'} z-50 flex items-end gap-3`}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            variants={diegoVariants}
+          >
+            {!isDiegoMinimized && (
+              <motion.div 
+                className={`bg-white rounded-lg shadow-xl border border-primary-100 max-w-sm ${isMobile ? 'w-full' : 'w-96'} relative`}
+                variants={bubbleVariants}
+              >
+                {/* Standard floating avatar for normal mode */}
+                {content.avatarType === "normal" && (
+                  <motion.div 
+                    className="absolute"
+                    style={{ 
+                      left: '50%', 
+                      top: 0, 
+                      transform: 'translate(-50%, -50%)' 
+                    }}
+                    variants={avatarVariants}
+                  >
+                    <DiegoAvatar emotion={content.emotion || "excited"} size="md" />
+                  </motion.div>
+                )}
+                
+                {/* Show welcome banner only for the first step */}
+                {activeStep === "welcome" && isNewUser && (
+                  <motion.div 
+                    className="fixed inset-x-0 top-0 z-50"
+                    variants={welcomeBannerVariants}
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                  >
+                    <div className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white p-4 shadow-lg">
+                      <div className="container mx-auto flex items-center justify-center gap-2 text-center">
+                        <span className="animate-pulse text-yellow-200">🏝️</span>
+                        <span className="font-medium">Welcome to DecA(I)de! 3-day trial activated - enjoy our tropical dolphin assistant!</span>
+                        <span className="animate-pulse text-yellow-200">🏝️</span>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+                
+                {/* Pointing dolphin avatar for interactive tutorial steps */}
+                {content.avatarType === "pointing" && (
+                  <motion.div
+                    className="fixed z-50"
+                    style={content.position as any}
+                    variants={pointerVariants}
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                  >
+                    <DiegoAvatar 
+                      emotion="pointing" 
+                      size="xl" 
+                      pointDirection={content.pointDirection as any} 
+                    />
+                  </motion.div>
+                )}
+
+                <div className="flex items-center justify-between bg-primary text-white rounded-t-lg p-3">
+                  <h3 className="font-medium text-sm">{content.title}</h3>
+                  <div className="flex items-center gap-2">
+                    <button onClick={minimizeDiego} className="text-white/80 hover:text-white">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M19 13H5V11H19V13Z" fill="currentColor"/>
+                      </svg>
+                    </button>
+                    <button onClick={toggleDiego} className="text-white/80 hover:text-white">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6 18L18 6M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+                <div className="p-4">
+                  <p className="text-sm text-slate-700 mb-4">{content.message}</p>
+                  <Button onClick={handleNextStep} className="w-full">
+                    {content.buttonText}
+                  </Button>
+                </div>
+                <div className="text-xs text-center text-slate-400 pb-2">
+                  {/* Calculate step number by finding which step we're on */}
+                  Step {Object.keys(TUTORIAL_CONTENT).indexOf(activeStep) + 1} of {Object.keys(TUTORIAL_CONTENT).length}
+                </div>
+              </motion.div>
+            )}
+
+            <motion.div 
+              className="bg-primary text-white p-3 rounded-full shadow-lg cursor-pointer"
+              variants={diegoVariants}
+              animate={isDiegoMinimized ? "bounce" : "visible"}
+              whileHover={{ scale: 1.1 }}
+              onClick={() => setIsDiegoMinimized(false)}
+            >
+              <DiegoAvatar emotion={isDiegoMinimized ? "excited" : "happy"} size="sm" />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Persistent floating Diego button when not visible */}
+      {!isVisible && !isNewUser && !isWandering && (
+        <motion.div
+          className="fixed bottom-5 right-5 z-50 cursor-pointer"
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          whileHover={{ scale: 1.1 }}
+          onClick={toggleDiego}
+        >
+          <div className="bg-primary text-white p-3 rounded-full shadow-lg">
+            <DiegoAvatar emotion="happy" size="sm" />
+          </div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </>
   );
 }

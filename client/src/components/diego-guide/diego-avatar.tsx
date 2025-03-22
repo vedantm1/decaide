@@ -186,26 +186,46 @@ export default function DiegoAvatar({
         fill="none" 
         xmlns="http://www.w3.org/2000/svg"
       >
-        {/* Improved dolphin body (light blue) with more dolphin-like shape */}
+        {/* More dolphin-like body shape with elongated snout */}
         <path 
-          d="M12 3C7.02944 3 3 7.02944 3 12C3 16.9706 7.02944 21 12 21C16.9706 21 21 16.9706 21 12C21 7.02944 16.9706 3 12 3Z" 
+          d="M12 3C9 3 6.5 4 5 6C3.5 8 3 10 3 12C3 16.9706 7.02944 21 12 21C16.9706 21 21 16.9706 21 12C21 8 19.5 5 17 4C14.5 3 14 3 12 3Z" 
           fill="#6CB4EE"
         />
         
         {/* More prominent dolphin fin on top */}
         <path 
-          d="M12 3C10 3 9 5 8.5 6C9 4 11 3 12 2C13 2 15 3 15.5 6C15 5 14 3 12 3Z" 
+          d="M12 2C10 2 8 4 8 5C9 3 11 2 12 1.5C13 1.5 14.5 2 16 4.5C16 4 14 2 12 2Z" 
           fill="#4B9FE1"
         />
         
-        {/* Side fins */}
+        {/* Dolphin snout/beak */}
+        <path 
+          d="M12 9C10 9 9 10 8 12C9 11 10.5 10.5 12 10.5C13.5 10.5 15 11 16 12C15 10 14 9 12 9Z" 
+          fill="#5AA7E4"
+        />
+        
+        {/* Tail fin */}
         <path
-          d="M4 13C3 13 2 14 3 15C4 16 5 15 6 14.5C5 14.75 4.5 14 4 13Z"
+          d="M12 18C10 18 8 17 7 16C9 17 13 18 16 16C14 17.5 13 18 12 18Z"
           fill="#4B9FE1"
         />
-        <path
-          d="M20 13C21 13 22 14 21 15C20 16 19 15 18 14.5C19 14.75 19.5 14 20 13Z"
+        
+        {/* Side fins with motion */}
+        <motion.path
+          d="M4.5 13C3.5 13 2.5 14 3.5 15C4.5 16 5.5 15 6.5 14.5C5.5 14.75 5 14 4.5 13Z"
           fill="#4B9FE1"
+          animate={{
+            rotate: [0, 15, 0],
+            transition: { repeat: Infinity, duration: 2 }
+          }}
+        />
+        <motion.path
+          d="M19.5 13C20.5 13 21.5 14 20.5 15C19.5 16 18.5 15 17.5 14.5C18.5 14.75 19 14 19.5 13Z"
+          fill="#4B9FE1"
+          animate={{
+            rotate: [0, -15, 0],
+            transition: { repeat: Infinity, duration: 2 }
+          }}
         />
         
         {/* Eyes */}
