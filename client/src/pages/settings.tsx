@@ -630,10 +630,10 @@ export default function SettingsPage() {
                           onClick={() => setAppearance(prev => ({...prev, colorScheme: "marketing"}))}
                         >
                           <div className="p-4 h-28 flex flex-col justify-between bg-gradient-to-b from-white to-red-50 relative">
-                            {appearance.colorScheme === "marketing" && (
-                              <div className="absolute top-2 right-2">
-                                <CheckIcon className="h-4 w-4 text-red-500" />
-                              </div>
+                            {appearance.colorScheme === "marketing" ? (
+                              <div className="deca-cluster-badge bg-red-500">MKTG</div>
+                            ) : (
+                              <div className="absolute top-3 right-3 w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-xs font-bold text-red-800">MKTG</div>
                             )}
                             <div className="flex flex-col gap-1">
                               <div className="w-full h-2 rounded-sm bg-red-500 opacity-70"></div>
@@ -660,10 +660,10 @@ export default function SettingsPage() {
                           onClick={() => setAppearance(prev => ({...prev, colorScheme: "entrepreneurship"}))}
                         >
                           <div className="p-4 h-28 flex flex-col justify-between bg-gradient-to-b from-white to-gray-50 relative">
-                            {appearance.colorScheme === "entrepreneurship" && (
-                              <div className="absolute top-2 right-2">
-                                <CheckIcon className="h-4 w-4 text-gray-500" />
-                              </div>
+                            {appearance.colorScheme === "entrepreneurship" ? (
+                              <div className="deca-cluster-badge bg-gray-500">ENTR</div>
+                            ) : (
+                              <div className="absolute top-3 right-3 w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-800">ENTR</div>
                             )}
                             <div className="flex flex-col gap-1">
                               <div className="w-full h-2 rounded-sm bg-gray-500 opacity-70"></div>
@@ -690,10 +690,10 @@ export default function SettingsPage() {
                           onClick={() => setAppearance(prev => ({...prev, colorScheme: "admin"}))}
                         >
                           <div className="p-4 h-28 flex flex-col justify-between bg-gradient-to-b from-white to-indigo-50 relative">
-                            {appearance.colorScheme === "admin" && (
-                              <div className="absolute top-2 right-2">
-                                <CheckIcon className="h-4 w-4 text-indigo-700" />
-                              </div>
+                            {appearance.colorScheme === "admin" ? (
+                              <div className="deca-cluster-badge bg-indigo-700">BAC</div>
+                            ) : (
+                              <div className="absolute top-3 right-3 w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-xs font-bold text-indigo-800">BAC</div>
                             )}
                             <div className="flex flex-col gap-1">
                               <div className="w-full h-2 rounded-sm bg-indigo-800 opacity-70"></div>
