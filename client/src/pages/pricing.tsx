@@ -20,7 +20,7 @@ declare global {
 
 export default function PricingPage() {
   const { user } = useAuth();
-  
+
   // Subscription update mutation
   const updateSubscriptionMutation = useMutation({
     mutationFn: async (tier: string) => {
@@ -34,14 +34,14 @@ export default function PricingPage() {
       console.error("Failed to update subscription:", error);
     }
   });
-  
+
   // Load Stripe script on component mount
   useEffect(() => {
     const script = document.createElement('script');
     script.src = 'https://js.stripe.com/v3/pricing-table.js';
     script.async = true;
     document.body.appendChild(script);
-    
+
     return () => {
       document.body.removeChild(script);
     };
@@ -50,10 +50,10 @@ export default function PricingPage() {
   return (
     <div className="flex h-screen overflow-hidden bg-slate-50 font-sans">
       <SidebarNavigation />
-      
+
       <main className="flex-1 overflow-y-auto bg-slate-50 pt-0 md:pt-0">
         <MobileHeader />
-        
+
         <div className="container mx-auto px-4 py-6 md:py-8 max-w-6xl">
           {/* Pricing Header */}
           <header className="mb-8 text-center">
@@ -61,7 +61,7 @@ export default function PricingPage() {
             <p className="text-slate-500 max-w-2xl mx-auto">
               Choose the plan that's right for you and take your DECA preparation to the next level.
             </p>
-            
+
             {user?.subscriptionTier && (
               <div className="mt-4 p-3 bg-primary-50 border border-primary-100 rounded-lg inline-block">
                 <p className="text-primary-700 font-medium">
@@ -70,7 +70,7 @@ export default function PricingPage() {
               </div>
             )}
           </header>
-          
+
           {/* Pricing Table */}
           <div className="bg-white rounded-xl border border-slate-200 p-6 mb-8 shadow-sm">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -78,25 +78,25 @@ export default function PricingPage() {
               <div className="border border-slate-200 rounded-xl overflow-hidden">
                 <div className="p-6 bg-slate-50 dark:bg-slate-800">
                   <h3 className="font-heading font-bold text-xl text-slate-800 dark:text-white">
-                    Standard 
-                    <span className="text-primary ml-1 dark:hidden">⭐️⭐️⭐️⭐️⭐️</span>
+                    Standard
+                    <span className="text-primary ml-1 dark:hidden">⭐️⭐️</span>
                     <span className="text-primary ml-1 hidden dark:inline">⭐️⭐️</span>
                   </h3>
                   <div className="mt-4 mb-2">
-                    <span className="text-3xl font-bold text-slate-800 dark:text-white">$12.99</span>
+                    <span className="text-3xl font-bold text-slate-800 dark:text-white">$9.99</span>
                     <span className="text-slate-500 dark:text-slate-400">/month</span>
                   </div>
-                  <p className="text-slate-500 dark:text-slate-400 text-sm">Essential DECA preparation for beginners</p>
+                  <p className="text-slate-500 dark:text-slate-400 text-sm">Essential DECA preparation</p>
                 </div>
                 <div className="p-6 dark:bg-slate-900">
                   <ul className="space-y-3">
                     <li className="flex items-start">
                       <i className="fas fa-check text-primary mt-1 mr-2"></i>
-                      <span className="dark:text-white">3 AI-generated roleplay scenarios per month</span>
+                      <span className="dark:text-white">15 AI-generated roleplay scenarios per month</span>
                     </li>
                     <li className="flex items-start">
                       <i className="fas fa-check text-primary mt-1 mr-2"></i>
-                      <span className="dark:text-white">2 monthly test attempts for exam practice</span>
+                      <span className="dark:text-white">15 monthly test attempts for exam practice</span>
                     </li>
                     <li className="flex items-start">
                       <i className="fas fa-check text-primary mt-1 mr-2"></i>
@@ -118,7 +118,7 @@ export default function PricingPage() {
                       </button>
                     ) : (
                       <Link 
-                        to={`/subscribe?priceId=price_standard&tier=standard&price=12.99`}
+                        to={`/subscribe?priceId=price_standard&tier=standard&price=9.99`}
                         className="w-full py-2 px-4 bg-primary hover:bg-primary/90 text-white rounded-lg text-center font-medium transition block"
                       >
                         Select Plan
@@ -127,7 +127,7 @@ export default function PricingPage() {
                   </div>
                 </div>
               </div>
-              
+
               {/* Plus Plan */}
               <div className="border-2 border-primary rounded-xl overflow-hidden relative">
                 <div className="absolute top-0 right-0 bg-primary text-white text-xs px-3 py-1 rounded-bl-lg font-medium">
@@ -149,11 +149,11 @@ export default function PricingPage() {
                   <ul className="space-y-3">
                     <li className="flex items-start">
                       <i className="fas fa-check text-primary mt-1 mr-2"></i>
-                      <span className="dark:text-white">10 roleplay scenarios per month with PI customization</span>
+                      <span className="dark:text-white">Additional roleplay scenarios per instructional area with PI customization</span>
                     </li>
                     <li className="flex items-start">
                       <i className="fas fa-check text-primary mt-1 mr-2"></i>
-                      <span className="dark:text-white">8 monthly test attempts</span>
+                      <span className="dark:text-white">25 monthly test attempts</span>
                     </li>
                     <li className="flex items-start">
                       <i className="fas fa-check text-primary mt-1 mr-2"></i>
@@ -184,7 +184,7 @@ export default function PricingPage() {
                   </div>
                 </div>
               </div>
-              
+
               {/* Pro Plan */}
               <div className="border border-slate-200 rounded-xl overflow-hidden">
                 <div className="p-6 bg-slate-50 dark:bg-slate-800">
@@ -244,7 +244,7 @@ export default function PricingPage() {
               </div>
             </div>
           </div>
-          
+
           {/* Stripe Pricing Table - Enable when ready */}
           {false && (
             <div className="mb-8">
@@ -254,7 +254,7 @@ export default function PricingPage() {
               ></stripe-pricing-table>
             </div>
           )}
-          
+
           {/* FAQ */}
           <div className="mb-8">
             <h2 className="text-2xl font-heading font-bold text-slate-800 dark:text-white mb-6 text-center">Frequently Asked Questions</h2>
@@ -277,12 +277,12 @@ export default function PricingPage() {
               </div>
             </div>
           </div>
-          
+
           {/* Contact */}
           <div className="text-center mb-12">
             <p className="text-slate-600 dark:text-slate-300">Have more questions? <a href="mailto:support@decade-deca.ai" className="text-primary font-medium">Contact our support team</a></p>
           </div>
-          
+
           {/* Footer */}
           <footer className="border-t border-slate-200 dark:border-slate-700 py-6">
             <div className="flex flex-col md:flex-row justify-between items-center">
@@ -295,7 +295,7 @@ export default function PricingPage() {
                 </div>
                 <span className="font-heading font-bold text-base text-slate-800 dark:text-white">DecA<span className="text-primary">(I)</span>de</span>
               </div>
-              
+
               <div className="text-center md:text-right">
                 <div className="text-sm text-slate-500 dark:text-slate-400">© 2023 DecA(I)de. All rights reserved.</div>
                 <div className="text-xs text-slate-400 dark:text-slate-500 mt-1">Who says there is no I in team?</div>
