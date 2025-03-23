@@ -56,6 +56,7 @@ export function applyTheme(appearance: AppearanceSettings): AppearanceSettings {
   
   if (isDarkMode) {
     document.documentElement.classList.add('dark');
+    document.documentElement.classList.remove('light');
     document.documentElement.setAttribute('data-theme', 'dark');
     // Force apply background color to body and main elements directly
     document.body.style.backgroundColor = 'hsl(222.2 84% 4.9%)';
@@ -73,19 +74,20 @@ export function applyTheme(appearance: AppearanceSettings): AppearanceSettings {
     });
   } else {
     document.documentElement.classList.remove('dark');
+    document.documentElement.classList.add('light');
     document.documentElement.setAttribute('data-theme', 'light');
-    // Reset inline styles
-    document.body.style.backgroundColor = '';
-    document.body.style.color = '';
+    // Apply light mode colors directly
+    document.body.style.backgroundColor = 'hsl(0 0% 100%)';
+    document.body.style.color = 'hsl(222.2 47.4% 11.2%)';
     
     const mainElement = document.querySelector('main');
     if (mainElement) {
-      (mainElement as HTMLElement).style.backgroundColor = '';
+      (mainElement as HTMLElement).style.backgroundColor = 'hsl(0 0% 100%)';
     }
     
-    // Reset bg-slate-50 elements
+    // Set light background for bg-slate-50 elements
     document.querySelectorAll('.bg-slate-50').forEach(el => {
-      (el as HTMLElement).style.backgroundColor = '';
+      (el as HTMLElement).style.backgroundColor = 'hsl(210 40% 98%)';
     });
   }
   
