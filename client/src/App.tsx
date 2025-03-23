@@ -137,7 +137,7 @@ function DiegoGuideManager() {
             animate={{ opacity: 1, y: 0, transition: { duration: 0.5 } }}
             exit={{ opacity: 0, y: -20, transition: { duration: 0.3 } }}
           >
-            <div className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white p-4 shadow-lg">
+            <div className="dark:bg-gradient-to-r dark:from-gray-900 dark:to-gray-800 dark:border-b dark:border-gray-700 bg-gradient-to-r from-blue-600 to-cyan-500 text-white p-4 shadow-lg">
               <div className="container mx-auto flex items-center justify-center gap-2 text-center">
                 <span className="animate-pulse text-yellow-200">🏝️</span>
                 <span className="font-medium">Welcome to DecA(I)de! 3-day trial activated - enjoy our tropical dolphin assistant!</span>

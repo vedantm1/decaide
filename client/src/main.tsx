@@ -1,6 +1,9 @@
 import { createRoot } from "react-dom/client";
 import App from "./App";
 import "./index.css";
+import "./styles/dark-input-fields.css"; // Dark mode input field styling
+import "./styles/dark-mode-gradients.css"; // Dark mode gradient backgrounds
+import "./styles/cluster-badges.css"; // DECA cluster badges for dark mode
 
 // Set the theme.json colors in CSS
 document.documentElement.style.setProperty("--background", "248 100% 96%");
