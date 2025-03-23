@@ -122,7 +122,7 @@ export default function SidebarNavigation() {
                   : "text-slate-600 hover:bg-slate-100"
               }`}>
                 <i className={`fas fa-people-arrows w-5 text-center ${
-                  isActive("/roleplay") ? "text-primary" : "text-slate-400"
+                  isActive("/roleplay") ? themeColor : "text-slate-400"
                 }`}></i>
                 <span>Roleplay Scenarios</span>
               </div>
@@ -134,7 +134,7 @@ export default function SidebarNavigation() {
                   : "text-slate-600 hover:bg-slate-100"
               }`}>
                 <i className={`fas fa-bullseye w-5 text-center ${
-                  isActive("/performance-indicators") ? "text-primary" : "text-slate-400"
+                  isActive("/performance-indicators") ? themeColor : "text-slate-400"
                 }`}></i>
                 <span>Performance Indicators</span>
               </div>
@@ -146,7 +146,7 @@ export default function SidebarNavigation() {
                   : "text-slate-600 hover:bg-slate-100"
               }`}>
                 <i className={`fas fa-clipboard-check w-5 text-center ${
-                  isActive("/tests") ? "text-primary" : "text-slate-400"
+                  isActive("/tests") ? themeColor : "text-slate-400"
                 }`}></i>
                 <span>Practice Tests</span>
               </div>
@@ -158,7 +158,7 @@ export default function SidebarNavigation() {
                   : "text-slate-600 hover:bg-slate-100"
               }`}>
                 <i className={`fas fa-file-alt w-5 text-center ${
-                  isActive("/written-events") ? "text-primary" : "text-slate-400"
+                  isActive("/written-events") ? themeColor : "text-slate-400"
                 }`}></i>
                 <span>Written Events</span>
               </div>
@@ -174,7 +174,7 @@ export default function SidebarNavigation() {
                   : "text-slate-600 hover:bg-slate-100"
               }`}>
                 <i className={`fas fa-trophy w-5 text-center ${
-                  isActive("/progress") ? "text-primary" : "text-slate-400"
+                  isActive("/progress") ? themeColor : "text-slate-400"
                 }`}></i>
                 <span>My Progress</span>
                 <span className="ml-auto bg-primary text-white text-xs px-1.5 py-0.5 rounded-md">New</span>
@@ -187,7 +187,7 @@ export default function SidebarNavigation() {
                   : "text-slate-600 hover:bg-slate-100"
               }`}>
                 <i className={`fas fa-info-circle w-5 text-center ${
-                  isActive("/why-decade") ? "text-primary" : "text-slate-400"
+                  isActive("/why-decade") ? themeColor : "text-slate-400"
                 }`}></i>
                 <span>Why DecA(I)de</span>
               </div>
@@ -199,7 +199,7 @@ export default function SidebarNavigation() {
                   : "text-slate-600 hover:bg-slate-100"
               }`}>
                 <i className={`fas fa-credit-card w-5 text-center ${
-                  isActive("/pricing") ? "text-primary" : "text-slate-400"
+                  isActive("/pricing") ? themeColor : "text-slate-400"
                 }`}></i>
                 <span>Subscription Plans</span>
                 {subscriptionTier === "standard" && (
@@ -214,7 +214,7 @@ export default function SidebarNavigation() {
                   : "text-slate-600 hover:bg-slate-100"
               }`}>
                 <i className={`fas fa-cog w-5 text-center ${
-                  isActive("/settings") ? "text-primary" : "text-slate-400"
+                  isActive("/settings") ? themeColor : "text-slate-400"
                 }`}></i>
                 <span>Settings</span>
               </div>
