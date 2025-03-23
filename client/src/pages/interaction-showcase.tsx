@@ -1,4 +1,7 @@
 import InteractionShowcase from "@/components/micro-interactions/interaction-showcase";
+import AnimationShowcase from "@/components/micro-interactions/animation-showcase";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card } from "@/components/ui/card";
 
 export default function InteractionShowcasePage() {
   return (
@@ -9,7 +12,26 @@ export default function InteractionShowcasePage() {
         than competing platforms. These features are designed to boost student retention, motivation, and enjoyment.
       </p>
       
-      <InteractionShowcase />
+      <Tabs defaultValue="animations" className="w-full">
+        <TabsList className="mb-6">
+          <TabsTrigger value="interactions">Interactive Elements</TabsTrigger>
+          <TabsTrigger value="animations">Animation Library</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="interactions">
+          <Card className="p-4">
+            <h2 className="text-xl font-semibold mb-4">Interactive Elements</h2>
+            <p className="text-muted-foreground mb-4">
+              Test our interactive UI elements that respond to user actions and provide immediate feedback.
+            </p>
+            <InteractionShowcase />
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="animations">
+          <AnimationShowcase />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

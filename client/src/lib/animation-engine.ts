@@ -377,14 +377,29 @@ const applyCssAnimation = (
 ): void => {
   if (!element) return;
   
-  element.style.animation = `${animationName} ${duration}ms ${timingFunction}`;
-  
-  const onAnimationEnd = () => {
-    element.style.animation = '';
-    element.removeEventListener('animationend', onAnimationEnd);
-  };
-  
-  element.addEventListener('animationend', onAnimationEnd);
+  // Check if animationName is one of our CSS classes
+  if (['bounce', 'fadeInUp', 'zoomIn', 'flipInX', 'tada', 'heartbeat', 'jello', 'wobble'].includes(animationName)) {
+    // Use CSS classes for predefined animations
+    const originalClasses = element.className;
+    element.className = `${originalClasses} ${animationName}`;
+    
+    const onAnimationEnd = () => {
+      element.className = originalClasses;
+      element.removeEventListener('animationend', onAnimationEnd);
+    };
+    
+    element.addEventListener('animationend', onAnimationEnd);
+  } else {
+    // Fallback to inline style for custom animations
+    element.style.animation = `${animationName} ${duration}ms ${timingFunction}`;
+    
+    const onAnimationEnd = () => {
+      element.style.animation = '';
+      element.removeEventListener('animationend', onAnimationEnd);
+    };
+    
+    element.addEventListener('animationend', onAnimationEnd);
+  }
 };
 
 // Generate a random animation from available types
@@ -405,7 +420,7 @@ const getRandomAnimation = (): AnimationType => {
   return randomFrom(animationTypes);
 };
 
-// Display an animation message
+// Display an animation message with CSS animations
 const displayAnimationMessage = (message: string, duration: number = 3000): void => {
   if (!message) return;
   
@@ -415,44 +430,35 @@ const displayAnimationMessage = (message: string, duration: number = 3000): void
   if (!messageContainer) {
     messageContainer = document.createElement('div');
     messageContainer.id = 'animation-message-container';
-    messageContainer.style.position = 'fixed';
-    messageContainer.style.top = '20%';
-    messageContainer.style.left = '50%';
-    messageContainer.style.transform = 'translateX(-50%)';
-    messageContainer.style.zIndex = '9999';
-    messageContainer.style.pointerEvents = 'none';
+    messageContainer.className = 'fixed top-1/5 left-1/2 transform -translate-x-1/2 z-[9999] pointer-events-none flex flex-col items-center';
     document.body.appendChild(messageContainer);
   }
   
-  // Create the message element
+  // Create the message element with Tailwind classes and our animations
   const messageElement = document.createElement('div');
   messageElement.textContent = message;
-  messageElement.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
-  messageElement.style.color = 'white';
-  messageElement.style.padding = '10px 20px';
-  messageElement.style.borderRadius = '20px';
-  messageElement.style.marginBottom = '10px';
-  messageElement.style.textAlign = 'center';
-  messageElement.style.fontSize = '18px';
-  messageElement.style.fontWeight = 'bold';
-  messageElement.style.maxWidth = '80vw';
-  messageElement.style.opacity = '0';
-  messageElement.style.transition = 'opacity 0.3s ease-in-out';
+  messageElement.className = 'bg-background/90 dark:bg-gray-900/90 backdrop-blur-sm text-foreground dark:text-white px-5 py-3 rounded-xl mb-3 text-center font-bold text-lg max-w-[80vw] shadow-lg zoomIn'; // Using zoomIn animation class
+  
+  // Add a random animation class from our collection for variety
+  const animationClasses = ['zoomIn', 'bounceIn', 'fadeInUp', 'jackInTheBox', 'flipInX'];
+  const randomAnimation = animationClasses[Math.floor(Math.random() * animationClasses.length)];
+  messageElement.classList.add(randomAnimation);
   
   // Add to container
   messageContainer.appendChild(messageElement);
   
-  // Animate in
-  setTimeout(() => {
-    messageElement.style.opacity = '1';
-  }, 10);
-  
   // Remove after duration
   setTimeout(() => {
-    messageElement.style.opacity = '0';
+    // Add a different exit animation
+    messageElement.classList.remove(randomAnimation);
+    messageElement.classList.add('fadeOut');
+    
+    // Wait for animation to complete before removing
     setTimeout(() => {
-      messageContainer.removeChild(messageElement);
-    }, 300);
+      if (messageElement.parentNode === messageContainer) {
+        messageContainer.removeChild(messageElement);
+      }
+    }, 500);
   }, duration);
 };
 
@@ -482,6 +488,10 @@ export const playAnimation = (params: AnimationParams = {}): void => {
       break;
     case 'fireworks':
       playFireworks(mergedParams);
+      break;
+    case 'achievement':
+      // Special achievement animation (trophy + stars + message)
+      playAchievementAnimation(mergedParams);
       break;
     // Apply CSS animations for element-based animations
     case 'bounce':
