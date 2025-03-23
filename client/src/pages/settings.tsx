@@ -474,7 +474,7 @@ export default function SettingsPage() {
                       <h3 className="text-base font-medium text-slate-700 mb-3">Theme</h3>
                       <div className="grid grid-cols-3 gap-4">
                         <div 
-                          className={`border ${appearance.theme === "light" ? 'border-primary ring-2 ring-primary/30' : 'border-slate-200'} rounded-lg overflow-hidden cursor-pointer shadow-sm transition-all hover:scale-[1.02] bg-white`}
+                          className={`border ${appearance.theme === "light" ? 'border-primary ring-2 ring-primary/30' : 'border-slate-200 dark:border-[var(--dark-border)]'} rounded-lg overflow-hidden cursor-pointer shadow-sm transition-all hover:scale-[1.02] bg-white dark:bg-white`}
                           onClick={() => setAppearance(prev => ({...prev, theme: "light"}))}
                         >
                           <div className="w-full h-24 bg-gradient-to-b from-white to-blue-50 mb-0 rounded-t relative">

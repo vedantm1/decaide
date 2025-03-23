@@ -1,6 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { SUBSCRIPTION_LIMITS } from "@shared/schema";
+import { useMemo } from "react";
 
 export default function SidebarNavigation() {
   const [location] = useLocation();
@@ -8,6 +9,36 @@ export default function SidebarNavigation() {
 
   const subscriptionTier = user?.subscriptionTier || "standard";
   const stars = SUBSCRIPTION_LIMITS[subscriptionTier as keyof typeof SUBSCRIPTION_LIMITS]?.stars || 2;
+  
+  // Determine theme color based on user's selected cluster
+  const themeColor = useMemo(() => {
+    const colorScheme = user?.uiTheme || 'aquaBlue';
+    
+    // Map color schemes to corresponding color classes
+    switch(colorScheme) {
+      case 'business':
+        return 'text-yellow-500';
+      case 'finance':
+        return 'text-green-500';
+      case 'hospitality':
+        return 'text-blue-500';
+      case 'marketing':
+        return 'text-red-500';
+      case 'entrepreneurship':
+        return 'text-gray-500';
+      case 'admin':
+        return 'text-indigo-600';
+      case 'mintGreen':
+        return 'text-emerald-500';
+      case 'coralPink':
+        return 'text-pink-500';
+      case 'royalPurple':
+        return 'text-purple-500';
+      default:
+        return 'text-primary'; // aquaBlue or default
+    }
+  }, [user?.uiTheme]);
+  
   // Function to determine the number of visible stars based on mode
   const getVisibleStars = () => {
     const isDarkMode = document.documentElement.classList.contains('dark');
@@ -77,7 +108,7 @@ export default function SidebarNavigation() {
                 ? "text-slate-800 bg-slate-100" 
                 : "text-slate-600 hover:bg-slate-100"
             }`}>
-            <i className="fas fa-chart-line w-5 text-center text-primary"></i>
+            <i className={`fas fa-chart-line w-5 text-center ${themeColor}`}></i>
             <span>Dashboard</span>
           </div>
 
