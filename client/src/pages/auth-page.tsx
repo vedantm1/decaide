@@ -477,17 +477,17 @@ export default function AuthPage() {
                             render={({ field }) => (
                               <FormItem>
                                 <FormLabel>UI Theme</FormLabel>
-                                <div className="grid grid-cols-3 gap-3 mb-2">
-                                  {/* Theme options - consistent sizing and improved layout */}
+                                <div className="grid grid-cols-2 gap-4 mb-4">
+                                  {/* Theme options - larger size for better visibility */}
                                   <motion.div 
-                                    className={`relative overflow-hidden rounded-md cursor-pointer transition-all ${field.value === 'aquaBlue' ? 'ring-2 ring-primary' : 'ring-1 ring-border'}`}
-                                    whileHover={{ scale: 1.02 }}
+                                    className={`relative overflow-hidden rounded-md cursor-pointer transition-all ${field.value === 'aquaBlue' ? 'ring-2 ring-primary shadow-md' : 'ring-1 ring-border'}`}
+                                    whileHover={{ scale: 1.03 }}
                                     onClick={() => {
                                       field.onChange('aquaBlue');
                                       setSelectedUiTheme('aquaBlue');
                                     }}
                                   >
-                                    <div className="p-4 h-20 flex flex-col justify-between bg-gradient-to-b from-white to-blue-50">
+                                    <div className="p-5 h-28 flex flex-col justify-between bg-gradient-to-b from-white to-blue-50">
                                       <div className="flex flex-col gap-1">
                                         <div className="w-full h-2 rounded-sm bg-blue-500"></div>
                                         <div className="w-full h-2 rounded-sm bg-blue-400"></div>
@@ -501,14 +501,14 @@ export default function AuthPage() {
                                   </motion.div>
                                   
                                   <motion.div 
-                                    className={`relative overflow-hidden rounded-md cursor-pointer transition-all ${field.value === 'coralPink' ? 'ring-2 ring-primary' : 'ring-1 ring-border'}`}
-                                    whileHover={{ scale: 1.02 }}
+                                    className={`relative overflow-hidden rounded-md cursor-pointer transition-all ${field.value === 'coralPink' ? 'ring-2 ring-primary shadow-md' : 'ring-1 ring-border'}`}
+                                    whileHover={{ scale: 1.03 }}
                                     onClick={() => {
                                       field.onChange('coralPink');
                                       setSelectedUiTheme('coralPink');
                                     }}
                                   >
-                                    <div className="p-4 h-20 flex flex-col justify-between bg-gradient-to-b from-white to-pink-50">
+                                    <div className="p-5 h-28 flex flex-col justify-between bg-gradient-to-b from-white to-pink-50">
                                       <div className="flex flex-col gap-1">
                                         <div className="w-full h-2 rounded-sm bg-pink-500"></div>
                                         <div className="w-full h-2 rounded-sm bg-pink-400"></div>
@@ -522,14 +522,14 @@ export default function AuthPage() {
                                   </motion.div>
                                   
                                   <motion.div 
-                                    className={`relative overflow-hidden rounded-md cursor-pointer transition-all ${field.value === 'mintGreen' ? 'ring-2 ring-primary' : 'ring-1 ring-border'}`}
-                                    whileHover={{ scale: 1.02 }}
+                                    className={`relative overflow-hidden rounded-md cursor-pointer transition-all ${field.value === 'mintGreen' ? 'ring-2 ring-primary shadow-md' : 'ring-1 ring-border'}`}
+                                    whileHover={{ scale: 1.03 }}
                                     onClick={() => {
                                       field.onChange('mintGreen');
                                       setSelectedUiTheme('mintGreen');
                                     }}
                                   >
-                                    <div className="p-4 h-20 flex flex-col justify-between bg-gradient-to-b from-white to-green-50">
+                                    <div className="p-5 h-28 flex flex-col justify-between bg-gradient-to-b from-white to-green-50">
                                       <div className="flex flex-col gap-1">
                                         <div className="w-full h-2 rounded-sm bg-green-500"></div>
                                         <div className="w-full h-2 rounded-sm bg-green-400"></div>
@@ -543,14 +543,14 @@ export default function AuthPage() {
                                   </motion.div>
                                   
                                   <motion.div 
-                                    className={`relative overflow-hidden rounded-md cursor-pointer transition-all ${field.value === 'royalPurple' ? 'ring-2 ring-primary' : 'ring-1 ring-border'}`}
-                                    whileHover={{ scale: 1.02 }}
+                                    className={`relative overflow-hidden rounded-md cursor-pointer transition-all ${field.value === 'royalPurple' ? 'ring-2 ring-primary shadow-md' : 'ring-1 ring-border'}`}
+                                    whileHover={{ scale: 1.03 }}
                                     onClick={() => {
                                       field.onChange('royalPurple');
                                       setSelectedUiTheme('royalPurple');
                                     }}
                                   >
-                                    <div className="p-4 h-20 flex flex-col justify-between bg-gradient-to-b from-white to-purple-50">
+                                    <div className="p-5 h-28 flex flex-col justify-between bg-gradient-to-b from-white to-purple-50">
                                       <div className="flex flex-col gap-1">
                                         <div className="w-full h-2 rounded-sm bg-purple-500"></div>
                                         <div className="w-full h-2 rounded-sm bg-purple-400"></div>
@@ -577,14 +577,14 @@ export default function AuthPage() {
                                 <FormLabel>Visual Style</FormLabel>
                                 <div className="grid grid-cols-2 gap-3">
                                   <motion.div 
-                                    className={`relative overflow-hidden rounded-md cursor-pointer transition-all ${field.value === 'memphis' ? 'ring-2 ring-primary' : 'ring-1 ring-border'}`}
-                                    whileHover={{ scale: 1.02 }}
+                                    className={`relative overflow-hidden rounded-md cursor-pointer transition-all ${field.value === 'memphis' ? 'ring-2 ring-primary shadow-md' : 'ring-1 ring-border'}`}
+                                    whileHover={{ scale: 1.03 }}
                                     onClick={() => {
                                       field.onChange('memphis');
                                       setSelectedColorScheme('memphis');
                                     }}
                                   >
-                                    <div className="p-4 h-40 bg-white bg-opacity-90 relative rounded-md overflow-hidden">
+                                    <div className="p-5 h-44 bg-white bg-opacity-90 relative rounded-md overflow-hidden">
                                       {/* Memphis-style patterns with actual colors based on the selected theme */}
                                       <div className={`absolute -right-2 -top-2 w-10 h-10 rounded-full bg-${selectedUiTheme === 'aquaBlue' ? 'blue' : selectedUiTheme === 'coralPink' ? 'pink' : selectedUiTheme === 'mintGreen' ? 'green' : 'purple'}-300`}></div>
                                       <div className={`absolute top-6 left-2 w-12 h-2 rounded-md bg-${selectedUiTheme === 'aquaBlue' ? 'blue' : selectedUiTheme === 'coralPink' ? 'pink' : selectedUiTheme === 'mintGreen' ? 'green' : 'purple'}-400`}></div>
