@@ -43,7 +43,7 @@ export default function SettingsPage() {
   const { toast } = useToast();
   const { triggerAnimation } = useMicroInteractions();
   const [activeTab, setActiveTab] = useState("profile");
-  
+
   // Appearance settings state
   const [appearance, setAppearance] = useState({
     theme: "light",
@@ -79,7 +79,7 @@ export default function SettingsPage() {
       case 'marketing': return '#ef4444'; // Red
       case 'entrepreneurship': return '#9ca3af'; // Gray
       case 'admin': return '#312e81'; // Navy Blue
-      
+
       // Regular UI Colors
       case 'aquaBlue': return '#3b82f6';
       case 'coralPink': return '#ec4899';
@@ -88,17 +88,17 @@ export default function SettingsPage() {
       default: return '#3b82f6';
     }
   };
-  
+
   // Update appearance settings mutation
   const updateAppearance = useMutation({
     mutationFn: async (data: any) => {
       try {
         // Import applyTheme from theme-controller
         const { applyTheme } = await import('@/lib/theme-controller');
-        
+
         // Apply theme immediately
         applyTheme(data);
-        
+
         // Save to user profile if authenticated
         if (user?.id) {
           const res = await apiRequest("POST", "/api/user/settings", {
@@ -117,7 +117,7 @@ export default function SettingsPage() {
     onSuccess: () => {
       // Invalidate the user data to get the updated preferences
       queryClient.invalidateQueries({ queryKey: ["/api/user"] });
-      
+
       toast({
         title: "Appearance Updated",
         description: "Your theme preferences have been saved and applied.",
@@ -132,7 +132,7 @@ export default function SettingsPage() {
       });
     },
   });
-  
+
   // Profile form
   const profileForm = useForm<z.infer<typeof profileSchema>>({
     resolver: zodResolver(profileSchema),
@@ -143,7 +143,7 @@ export default function SettingsPage() {
       instructionalArea: user?.instructionalArea || "",
     },
   });
-  
+
   // Notification form
   const notificationForm = useForm<z.infer<typeof notificationSchema>>({
     resolver: zodResolver(notificationSchema),
@@ -154,7 +154,7 @@ export default function SettingsPage() {
       streakAlerts: true,
     },
   });
-  
+
   // Update profile mutation
   const updateProfile = useMutation({
     mutationFn: async (data: z.infer<typeof profileSchema>) => {
@@ -179,7 +179,7 @@ export default function SettingsPage() {
       });
     },
   });
-  
+
   // Update notification settings mutation
   const updateNotifications = useMutation({
     mutationFn: async (data: z.infer<typeof notificationSchema>) => {
@@ -200,12 +200,12 @@ export default function SettingsPage() {
       });
     },
   });
-  
+
   // Profile form submission
   const onProfileSubmit = (data: z.infer<typeof profileSchema>) => {
     updateProfile.mutate(data);
   };
-  
+
   // Notification form submission
   const onNotificationSubmit = (data: z.infer<typeof notificationSchema>) => {
     updateNotifications.mutate(data);
@@ -214,23 +214,23 @@ export default function SettingsPage() {
   return (
     <div className="flex h-screen overflow-hidden bg-slate-50 font-sans">
       <SidebarNavigation />
-      
+
       <main className="flex-1 overflow-y-auto bg-slate-50 pt-0 md:pt-0">
         <MobileHeader />
-        
+
         <div className="container mx-auto px-4 py-6 md:py-8 max-w-6xl">
           <header className="mb-6">
             <h1 className="text-2xl font-heading font-bold text-slate-800">Settings</h1>
             <p className="text-slate-500 mt-1">Manage your account preferences and settings</p>
           </header>
-          
+
           <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="mb-6">
             <TabsList className="grid grid-cols-3 max-w-md mb-8">
               <TabsTrigger value="profile">Profile</TabsTrigger>
               <TabsTrigger value="notifications">Notifications</TabsTrigger>
               <TabsTrigger value="appearance">Appearance</TabsTrigger>
             </TabsList>
-            
+
             <TabsContent value="profile">
               <Card>
                 <CardHeader>
@@ -255,7 +255,7 @@ export default function SettingsPage() {
                           </FormItem>
                         )}
                       />
-                      
+
                       <FormField
                         control={profileForm.control}
                         name="email"
@@ -272,11 +272,11 @@ export default function SettingsPage() {
                           </FormItem>
                         )}
                       />
-                      
+
                       <Separator />
-                      
+
                       <div className="text-sm font-medium text-slate-700 mb-4">DECA Competition Settings</div>
-                      
+
                       <FormField
                         control={profileForm.control}
                         name="eventType"
@@ -302,7 +302,7 @@ export default function SettingsPage() {
                           </FormItem>
                         )}
                       />
-                      
+
                       <FormField
                         control={profileForm.control}
                         name="instructionalArea"
@@ -330,7 +330,7 @@ export default function SettingsPage() {
                           </FormItem>
                         )}
                       />
-                      
+
                       <Button 
                         type="submit" 
                         className="w-full md:w-auto"
@@ -350,7 +350,7 @@ export default function SettingsPage() {
                 </CardContent>
               </Card>
             </TabsContent>
-            
+
             <TabsContent value="notifications">
               <Card>
                 <CardHeader>
@@ -379,7 +379,7 @@ export default function SettingsPage() {
                           </FormItem>
                         )}
                       />
-                      
+
                       <FormField
                         control={notificationForm.control}
                         name="dailyReminders"
@@ -400,7 +400,7 @@ export default function SettingsPage() {
                           </FormItem>
                         )}
                       />
-                      
+
                       <FormField
                         control={notificationForm.control}
                         name="weeklyProgressReports"
@@ -421,7 +421,7 @@ export default function SettingsPage() {
                           </FormItem>
                         )}
                       />
-                      
+
                       <FormField
                         control={notificationForm.control}
                         name="streakAlerts"
@@ -442,7 +442,7 @@ export default function SettingsPage() {
                           </FormItem>
                         )}
                       />
-                      
+
                       <Button 
                         type="submit" 
                         className="w-full md:w-auto"
@@ -462,7 +462,7 @@ export default function SettingsPage() {
                 </CardContent>
               </Card>
             </TabsContent>
-            
+
             <TabsContent value="appearance">
               <Card>
                 <CardHeader>
@@ -515,9 +515,9 @@ export default function SettingsPage() {
                         </div>
                       </div>
                     </div>
-                    
+
                     <Separator />
-                    
+
                     <div>
                       <h3 className="text-base font-medium text-slate-700 dark:text-[var(--dark-text-primary)] mb-3">DECA Cluster Themes</h3>
                       <p className="text-xs text-slate-500 dark:text-[var(--dark-text-secondary)] mb-4">Select a DECA event cluster for a specialized color scheme</p>
@@ -551,7 +551,7 @@ export default function SettingsPage() {
                             </div>
                           </div>
                         </div>
-                        
+
                         <div 
                           className={`relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ${appearance.colorScheme === "finance" ? 'ring-green-500 ring-2' : 'ring-border'} hover:scale-[1.02] shadow-sm`}
                           onClick={() => setAppearance(prev => ({...prev, colorScheme: "finance"}))}
@@ -581,7 +581,7 @@ export default function SettingsPage() {
                             </div>
                           </div>
                         </div>
-                        
+
                         <div 
                           className={`relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ${appearance.colorScheme === "hospitality" ? 'ring-blue-500 ring-2' : 'ring-border'} hover:scale-[1.02] shadow-sm`}
                           onClick={() => setAppearance(prev => ({...prev, colorScheme: "hospitality"}))}
@@ -611,7 +611,7 @@ export default function SettingsPage() {
                             </div>
                           </div>
                         </div>
-                      
+
                         <div 
                           className={`relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ${appearance.colorScheme === "marketing" ? 'ring-red-500 ring-2' : 'ring-border'} hover:scale-[1.02] shadow-sm`}
                           onClick={() => setAppearance(prev => ({...prev, colorScheme: "marketing"}))}
@@ -641,7 +641,7 @@ export default function SettingsPage() {
                             </div>
                           </div>
                         </div>
-                        
+
                         <div 
                           className={`relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ${appearance.colorScheme === "entrepreneurship" ? 'ring-gray-500 ring-2' : 'ring-border'} hover:scale-[1.02] shadow-sm`}
                           onClick={() => setAppearance(prev => ({...prev, colorScheme: "entrepreneurship"}))}
@@ -671,7 +671,7 @@ export default function SettingsPage() {
                             </div>
                           </div>
                         </div>
-                        
+
                         <div 
                           className={`relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ${appearance.colorScheme === "admin" ? 'ring-indigo-700 ring-2' : 'ring-border'} hover:scale-[1.02] shadow-sm`}
                           onClick={() => setAppearance(prev => ({...prev, colorScheme: "admin"}))}
@@ -703,14 +703,14 @@ export default function SettingsPage() {
                         </div>
                       </div>
                     </div>
-                    
+
                     <Separator />
-                    
+
                     <div>
                       <h3 className="text-base font-medium text-slate-700 mb-3">Additional UI Themes</h3>
                       <div className="grid grid-cols-4 gap-3 mb-2">
                         <div 
-                          className={`relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ${appearance.colorScheme === "aquaBlue" ? 'ring-blue-500 ring-2' : 'ring-border'} hover:scale-[1.02] shadow-sm`}
+                          className={`relative overflow-hidden rounded-md cursorpointer transition-all ring-1 ${appearance.colorScheme === "aquaBlue" ? 'ring-blue-500 ring-2' : 'ring-border'} hover:scale-[1.02] shadow-sm`}
                           onClick={() => setAppearance(prev => ({...prev, colorScheme: "aquaBlue"}))}
                         >
                           <div className="p-4 h-24 flex flex-col justify-between bg-gradient-to-b from-white to-blue-50 dark:from-slate-800 dark:to-blue-950 relative">
@@ -726,10 +726,11 @@ export default function SettingsPage() {
                             </div>
                             <div className="mt-2">
                               <span className="text-xs font-medium text-blue-700 dark:text-blue-300">Aqua Blue</span>
+                              <div className="text-xs text-slate-500 mt-0.5">As refreshing as a vacation expense report</div>
                             </div>
                           </div>
                         </div>
-                        
+
                         <div 
                           className={`relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ${appearance.colorScheme === "coralPink" ? 'ring-pink-500 ring-2' : 'ring-border'} hover:scale-[1.02] shadow-sm`}
                           onClick={() => setAppearance(prev => ({...prev, colorScheme: "coralPink"}))}
@@ -747,10 +748,11 @@ export default function SettingsPage() {
                             </div>
                             <div className="mt-2">
                               <span className="text-xs font-medium text-pink-700 dark:text-pink-300">Coral Pink</span>
+                              <div className="text-xs text-slate-500 mt-0.5">Like a sunset on your screen</div>
                             </div>
                           </div>
                         </div>
-                        
+
                         <div 
                           className={`relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ${appearance.colorScheme === "mintGreen" ? 'ring-green-500 ring-2' : 'ring-border'} hover:scale-[1.02] shadow-sm`}
                           onClick={() => setAppearance(prev => ({...prev, colorScheme: "mintGreen"}))}
@@ -768,10 +770,11 @@ export default function SettingsPage() {
                             </div>
                             <div className="mt-2">
                               <span className="text-xs font-medium text-green-700 dark:text-green-300">Mint Green</span>
+                              <div className="text-xs text-slate-500 mt-0.5">Fresh ideas, fresh colors</div>
                             </div>
                           </div>
                         </div>
-                        
+
                         <div 
                           className={`relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ${appearance.colorScheme === "royalPurple" ? 'ring-purple-500 ring-2' : 'ring-border'} hover:scale-[1.02] shadow-sm`}
                           onClick={() => setAppearance(prev => ({...prev, colorScheme: "royalPurple"}))}
@@ -789,14 +792,15 @@ export default function SettingsPage() {
                             </div>
                             <div className="mt-2">
                               <span className="text-xs font-medium text-purple-700 dark:text-purple-300">Royal Purple</span>
+                              <div className="text-xs text-slate-500 mt-0.5">Because you deserve the royal treatment</div>
                             </div>
                           </div>
                         </div>
                       </div>
                     </div>
-                    
+
                     <Separator />
-                    
+
                     <div>
                       <h3 className="text-base font-medium text-slate-700 mb-3">Visual Style</h3>
                       <p className="text-xs text-slate-500 mb-4">Choose between playful or simplified UI design</p>
@@ -845,9 +849,9 @@ export default function SettingsPage() {
                         </div>
                       </div>
                     </div>
-                    
+
                     <Separator />
-                    
+
                     <div>
                       <h3 className="text-base font-medium text-slate-700 mb-3">Font Size</h3>
                       <p className="text-xs text-slate-500 mb-4">Adjust the text size for better readability</p>
@@ -870,7 +874,7 @@ export default function SettingsPage() {
                             <span className="text-xs font-medium">Small</span>
                           </div>
                         </div>
-                        
+
                         <div 
                           className={`relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 p-4 ${appearance.fontSize === "medium" ? 'ring-2 ring-primary bg-primary/5 dark:bg-primary/10' : 'ring-border'} hover:scale-[1.02] shadow-sm`}
                           onClick={() => setAppearance(prev => ({...prev, fontSize: "medium"}))}
@@ -890,7 +894,7 @@ export default function SettingsPage() {
                             <p className="text-[10px] text-muted-foreground">(Default)</p>
                           </div>
                         </div>
-                        
+
                         <div 
                           className={`relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 p-4 ${appearance.fontSize === "large" ? 'ring-2 ring-primary bg-primary/5 dark:bg-primary/10' : 'ring-border'} hover:scale-[1.02] shadow-sm`}
                           onClick={() => setAppearance(prev => ({...prev, fontSize: "large"}))}
@@ -911,7 +915,9 @@ export default function SettingsPage() {
                         </div>
                       </div>
                     </div>
-                    
+
+                    <Separator />
+
                     <Button 
                       className="w-full md:w-auto"
                       onClick={() => updateAppearance.mutate(appearance)}
