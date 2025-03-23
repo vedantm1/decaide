@@ -29,6 +29,8 @@ type MicroInteractionsContextType = {
   startOnboarding: () => void;
 };
 
+// Create context with default value of null
+// Named export for compatibility
 export const MicroInteractionsContext = createContext<MicroInteractionsContextType | null>(null);
 
 export function MicroInteractionsProvider({ children }: { children: ReactNode }) {

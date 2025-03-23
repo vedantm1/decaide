@@ -5,9 +5,10 @@
  * throughout the application, creating a lively and engaging user experience.
  */
 
+// @ts-ignore - Ignoring TS1259 error for canvas-confetti
 import confetti from 'canvas-confetti';
 
-// Animation Types
+// Animation Types - exported for use in other components
 export type AnimationType = 
   | 'confetti' | 'stars' | 'circles' | 'fireworks' | 'random'
   | 'sparkles' | 'bubbles' | 'waves' | 'dolphin' | 'tropical'
