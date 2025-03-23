@@ -5,8 +5,10 @@
  * throughout the application, creating a lively and engaging user experience.
  */
 
-// @ts-ignore - Ignoring TS1259 error for canvas-confetti
-import confetti from 'canvas-confetti';
+// Import confetti with proper type handling
+// @ts-ignore
+import * as confettiModule from 'canvas-confetti';
+const confetti = confettiModule.default || confettiModule;
 
 // Animation Types - exported for use in other components
 export type AnimationType = 
