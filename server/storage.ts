@@ -8,11 +8,21 @@ import {
 } from "@shared/schema";
 import session from "express-session";
 import createMemoryStore from "memorystore";
+import connectPg from "connect-pg-simple";
+import { db } from "./db";
+import { eq, desc, count, sql, getTableColumns, asc, and, isNull, isNotNull } from "drizzle-orm";
+import { users, performanceIndicators, practiceSessions } from "@shared/schema";
+import pg from "pg";
 
+// Create session stores
 const MemoryStore = createMemoryStore(session);
 
-// Define a SessionStore type alias to fix type issues
-type SessionStore = ReturnType<typeof createMemoryStore>;
+// Create PostgreSQL session store
+const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
+const PostgresSessionStore = connectPg(session);
+
+// Define a SessionStore type for both memory and PostgreSQL session stores
+type SessionStore = any;
 
 // Interface for storage methods
 export interface IStorage {
@@ -586,4 +596,551 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+// Implementation of DatabaseStorage using Drizzle ORM
+export class DatabaseStorage implements IStorage {
+  sessionStore: SessionStore;
+
+  constructor() {
+    // Initialize the PostgreSQL session store
+    this.sessionStore = new PostgresSessionStore({
+      pool,
+      createTableIfMissing: true,
+    });
+  }
+
+  // User methods
+  async getUser(id: number): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user;
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const now = new Date();
+    const sessionId = `session_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
+    
+    // Create the user with the default values
+    const [user] = await db.insert(users).values({
+      ...insertUser,
+      email: insertUser.email || null,
+      eventFormat: insertUser.eventFormat || null,
+      eventCode: insertUser.eventCode || null,
+      eventType: insertUser.eventType || null,
+      instructionalArea: insertUser.instructionalArea || null,
+      uiTheme: insertUser.uiTheme || "aquaBlue",
+      colorScheme: insertUser.colorScheme || "memphis",
+      subscriptionTier: "standard",
+      streak: 0,
+      lastLoginDate: now,
+      points: 0,
+      sessionId,
+      stripeCustomerId: null,
+      stripeSubscriptionId: null
+    }).returning();
+    
+    // Create default PIs for the user
+    await this.createDefaultPIs(user.id);
+    
+    return user;
+  }
+  
+  private async createDefaultPIs(userId: number) {
+    const samplePIs = [
+      { category: "Financial Analysis", indicator: "Explain the role of finance in business" },
+      { category: "Financial Analysis", indicator: "Implement budget management" },
+      { category: "Financial Analysis", indicator: "Analyze managerial accounting data" },
+      { category: "Financial Analysis", indicator: "Manage financial risks" },
+      { category: "Financial Analysis", indicator: "Explain the concept of ROI" },
+      { category: "Marketing", indicator: "Describe marketing functions and related activities" },
+      { category: "Marketing", indicator: "Explain the nature of marketing plans" },
+      { category: "Marketing", indicator: "Explain factors that influence customer behavior" },
+      { category: "Business Law", indicator: "Explain the civil results of unethical business behavior" },
+      { category: "Business Law", indicator: "Describe legal issues affecting businesses" }
+    ];
+    
+    for (const pi of samplePIs) {
+      await db.insert(performanceIndicators).values({
+        userId,
+        indicator: pi.indicator,
+        category: pi.category,
+        status: "not_started",
+        lastPracticed: null
+      });
+    }
+  }
+
+  async updateLastLogin(id: number, date: Date): Promise<User | undefined> {
+    const user = await this.getUser(id);
+    if (!user) return undefined;
+    
+    // Check if we need to update the streak
+    let streak = user.streak || 0;
+    if (user.lastLoginDate) {
+      const lastLogin = new Date(user.lastLoginDate);
+      const today = new Date();
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+      
+      // If last login was yesterday, increment streak
+      if (lastLogin.toDateString() === yesterday.toDateString()) {
+        streak += 1;
+      } 
+      // If last login was before yesterday, reset streak
+      else if (lastLogin < yesterday) {
+        streak = 1;
+      }
+      // Otherwise it's the same day, no streak change
+    } else {
+      streak = 1;
+    }
+    
+    const [updatedUser] = await db.update(users)
+      .set({ lastLoginDate: date, streak })
+      .where(eq(users.id, id))
+      .returning();
+    
+    return updatedUser;
+  }
+
+  async updateUserSettings(id: number, settings: { 
+    eventFormat?: string, 
+    eventCode?: string,
+    eventType?: string,
+    instructionalArea?: string,
+    uiTheme?: string,
+    colorScheme?: string
+  }): Promise<User | undefined> {
+    const user = await this.getUser(id);
+    if (!user) return undefined;
+    
+    const updateData: any = {};
+    if (settings.eventFormat) updateData.eventFormat = settings.eventFormat;
+    if (settings.eventCode) updateData.eventCode = settings.eventCode;
+    if (settings.eventType) updateData.eventType = settings.eventType;
+    if (settings.instructionalArea) updateData.instructionalArea = settings.instructionalArea;
+    if (settings.uiTheme) updateData.uiTheme = settings.uiTheme;
+    if (settings.colorScheme) updateData.colorScheme = settings.colorScheme;
+    
+    const [updatedUser] = await db.update(users)
+      .set(updateData)
+      .where(eq(users.id, id))
+      .returning();
+    
+    return updatedUser;
+  }
+
+  async updateSubscription(id: number, tier: string): Promise<User | undefined> {
+    const [updatedUser] = await db.update(users)
+      .set({ subscriptionTier: tier })
+      .where(eq(users.id, id))
+      .returning();
+    
+    return updatedUser;
+  }
+  
+  // Other methods would be implemented similarly using drizzle-orm
+  async updateStripeCustomerId(userId: number, customerId: string): Promise<User | undefined> {
+    const [updatedUser] = await db.update(users)
+      .set({ stripeCustomerId: customerId })
+      .where(eq(users.id, userId))
+      .returning();
+      
+    return updatedUser;
+  }
+  
+  async updateStripeSubscriptionId(userId: number, subscriptionId: string): Promise<User | undefined> {
+    const [updatedUser] = await db.update(users)
+      .set({ stripeSubscriptionId: subscriptionId })
+      .where(eq(users.id, userId))
+      .returning();
+      
+    return updatedUser;
+  }
+  
+  async updateUserStripeInfo(userId: number, info: { customerId: string, subscriptionId: string }): Promise<User | undefined> {
+    const [updatedUser] = await db.update(users)
+      .set({ 
+        stripeCustomerId: info.customerId,
+        stripeSubscriptionId: info.subscriptionId
+      })
+      .where(eq(users.id, userId))
+      .returning();
+      
+    return updatedUser;
+  }
+  
+  async getUserByStripeCustomerId(customerId: string): Promise<User | undefined> {
+    const [user] = await db.select()
+      .from(users)
+      .where(eq(users.stripeCustomerId, customerId));
+      
+    return user;
+  }
+  
+  // Performance Indicators methods
+  async getUserPIs(userId: number, category?: string): Promise<PerformanceIndicator[]> {
+    if (category) {
+      return db.select()
+        .from(performanceIndicators)
+        .where(
+          and(
+            eq(performanceIndicators.userId, userId),
+            eq(performanceIndicators.category, category)
+          )
+        );
+    } else {
+      return db.select()
+        .from(performanceIndicators)
+        .where(eq(performanceIndicators.userId, userId));
+    }
+  }
+  
+  async updatePIStatus(userId: number, piId: number, status: string): Promise<boolean> {
+    const pi = await db.select()
+      .from(performanceIndicators)
+      .where(
+        and(
+          eq(performanceIndicators.id, piId),
+          eq(performanceIndicators.userId, userId)
+        )
+      );
+      
+    if (pi.length === 0) return false;
+    
+    const now = new Date();
+    await db.update(performanceIndicators)
+      .set({ 
+        status,
+        lastPracticed: now
+      })
+      .where(eq(performanceIndicators.id, piId));
+      
+    // If completed, add points to the user
+    if (status === "completed") {
+      await db.update(users)
+        .set({ 
+          points: sql`${users.points} + 10`
+        })
+        .where(eq(users.id, userId));
+    }
+    
+    return true;
+  }
+  
+  // Practice sessions methods
+  async recordPracticeSession(sessionData: InsertSession): Promise<PracticeSession> {
+    const [session] = await db.insert(practiceSessions)
+      .values({
+        userId: sessionData.userId,
+        type: sessionData.type,
+        score: sessionData.score || null,
+        completedAt: sessionData.completedAt,
+        details: sessionData.details || null
+      })
+      .returning();
+      
+    // Add points to user
+    if (session.score) {
+      await db.update(users)
+        .set({ 
+          points: sql`${users.points} + ${session.score}`
+        })
+        .where(eq(users.id, sessionData.userId));
+    }
+    
+    return session;
+  }
+  
+  // We'll implement the remaining methods as needed
+  // These stubs follow the same pattern
+  
+  // Stats and activities
+  async getUserStats(userId: number): Promise<any> {
+    // Count roleplays
+    const roleplayCount = await db.select({ 
+      count: count() 
+    })
+    .from(practiceSessions)
+    .where(
+      and(
+        eq(practiceSessions.userId, userId),
+        eq(practiceSessions.type, "roleplay")
+      )
+    );
+    
+    // Count tests
+    const testCount = await db.select({ 
+      count: count() 
+    })
+    .from(practiceSessions)
+    .where(
+      and(
+        eq(practiceSessions.userId, userId),
+        eq(practiceSessions.type, "test")
+      )
+    );
+    
+    // Count completed PIs
+    const completedPICount = await db.select({ 
+      count: count() 
+    })
+    .from(performanceIndicators)
+    .where(
+      and(
+        eq(performanceIndicators.userId, userId),
+        eq(performanceIndicators.status, "completed")
+      )
+    );
+    
+    // Count total PIs
+    const totalPICount = await db.select({ 
+      count: count() 
+    })
+    .from(performanceIndicators)
+    .where(eq(performanceIndicators.userId, userId));
+    
+    return {
+      roleplays: roleplayCount[0].count,
+      tests: testCount[0].count,
+      completedPIs: completedPICount[0].count,
+      totalPIs: totalPICount[0].count
+    };
+  }
+  
+  async getUserActivities(userId: number): Promise<any[]> {
+    // Get recent practice sessions
+    const sessions = await db.select()
+      .from(practiceSessions)
+      .where(eq(practiceSessions.userId, userId))
+      .orderBy(desc(practiceSessions.completedAt))
+      .limit(10);
+      
+    const sessionActivities = sessions.map(session => {
+      let details;
+      try {
+        details = JSON.parse(session.details || "{}");
+      } catch (e) {
+        details = {};
+      }
+      
+      let title = "";
+      let description = "";
+      
+      if (session.type === "roleplay") {
+        title = "Completed Roleplay Practice";
+        description = details.title || "Roleplay scenario";
+      } else if (session.type === "test") {
+        title = "Practice Test Completed";
+        description = details.testType || "DECA Exam";
+      }
+      
+      return {
+        id: session.id,
+        type: session.type,
+        title,
+        description,
+        score: session.score,
+        date: session.completedAt
+      };
+    });
+    
+    // Get recent PI completions 
+    const piCompletions = await db.select()
+      .from(performanceIndicators)
+      .where(
+        and(
+          eq(performanceIndicators.userId, userId),
+          eq(performanceIndicators.status, "completed"),
+          isNotNull(performanceIndicators.lastPracticed)
+        )
+      )
+      .orderBy(desc(performanceIndicators.lastPracticed))
+      .limit(5);
+      
+    const piActivities = piCompletions.map(pi => {
+      return {
+        id: `pi-${pi.id}`,
+        type: "pi",
+        title: "Mastered Performance Indicator",
+        description: pi.indicator,
+        points: 10,
+        date: pi.lastPracticed
+      };
+    });
+    
+    // Combine and return
+    const allActivities = [...sessionActivities, ...piActivities];
+    allActivities.sort((a, b) => {
+      return new Date(b.date!).getTime() - new Date(a.date!).getTime();
+    });
+    
+    return allActivities.slice(0, 10);
+  }
+  
+  // Placeholder implementations for the rest of the required methods
+  // These would need to be completed for a full implementation
+  async getLearningItems(userId: number): Promise<any[]> {
+    // For demo purposes, returning similar data as MemStorage
+    return [
+      {
+        id: "roleplay-1",
+        type: "roleplay",
+        title: "Advanced Hospitality Roleplay",
+        description: "Customer Service Excellence - Hotel Management",
+        progress: 0.6,
+        category: "Hospitality & Tourism"
+      },
+      {
+        id: "written-1",
+        type: "written",
+        title: "Business Plan Development",
+        description: "Written event guidance with examples",
+        progress: 0.15,
+        category: "Entrepreneurship"
+      }
+    ];
+  }
+  
+  // Session management methods (simplified)
+  async updateUserSession(userId: number, sessionInfo: { id: string, createdAt: Date, lastActive: Date }): Promise<boolean> {
+    await db.update(users)
+      .set({ sessionId: sessionInfo.id })
+      .where(eq(users.id, userId));
+    return true;
+  }
+  
+  async validateUserSession(userId: number, sessionId: string): Promise<boolean> {
+    const [user] = await db.select()
+      .from(users)
+      .where(eq(users.id, userId));
+    
+    if (!user) return false;
+    return user.sessionId === sessionId;
+  }
+  
+  async invalidateOtherSessions(userId: number, currentSessionId: string): Promise<boolean> {
+    // In a database context, we don't need to track "other" sessions
+    // We just ensure the current one is set
+    await db.update(users)
+      .set({ sessionId: currentSessionId })
+      .where(eq(users.id, userId));
+    return true;
+  }
+  
+  async getUserSession(userId: number): Promise<{ id: string, createdAt: Date, lastActive: Date } | undefined> {
+    const [user] = await db.select()
+      .from(users)
+      .where(eq(users.id, userId));
+    
+    if (!user || !user.sessionId) return undefined;
+    
+    // We don't have separate createdAt/lastActive fields in our schema
+    // so we'll use lastLoginDate for both
+    return {
+      id: user.sessionId,
+      createdAt: user.lastLoginDate || new Date(),
+      lastActive: user.lastLoginDate || new Date()
+    };
+  }
+  
+  // These would be implemented with tables tracking usage in real DB
+  async checkRoleplayAllowance(userId: number): Promise<boolean> {
+    const [user] = await db.select()
+      .from(users)
+      .where(eq(users.id, userId));
+    
+    if (!user) return false;
+    
+    const tier = user.subscriptionTier as keyof typeof SUBSCRIPTION_LIMITS;
+    const limit = SUBSCRIPTION_LIMITS[tier].roleplays;
+    
+    // Always allow for unlimited tier (pro)
+    if (limit === -1) return true;
+    
+    // TODO: Implement proper usage tracking in DB
+    // For now, we'll assume under limit
+    return true;
+  }
+  
+  async checkTestAllowance(userId: number): Promise<boolean> {
+    const [user] = await db.select()
+      .from(users)
+      .where(eq(users.id, userId));
+    
+    if (!user) return false;
+    
+    const tier = user.subscriptionTier as keyof typeof SUBSCRIPTION_LIMITS;
+    const limit = SUBSCRIPTION_LIMITS[tier].tests;
+    
+    // Always allow for unlimited tier (pro)
+    if (limit === -1) return true;
+    
+    // TODO: Implement proper usage tracking in DB
+    // For now, we'll assume under limit
+    return true;
+  }
+  
+  async recordRoleplayGeneration(userId: number): Promise<void> {
+    // TODO: Implement usage tracking
+  }
+  
+  async recordTestGeneration(userId: number): Promise<void> {
+    // TODO: Implement usage tracking
+  }
+  
+  // Daily challenge - simplified 
+  async getDailyChallenge(userId: number): Promise<any> {
+    const [user] = await db.select()
+      .from(users)
+      .where(eq(users.id, userId));
+    
+    if (!user) throw new Error("User not found");
+    
+    // Find the event details from the user's eventCode
+    let category = "Finance";
+    if (user.eventCode) {
+      const format = user.eventFormat === "roleplay" ? "roleplay" : "written";
+      const event = DECA_EVENTS[format as keyof typeof DECA_EVENTS]?.find(e => e.code === user.eventCode);
+      if (event) {
+        category = event.category;
+      }
+    }
+    
+    // Find a matching PI category
+    const piCategory = PI_CATEGORIES.find(c => c.includes(category)) || "Financial Analysis";
+    
+    return {
+      id: `challenge-${Date.now()}`,
+      title: `Master 5 ${piCategory} Performance Indicators`,
+      description: "Complete today's challenge to earn 50 extra points!",
+      category: piCategory,
+      points: 50,
+      completed: false
+    };
+  }
+  
+  async completeDailyChallenge(userId: number): Promise<any> {
+    // Add points
+    await db.update(users)
+      .set({ 
+        points: sql`${users.points} + 50`
+      })
+      .where(eq(users.id, userId));
+    
+    return {
+      success: true,
+      message: "Challenge completed! +50 points awarded."
+    };
+  }
+}
+
+// Choose between MemStorage and DatabaseStorage based on environment
+const useDatabase = process.env.USE_DATABASE === 'true' || true; // Default to true
+
+export const storage = useDatabase 
+  ? new DatabaseStorage() 
+  : new MemStorage();
