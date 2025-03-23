@@ -3,9 +3,20 @@ import SuccessAnimation from '@/components/animations/success-animation';
 import BreakTimer from '@/components/break-timer';
 import BreakGameModal from '@/components/break-timer/break-game-modal';
 import { useToast } from '@/hooks/use-toast';
+import { playAnimation, AnimationType as AnimationEngineType } from '@/lib/animation-engine';
 
 // Animation types supported by our system
-type AnimationType = 'confetti' | 'stars' | 'circles' | 'fireworks' | 'random';
+type AnimationType = 
+  | 'confetti' | 'stars' | 'circles' | 'fireworks' | 'random'
+  | 'sparkles' | 'bubbles' | 'waves' | 'dolphin' | 'tropical'
+  | 'achievement' | 'celebrate' | 'success' | 'levelUp' | 'rewardUnlocked'
+  | 'rainbowTrail' | 'glitter' | 'paperPlane' | 'floatingNumbers'
+  | 'flipCard' | 'rotate3D' | 'bounce' | 'fadeScale' | 'slideSwing'
+  | 'popIn' | 'rollOut' | 'blinkFade' | 'wiggle' | 'tremble'
+  | 'heartbeat' | 'pulse' | 'flash' | 'tada' | 'jello' | 'rubber'
+  | 'swing' | 'wobble' | 'shake' | 'flip' | 'flipInX' | 'flipInY'
+  | 'fadeIn' | 'fadeInUp' | 'fadeInDown' | 'zoomIn' | 'jackInTheBox'
+  | 'lightSpeedIn' | 'rotateIn' | 'rollIn' | 'slideInUp' | 'slideInDown';
 
 // Define the context type with all micro-interaction functions
 type MicroInteractionsContextType = {
@@ -47,10 +58,20 @@ export function MicroInteractionsProvider({ children }: { children: ReactNode })
 
   // Trigger a success animation with optional message
   const triggerAnimation = useCallback((type: AnimationType = 'random', message?: string) => {
+    // Set state for the legacy animation component
     setAnimationDetails({
       trigger: true,
       type,
       message,
+    });
+    
+    // Also use our new animation engine for enhanced animations
+    playAnimation({
+      type: type as AnimationEngineType,
+      message,
+      particleCount: type === 'random' ? 150 : 100, // More particles for random animations
+      duration: 3000,
+      colorScheme: 'tropical', // Use tropical theme by default
     });
   }, []);
 
@@ -90,8 +111,8 @@ export function MicroInteractionsProvider({ children }: { children: ReactNode })
 
   // Show achievement notification with points
   const showAchievement = useCallback((title: string, description: string, points: number = 0) => {
-    // Trigger stars animation
-    triggerAnimation('stars');
+    // Trigger achievement-specific animations
+    triggerAnimation('achievement');
     
     // Show toast with achievement details
     toast({
@@ -132,11 +153,17 @@ export function MicroInteractionsProvider({ children }: { children: ReactNode })
     >
       {children}
       
-      {/* Success animation component */}
+      {/* Success animation component - only use for basic animation types that it supports */}
       <SuccessAnimation
         trigger={animationDetails.trigger}
         onComplete={handleAnimationComplete}
-        type={animationDetails.type}
+        type={animationDetails.type === 'confetti' || 
+              animationDetails.type === 'stars' || 
+              animationDetails.type === 'circles' || 
+              animationDetails.type === 'fireworks' || 
+              animationDetails.type === 'random' 
+                ? animationDetails.type 
+                : 'random'}
         message={animationDetails.message}
       />
       
