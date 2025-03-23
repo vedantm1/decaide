@@ -9,16 +9,14 @@ import {
 import session from "express-session";
 import createMemoryStore from "memorystore";
 import connectPg from "connect-pg-simple";
-import { db } from "./db";
+import { db, pool } from "./db";
 import { eq, desc, count, sql, getTableColumns, asc, and, isNull, isNotNull } from "drizzle-orm";
 import { users, performanceIndicators, practiceSessions } from "@shared/schema";
-import pg from "pg";
 
 // Create session stores
 const MemoryStore = createMemoryStore(session);
 
 // Create PostgreSQL session store
-const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
 const PostgresSessionStore = connectPg(session);
 
 // Define a SessionStore type for both memory and PostgreSQL session stores
@@ -602,9 +600,10 @@ export class DatabaseStorage implements IStorage {
 
   constructor() {
     // Initialize the PostgreSQL session store
+    // Use a string-based connection instead of passing a pool directly
     this.sessionStore = new PostgresSessionStore({
-      pool,
-      createTableIfMissing: true,
+      conString: process.env.DATABASE_URL,
+      createTableIfMissing: true
     });
   }
 
