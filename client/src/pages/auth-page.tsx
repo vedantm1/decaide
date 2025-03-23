@@ -98,11 +98,11 @@ export default function AuthPage() {
       colorScheme: "memphis"
     },
   });
-  
+
   // For managing UI theme selection
   const [selectedUiTheme, setSelectedUiTheme] = useState<string>("aquaBlue");
   const [selectedColorScheme, setSelectedColorScheme] = useState<string>("memphis");
-  
+
   // State to track event format selection for filtering the event list
   const [selectedEventFormat, setSelectedEventFormat] = useState<"roleplay" | "written" | null>(null);
 
@@ -112,10 +112,10 @@ export default function AuthPage() {
       navigate("/");
     }
   }, [user, navigate]);
-  
+
   // Use ref to track previous tab to prevent showing animation on initial render
   const prevTabRef = useRef<string | null>(null);
-  
+
   useEffect(() => {
     // Skip first render (when prevTabRef.current is null)
     if (prevTabRef.current !== null) {
@@ -124,28 +124,28 @@ export default function AuthPage() {
         triggerAnimation("stars", "Let's create your account!");
       }
     }
-    
+
     // Update previous tab reference
     prevTabRef.current = activeTab;
   }, [activeTab, triggerAnimation]);
-  
+
   // Using a ref to track previous format to prevent infinite loops
   const prevFormatRef = useRef<string | null>(null);
-  
+
   // Event format selection handler - moved outside useEffect to avoid dependency issues
   const handleEventFormatChange = useCallback((format: "roleplay" | "written") => {
     // Set the format in the form
     registerForm.setValue('eventFormat', format);
     setSelectedEventFormat(format);
-    
+
     // Only show animation if this is a new format selection
     if (prevFormatRef.current !== format) {
       prevFormatRef.current = format;
-      
+
       const message = format === "roleplay" 
         ? "Great choice! Role-play events are all about thinking on your feet."
         : "Excellent! Written events require detailed business plans.";
-      
+
       // Trigger animation with message
       triggerAnimation("stars", message);
     }
@@ -154,7 +154,7 @@ export default function AuthPage() {
   const onLoginSubmit = (values: z.infer<typeof loginSchema>) => {
     // Subtle animation for login
     triggerAnimation("random");
-    
+
     loginMutation.mutate(values, {
       onSuccess: () => {
         // Show success animation
@@ -169,13 +169,13 @@ export default function AuthPage() {
   const onRegisterSubmit = (values: z.infer<typeof registerSchema>) => {
     // Trigger animation when form is submitted
     triggerAnimation("confetti", "Creating your account! I'm excited to help you prepare for DECA success!");
-    
+
     // Submit the form data
     registerMutation.mutate(values, {
       onSuccess: () => {
         // Show success animation
         triggerAnimation("fireworks", "Welcome to DecA(I)de!");
-        
+
         // Set user as new to trigger Diego tutorial
         setIsNewUser(true);
       },
@@ -193,7 +193,7 @@ export default function AuthPage() {
   // Using useIsMobile hook to handle responsive functionality
   const isMobile = useIsMobile();
   const formRef = useRef<HTMLDivElement>(null);
-  
+
   // Use this effect to scroll the form into view on mobile when errors occur
   useEffect(() => {
     if (isMobile && (loginForm.formState.errors.username || loginForm.formState.errors.password || 
@@ -235,7 +235,7 @@ export default function AuthPage() {
                 <TabsTrigger value="login" className="dark:data-[state=active]:bg-[var(--surface-1)] dark:data-[state=active]:text-white">Login</TabsTrigger>
                 <TabsTrigger value="register" className="dark:data-[state=active]:bg-[var(--surface-1)] dark:data-[state=active]:text-white">Register</TabsTrigger>
               </TabsList>
-              
+
               {/* Login Form */}
               <TabsContent value="login">
                 <Form {...loginForm}>
@@ -281,7 +281,7 @@ export default function AuthPage() {
                   </form>
                 </Form>
               </TabsContent>
-              
+
               {/* Registration Form */}
               <TabsContent value="register">
                 <Form {...registerForm}>
@@ -313,7 +313,7 @@ export default function AuthPage() {
                         </FormItem>
                       )}
                     />
-                    
+
                     <FormField
                       control={registerForm.control}
                       name="email"
@@ -371,7 +371,7 @@ export default function AuthPage() {
                                 </div>
                               </div>
                             </div>
-                            
+
                             <div
                               className={`relative overflow-hidden rounded-lg border-2 transition-all cursor-pointer ${
                                 field.value === "written" 
@@ -433,17 +433,17 @@ export default function AuthPage() {
                                     {EVENT_TYPE_GROUPS.map(group => {
                                       // Only show events from the selected format and current group
                                       const events = DECA_EVENTS[selectedEventFormat].filter(event => event.type === group);
-                                      
+
                                       // If no events in this group, skip
                                       if (events.length === 0) return null;
-                                      
+
                                       return (
                                         <div key={group} className="px-1 mb-3">
                                           <h4 className="text-sm font-semibold mb-1">{group}</h4>
                                           {events.map(event => {
                                             // Get category color
                                             const categoryColor = DECA_CATEGORIES[event.category as keyof typeof DECA_CATEGORIES]?.colorClass || "bg-gray-300";
-                                            
+
                                             return (
                                               <SelectItem key={event.code} value={event.code} className="flex items-center">
                                                 <div className="flex items-center">
@@ -463,14 +463,14 @@ export default function AuthPage() {
                             </FormItem>
                           )}
                         />
-                        
+
                         {/* UI Theme Selection */}
                         <div className="mt-6">
                           <h3 className="text-md font-medium mb-2">Personalize Your Experience</h3>
                           <p className="text-sm text-muted-foreground mb-4">
                             Choose a theme that matches your style. You can change this later in settings.
                           </p>
-                          
+
                           <FormField
                             control={registerForm.control}
                             name="uiTheme"
@@ -495,11 +495,11 @@ export default function AuthPage() {
                                       </div>
                                       <div>
                                         <span className="text-xs font-medium text-blue-700">Aqua Blue</span>
-                                        <p className="text-xs text-slate-600 mt-0.5">Business & Finance</p>
+                                        <p className="text-xs text-slate-600 mt-0.5">As refreshing as a vacation expense report</p>
                                       </div>
                                     </div>
                                   </motion.div>
-                                  
+
                                   <motion.div 
                                     className={`relative overflow-hidden rounded-md cursor-pointer transition-all ${field.value === 'coralPink' ? 'ring-2 ring-primary shadow-md' : 'ring-1 ring-border'}`}
                                     whileHover={{ scale: 1.03 }}
@@ -516,11 +516,11 @@ export default function AuthPage() {
                                       </div>
                                       <div>
                                         <span className="text-xs font-medium text-pink-700">Coral Pink</span>
-                                        <p className="text-xs text-slate-600 mt-0.5">Marketing & Hospitality</p>
+                                        <p className="text-xs text-slate-600 mt-0.5">Like a sunset on your screen</p>
                                       </div>
                                     </div>
                                   </motion.div>
-                                  
+
                                   <motion.div 
                                     className={`relative overflow-hidden rounded-md cursor-pointer transition-all ${field.value === 'mintGreen' ? 'ring-2 ring-primary shadow-md' : 'ring-1 ring-border'}`}
                                     whileHover={{ scale: 1.03 }}
@@ -541,7 +541,7 @@ export default function AuthPage() {
                                       </div>
                                     </div>
                                   </motion.div>
-                                  
+
                                   <motion.div 
                                     className={`relative overflow-hidden rounded-md cursor-pointer transition-all ${field.value === 'royalPurple' ? 'ring-2 ring-primary shadow-md' : 'ring-1 ring-border'}`}
                                     whileHover={{ scale: 1.03 }}
@@ -567,7 +567,7 @@ export default function AuthPage() {
                               </FormItem>
                             )}
                           />
-                          
+
                           {/* Visual Style Selection */}
                           <FormField
                             control={registerForm.control}
@@ -590,7 +590,7 @@ export default function AuthPage() {
                                       <div className={`absolute top-6 left-2 w-12 h-2 rounded-md bg-${selectedUiTheme === 'aquaBlue' ? 'blue' : selectedUiTheme === 'coralPink' ? 'pink' : selectedUiTheme === 'mintGreen' ? 'green' : 'purple'}-400`}></div>
                                       <div className={`absolute bottom-2 right-8 w-6 h-6 rotate-45 bg-${selectedUiTheme === 'aquaBlue' ? 'cyan' : selectedUiTheme === 'coralPink' ? 'red' : selectedUiTheme === 'mintGreen' ? 'emerald' : 'indigo'}-200`}></div>
                                       <div className={`absolute left-14 top-10 w-3 h-3 rounded-full bg-${selectedUiTheme === 'aquaBlue' ? 'sky' : selectedUiTheme === 'coralPink' ? 'rose' : selectedUiTheme === 'mintGreen' ? 'teal' : 'violet'}-300`}></div>
-                                      
+
                                       {/* Zig-zag pattern as additional Memphis element */}
                                       <svg className="absolute bottom-10 right-2 w-14 h-3" viewBox="0 0 60 10">
                                         <path 
@@ -600,7 +600,7 @@ export default function AuthPage() {
                                           fill="none" 
                                         />
                                       </svg>
-                                      
+
                                       {/* Text with enough space */}
                                       <div className="absolute bottom-4 left-3 right-3">
                                         <span className={`text-sm font-bold block text-${selectedUiTheme === 'aquaBlue' ? 'blue' : selectedUiTheme === 'coralPink' ? 'pink' : selectedUiTheme === 'mintGreen' ? 'green' : 'purple'}-600`}>
@@ -624,10 +624,10 @@ export default function AuthPage() {
                                       <div className={`absolute top-4 left-4 w-12 h-0.5 bg-${selectedUiTheme === 'aquaBlue' ? 'blue' : selectedUiTheme === 'coralPink' ? 'pink' : selectedUiTheme === 'mintGreen' ? 'green' : 'purple'}-400`}></div>
                                       <div className={`absolute top-7 left-4 w-8 h-0.5 bg-${selectedUiTheme === 'aquaBlue' ? 'blue' : selectedUiTheme === 'coralPink' ? 'pink' : selectedUiTheme === 'mintGreen' ? 'green' : 'purple'}-300`}></div>
                                       <div className={`absolute top-10 left-4 w-5 h-0.5 bg-${selectedUiTheme === 'aquaBlue' ? 'blue' : selectedUiTheme === 'coralPink' ? 'pink' : selectedUiTheme === 'mintGreen' ? 'green' : 'purple'}-200`}></div>
-                                      
+
                                       {/* Add a subtle design element */}
                                       <div className={`absolute bottom-8 right-4 w-16 h-16 rounded-full bg-${selectedUiTheme === 'aquaBlue' ? 'blue' : selectedUiTheme === 'coralPink' ? 'pink' : selectedUiTheme === 'mintGreen' ? 'green' : 'purple'}-100`}></div>
-                                      
+
                                       {/* Text positioned with better spacing */}
                                       <div className="absolute bottom-4 left-3 right-3">
                                         <span className={`text-sm font-bold block text-${selectedUiTheme === 'aquaBlue' ? 'blue' : selectedUiTheme === 'coralPink' ? 'pink' : selectedUiTheme === 'mintGreen' ? 'green' : 'purple'}-600`}>
@@ -668,7 +668,7 @@ export default function AuthPage() {
           </CardFooter>
         </Card>
       </div>
-      
+
       {/* Right side - Hero section - Memphis Style */}
       <div className="hidden lg:flex lg:w-1/2 relative flex-col order-1 lg:order-2 bg-cyan-50 dark:bg-slate-900 text-slate-900 dark:text-white p-12 overflow-hidden">
         {/* Memphis style background patterns with high saturation */}
@@ -676,14 +676,14 @@ export default function AuthPage() {
         <div className="absolute bottom-20 right-14 w-40 h-40 bg-secondary/80 dark:bg-secondary/70 rounded-lg rotate-12 shadow-md" />
         <div className="absolute top-40 right-12 w-24 h-24 bg-accent/80 dark:bg-accent/70 rounded-full shadow-md" />
         <div className="absolute bottom-60 left-10 w-28 h-28 bg-yellow-500/90 dark:bg-yellow-600/80 rounded-lg -rotate-12 shadow-md" />
-        
+
         {/* Zigzag pattern with enhanced visibility */}
         <div className="absolute top-40 left-1/2 transform -translate-x-1/2 w-48 h-8">
           <svg viewBox="0 0 160 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M0 0L20 24L40 0L60 24L80 0L100 24L120 0L140 24L160 0" stroke="rgba(59, 130, 246, 0.8)" strokeWidth="4" fill="none" />
           </svg>
         </div>
-        
+
         {/* Enhanced Dolphin mascot */}
         <div className="absolute bottom-10 right-8 w-40 h-40">
           <div className="w-full h-full relative">
@@ -696,19 +696,19 @@ export default function AuthPage() {
                     d="M-25,-10 C-40,-25 -20,-40 0,-35 C20,-40 35,-20 30,0 C25,20 5,35 -10,25 C-25,15 -30,0 -25,-10 Z" 
                     fill="#60A5FA" 
                   />
-                  
+
                   {/* Dolphin fin */}
                   <path 
                     d="M20,-15 C30,-25 35,-15 30,-5 C25,-8 20,-10 20,-15 Z" 
                     fill="#3B82F6" 
                   />
-                  
+
                   {/* Dolphin snout */}
                   <path 
                     d="M-25,-10 C-35,-5 -40,5 -30,10 C-25,12 -20,10 -15,5 C-20,0 -25,-5 -25,-10 Z" 
                     fill="#93C5FD" 
                   />
-                  
+
                   {/* Dolphin smile */}
                   <path 
                     d="M-20,5 Q-10,15 5,5" 
@@ -717,13 +717,13 @@ export default function AuthPage() {
                     strokeWidth="2.5" 
                     strokeLinecap="round" 
                   />
-                  
+
                   {/* Eyes */}
                   <circle cx="-15" cy="-5" r="4" fill="white" />
                   <circle cx="0" cy="-10" r="4" fill="white" />
                   <circle cx="-15" cy="-5" r="2" fill="black" />
                   <circle cx="0" cy="-10" r="2" fill="black" />
-                  
+
                   {/* Water splash effect - enhanced */}
                   <path 
                     d="M-30,20 C-25,15 -15,25 -10,20 C-5,25 5,15 10,20 C15,15 25,25 30,20" 
@@ -738,13 +738,13 @@ export default function AuthPage() {
             </div>
           </div>
         </div>
-        
+
         <div className="h-full flex flex-col justify-center max-w-lg mx-auto z-10">
           <div className="inline-flex items-center mb-6 bg-primary/60 px-4 py-2 rounded-lg shadow-sm">
             <span className="inline-block mr-2 w-3 h-3 bg-primary rounded-full shadow-sm"></span>
             <h2 className="text-xl font-heading font-bold text-slate-800 drop-shadow-sm">DECA AI Preparation</h2>
           </div>
-          
+
           <h1 className="text-4xl md:text-5xl font-heading font-bold mb-8 text-slate-800 dark:text-white">
             <span className="relative inline-block mb-2">
               <span className="relative z-10 px-3 py-1">Master DECA with</span>
@@ -756,7 +756,7 @@ export default function AuthPage() {
               <span className="absolute inset-0 bg-accent/90 dark:bg-accent/80 -rotate-1 rounded-md"></span>
             </span>
           </h1>
-          
+
           <div className="space-y-6 mb-10">
             <div className="flex items-start bg-blue-200/90 dark:bg-blue-800/90 p-3 rounded-lg shadow-sm transform hover:scale-102 transition-transform duration-200">
               <div className="mr-4 flex-shrink-0 w-12 h-12 bg-blue-400 dark:bg-blue-600 rounded-lg flex items-center justify-center shadow-sm">
@@ -770,7 +770,7 @@ export default function AuthPage() {
                 <p className="text-slate-700 dark:text-blue-100 mt-1">Practice with unlimited roleplay scenarios tailored to your event</p>
               </div>
             </div>
-            
+
             <div className="flex items-start bg-accent/40 dark:bg-accent/50 p-3 rounded-lg shadow-sm transform hover:scale-102 transition-transform duration-200">
               <div className="mr-4 flex-shrink-0 w-12 h-12 bg-accent/70 dark:bg-accent/80 rounded-lg flex items-center justify-center shadow-sm">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white"><path d="M16 6H3"></path><path d="M11 12H3"></path><path d="M7 18H3"></path><path d="M12 18a5 5 0 0 0 9-3 4.5 4.5 0 0 0-4.5-4.5c-1.33 0-2.54.54-3.41 1.41L11 14"></path></svg>
@@ -783,7 +783,7 @@ export default function AuthPage() {
                 <p className="text-slate-700 dark:text-blue-100 mt-1">Learn and practice essential performance indicators with real-world examples</p>
               </div>
             </div>
-            
+
             <div className="flex items-start bg-yellow-200/80 dark:bg-yellow-800/80 p-3 rounded-lg shadow-sm transform hover:scale-102 transition-transform duration-200">
               <div className="mr-4 flex-shrink-0 w-12 h-12 bg-yellow-400 dark:bg-yellow-600 rounded-lg flex items-center justify-center shadow-sm">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-yellow-800 dark:text-white"><path d="M12 20v-6"></path><path d="M6 20v-6"></path><path d="M18 20v-6"></path><path d="M17 14h1a2 2 0 0 0 2-2V5a1 1 0 0 0-1-1h-6V2.12c0-.59-.26-1.05-.59-1.06-.32 0-.59.45-.59 1.04L11.97 4H5.95a.94.94 0 0 0-.9.94c0 .13.05.25.09.36C5.11 5.73 5.95 8 9 8h7.33a2 2 0 0 0 1.9-1.37"></path><path d="M12 20a2 2 0 0 0 4 0"></path><path d="M6 20a2 2 0 0 0 4 0"></path><path d="M18 20a2 2 0 0 0 4 0"></path></svg>
@@ -797,7 +797,7 @@ export default function AuthPage() {
               </div>
             </div>
           </div>
-          
+
           <div className="inline-block relative bg-gradient-to-r from-blue-300/80 to-blue-200/80 dark:from-blue-700 dark:to-blue-900 rounded-lg px-6 py-4 border-2 border-primary/50 dark:border-primary/70 shadow-md">
             <div className="flex items-center space-x-4">
               <div className="rounded-full bg-primary/60 dark:bg-primary/80 h-12 w-12 flex items-center justify-center text-white shadow-sm">

@@ -477,7 +477,7 @@ export default function SettingsPage() {
                           className={`border ${appearance.theme === "light" ? 'border-primary ring-2 ring-primary/30' : 'border-slate-200 dark:border-[var(--dark-border)]'} rounded-lg overflow-hidden cursor-pointer shadow-sm transition-all hover:scale-[1.02] bg-white dark:bg-white`}
                           onClick={() => setAppearance(prev => ({...prev, theme: "light"}))}
                         >
-                          <div className="w-full h-24 bg-gradient-to-b from-white to-blue-50 mb-0 rounded-t relative">
+                          <div className="w-full h-32 bg-gradient-to-b from-white to-blue-50 mb-0 rounded-t relative"> {/* Increased height */}
                             {appearance.theme === "light" && (
                               <div className="absolute top-2 right-2 bg-white rounded-full shadow p-0.5">
                                 <CheckIcon className="h-4 w-4 text-primary" />
@@ -490,7 +490,7 @@ export default function SettingsPage() {
                           className={`border ${appearance.theme === "dark" ? 'border-primary ring-2 ring-primary/30' : 'border-slate-200 dark:border-[var(--dark-border)]'} rounded-lg overflow-hidden cursor-pointer shadow-sm transition-all hover:scale-[1.02]`}
                           onClick={() => setAppearance(prev => ({...prev, theme: "dark"}))}
                         >
-                          <div className="w-full h-24 bg-gradient-to-b from-slate-700 to-slate-900 mb-0 rounded-t relative">
+                          <div className="w-full h-32 bg-gradient-to-b from-slate-700 to-slate-900 mb-0 rounded-t relative"> {/* Increased height */}
                             {appearance.theme === "dark" && (
                               <div className="absolute top-2 right-2 bg-white dark:bg-[var(--dark-bg-tertiary)] rounded-full shadow p-0.5">
                                 <CheckIcon className="h-4 w-4 text-primary" />
@@ -503,7 +503,7 @@ export default function SettingsPage() {
                           className={`border ${appearance.theme === "system" ? 'border-primary ring-2 ring-primary/30' : 'border-slate-200 dark:border-[var(--dark-border)]'} rounded-lg overflow-hidden cursor-pointer shadow-sm transition-all hover:scale-[1.02]`}
                           onClick={() => setAppearance(prev => ({...prev, theme: "system"}))}
                         >
-                          <div className="w-full h-24 bg-gradient-to-b from-white to-slate-800 mb-0 rounded-t relative">
+                          <div className="w-full h-32 bg-gradient-to-b from-white to-slate-800 mb-0 rounded-t relative"> {/* Increased height */}
                             <div className="absolute top-0 left-0 w-1/2 h-full bg-white"></div>
                             {appearance.theme === "system" && (
                               <div className="absolute top-2 right-2 bg-white dark:bg-[var(--dark-bg-tertiary)] rounded-full shadow p-0.5">
@@ -526,7 +526,7 @@ export default function SettingsPage() {
                           className={`relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ${appearance.colorScheme === "business" ? 'ring-yellow-500 ring-2' : 'ring-border'} hover:scale-[1.02] shadow-sm`}
                           onClick={() => setAppearance(prev => ({...prev, colorScheme: "business"}))}
                         >
-                          <div className="p-4 h-28 flex flex-col justify-between bg-gradient-to-b from-white to-yellow-50 relative">
+                          <div className="p-4 h-36 flex flex-col justify-between bg-gradient-to-b from-white to-yellow-50 relative"> {/* Increased height */}
                             {appearance.colorScheme === "business" ? (
                               <div className="deca-cluster-badge bg-yellow-500">BMA</div>
                             ) : (
@@ -556,7 +556,7 @@ export default function SettingsPage() {
                           className={`relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ${appearance.colorScheme === "finance" ? 'ring-green-500 ring-2' : 'ring-border'} hover:scale-[1.02] shadow-sm`}
                           onClick={() => setAppearance(prev => ({...prev, colorScheme: "finance"}))}
                         >
-                          <div className="p-4 h-28 flex flex-col justify-between bg-gradient-to-b from-white to-green-50 relative">
+                          <div className="p-4 h-36 flex flex-col justify-between bg-gradient-to-b from-white to-green-50 relative"> {/* Increased height */}
                             {appearance.colorScheme === "finance" ? (
                               <div className="deca-cluster-badge bg-green-600">FIN</div>
                             ) : (
@@ -586,7 +586,7 @@ export default function SettingsPage() {
                           className={`relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ${appearance.colorScheme === "hospitality" ? 'ring-blue-500 ring-2' : 'ring-border'} hover:scale-[1.02] shadow-sm`}
                           onClick={() => setAppearance(prev => ({...prev, colorScheme: "hospitality"}))}
                         >
-                          <div className="p-4 h-28 flex flex-col justify-between bg-gradient-to-b from-white to-blue-50 relative">
+                          <div className="p-4 h-36 flex flex-col justify-between bg-gradient-to-b from-white to-blue-50 relative"> {/* Increased height */}
                             {appearance.colorScheme === "hospitality" ? (
                               <div className="deca-cluster-badge bg-blue-500">HOSP</div>
                             ) : (
@@ -616,7 +616,7 @@ export default function SettingsPage() {
                           className={`relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ${appearance.colorScheme === "marketing" ? 'ring-red-500 ring-2' : 'ring-border'} hover:scale-[1.02] shadow-sm`}
                           onClick={() => setAppearance(prev => ({...prev, colorScheme: "marketing"}))}
                         >
-                          <div className="p-4 h-28 flex flex-col justify-between bg-gradient-to-b from-white to-red-50 relative">
+                          <div className="p-4 h-36 flex flex-col justify-between bg-gradient-to-b from-white to-red-50 relative"> {/* Increased height */}
                             {appearance.colorScheme === "marketing" ? (
                               <div className="deca-cluster-badge bg-red-500">MKTG</div>
                             ) : (
@@ -646,7 +646,7 @@ export default function SettingsPage() {
                           className={`relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ${appearance.colorScheme === "entrepreneurship" ? 'ring-gray-500 ring-2' : 'ring-border'} hover:scale-[1.02] shadow-sm`}
                           onClick={() => setAppearance(prev => ({...prev, colorScheme: "entrepreneurship"}))}
                         >
-                          <div className="p-4 h-28 flex flex-col justify-between bg-gradient-to-b from-white to-gray-50 relative">
+                          <div className="p-4 h-36 flex flex-col justify-between bg-gradient-to-b from-white to-gray-50 relative"> {/* Increased height */}
                             {appearance.colorScheme === "entrepreneurship" ? (
                               <div className="deca-cluster-badge bg-gray-500">ENTR</div>
                             ) : (
@@ -676,7 +676,7 @@ export default function SettingsPage() {
                           className={`relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ${appearance.colorScheme === "admin" ? 'ring-indigo-700 ring-2' : 'ring-border'} hover:scale-[1.02] shadow-sm`}
                           onClick={() => setAppearance(prev => ({...prev, colorScheme: "admin"}))}
                         >
-                          <div className="p-4 h-28 flex flex-col justify-between bg-gradient-to-b from-white to-indigo-50 relative">
+                          <div className="p-4 h-36 flex flex-col justify-between bg-gradient-to-b from-white to-indigo-50 relative"> {/* Increased height */}
                             {appearance.colorScheme === "admin" ? (
                               <div className="deca-cluster-badge bg-indigo-700">BAC</div>
                             ) : (
@@ -696,8 +696,7 @@ export default function SettingsPage() {
                                       {code}
                                     </Badge>
                                   ))}
-                                </div>
-                              </div>
+                                </div>                              </div>
                             </div>
                           </div>
                         </div>
@@ -713,7 +712,7 @@ export default function SettingsPage() {
                           className={`relative overflow-hidden rounded-md cursorpointer transition-all ring-1 ${appearance.colorScheme === "aquaBlue" ? 'ring-blue-500 ring-2' : 'ring-border'} hover:scale-[1.02] shadow-sm`}
                           onClick={() => setAppearance(prev => ({...prev, colorScheme: "aquaBlue"}))}
                         >
-                          <div className="p-4 h-24 flex flex-col justify-between bg-gradient-to-b from-white to-blue-50 dark:from-slate-800 dark:to-blue-950 relative">
+                          <div className="p-4 h-32 flex flex-col justify-between bg-gradient-to-b from-white to-blue-50 dark:from-slate-800 dark:to-blue-950 relative"> {/* Increased height */}
                             {appearance.colorScheme === "aquaBlue" && (
                               <div className="absolute top-2 right-2 bg-white dark:bg-slate-700 rounded-full shadow p-0.5">
                                 <CheckIcon className="h-3 w-3 text-blue-500" />
@@ -735,7 +734,7 @@ export default function SettingsPage() {
                           className={`relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ${appearance.colorScheme === "coralPink" ? 'ring-pink-500 ring-2' : 'ring-border'} hover:scale-[1.02] shadow-sm`}
                           onClick={() => setAppearance(prev => ({...prev, colorScheme: "coralPink"}))}
                         >
-                          <div className="p-4 h-24 flex flex-col justify-between bg-gradient-to-b from-white to-pink-50 dark:from-slate-800 dark:to-pink-950 relative">
+                          <div className="p-4 h-32 flex flex-col justify-between bg-gradient-to-b from-white to-pink-50 dark:from-slate-800 dark:to-pink-950 relative"> {/* Increased height */}
                             {appearance.colorScheme === "coralPink" && (
                               <div className="absolute top-2 right-2 bg-white dark:bg-slate-700 rounded-full shadow p-0.5">
                                 <CheckIcon className="h-3 w-3 text-pink-500" />
@@ -757,7 +756,7 @@ export default function SettingsPage() {
                           className={`relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ${appearance.colorScheme === "mintGreen" ? 'ring-green-500 ring-2' : 'ring-border'} hover:scale-[1.02] shadow-sm`}
                           onClick={() => setAppearance(prev => ({...prev, colorScheme: "mintGreen"}))}
                         >
-                          <div className="p-4 h-24 flex flex-col justify-between bg-gradient-to-b from-white to-green-50 dark:from-slate-800 dark:to-green-950 relative">
+                          <div className="p-4 h-32 flex flex-col justify-between bg-gradient-to-b from-white to-green-50 dark:from-slate-800 dark:to-green-950 relative"> {/* Increased height */}
                             {appearance.colorScheme === "mintGreen" && (
                               <div className="absolute top-2 right-2 bg-white dark:bg-slate-700 rounded-full shadow p-0.5">
                                 <CheckIcon className="h-3 w-3 text-green-500" />
@@ -779,7 +778,7 @@ export default function SettingsPage() {
                           className={`relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ${appearance.colorScheme === "royalPurple" ? 'ring-purple-500 ring-2' : 'ring-border'} hover:scale-[1.02] shadow-sm`}
                           onClick={() => setAppearance(prev => ({...prev, colorScheme: "royalPurple"}))}
                         >
-                          <div className="p-4 h-24 flex flex-col justify-between bg-gradient-to-b from-white to-purple-50 dark:from-slate-800 dark:to-purple-950 relative">
+                          <div className="p-4 h-32 flex flex-col justify-between bg-gradient-to-b from-white to-purple-50 dark:from-slate-800 dark:to-purple-950 relative"> {/* Increased height */}
                             {appearance.colorScheme === "royalPurple" && (
                               <div className="absolute top-2 right-2 bg-white dark:bg-slate-700 rounded-full shadow p-0.5">
                                 <CheckIcon className="h-3 w-3 text-purple-500" />
@@ -809,7 +808,7 @@ export default function SettingsPage() {
                           className={`relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 hover:scale-[1.02] shadow-sm ${appearance.visualStyle === "memphis" ? 'ring-2 ring-primary' : 'ring-border'}`}
                           onClick={() => setAppearance(prev => ({...prev, visualStyle: "memphis"}))}
                         >
-                          <div className="p-4 h-28 bg-white dark:bg-[var(--dark-gradient-v-default)] bg-opacity-90 relative rounded-md overflow-hidden">
+                          <div className="p-4 h-36 bg-white dark:bg-[var(--dark-gradient-v-default)] bg-opacity-90 relative rounded-md overflow-hidden"> {/* Increased height */}
                             {/* Memphis-style patterns */}
                             <div className="absolute -right-2 -top-2 w-10 h-10 rounded-full bg-blue-300 dark:bg-blue-600 opacity-80"></div>
                             <div className="absolute top-6 left-2 w-12 h-2 rounded-md bg-blue-400 dark:bg-blue-700 opacity-90"></div>
@@ -831,7 +830,7 @@ export default function SettingsPage() {
                           className={`relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 hover:scale-[1.02] shadow-sm ${appearance.visualStyle === "minimalist" ? 'ring-2 ring-primary' : 'ring-border'}`}
                           onClick={() => setAppearance(prev => ({...prev, visualStyle: "minimalist"}))}
                         >
-                          <div className="p-4 h-28 bg-white dark:bg-[var(--dark-gradient-v-default)] relative rounded-md overflow-hidden">
+                          <div className="p-4 h-36 bg-white dark:bg-[var(--dark-gradient-v-default)] relative rounded-md overflow-hidden"> {/* Increased height */}
                             {/* Clean minimalist design */}
                             <div className="absolute top-4 left-4 w-10 h-2 rounded-full bg-blue-400 opacity-75"></div>
                             <div className="absolute top-8 left-4 w-6 h-2 rounded-full bg-blue-300 opacity-75"></div>
