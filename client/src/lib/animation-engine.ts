@@ -368,6 +368,62 @@ const playFireworks = (params: AnimationParams = {}): void => {
   }
 };
 
+// Play achievement animation (trophy + stars + message)
+const playAchievementAnimation = (params: AnimationParams = {}): void => {
+  const mergedParams = mergeParams({
+    ...params,
+    particleCount: params.particleCount || 150,
+    spread: params.spread || 100,
+    startVelocity: params.startVelocity || 45
+  });
+  const colors = getColors(mergedParams);
+  
+  // First wave: Trophy-like particle burst
+  confetti({
+    particleCount: Math.floor(mergedParams.particleCount! * 0.4),
+    spread: mergedParams.spread,
+    startVelocity: mergedParams.startVelocity,
+    decay: 0.9,
+    gravity: 1,
+    ticks: 200,
+    origin: { y: 0.5, x: 0.5 },
+    colors: colors,
+    shapes: ['square'],
+    scalar: 1.2
+  });
+  
+  // Second wave: Star particles around it
+  setTimeout(() => {
+    confetti({
+      particleCount: Math.floor(mergedParams.particleCount! * 0.6),
+      spread: mergedParams.spread! * 1.2,
+      startVelocity: mergedParams.startVelocity! * 0.8,
+      decay: 0.85,
+      gravity: 0.8,
+      ticks: 200,
+      origin: { y: 0.5, x: 0.5 },
+      colors: colors,
+      shapes: ['star'],
+      scalar: 1
+    });
+  }, 250);
+  
+  // Display a trophy icon or animation if an element is provided
+  if (mergedParams.element) {
+    applyCssAnimation(
+      mergedParams.element, 
+      'achievement-unlocked', 
+      mergedParams.duration || 2000,
+      mergedParams.timingFunction || 'ease-out'
+    );
+  }
+  
+  // If a message is provided, display it prominently
+  if (mergedParams.message) {
+    displayAnimationMessage(mergedParams.message, mergedParams.duration || 2500);
+  }
+};
+
 // Apply CSS animation to an element
 const applyCssAnimation = (
   element: HTMLElement, 
@@ -550,5 +606,6 @@ export default {
   stars: playStars,
   circles: playCircles,
   fireworks: playFireworks,
+  achievement: playAchievementAnimation,
   randomAnimation: getRandomAnimation,
 };
