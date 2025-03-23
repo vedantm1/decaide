@@ -691,7 +691,7 @@ export default function SettingsPage() {
                               <span className="text-xs font-medium text-indigo-800">Business Admin Core</span>
                               <div className="mt-1 space-y-1">
                                 <div className="flex flex-wrap gap-1">
-                                  {['PFL', 'PBM', 'PMK'].map(code => (
+                                  {['PFN', 'PBM', 'PMK'].map(code => (
                                     <Badge key={code} variant="outline" className="text-[10px] py-0 h-4 bg-indigo-100 text-indigo-800 hover:bg-indigo-100 border-indigo-200">
                                       {code}
                                     </Badge>
