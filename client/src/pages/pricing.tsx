@@ -297,7 +297,7 @@ export default function PricingPage() {
               </div>
 
               <div className="text-center md:text-right">
-                <div className="text-sm text-slate-500 dark:text-slate-400">© 2023 DecA(I)de. All rights reserved.</div>
+                <div className="text-sm text-slate-500 dark:text-slate-400">© 2025 DecA(I)de. All rights reserved.</div>
                 <div className="text-xs text-slate-400 dark:text-slate-500 mt-1">Who says there is no I in team?</div>
               </div>
             </div>
