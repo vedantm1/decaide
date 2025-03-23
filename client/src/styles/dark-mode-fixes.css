@@ -108,10 +108,21 @@ html.dark .bg-white, html[data-theme="dark"] .bg-white {
   color: var(--dark-text-primary) !important;
 }
 
-/* Fix slate backgrounds */
-html.dark .bg-slate-50, html.dark .bg-slate-100, html.dark .bg-slate-200,
-html[data-theme="dark"] .bg-slate-50, html[data-theme="dark"] .bg-slate-100, html[data-theme="dark"] .bg-slate-200 {
+/* Fix slate backgrounds, but preserve light theme box */
+html.dark .bg-slate-50:not([data-theme-option="light"]), 
+html.dark .bg-slate-100:not([data-theme-option="light"]), 
+html.dark .bg-slate-200:not([data-theme-option="light"]),
+html[data-theme="dark"] .bg-slate-50:not([data-theme-option="light"]), 
+html[data-theme="dark"] .bg-slate-100:not([data-theme-option="light"]), 
+html[data-theme="dark"] .bg-slate-200:not([data-theme-option="light"]) {
   background-color: var(--dark-bg-primary) !important;
+}
+
+/* Light theme box in dark mode */
+html.dark [data-theme-option="light"],
+html[data-theme="dark"] [data-theme-option="light"] {
+  background-color: #ffffff !important;
+  color: #000000 !important;
 }
 
 /* Settings page fixes */
