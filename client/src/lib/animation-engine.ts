@@ -5,12 +5,9 @@
  * throughout the application, creating a lively and engaging user experience.
  */
 
-// Import confetti with proper type handling
-// @ts-ignore
-import * as confettiModule from 'canvas-confetti';
-const confetti = confettiModule.default || confettiModule;
+import confetti from 'canvas-confetti';
 
-// Animation Types - exported for use in other components
+// Animation Types
 export type AnimationType = 
   | 'confetti' | 'stars' | 'circles' | 'fireworks' | 'random'
   | 'sparkles' | 'bubbles' | 'waves' | 'dolphin' | 'tropical'
@@ -371,99 +368,6 @@ const playFireworks = (params: AnimationParams = {}): void => {
   }
 };
 
-// Achievement animation that combines multiple effects
-const playAchievementAnimation = (params: AnimationParams = {}): void => {
-  const mergedParams = mergeParams(params);
-  const colors = getColors(mergedParams);
-  
-  // Create a container for the achievement animation
-  const container = document.createElement('div');
-  container.className = 'fixed inset-0 pointer-events-none z-50 flex items-center justify-center';
-  document.body.appendChild(container);
-  
-  // Create trophy icon that zooms in
-  const trophy = document.createElement('div');
-  trophy.className = 'relative zoomIn animate-slow';
-  trophy.innerHTML = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-yellow-500">
-      <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
-      <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
-      <path d="M4 22h16"></path>
-      <path d="M10 22v-4"></path>
-      <path d="M14 22v-4"></path>
-      <path d="M12 22v-4"></path>
-      <path d="M8 6h8"></path>
-      <path d="M9 12v-6"></path>
-      <path d="M15 12v-6"></path>
-      <path d="M12 16a4 4 0 0 0 4-4v-4H8v4a4 4 0 0 0 4 4Z"></path>
-    </svg>
-    <div class="absolute -top-2 -right-2 flex space-x-1">
-      ${Array(3).fill(0).map(() => `
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="${randomFrom(colors)}" class="animate-pulse">
-          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-        </svg>
-      `).join('')}
-    </div>
-  `;
-  container.appendChild(trophy);
-  
-  // Create stars that appear after the trophy
-  setTimeout(() => {
-    // Add background stars
-    for (let i = 0; i < 20; i++) {
-      const star = document.createElement('div');
-      star.className = `absolute ${randomFrom(['fadeIn', 'zoomIn', 'fadeInUp'])} animate-delay-${i % 5 + 1}`;
-      star.style.left = `${Math.random() * 100}%`;
-      star.style.top = `${Math.random() * 100}%`;
-      
-      // Create star shape
-      const starSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      starSvg.setAttribute('width', '16');
-      starSvg.setAttribute('height', '16');
-      starSvg.setAttribute('viewBox', '0 0 24 24');
-      
-      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-      path.setAttribute('d', 'M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z');
-      path.setAttribute('fill', randomFrom(colors));
-      
-      starSvg.appendChild(path);
-      star.appendChild(starSvg);
-      container.appendChild(star);
-    }
-    
-    // Add confetti after stars
-    confetti({
-      particleCount: 100,
-      spread: 70,
-      origin: { y: 0.6 },
-      colors: colors,
-    });
-  }, 400);
-  
-  // Display achievement message
-  if (mergedParams.message) {
-    setTimeout(() => {
-      const messageEl = document.createElement('div');
-      messageEl.className = 'absolute top-2/3 left-1/2 transform -translate-x-1/2 bg-background/90 dark:bg-gray-900/90 backdrop-blur-sm text-foreground dark:text-white px-8 py-4 rounded-xl text-center shadow-xl bounceIn max-w-[80vw]';
-      messageEl.innerHTML = `
-        <h3 class="text-2xl font-bold mb-2">${mergedParams.message}</h3>
-        <p class="text-sm opacity-80">Achievement Unlocked</p>
-      `;
-      container.appendChild(messageEl);
-    }, 600);
-  }
-  
-  // Remove the animation container after duration
-  setTimeout(() => {
-    container.classList.add('fadeOut');
-    setTimeout(() => {
-      if (container.parentNode) {
-        document.body.removeChild(container);
-      }
-    }, 1000);
-  }, mergedParams.duration);
-};
-
 // Apply CSS animation to an element
 const applyCssAnimation = (
   element: HTMLElement, 
@@ -646,6 +550,5 @@ export default {
   stars: playStars,
   circles: playCircles,
   fireworks: playFireworks,
-  achievement: playAchievementAnimation,
   randomAnimation: getRandomAnimation,
 };

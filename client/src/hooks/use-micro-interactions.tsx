@@ -1,8 +1,3 @@
-/**
- * Micro-Interactions Hook and Context Provider
- * This provides a centralized system for triggering various animations and micro-interactions
- * throughout the application, enhancing user experience.
- */
 import { createContext, ReactNode, useContext, useState, useCallback } from 'react';
 import SuccessAnimation from '@/components/animations/success-animation';
 import BreakTimer from '@/components/break-timer';
@@ -11,7 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 import { playAnimation, AnimationType as AnimationEngineType } from '@/lib/animation-engine';
 
 // Animation types supported by our system
-export type AnimationType = 
+type AnimationType = 
   | 'confetti' | 'stars' | 'circles' | 'fireworks' | 'random'
   | 'sparkles' | 'bubbles' | 'waves' | 'dolphin' | 'tropical'
   | 'achievement' | 'celebrate' | 'success' | 'levelUp' | 'rewardUnlocked'
@@ -34,15 +29,12 @@ type MicroInteractionsContextType = {
   startOnboarding: () => void;
 };
 
-// Create context with null default value
-// We maintain this as a named export for compatibility with existing code
 export const MicroInteractionsContext = createContext<MicroInteractionsContextType | null>(null);
 
-// Provider component that wraps around components that need micro-interactions
 export function MicroInteractionsProvider({ children }: { children: ReactNode }) {
   const { toast } = useToast();
   
-  // Animation state for legacy animation component
+  // Animation state
   const [animationDetails, setAnimationDetails] = useState<{
     trigger: boolean;
     type: AnimationType;
@@ -52,10 +44,10 @@ export function MicroInteractionsProvider({ children }: { children: ReactNode })
     type: 'random',
   });
 
-  // Break timer visibility state
+  // Break timer state
   const [showBreakTimerState, setShowBreakTimerState] = useState(false);
   
-  // Break game state with duration
+  // Break game state
   const [breakGameDetails, setBreakGameDetails] = useState<{
     show: boolean;
     duration: number;
@@ -64,7 +56,7 @@ export function MicroInteractionsProvider({ children }: { children: ReactNode })
     duration: 300, // 5 minutes in seconds
   });
 
-  // Trigger an animation with optional message
+  // Trigger a success animation with optional message
   const triggerAnimation = useCallback((type: AnimationType = 'random', message?: string) => {
     // Set state for the legacy animation component
     setAnimationDetails({
@@ -192,7 +184,6 @@ export function MicroInteractionsProvider({ children }: { children: ReactNode })
   );
 }
 
-// Hook for accessing the micro-interactions context
 export function useMicroInteractions() {
   const context = useContext(MicroInteractionsContext);
   if (!context) {

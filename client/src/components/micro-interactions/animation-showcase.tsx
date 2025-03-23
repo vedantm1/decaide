@@ -5,10 +5,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-// Import the playAnimation function from animation engine
-import { playAnimation } from '@/lib/animation-engine';
-// Import useMicroInteractions hook and AnimationType from our context
-import { useMicroInteractions, AnimationType } from '@/hooks/use-micro-interactions';
+import { playAnimation, AnimationType } from '@/lib/animation-engine';
+import { useMicroInteractions } from '@/hooks/use-micro-interactions';
 
 // Animation categories for organization
 const ANIMATION_CATEGORIES = {

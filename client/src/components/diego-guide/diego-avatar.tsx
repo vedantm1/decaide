@@ -1,308 +1,281 @@
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from "framer-motion";
+import { useState } from "react";
+import SideProfileDolphin from "./side-profile-dolphin";
 
 interface DiegoAvatarProps {
-  emotion?: 'default' | 'happy' | 'excited' | 'thinking' | 'explaining' | 'confused';
-  size?: 'small' | 'medium' | 'large';
+  emotion?: 'happy' | 'excited' | 'thinking' | 'neutral' | 'pointing';
+  size?: 'sm' | 'md' | 'lg' | 'xl';
   className?: string;
+  pointDirection?: 'left' | 'right' | 'up' | 'down';
+  swimming?: boolean;
+  targetPosition?: { x: number, y: number };
+  onArrival?: () => void;
+  message?: string;
+  showTextBox?: boolean;
 }
 
-/**
- * DiegoAvatar - The visual representation of Diego, the dolphin assistant
- * Supports different emotions and sizes for various contexts
- */
+// Size variants
+const SIZE_VARIANTS = {
+  sm: { width: 32, height: 32 },
+  md: { width: 48, height: 48 },
+  lg: { width: 64, height: 64 },
+  xl: { width: 120, height: 80 }, // Side profile is wider than tall
+};
+
+// Animation variants
+const avatarVariants = {
+  idle: {
+    y: [0, -3, 0],
+    transition: { 
+      repeat: Infinity, 
+      duration: 2,
+      ease: "easeInOut"
+    }
+  },
+  hover: {
+    scale: 1.1,
+    transition: { 
+      type: "spring",
+      stiffness: 400,
+      damping: 10
+    }
+  },
+  swimming: {
+    x: [0, 15, 30, 45, 60],
+    transition: {
+      duration: 2,
+      ease: "linear",
+    }
+  },
+  pointingLeft: {
+    x: [-5, 0, -5],
+    transition: { 
+      repeat: Infinity, 
+      duration: 1.5,
+      ease: "easeInOut"
+    }
+  },
+  pointingRight: {
+    x: [0, 5, 0],
+    transition: { 
+      repeat: Infinity, 
+      duration: 1.5,
+      ease: "easeInOut"
+    }
+  },
+  pointingUp: {
+    y: [-5, 0, -5],
+    transition: { 
+      repeat: Infinity, 
+      duration: 1.5,
+      ease: "easeInOut"
+    }
+  },
+  pointingDown: {
+    y: [0, 5, 0],
+    transition: { 
+      repeat: Infinity, 
+      duration: 1.5,
+      ease: "easeInOut"
+    }
+  }
+};
+
+// Emotions for the front-facing dolphin
+const EMOTIONS = {
+  happy: {
+    eyes: 'M7 8C7 9.1046 7.44772 10 8 10C8.55228 10 9 9.1046 9 8C9 6.89543 8.55228 6 8 6C7.44772 6 7 6.89543 7 8ZM15 8C15 9.1046 15.4477 10 16 10C16.5523 10 17 9.1046 17 8C17 6.89543 16.5523 6 16 6C15.4477 6 15 6.89543 15 8Z',
+    mouth: 'M8.5 14C8.5 14 10 16 12 16C14 16 15.5 14 15.5 14',
+  },
+  excited: {
+    eyes: 'M7 8C7 9.1046 7.44772 10 8 10C8.55228 10 9 9.1046 9 8C9 6.89543 8.55228 6 8 6C7.44772 6 7 6.89543 7 8ZM15 8C15 9.1046 15.4477 10 16 10C16.5523 10 17 9.1046 17 8C17 6.89543 16.5523 6 16 6C15.4477 6 15 6.89543 15 8Z',
+    mouth: 'M7.5 14C7.5 14 10 17 12 17C14 17 16.5 14 16.5 14',
+  },
+  thinking: {
+    eyes: 'M7 8C7 9.1046 7.44772 10 8 10C8.55228 10 9 9.1046 9 8C9 6.89543 8.55228 6 8 6C7.44772 6 7 6.89543 7 8ZM15 8C15 9.1046 15.4477 10 16 10C16.5523 10 17 9.1046 17 8C17 6.89543 16.5523 6 16 6C15.4477 6 15 6.89543 15 8Z',
+    mouth: 'M9 14H15',
+  },
+  neutral: {
+    eyes: 'M7 8C7 9.1046 7.44772 10 8 10C8.55228 10 9 9.1046 9 8C9 6.89543 8.55228 6 8 6C7.44772 6 7 6.89543 7 8ZM15 8C15 9.1046 15.4477 10 16 10C16.5523 10 17 9.1046 17 8C17 6.89543 16.5523 6 16 6C15.4477 6 15 6.89543 15 8Z',
+    mouth: 'M9 14H15',
+  },
+};
+
 export default function DiegoAvatar({ 
-  emotion = 'default', 
-  size = 'medium',
-  className = '' 
+  emotion = 'happy', 
+  size = 'md',
+  className = '',
+  pointDirection = 'right',
+  swimming = false,
+  targetPosition,
+  onArrival,
+  message = "I'm here to help with your DECA preparation!",
+  showTextBox = true
 }: DiegoAvatarProps) {
-  // Size dimensions
-  const dimensions = {
-    small: { width: 40, height: 40 },
-    medium: { width: 60, height: 60 },
-    large: { width: 80, height: 80 }
-  };
+  const dimensions = SIZE_VARIANTS[size];
+  const [isTransitioning, setIsTransitioning] = useState(false);
   
-  // Colors
-  const primaryColor = '#1E88E5'; // Dolphin body color
-  const secondaryColor = '#64B5F6'; // Lighter blue for details
-  const eyeColor = '#FFFFFF';
-  const highlightColor = '#BBDEFB'; // Very light blue for highlights
-  
-  // Expression variants based on emotion
-  const getEmotionStyles = () => {
-    switch(emotion) {
-      case 'happy':
-        return {
-          mouth: "M40,65 Q50,75 60,65", // Curved up smile
-          eye: { rx: 2, ry: 4 }, // Slightly squinted eyes
-          blushVisible: true,
-          eyebrowRotation: -10 // Raised eyebrows
-        };
-      case 'excited':
-        return {
-          mouth: "M40,65 Q50,80 60,65", // Big smile
-          eye: { rx: 3, ry: 3 }, // Wide open eyes
-          blushVisible: true,
-          eyebrowRotation: -15, // Very raised eyebrows
-          sparkles: true // Add sparkle effects
-        };
-      case 'thinking':
-        return {
-          mouth: "M42,65 Q50,63 58,65", // Straight, slightly curved mouth
-          eye: { rx: 3, ry: 2 }, // Narrow eyes
-          eyebrowRotation: 20, // Furrowed brows
-          bubbleVisible: true // Thought bubble
-        };
-      case 'explaining':
-        return {
-          mouth: "M40,65 Q50,70 60,65", // Speaking mouth
-          eye: { rx: 3, ry: 3 }, // Normal eyes
-          eyebrowRotation: 0,
-          handVisible: true // Show a pointing fin
-        };
-      case 'confused':
-        return {
-          mouth: "M42,67 Q50,65 58,67", // Slightly frowning
-          eye: { rx: 2, ry: 4 }, // Questioning eyes
-          eyebrowRotation: 15, // One brow up
-          questionMarkVisible: true // Shows a question mark
-        };
-      default: // Default friendly expression
-        return {
-          mouth: "M42,65 Q50,70 58,65", // Slight smile
-          eye: { rx: 3, ry: 3 }, // Normal round eyes
-          eyebrowRotation: 0,
-          blushVisible: false
-        };
+  // Handle animation completion
+  const handleArrival = () => {
+    if (onArrival) {
+      onArrival();
     }
   };
   
-  const emotionStyles = getEmotionStyles();
-  const { width, height } = dimensions[size];
-
+  // Use enhanced side profile dolphin component when pointing or swimming
+  if (emotion === 'pointing' || swimming) {
+    return (
+      <AnimatePresence mode="wait">
+        <SideProfileDolphin 
+          dimensions={dimensions}
+          swimming={swimming}
+          pointDirection={pointDirection as 'left' | 'right'}
+          targetPosition={targetPosition}
+          onArrival={handleArrival}
+          showTextBox={showTextBox}
+          message={message}
+        />
+      </AnimatePresence>
+    );
+  }
+  
+  // For the front-facing dolphin, use the appropriate emotion
+  const currentEmotion = emotion as keyof typeof EMOTIONS;
+  const emotionPaths = EMOTIONS[currentEmotion];
+  
   return (
-    <div className={`relative inline-block ${className}`} style={{ width, height }}>
-      <motion.svg
-        viewBox="0 0 100 100"
-        width={width}
-        height={height}
-        initial={{ scale: 0.9 }}
-        animate={{ 
-          scale: [0.95, 1.05, 0.95],
-          rotate: [-2, 2, -2]
-        }}
-        transition={{ 
-          repeat: Infinity, 
-          duration: 4, 
-          ease: "easeInOut" 
-        }}
+    <motion.div
+      className={`relative ${className}`}
+      variants={avatarVariants}
+      animate="idle"
+      whileHover="hover"
+    >
+      <svg 
+        width={dimensions.width} 
+        height={dimensions.height} 
+        viewBox="0 0 24 24" 
+        fill="none" 
+        xmlns="http://www.w3.org/2000/svg"
       >
-        {/* Base dolphin shape */}
-        <g>
-          {/* Body */}
-          <motion.path
-            d="M30,30 C10,50 15,80 40,85 C65,90 85,70 85,50 C85,30 70,20 50,20 C40,20 35,25 30,30 Z"
-            fill={primaryColor}
-            strokeWidth="2"
-            stroke={secondaryColor}
-            initial={{ scale: 0.95 }}
-            animate={{ scale: 1 }}
-            transition={{ 
-              yoyo: Infinity, 
-              duration: 2, 
-              ease: "easeInOut" 
-            }}
-          />
-          
-          {/* Belly */}
-          <ellipse cx="55" cy="60" rx="22" ry="20" fill={highlightColor} opacity="0.5" />
-          
-          {/* Dorsal fin */}
-          <path
-            d="M50,30 C60,10 70,10 60,35"
-            fill={primaryColor}
-            stroke={secondaryColor}
-            strokeWidth="2"
-            strokeLinecap="round"
-          />
-          
-          {/* Tail */}
-          <motion.path
-            d="M30,55 C20,50 15,60 25,65 C15,70 20,80 30,75"
-            fill="none"
-            stroke={primaryColor}
-            strokeWidth="8"
-            strokeLinecap="round"
-            animate={{ 
-              rotate: [-5, 5, -5],
-            }}
-            transition={{ 
-              repeat: Infinity, 
-              duration: 2, 
-              ease: "easeInOut" 
-            }}
-          />
-          
-          {/* Face features */}
-          {/* Left eye */}
-          <ellipse 
-            cx="40" 
-            cy="45" 
-            rx={emotionStyles.eye.rx} 
-            ry={emotionStyles.eye.ry} 
-            fill={eyeColor} 
-          />
-          <circle cx="40" cy="45" r="1.5" fill="#000" />
-          
-          {/* Right eye */}
-          <ellipse 
-            cx="60" 
-            cy="45" 
-            rx={emotionStyles.eye.rx} 
-            ry={emotionStyles.eye.ry} 
-            fill={eyeColor} 
-          />
-          <circle cx="60" cy="45" r="1.5" fill="#000" />
-          
-          {/* Eyebrows */}
-          <motion.path
-            d="M35,39 C38,37 42,37 45,39"
-            fill="none"
-            stroke={secondaryColor}
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            initial={{ rotate: 0 }}
-            animate={{ rotate: emotionStyles.eyebrowRotation }}
-            style={{ transformOrigin: '40px 45px' }}
-          />
-          <motion.path
-            d="M55,39 C58,37 62,37 65,39"
-            fill="none"
-            stroke={secondaryColor}
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            initial={{ rotate: 0 }}
-            animate={{ rotate: -emotionStyles.eyebrowRotation }}
-            style={{ transformOrigin: '60px 45px' }}
-          />
-          
-          {/* Mouth */}
-          <path
-            d={emotionStyles.mouth}
-            fill="none"
-            stroke={secondaryColor}
-            strokeWidth="2"
-            strokeLinecap="round"
-          />
-          
-          {/* Blowhole */}
-          <circle cx="50" cy="25" r="2" fill={secondaryColor} />
-          
-          {/* Blush (conditional) */}
-          {emotionStyles.blushVisible && (
-            <>
-              <circle cx="35" cy="50" r="5" fill="#FF9E80" opacity="0.3" />
-              <circle cx="65" cy="50" r="5" fill="#FF9E80" opacity="0.3" />
-            </>
-          )}
-          
-          {/* Side fins */}
-          <path
-            d="M70,55 C85,45 90,55 80,65"
-            fill={primaryColor}
-            stroke={secondaryColor}
-            strokeWidth="2"
-            strokeLinecap="round"
-          />
-        </g>
+        {/* Dolphin head with gradient fill */}
+        <defs>
+          <linearGradient id="bodyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#4FD1C5" />
+            <stop offset="100%" stopColor="#3182CE" />
+          </linearGradient>
+          <linearGradient id="bellyGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#79C3F1" />
+            <stop offset="100%" stopColor="#A7D8FF" />
+          </linearGradient>
+          <linearGradient id="finGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#2D8BC7" />
+            <stop offset="100%" stopColor="#1A5F9E" />
+          </linearGradient>
+          <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="0.5" result="blur" />
+            <feComposite in="SourceGraphic" in2="blur" operator="over" />
+          </filter>
+        </defs>
         
-        {/* Sparkles for excited emotion */}
-        {emotionStyles.sparkles && (
-          <g>
-            <motion.circle 
-              cx="25" 
-              cy="25" 
-              r="2" 
-              fill="#FFD54F" 
-              animate={{ 
-                opacity: [0, 1, 0],
-                scale: [0.5, 1.5, 0.5]
-              }}
-              transition={{ 
-                repeat: Infinity, 
-                duration: 2, 
-                ease: "easeInOut",
-                delay: 0.2
-              }}
-            />
-            <motion.circle 
-              cx="75" 
-              cy="25" 
-              r="2" 
-              fill="#FFD54F" 
-              animate={{ 
-                opacity: [0, 1, 0],
-                scale: [0.5, 1.5, 0.5]
-              }}
-              transition={{ 
-                repeat: Infinity, 
-                duration: 2, 
-                ease: "easeInOut",
-                delay: 0.5
-              }}
-            />
-            <motion.circle 
-              cx="60" 
-              cy="20" 
-              r="2" 
-              fill="#FFD54F" 
-              animate={{ 
-                opacity: [0, 1, 0],
-                scale: [0.5, 1.5, 0.5]
-              }}
-              transition={{ 
-                repeat: Infinity, 
-                duration: 2, 
-                ease: "easeInOut",
-                delay: 0.8
-              }}
-            />
-          </g>
-        )}
+        {/* Enhanced rounded dolphin body with more defined shape */}
+        <path 
+          d="M12 3C7 3 4 6 3 9C2 12 2 15 4 18C6 21 9 22 12 22C15 22 18 21 20 18C22 15 22 12 21 9C20 6 17 3 12 3Z" 
+          fill="url(#bodyGradient)"
+          stroke="#2D8BC7"
+          strokeWidth="0.2"
+        />
         
-        {/* Thought bubble (conditional) */}
-        {emotionStyles.bubbleVisible && (
-          <g>
-            <circle cx="70" cy="25" r="3" fill="white" />
-            <circle cx="75" cy="20" r="4" fill="white" />
-            <circle cx="82" cy="15" r="5" fill="white" />
-          </g>
-        )}
+        {/* Enhanced belly with gradient */}
+        <path 
+          d="M12 11C9 11 7 12 6 14C5 16 5 18 7 19C9 20 15 20 17 19C19 18 19 16 18 14C17 12 15 11 12 11Z" 
+          fill="url(#bellyGradient)"
+        />
         
-        {/* Question mark (conditional) */}
-        {emotionStyles.questionMarkVisible && (
-          <g>
-            <motion.text
-              x="75" 
-              y="30" 
-              fontSize="15" 
-              fontWeight="bold" 
-              fill="#FFD54F"
-              animate={{ 
-                y: [30, 25, 30],
-                opacity: [0.7, 1, 0.7]
-              }}
-              transition={{ 
-                repeat: Infinity, 
-                duration: 2, 
-                ease: "easeInOut" 
-              }}
-            >
-              ?
-            </motion.text>
-          </g>
-        )}
-      </motion.svg>
-    </div>
+        {/* More prominent and detailed dorsal fin */}
+        <motion.path 
+          d="M12 2C10 2.5 9 3.5 9 4C9.5 3 11 2 12 1.5C13 1.5 14.5 2 15 4C15 3 14 1.5 12 2Z" 
+          fill="url(#finGradient)"
+          stroke="#2D8BC7"
+          strokeWidth="0.2"
+          animate={{
+            rotate: [0, 5, 0, -5, 0],
+            originX: 0.5,
+            originY: 1,
+            transition: { repeat: Infinity, duration: 2, ease: "easeInOut" }
+          }}
+        />
+        
+        {/* Enhanced snout with more defined shape */}
+        <path 
+          d="M12 8C10 8 9 9 8 11C9 10 10.5 9.5 12 9.5C13.5 9.5 15 10 16 11C15 9 14 8 12 8Z" 
+          fill="#79C3F1"
+          stroke="#2D8BC7"
+          strokeWidth="0.1"
+        />
+        
+        {/* Enhanced tail fin with better shape */}
+        <motion.path
+          d="M12 19C10 19 7 18 6 17C8 18.5 13 19 16 17.5C14 19 13 19 12 19Z"
+          fill="url(#finGradient)"
+          stroke="#2D8BC7"
+          strokeWidth="0.2"
+          animate={{
+            rotate: [0, 5, 0, -5, 0],
+            originX: 0.5,
+            originY: 0,
+            transition: { repeat: Infinity, duration: 1.5, ease: "easeInOut" }
+          }}
+        />
+        
+        {/* Enhanced side flippers with better shape and animation */}
+        <motion.path
+          d="M5 13C4 13 3 14 4 15C5 16 6 15 7 14.5C6 14.75 5.5 14 5 13Z"
+          fill="url(#finGradient)"
+          stroke="#2D8BC7"
+          strokeWidth="0.2"
+          animate={{
+            rotate: [0, 15, 0, -15, 0],
+            originX: 1,
+            originY: 0.5,
+            transition: { repeat: Infinity, duration: 2.5, ease: "easeInOut" }
+          }}
+        />
+        <motion.path
+          d="M19 13C20 13 21 14 20 15C19 16 18 15 17 14.5C18 14.75 18.5 14 19 13Z"
+          fill="url(#finGradient)"
+          stroke="#2D8BC7"
+          strokeWidth="0.2"
+          animate={{
+            rotate: [0, -15, 0, 15, 0],
+            originX: 0,
+            originY: 0.5,
+            transition: { repeat: Infinity, duration: 2.5, ease: "easeInOut" }
+          }}
+        />
+        
+        {/* Enhanced eyes with glow effect */}
+        <circle cx="8" cy="8" r="1.2" fill="black"/>
+        <circle cx="16" cy="8" r="1.2" fill="black"/>
+        <circle cx="7.7" cy="7.7" r="0.5" fill="white" filter="url(#glow)"/>
+        <circle cx="15.7" cy="7.7" r="0.5" fill="white" filter="url(#glow)"/>
+        
+        {/* Enhanced mouth with better animation based on emotion */}
+        <path 
+          d={emotionPaths.mouth} 
+          stroke="white" 
+          strokeWidth="1.5" 
+          strokeLinecap="round"
+          filter="url(#glow)"
+        />
+        
+        {/* Enhanced blowhole */}
+        <circle cx="12" cy="4" r="0.5" fill="#0A4D81"/>
+        
+        {/* Subtle water sparkles around the dolphin */}
+        <circle cx="10" cy="6" r="0.2" fill="white" opacity="0.6"/>
+        <circle cx="18" cy="12" r="0.15" fill="white" opacity="0.5"/>
+        <circle cx="5" cy="10" r="0.1" fill="white" opacity="0.4"/>
+      </svg>
+    </motion.div>
   );
 }

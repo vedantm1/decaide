@@ -1,321 +1,396 @@
-import { useState, useRef, useEffect } from 'react';
-import { AnimatePresence, motion, Variants } from 'framer-motion';
-import { useMicroInteractions } from '@/hooks/use-micro-interactions';
+import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { apiRequest } from '@/lib/queryClient';
+import { Card, CardContent } from '@/components/ui/card';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Send, X, Loader2, Info, Star, BookOpen, Award, Sparkles } from 'lucide-react';
 import DiegoAvatar from './diego-avatar';
+import { apiRequest } from '@/lib/queryClient';
+import { useAuth } from '@/hooks/use-auth';
+import { useMicroInteractions } from '@/hooks/use-micro-interactions';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useToast } from '@/hooks/use-toast';
+
+// Define available chat message types
+interface ChatMessage {
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: Date;
+  emotion?: 'happy' | 'excited' | 'thinking' | 'neutral';
+  isExitMessage?: boolean;
+}
 
 interface DiegoChatProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-const containerVariants: Variants = {
-  hidden: { 
-    opacity: 0, 
-    y: 20, 
-    scale: 0.9,
-    transformOrigin: 'bottom right'
-  },
-  visible: { 
-    opacity: 1, 
-    y: 0, 
-    scale: 1,
-    transition: { duration: 0.3, ease: 'easeOut' }
-  },
-  exit: { 
-    opacity: 0, 
-    y: 20, 
-    scale: 0.9,
-    transformOrigin: 'bottom right',
-    transition: { duration: 0.2, ease: 'easeIn' }
-  }
-};
-
-// Message types
-type MessageType = 'user' | 'diego';
-
-interface Message {
-  id: string;
-  type: MessageType;
-  text: string;
-  timestamp: Date;
-}
-
-// Initial intro messages from Diego
-const introMessages: Message[] = [
-  {
-    id: '1',
-    type: 'diego',
-    text: "Hi there! 👋 I'm Diego, your DECA training assistant. How can I help you today?",
-    timestamp: new Date(),
-  },
-  {
-    id: '2',
-    type: 'diego',
-    text: "You can ask me about DECA events, performance indicators, or how to prepare for your competition!",
-    timestamp: new Date(Date.now() + 500),
-  }
-];
-
-// Common DECA-related questions that Diego can quickly answer
-const quickQuestions = [
-  "What are performance indicators?",
-  "How do I prepare for a roleplay?",
-  "Explain the Business Management cluster",
-  "What's the format of DECA exams?",
-  "How are written events scored?",
-  "Tell me about international events"
+// Quick prompt suggestions
+const PROMPT_SUGGESTIONS = [
+  { icon: <Info className="h-3 w-3" />, text: "What is DecA(I)de?", value: "What is DecA(I)de and how does it help with DECA competitions?" },
+  { icon: <Star className="h-3 w-3" />, text: "Subscription tiers", value: "Can you explain the different subscription tiers in DecA(I)de?" },
+  { icon: <BookOpen className="h-3 w-3" />, text: "DECA events", value: "What are the main DECA event categories I can prepare for?" },
+  { icon: <Award className="h-3 w-3" />, text: "Performance Indicators", value: "What are Performance Indicators in DECA and why are they important?" },
+  { icon: <Sparkles className="h-3 w-3" />, text: "Study tips", value: "What are your top 3 tips for DECA competition success?" },
 ];
 
 export default function DiegoChat({ isOpen, onClose }: DiegoChatProps) {
-  const [messages, setMessages] = useState<Message[]>(introMessages);
-  const [inputValue, setInputValue] = useState<string>('');
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [diegoEmotion, setDiegoEmotion] = useState<'happy' | 'excited' | 'thinking' | 'neutral'>('happy');
+  const [shouldExitChat, setShouldExitChat] = useState(false);
+  const [exitCountdown, setExitCountdown] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { user } = useAuth();
   const { triggerAnimation } = useMicroInteractions();
-
-  // Auto-scroll to bottom when new messages arrive
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
-
-  // Focus input when chat opens
+  const { toast } = useToast();
+  
+  // Track the number of questions asked in the current session
+  const [questionCount, setQuestionCount] = useState(0);
+  const [unrelatedCount, setUnrelatedCount] = useState(0);
+  
+  // Load chat history from localStorage
   useEffect(() => {
     if (isOpen) {
-      setTimeout(() => {
-        inputRef.current?.focus();
-      }, 300);
+      const savedMessages = localStorage.getItem('diegoChat');
+      if (savedMessages) {
+        try {
+          const parsedMessages = JSON.parse(savedMessages).map((msg: any) => ({
+            ...msg,
+            timestamp: new Date(msg.timestamp)
+          }));
+          setMessages(parsedMessages);
+        } catch (e) {
+          console.error('Error parsing saved messages:', e);
+          // If there's an error, start fresh
+          addInitialGreeting();
+        }
+      } else {
+        // No saved messages, add initial greeting
+        addInitialGreeting();
+      }
     }
   }, [isOpen]);
 
-  // Handle sending a message
-  const handleSendMessage = async () => {
-    if (!inputValue.trim()) return;
+  // Add initial greeting if there are no messages
+  const addInitialGreeting = () => {
+    const timeOfDay = new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 18 ? 'afternoon' : 'evening';
     
-    // Add user message
-    const userMessage: Message = {
-      id: `user-${Date.now()}`,
-      type: 'user',
-      text: inputValue,
-      timestamp: new Date(),
+    setMessages([
+      {
+        role: 'assistant',
+        content: `Good ${timeOfDay}${user?.username ? ', ' + user.username : ''}! 🐬 I'm Diego, your friendly dolphin assistant for DecA(I)de. How can I help you with your DECA preparation today?`,
+        timestamp: new Date(),
+        emotion: 'excited'
+      }
+    ]);
+  };
+  
+  // Save chat history to localStorage when messages change
+  useEffect(() => {
+    if (messages.length > 0) {
+      localStorage.setItem('diegoChat', JSON.stringify(messages));
+    }
+  }, [messages]);
+  
+  useEffect(() => {
+    if (isOpen && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isOpen]);
+  
+  useEffect(() => {
+    // Scroll to bottom of messages when new messages are added
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages]);
+
+  // Handle exit countdown
+  useEffect(() => {
+    if (shouldExitChat && exitCountdown > 0) {
+      const timer = setTimeout(() => {
+        setExitCountdown(exitCountdown - 1);
+      }, 1000);
+      
+      return () => clearTimeout(timer);
+    } else if (shouldExitChat && exitCountdown === 0) {
+      onClose();
+      setShouldExitChat(false);
+    }
+  }, [shouldExitChat, exitCountdown, onClose]);
+
+  const handleSend = async () => {
+    if (input.trim() === '') return;
+    if (isLoading) return;
+    
+    const userMessage: ChatMessage = {
+      role: 'user',
+      content: input,
+      timestamp: new Date()
     };
     
     setMessages(prev => [...prev, userMessage]);
-    setInputValue('');
+    setInput('');
     setIsLoading(true);
-    
-    // Small animation when sending
-    triggerAnimation('popIn');
+    setDiegoEmotion('thinking');
     
     try {
-      // Basic fallback responses for development
-      const localResponses: Record<string, string> = {
-        "What are performance indicators?": 
-          "Performance Indicators are specific knowledge or skills that you need to demonstrate in DECA competitive events. They serve as a checklist of what judges will be looking for during your presentation.",
-        
-        "How do I prepare for a roleplay?": 
-          "To prepare for a roleplay, familiarize yourself with your event's Performance Indicators, practice quick thinking, study business concepts relevant to your event, use the STAR approach (Situation, Task, Action, Result), and role-play with peers for feedback.",
-        
-        "Explain the Business Management cluster": 
-          "The Business Management & Administration cluster prepares students for careers in planning, organizing, directing and evaluating business functions. Events include Business Management and Administration Series, Human Resources Management Series, and more.",
-        
-        "What's the format of DECA exams?": 
-          "DECA exams typically consist of 100 multiple-choice questions covering business administration core performance indicators and your specific competitive event area. You have 100 minutes to complete the exam.",
-        
-        "How are written events scored?": 
-          "Written events are scored using a rubric that evaluates executive summary, strategic planning, implementation, and presentation skills. Judges assess content knowledge, critical thinking, communication, and professionalism.",
-        
-        "Tell me about international events": 
-          "DECA's International Career Development Conference (ICDC) brings together over 20,000 students from around the world. It's the culmination of competitive events, featuring championships for all DECA event categories."
-      };
-
-      // Try API call first
-      try {
-        const response = await apiRequest('POST', '/api/chat/diego', {
-          message: userMessage.text,
-        });
-        
-        if (response.ok) {
-          const data = await response.json();
-          
-          // Add Diego's response from API
-          const diegoResponse: Message = {
-            id: `diego-${Date.now()}`,
-            type: 'diego',
-            text: data.message,
-            timestamp: new Date(),
-          };
-          
-          setMessages(prev => [...prev, diegoResponse]);
-          return;
-        }
-      } catch (e) {
-        console.log("API call failed, falling back to local responses");
+      // Increment question count
+      const newQuestionCount = questionCount + 1;
+      setQuestionCount(newQuestionCount);
+      
+      // Send message to API
+      const response = await apiRequest('POST', '/api/chat/diego', {
+        message: input,
+        questionCount: newQuestionCount,
+        unrelatedCount
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to get a response from Diego');
       }
       
-      // If API call fails, use local fallback
-      let responseText = localResponses[userMessage.text] || "";
+      const data = await response.json();
       
-      // If no exact match, provide a helpful default response
-      if (!responseText) {
-        if (userMessage.text.toLowerCase().includes("performance indicator") || userMessage.text.toLowerCase().includes("pi")) {
-          responseText = "Performance Indicators are essential elements in DECA competitions. They guide what judges are looking for in your presentation and solutions.";
-        } else if (userMessage.text.toLowerCase().includes("roleplay") || userMessage.text.toLowerCase().includes("role play")) {
-          responseText = "Role plays are simulated business scenarios where you demonstrate your business knowledge and problem-solving skills. Practice is key to success!";
-        } else if (userMessage.text.toLowerCase().includes("exam") || userMessage.text.toLowerCase().includes("test")) {
-          responseText = "DECA exams test your knowledge of business concepts and principles. Regular study of business terminology and practices will help you succeed.";
-        } else if (userMessage.text.toLowerCase().includes("written") || userMessage.text.toLowerCase().includes("write")) {
-          responseText = "Written events require thorough research, strategic thinking, and professional presentation. Start early and seek feedback on your work.";
-        } else {
-          responseText = "I'm here to help with your DECA preparation! You can ask me about performance indicators, role plays, exam strategies, or written events.";
-        }
+      // Check if the server indicates we should exit
+      if (data.shouldExit) {
+        const exitMessage: ChatMessage = {
+          role: 'assistant',
+          content: data.response,
+          timestamp: new Date(),
+          emotion: 'neutral',
+          isExitMessage: true
+        };
+        
+        setMessages(prev => [...prev, exitMessage]);
+        triggerAnimation('stars');
+        setDiegoEmotion('neutral');
+        
+        // Set a timer to close the chat after 5 seconds
+        setShouldExitChat(true);
+        setExitCountdown(5);
+        
+        setIsLoading(false);
+        return;
       }
       
-      // Add Diego's response
-      const diegoResponse: Message = {
-        id: `diego-${Date.now()}`,
-        type: 'diego',
-        text: responseText,
+      // Check if the AI flagged this as an unrelated question
+      if (data.isUnrelated) {
+        const newUnrelatedCount = unrelatedCount + 1;
+        setUnrelatedCount(newUnrelatedCount);
+        setDiegoEmotion('neutral');
+      } else {
+        setDiegoEmotion('happy');
+      }
+      
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: data.response,
         timestamp: new Date(),
-      };
+        emotion: data.isUnrelated ? 'neutral' : 'happy'
+      }]);
       
-      setMessages(prev => [...prev, diegoResponse]);
+      // Add a small animation when Diego responds
+      triggerAnimation('stars');
+      
     } catch (error) {
-      // Fallback response if everything fails
-      const fallbackResponse: Message = {
-        id: `diego-${Date.now()}`,
-        type: 'diego',
-        text: "I'm having trouble connecting to my knowledge base right now. Please try again in a moment.",
+      console.error('Error sending message to Diego:', error);
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: "Sorry, I'm having trouble connecting to my dolphin brain right now. Try asking me again in a moment!",
         timestamp: new Date(),
-      };
+        emotion: 'neutral'
+      }]);
+      setDiegoEmotion('neutral');
       
-      setMessages(prev => [...prev, fallbackResponse]);
+      toast({
+        title: "Connection Issue",
+        description: "Diego is having trouble accessing the AI service. Please try again later.",
+        variant: "destructive"
+      });
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Handle quick question click
-  const handleQuickQuestionClick = (question: string) => {
-    setInputValue(question);
-    // Wait for state update, then send
-    setTimeout(() => {
-      handleSendMessage();
-    }, 10);
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSend();
+    }
   };
+  
+  const handleSuggestionClick = (suggestion: string) => {
+    setInput(suggestion);
+    inputRef.current?.focus();
+  };
+  
+  const handleClearChat = () => {
+    // Keep only the initial greeting
+    const initialGreeting = messages.length > 0 ? [messages[0]] : [];
+    setMessages(initialGreeting);
+    setQuestionCount(0);
+    setUnrelatedCount(0);
+    localStorage.setItem('diegoChat', JSON.stringify(initialGreeting));
+    
+    toast({
+      title: "Chat Cleared",
+      description: "Your conversation with Diego has been reset.",
+      variant: "default"
+    });
+  };
+
+  if (!isOpen) return null;
 
   return (
     <AnimatePresence>
-      {isOpen && (
-        <motion.div
-          className="fixed bottom-20 right-6 w-[350px] sm:w-[400px] max-h-[500px] bg-white dark:bg-gray-900 rounded-lg shadow-xl overflow-hidden z-50 border border-gray-200 dark:border-gray-800"
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          exit="exit"
-        >
-          {/* Chat header */}
-          <div className="flex items-center justify-between p-3 bg-gradient-to-r from-blue-600 to-cyan-500 text-white">
+      <motion.div 
+        className="fixed bottom-20 right-4 w-80 md:w-96 z-50 shadow-xl"
+        initial={{ opacity: 0, y: 20, scale: 0.9 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: 20, scale: 0.9 }}
+        transition={{ duration: 0.2 }}
+      >
+        <Card className="border border-primary/20 overflow-hidden">
+          <div className="flex items-center justify-between p-3 border-b bg-primary/5">
             <div className="flex items-center gap-2">
-              <DiegoAvatar size="small" />
+              <DiegoAvatar size="sm" emotion={diegoEmotion} />
               <div>
-                <h3 className="font-semibold">Diego</h3>
-                <p className="text-xs text-white/80">DECA Training Assistant</p>
+                <span className="font-medium text-sm">Chat with Diego</span>
+                {shouldExitChat && (
+                  <span className="block text-xs text-muted-foreground">
+                    Closing in {exitCountdown}s...
+                  </span>
+                )}
               </div>
             </div>
-            <button 
-              onClick={onClose}
-              className="text-white/80 hover:text-white"
-              aria-label="Close chat"
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M6 18L18 6M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </button>
-          </div>
-          
-          {/* Messages container */}
-          <div className="p-4 overflow-y-auto h-[320px] bg-gray-50 dark:bg-gray-900">
-            {messages.map((message) => (
-              <div 
-                key={message.id} 
-                className={`mb-4 ${message.type === 'user' ? 'text-right' : ''}`}
+            <div className="flex gap-1">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={handleClearChat} 
+                aria-label="Clear chat"
+                title="Clear chat history"
+                className="h-8 w-8 p-0"
               >
-                <div 
-                  className={`inline-block px-4 py-2 rounded-lg max-w-[80%] ${
-                    message.type === 'user' 
-                      ? 'bg-primary text-primary-foreground' 
-                      : 'bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-gray-100'
-                  }`}
-                >
-                  {message.text}
-                </div>
-                <div className={`text-xs text-gray-500 mt-1 ${message.type === 'user' ? 'text-right' : ''}`}>
-                  {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                </div>
-              </div>
-            ))}
-            
-            {/* Loading indicator */}
-            {isLoading && (
-              <div className="mb-4">
-                <div className="inline-block px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-800">
-                  <span className="inline-flex items-center">
-                    <span className="w-2 h-2 bg-gray-500 dark:bg-gray-400 rounded-full animate-bounce mr-1" style={{ animationDelay: '0ms' }}></span>
-                    <span className="w-2 h-2 bg-gray-500 dark:bg-gray-400 rounded-full animate-bounce mr-1" style={{ animationDelay: '150ms' }}></span>
-                    <span className="w-2 h-2 bg-gray-500 dark:bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
-                  </span>
-                </div>
-              </div>
-            )}
-            
-            {/* Invisible element for scrolling to bottom */}
-            <div ref={messagesEndRef} />
+                <Sparkles className="h-4 w-4" />
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={onClose} 
+                aria-label="Close"
+                className="h-8 w-8 p-0"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
           
-          {/* Quick questions */}
-          <div className="px-3 py-2 border-t border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 overflow-x-auto whitespace-nowrap">
-            <div className="flex gap-2">
-              {quickQuestions.map((question, index) => (
+          <ScrollArea className="h-80 p-3 bg-background/80">
+            <div className="flex flex-col gap-3">
+              {messages.map((message, index) => (
+                <motion.div 
+                  key={index} 
+                  className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <div 
+                    className={`max-w-[85%] rounded-lg p-3 ${
+                      message.role === 'user' 
+                        ? 'bg-primary text-primary-foreground' 
+                        : message.isExitMessage
+                          ? 'bg-accent/30'
+                          : 'bg-muted'
+                    }`}
+                  >
+                    {message.role === 'assistant' && (
+                      <div className="flex items-start gap-2 mb-1">
+                        <DiegoAvatar 
+                          size="sm" 
+                          emotion={message.emotion || 'happy'} 
+                        />
+                        <span className="text-xs font-medium">Diego</span>
+                      </div>
+                    )}
+                    <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                    <span className="text-xs opacity-70 mt-1 block text-right">
+                      {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  </div>
+                </motion.div>
+              ))}
+              
+              {isLoading && (
+                <motion.div 
+                  className="flex justify-start"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <div className="bg-muted rounded-lg p-3 max-w-[85%]">
+                    <div className="flex items-center gap-2">
+                      <DiegoAvatar size="sm" emotion="thinking" />
+                      <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                      <span className="text-xs">Diego is thinking...</span>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+              
+              <div ref={messagesEndRef} />
+            </div>
+          </ScrollArea>
+          
+          {/* Quick prompts suggestions */}
+          {messages.length <= 3 && (
+            <div className="p-2 border-t flex gap-1 overflow-x-auto no-scrollbar">
+              {PROMPT_SUGGESTIONS.map((suggestion, i) => (
                 <Button 
-                  key={index}
+                  key={i} 
                   variant="outline" 
                   size="sm" 
-                  onClick={() => handleQuickQuestionClick(question)}
-                  className="flex-shrink-0"
+                  className="text-xs flex items-center gap-1 whitespace-nowrap py-1 h-auto"
+                  onClick={() => handleSuggestionClick(suggestion.value)}
                 >
-                  {question}
+                  {suggestion.icon}
+                  {suggestion.text}
                 </Button>
               ))}
             </div>
-          </div>
+          )}
           
-          {/* Input area */}
-          <div className="p-3 border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 flex items-center gap-2">
-            <Input
-              ref={inputRef}
-              type="text"
-              placeholder="Ask Diego something..."
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-              className="flex-1"
-            />
-            <Button 
-              onClick={handleSendMessage}
-              size="icon"
-              disabled={!inputValue.trim() || isLoading}
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="rotate-90">
-                <path d="M12 5V19M12 5L6 11M12 5L18 11" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </Button>
-          </div>
-        </motion.div>
-      )}
+          <CardContent className="p-3 border-t">
+            <div className="flex items-center gap-2">
+              <Input
+                ref={inputRef}
+                placeholder="Ask Diego a question..."
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                disabled={isLoading || shouldExitChat}
+                className="flex-1"
+              />
+              <Button 
+                size="icon"
+                disabled={isLoading || input.trim() === '' || shouldExitChat}
+                onClick={handleSend}
+                aria-label="Send message"
+                className="bg-primary hover:bg-primary/90"
+              >
+                <Send className="h-4 w-4" />
+              </Button>
+            </div>
+            <div className="text-xs text-center mt-2 text-muted-foreground">
+              <p>Diego can answer questions about DECA and business concepts</p>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
     </AnimatePresence>
   );
 }
