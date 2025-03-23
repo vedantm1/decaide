@@ -193,8 +193,7 @@ export default function DiegoChat({ isOpen, onClose }: DiegoChatProps) {
         emotion: data.isUnrelated ? 'neutral' : 'happy'
       }]);
       
-      // Add a small animation when Diego responds
-      triggerAnimation('stars');
+      // Animation disabled for chat messages
       
     } catch (error) {
       console.error('Error sending message to Diego:', error);

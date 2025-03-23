@@ -128,34 +128,7 @@ function DiegoGuideManager() {
       {/* Playful background animation for Memphis style */}
       <PlayfulBackground enabled={visualStyle === 'memphis'} colorScheme={colorScheme} />
 
-      {/* Persistent welcome banner that appears after tutorial completion */}
-      <AnimatePresence>
-        {showWelcomeBanner && (
-          <motion.div 
-            className="fixed inset-x-0 top-0 z-50"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0, transition: { duration: 0.5 } }}
-            exit={{ opacity: 0, y: -20, transition: { duration: 0.3 } }}
-          >
-            <div className="dark:bg-gradient-to-r dark:from-gray-900 dark:to-gray-800 dark:border-b dark:border-gray-700 bg-gradient-to-r from-blue-600 to-cyan-500 text-white p-4 shadow-lg">
-              <div className="container mx-auto flex items-center justify-center gap-2 text-center">
-                <span className="animate-pulse text-yellow-200">🏝️</span>
-                <span className="font-medium">Welcome to DecA(I)de! 3-day trial activated - enjoy our tropical dolphin assistant!</span>
-                <span className="animate-pulse text-yellow-200">🏝️</span>
-                <button 
-                  onClick={() => setShowWelcomeBanner(false)}
-                  className="ml-2 text-white/80 hover:text-white"
-                  aria-label="Close welcome banner"
-                >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M6 18L18 6M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </button>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Welcome banner removed as requested */}
 
       <Diego 
         isNewUser={isNewUser} 
