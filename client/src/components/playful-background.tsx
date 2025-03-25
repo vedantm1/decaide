@@ -79,18 +79,16 @@ const PlayfulBackground: React.FC<PlayfulBackgroundProps> = ({ enabled, colorSch
     const colors = getColors();
     const newShapes: Shape[] = [];
     
-    // Generate only a few shapes to avoid performance issues and distraction
-    // Add more shapes for larger screens but keep them sparse
-    const numShapes = Math.min(12, Math.floor(window.innerWidth / 180));
+    // Generate more shapes for a more noticeable effect while maintaining performance
+    // Scale with screen size but ensure there are enough shapes for visual impact
+    const numShapes = Math.min(20, Math.floor(window.innerWidth / 120));
     
-    // Define areas to avoid (main content areas)
+    // Define areas to avoid (reduced to allow more shapes in more areas)
     const avoidAreas = [
-      // Center area where main content usually is
-      { x1: 30, y1: 15, x2: 70, y2: 85 }, 
-      // Top header area
-      { x1: 0, y1: 0, x2: 100, y2: 10 },
-      // Bottom footer area
-      { x1: 0, y1: 85, x2: 100, y2: 100 },
+      // Only avoid the very center of the content area
+      { x1: 40, y1: 25, x2: 60, y2: 75 }, 
+      // Essential navigation area
+      { x1: 0, y1: 0, x2: 100, y2: 5 },
     ];
     
     // Check if a position is in an area to avoid
@@ -128,7 +126,7 @@ const PlayfulBackground: React.FC<PlayfulBackgroundProps> = ({ enabled, colorSch
         type: shapeTypes[Math.floor(Math.random() * shapeTypes.length)],
         x: x,
         y: y,
-        size: 15 + Math.random() * 45, // Slightly smaller shapes
+        size: 25 + Math.random() * 65, // Larger shapes for more visual impact
         rotation: Math.random() * 360,
         color: colors[Math.floor(Math.random() * colors.length)],
         delay: Math.random() * 5,
@@ -152,7 +150,7 @@ const PlayfulBackground: React.FC<PlayfulBackgroundProps> = ({ enabled, colorSch
       {shapes.map((shape) => (
         <motion.div
           key={shape.id}
-          className="absolute opacity-5" // Reduced opacity to make them very subtle
+          className="absolute opacity-10" // Increased opacity for better visibility
           style={{
             left: `${shape.x}%`,
             top: `${shape.y}%`,
