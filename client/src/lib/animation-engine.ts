@@ -29,7 +29,7 @@ type ParticleType =
 // Color Schemes
 type ColorScheme = 
   | 'rainbow' | 'tropical' | 'ocean' | 'forest' | 'sunset' | 'neon'
-  | 'pastel' | 'monochrome' | 'gold' | 'silver' | 'brand' | 'custom';
+  | 'pastel' | 'monochrome' | 'gold' | 'silver' | 'brand' | 'custom' | 'theme';
 
 // Animation Timing Functions
 type TimingFunction = 
@@ -57,7 +57,7 @@ const defaultParams: AnimationParams = {
   duration: 3000,
   particleCount: 100,
   particleType: 'circle',
-  colorScheme: 'rainbow',
+  colorScheme: 'theme', // Changed from 'rainbow' to 'theme' to use application theme colors
   spread: 90,
   startVelocity: 45,
   decay: 0.9,
@@ -78,6 +78,8 @@ const colorSchemes: Record<ColorScheme, string[]> = {
   silver: ['#C0C0C0', '#9E9E9E', '#757575', '#616161', '#424242'],
   brand: ['#3B82F6', '#2563EB', '#1E40AF', '#1E3A8A', '#172554'],
   custom: [],
+  // Added a placeholder array for theme - the actual colors will be dynamically generated
+  theme: ['#3B82F6', '#2563EB', '#1E40AF', '#1E3A8A', '#172554'],
 };
 
 // Particle type generators
@@ -258,18 +260,83 @@ const randomColor = (): string => {
   return `hsl(${Math.random() * 360}, ${50 + Math.random() * 50}%, ${50 + Math.random() * 20}%)`;
 };
 
-// Get colors based on color scheme
+// Get colors based on color scheme or app theme
 const getColors = (params: AnimationParams): string[] => {
   if (params.colors && params.colors.length > 0) {
     return params.colors;
   }
   
-  if (params.colorScheme && params.colorScheme !== 'custom') {
+  // Get color scheme from CSS variables for 'theme' option - this makes animations match the app theme
+  if (params.colorScheme === 'theme') {
+    const getCSSVar = (name: string) => getComputedStyle(document.documentElement).getPropertyValue(name).trim() || '';
+    
+    // Get theme colors
+    const primary = getCSSVar('--color-primary');
+    const secondary = getCSSVar('--color-secondary');
+    const accent = getCSSVar('--color-accent');
+    const isDark = document.documentElement.classList.contains('dark');
+    
+    // If we couldn't get CSS variables, fallback to brand colors
+    if (!primary) {
+      return colorSchemes.brand;
+    }
+    
+    // Create array with theme colors and variations
+    return [
+      primary,
+      secondary,
+      accent,
+      // Add brightness variations using HSL to create a coordinated palette
+      `hsl(${hslFromHex(primary).h}, ${Math.min(hslFromHex(primary).s + 10, 100)}%, ${Math.min(hslFromHex(primary).l + (isDark ? 15 : -10), 95)}%)`,
+      `hsl(${hslFromHex(secondary).h}, ${Math.min(hslFromHex(secondary).s + 15, 100)}%, ${Math.min(hslFromHex(secondary).l + (isDark ? 20 : -15), 95)}%)`
+    ];
+  }
+  
+  if (params.colorScheme && params.colorScheme !== 'custom' && colorSchemes[params.colorScheme]) {
     return colorSchemes[params.colorScheme];
   }
   
-  // Default to rainbow if no valid scheme provided
-  return colorSchemes.rainbow;
+  // Default to brand or rainbow if no valid scheme provided
+  return colorSchemes.brand || colorSchemes.rainbow;
+};
+
+// Helper to convert hex to HSL
+const hslFromHex = (hex: string) => {
+  // Remove the hash if it exists
+  hex = hex.replace(/^#/, '');
+  
+  // Parse the r, g, b values
+  let r = parseInt(hex.substring(0, 2), 16) / 255;
+  let g = parseInt(hex.substring(2, 4), 16) / 255;
+  let b = parseInt(hex.substring(4, 6), 16) / 255;
+  
+  // If parsing failed, return default values
+  if (isNaN(r)) r = 0.5;
+  if (isNaN(g)) g = 0.5;
+  if (isNaN(b)) b = 0.5;
+  
+  // Find the min and max values to compute the lightness
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  let h = 0, s = 0, l = (max + min) / 2;
+  
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    
+    switch (max) {
+      case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+      case g: h = (b - r) / d + 2; break;
+      case b: h = (r - g) / d + 4; break;
+    }
+    
+    h = Math.round(h * 60);
+  }
+  
+  s = Math.round(s * 100);
+  l = Math.round(l * 100);
+  
+  return { h, s, l };
 };
 
 // Merge default parameters with provided ones
