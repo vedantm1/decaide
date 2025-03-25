@@ -26,27 +26,15 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
     return cleanup;
   }, []); // Empty dependency array - only run on mount
 
-  // Handle user theme preferences from database whenever user loads or changes
+  // Handle user theme preferences
   useEffect(() => {
-    if (user?.uiTheme) {
-      // If user has a color scheme preference in their account, that takes priority
+    if (user?.uiTheme && user.uiTheme !== appearance.colorScheme) {
       const newAppearance = {
         ...appearance,
         colorScheme: user.uiTheme
       };
-      
-      // Note: In the future, we could add visualStyle to the user schema
-      // and include it here as well
-      
-      // Apply the theme and update state
-      const updatedTheme = applyTheme(newAppearance);
-      setAppearance(updatedTheme);
-      
-      // Also update localStorage/sessionStorage for consistency
-      localStorage.setItem('diegoAppearance', JSON.stringify(updatedTheme));
-      sessionStorage.setItem('diegoAppearance', JSON.stringify(updatedTheme));
-      
-      console.log('Applied user theme from account:', user.uiTheme);
+      setAppearance(newAppearance);
+      applyTheme(newAppearance);
     }
   }, [user]);
 

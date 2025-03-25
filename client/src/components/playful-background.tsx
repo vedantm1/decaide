@@ -23,74 +23,38 @@ const PlayfulBackground: React.FC<PlayfulBackgroundProps> = ({ enabled, colorSch
   const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
   const isDarkMode = document.documentElement.classList.contains('dark');
 
-  // Get colors directly from CSS variables to ensure perfect theme matching
+  // Colors for light and dark mode
   const getColors = (): string[] => {
-    const getCSSVar = (name: string) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    const baseColors: Record<string, string[]> = {
+      'aquaBlue': ['#3b82f6', '#60a5fa', '#93c5fd', '#bfdbfe'],
+      'coralPink': ['#ec4899', '#f472b6', '#f9a8d4', '#fbcfe8'],
+      'mintGreen': ['#22c55e', '#4ade80', '#86efac', '#bbf7d0'],
+      'royalPurple': ['#8b5cf6', '#a78bfa', '#c4b5fd', '#ddd6fe'],
+    };
     
-    // Get primary colors from CSS variables set by the theme controller
-    const primary = getCSSVar('--color-primary') || '#3b82f6';
-    const secondary = getCSSVar('--color-secondary') || '#60a5fa';
-    const accent = getCSSVar('--color-accent') || '#1e40af';
-    const medium = getCSSVar('--color-medium') || '#bfdbfe';
+    // Get colors based on color scheme, default to aquaBlue if scheme not found
+    const schemeColors = baseColors[colorScheme as keyof typeof baseColors] || baseColors.aquaBlue;
     
-    // For dark mode, create variations with better contrast
+    // For dark mode, use color opposites with reduced opacity for contrast
     if (isDarkMode) {
-      // Create brighter, more vivid colors for dark mode to stand out
-      return [
-        primary,
-        secondary,
-        accent,
-        medium,
-        // Add brightness variations
-        `hsl(${hslFromHex(primary).h}, ${hslFromHex(primary).s}%, ${Math.min(hslFromHex(primary).l + 15, 90)}%)`,
-        `hsl(${hslFromHex(secondary).h}, ${hslFromHex(secondary).s}%, ${Math.min(hslFromHex(secondary).l + 20, 90)}%)`
-      ];
+      // Create complementary colors for dark mode by using opposite colors
+      return schemeColors.map(color => {
+        // Basic complementary color calculation
+        const hex = color.replace('#', '');
+        const r = parseInt(hex.slice(0, 2), 16);
+        const g = parseInt(hex.slice(2, 4), 16);
+        const b = parseInt(hex.slice(4, 6), 16);
+        
+        // Generate colors with higher contrast but lower opacity for dark mode
+        const complementaryR = Math.floor((255 - r) * 0.7);
+        const complementaryG = Math.floor((255 - g) * 0.7);
+        const complementaryB = Math.floor((255 - b) * 0.7);
+        
+        return `rgb(${complementaryR}, ${complementaryG}, ${complementaryB})`;
+      });
     }
     
-    // Light mode - use theme colors with some variations
-    return [
-      primary,
-      secondary,
-      accent,
-      medium,
-      // Add subtle variations
-      `hsl(${hslFromHex(primary).h}, ${Math.max(hslFromHex(primary).s - 10, 30)}%, ${hslFromHex(primary).l}%)`,
-      `hsl(${hslFromHex(secondary).h}, ${Math.max(hslFromHex(secondary).s - 15, 30)}%, ${hslFromHex(secondary).l}%)`
-    ];
-  };
-  
-  // Helper function to convert hex to HSL
-  const hslFromHex = (hex: string) => {
-    // Remove the hash if it exists
-    hex = hex.replace(/^#/, '');
-    
-    // Parse the r, g, b values
-    let r = parseInt(hex.substring(0, 2), 16) / 255;
-    let g = parseInt(hex.substring(2, 4), 16) / 255;
-    let b = parseInt(hex.substring(4, 6), 16) / 255;
-    
-    // Find the min and max values to compute the lightness
-    const max = Math.max(r, g, b);
-    const min = Math.min(r, g, b);
-    let h = 0, s = 0, l = (max + min) / 2;
-    
-    if (max !== min) {
-      const d = max - min;
-      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-      
-      switch (max) {
-        case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-        case g: h = (b - r) / d + 2; break;
-        case b: h = (r - g) / d + 4; break;
-      }
-      
-      h = Math.round(h * 60);
-    }
-    
-    s = Math.round(s * 100);
-    l = Math.round(l * 100);
-    
-    return { h, s, l };
+    return schemeColors;
   };
 
   useEffect(() => {
@@ -115,16 +79,18 @@ const PlayfulBackground: React.FC<PlayfulBackgroundProps> = ({ enabled, colorSch
     const colors = getColors();
     const newShapes: Shape[] = [];
     
-    // Generate more shapes for a more noticeable effect while maintaining performance
-    // Scale with screen size but ensure there are enough shapes for visual impact
-    const numShapes = Math.min(20, Math.floor(window.innerWidth / 120));
+    // Generate only a few shapes to avoid performance issues and distraction
+    // Add more shapes for larger screens but keep them sparse
+    const numShapes = Math.min(12, Math.floor(window.innerWidth / 180));
     
-    // Define areas to avoid (reduced to allow more shapes in more areas)
+    // Define areas to avoid (main content areas)
     const avoidAreas = [
-      // Only avoid the very center of the content area
-      { x1: 40, y1: 25, x2: 60, y2: 75 }, 
-      // Essential navigation area
-      { x1: 0, y1: 0, x2: 100, y2: 5 },
+      // Center area where main content usually is
+      { x1: 30, y1: 15, x2: 70, y2: 85 }, 
+      // Top header area
+      { x1: 0, y1: 0, x2: 100, y2: 10 },
+      // Bottom footer area
+      { x1: 0, y1: 85, x2: 100, y2: 100 },
     ];
     
     // Check if a position is in an area to avoid
@@ -162,7 +128,7 @@ const PlayfulBackground: React.FC<PlayfulBackgroundProps> = ({ enabled, colorSch
         type: shapeTypes[Math.floor(Math.random() * shapeTypes.length)],
         x: x,
         y: y,
-        size: 25 + Math.random() * 65, // Larger shapes for more visual impact
+        size: 15 + Math.random() * 45, // Slightly smaller shapes
         rotation: Math.random() * 360,
         color: colors[Math.floor(Math.random() * colors.length)],
         delay: Math.random() * 5,
@@ -186,7 +152,7 @@ const PlayfulBackground: React.FC<PlayfulBackgroundProps> = ({ enabled, colorSch
       {shapes.map((shape) => (
         <motion.div
           key={shape.id}
-          className="absolute opacity-15" // Further increased opacity for better visibility
+          className="absolute opacity-5" // Reduced opacity to make them very subtle
           style={{
             left: `${shape.x}%`,
             top: `${shape.y}%`,

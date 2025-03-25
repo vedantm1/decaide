@@ -43,19 +43,16 @@ export function getCurrentTheme(): AppearanceSettings {
 
 // Apply the theme to the document
 export function applyTheme(appearance: AppearanceSettings): AppearanceSettings {
-  // Ensure we have a complete appearance object with defaults for any missing properties
-  const completeAppearance = { ...defaultAppearance, ...appearance };
-  
   // Save to sessionStorage (user session specific)
-  sessionStorage.setItem('diegoAppearance', JSON.stringify(completeAppearance));
+  sessionStorage.setItem('diegoAppearance', JSON.stringify(appearance));
   
   // Also save to localStorage for device persistence 
   // This is a fallback for users who aren't logged in
-  localStorage.setItem('diegoAppearance', JSON.stringify(completeAppearance));
+  localStorage.setItem('diegoAppearance', JSON.stringify(appearance));
   
   // 1. Handle dark/light/system mode
   const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-  const isDarkMode = completeAppearance.theme === 'dark' || (completeAppearance.theme === 'system' && prefersDark);
+  const isDarkMode = appearance.theme === 'dark' || (appearance.theme === 'system' && prefersDark);
   
   // Define DECA color systems
   const colorSystems = {
@@ -163,13 +160,11 @@ export function applyTheme(appearance: AppearanceSettings): AppearanceSettings {
   };
 
   // Get colors based on selected scheme (or default if not found)
-  const colors = colorSystems[completeAppearance.colorScheme as keyof typeof colorSystems] || colorSystems.aquaBlue;
+  const colors = colorSystems[appearance.colorScheme as keyof typeof colorSystems] || colorSystems.aquaBlue;
   
   // Apply all color variables
   Object.entries(colors).forEach(([key, value]) => {
     document.documentElement.style.setProperty(`--color-${key}`, value);
-    // Also set the CSS variable to ensure consistency across components
-    document.documentElement.style.setProperty(`--${key}`, value);
   });
   
   if (isDarkMode) {
@@ -225,16 +220,16 @@ export function applyTheme(appearance: AppearanceSettings): AppearanceSettings {
   document.documentElement.classList.remove(...themeClasses);
   
   // 3. Apply new color scheme class
-  document.documentElement.classList.add(`theme-${completeAppearance.colorScheme}`);
+  document.documentElement.classList.add(`theme-${appearance.colorScheme}`);
   
   // Debug to console
-  console.log(`Applied theme: ${completeAppearance.colorScheme}, dark mode: ${isDarkMode}`);
+  console.log(`Applied theme: ${appearance.colorScheme}, dark mode: ${isDarkMode}`);
   
   // 4. Apply font size using data attribute
-  document.documentElement.setAttribute('data-font-size', completeAppearance.fontSize);
+  document.documentElement.setAttribute('data-font-size', appearance.fontSize);
   
   // 5. Apply visual style
-  if (completeAppearance.visualStyle === 'memphis') {
+  if (appearance.visualStyle === 'memphis') {
     document.documentElement.classList.add('memphis-style');
     document.documentElement.classList.remove('minimalist-style');
   } else {
@@ -245,8 +240,8 @@ export function applyTheme(appearance: AppearanceSettings): AppearanceSettings {
   // 6. Force a repaint
   const forceRepaint = document.body.offsetHeight;
   
-  // 7. Return the updated complete appearance to ensure consistency
-  return completeAppearance;
+  // 7. Return the updated appearance
+  return appearance;
 }
 
 // Listen for system theme changes
