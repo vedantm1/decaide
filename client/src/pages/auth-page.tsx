@@ -170,6 +170,16 @@ export default function AuthPage() {
     // Trigger animation when form is submitted
     triggerAnimation("confetti", "Creating your account! I'm excited to help you prepare for DECA success!");
 
+    // Apply the selected theme immediately upon registration
+    import('../lib/theme-controller').then(({ applyTheme }) => {
+      applyTheme({
+        theme: window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light',
+        colorScheme: values.uiTheme,
+        fontSize: 'medium',
+        visualStyle: values.colorScheme as 'memphis' | 'minimalist'
+      });
+    });
+
     // Submit the form data
     registerMutation.mutate(values, {
       onSuccess: () => {
