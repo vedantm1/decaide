@@ -150,7 +150,7 @@ const PlayfulBackground: React.FC<PlayfulBackgroundProps> = ({ enabled, colorSch
       {shapes.map((shape) => (
         <motion.div
           key={shape.id}
-          className="absolute opacity-10" // Increased opacity for better visibility
+          className="absolute opacity-15" // Further increased opacity for better visibility
           style={{
             left: `${shape.x}%`,
             top: `${shape.y}%`,
