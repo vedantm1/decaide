@@ -919,7 +919,17 @@ export default function SettingsPage() {
 
                     <Button 
                       className="w-full md:w-auto"
-                      onClick={() => updateAppearance.mutate(appearance)}
+                      onClick={() => {
+                        // Apply theme immediately for instant feedback
+                        const { applyTheme } = require('@/lib/theme-controller');
+                        applyTheme(appearance);
+                        
+                        // Then save it through the mutation
+                        updateAppearance.mutate(appearance);
+                        
+                        // Trigger a small animation for better user feedback
+                        triggerAnimation('sparkles');
+                      }}
                       disabled={updateAppearance.isPending}
                     >
                       {updateAppearance.isPending ? (

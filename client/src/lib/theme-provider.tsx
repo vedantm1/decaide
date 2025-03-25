@@ -32,10 +32,11 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
       // If user has a color scheme preference in their account, that takes priority
       const newAppearance = {
         ...appearance,
-        colorScheme: user.uiTheme,
-        // If user has a visual style preference, apply that too
-        ...(user.visualStyle && { visualStyle: user.visualStyle as 'memphis' | 'minimalist' })
+        colorScheme: user.uiTheme
       };
+      
+      // Note: In the future, we could add visualStyle to the user schema
+      // and include it here as well
       
       // Apply the theme and update state
       const updatedTheme = applyTheme(newAppearance);

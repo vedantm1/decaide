@@ -23,38 +23,74 @@ const PlayfulBackground: React.FC<PlayfulBackgroundProps> = ({ enabled, colorSch
   const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
   const isDarkMode = document.documentElement.classList.contains('dark');
 
-  // Colors for light and dark mode
+  // Get colors directly from CSS variables to ensure perfect theme matching
   const getColors = (): string[] => {
-    const baseColors: Record<string, string[]> = {
-      'aquaBlue': ['#3b82f6', '#60a5fa', '#93c5fd', '#bfdbfe'],
-      'coralPink': ['#ec4899', '#f472b6', '#f9a8d4', '#fbcfe8'],
-      'mintGreen': ['#22c55e', '#4ade80', '#86efac', '#bbf7d0'],
-      'royalPurple': ['#8b5cf6', '#a78bfa', '#c4b5fd', '#ddd6fe'],
-    };
+    const getCSSVar = (name: string) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
     
-    // Get colors based on color scheme, default to aquaBlue if scheme not found
-    const schemeColors = baseColors[colorScheme as keyof typeof baseColors] || baseColors.aquaBlue;
+    // Get primary colors from CSS variables set by the theme controller
+    const primary = getCSSVar('--color-primary') || '#3b82f6';
+    const secondary = getCSSVar('--color-secondary') || '#60a5fa';
+    const accent = getCSSVar('--color-accent') || '#1e40af';
+    const medium = getCSSVar('--color-medium') || '#bfdbfe';
     
-    // For dark mode, use color opposites with reduced opacity for contrast
+    // For dark mode, create variations with better contrast
     if (isDarkMode) {
-      // Create complementary colors for dark mode by using opposite colors
-      return schemeColors.map(color => {
-        // Basic complementary color calculation
-        const hex = color.replace('#', '');
-        const r = parseInt(hex.slice(0, 2), 16);
-        const g = parseInt(hex.slice(2, 4), 16);
-        const b = parseInt(hex.slice(4, 6), 16);
-        
-        // Generate colors with higher contrast but lower opacity for dark mode
-        const complementaryR = Math.floor((255 - r) * 0.7);
-        const complementaryG = Math.floor((255 - g) * 0.7);
-        const complementaryB = Math.floor((255 - b) * 0.7);
-        
-        return `rgb(${complementaryR}, ${complementaryG}, ${complementaryB})`;
-      });
+      // Create brighter, more vivid colors for dark mode to stand out
+      return [
+        primary,
+        secondary,
+        accent,
+        medium,
+        // Add brightness variations
+        `hsl(${hslFromHex(primary).h}, ${hslFromHex(primary).s}%, ${Math.min(hslFromHex(primary).l + 15, 90)}%)`,
+        `hsl(${hslFromHex(secondary).h}, ${hslFromHex(secondary).s}%, ${Math.min(hslFromHex(secondary).l + 20, 90)}%)`
+      ];
     }
     
-    return schemeColors;
+    // Light mode - use theme colors with some variations
+    return [
+      primary,
+      secondary,
+      accent,
+      medium,
+      // Add subtle variations
+      `hsl(${hslFromHex(primary).h}, ${Math.max(hslFromHex(primary).s - 10, 30)}%, ${hslFromHex(primary).l}%)`,
+      `hsl(${hslFromHex(secondary).h}, ${Math.max(hslFromHex(secondary).s - 15, 30)}%, ${hslFromHex(secondary).l}%)`
+    ];
+  };
+  
+  // Helper function to convert hex to HSL
+  const hslFromHex = (hex: string) => {
+    // Remove the hash if it exists
+    hex = hex.replace(/^#/, '');
+    
+    // Parse the r, g, b values
+    let r = parseInt(hex.substring(0, 2), 16) / 255;
+    let g = parseInt(hex.substring(2, 4), 16) / 255;
+    let b = parseInt(hex.substring(4, 6), 16) / 255;
+    
+    // Find the min and max values to compute the lightness
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    let h = 0, s = 0, l = (max + min) / 2;
+    
+    if (max !== min) {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      
+      switch (max) {
+        case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+        case g: h = (b - r) / d + 2; break;
+        case b: h = (r - g) / d + 4; break;
+      }
+      
+      h = Math.round(h * 60);
+    }
+    
+    s = Math.round(s * 100);
+    l = Math.round(l * 100);
+    
+    return { h, s, l };
   };
 
   useEffect(() => {
