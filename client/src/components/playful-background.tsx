@@ -152,7 +152,7 @@ const PlayfulBackground: React.FC<PlayfulBackgroundProps> = ({ enabled, colorSch
       {shapes.map((shape) => (
         <motion.div
           key={shape.id}
-          className="absolute opacity-5" // Reduced opacity to make them very subtle
+          className="absolute opacity-10" // Increased opacity to make them more visible (0.1)
           style={{
             left: `${shape.x}%`,
             top: `${shape.y}%`,
@@ -161,6 +161,7 @@ const PlayfulBackground: React.FC<PlayfulBackgroundProps> = ({ enabled, colorSch
             backgroundColor: shape.type === 'circle' || shape.type === 'square' ? shape.color : 'transparent',
             borderRadius: shape.type === 'circle' ? '50%' : '0',
             transform: `rotate(${shape.rotation}deg)`,
+            zIndex: 0,
           }}
           animate={{
             x: [0, 10, -10, 5, -5, 0], // Reduced movement distance
