@@ -245,8 +245,8 @@ export function applyTheme(appearance: AppearanceSettings): AppearanceSettings {
   // 6. Force a repaint
   const forceRepaint = document.body.offsetHeight;
   
-  // 7. Return the updated appearance
-  return appearance;
+  // 7. Return the updated complete appearance to ensure consistency
+  return completeAppearance;
 }
 
 // Listen for system theme changes

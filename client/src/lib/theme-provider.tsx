@@ -26,15 +26,26 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
     return cleanup;
   }, []); // Empty dependency array - only run on mount
 
-  // Handle user theme preferences
+  // Handle user theme preferences from database whenever user loads or changes
   useEffect(() => {
-    if (user?.uiTheme && user.uiTheme !== appearance.colorScheme) {
+    if (user?.uiTheme) {
+      // If user has a color scheme preference in their account, that takes priority
       const newAppearance = {
         ...appearance,
-        colorScheme: user.uiTheme
+        colorScheme: user.uiTheme,
+        // If user has a visual style preference, apply that too
+        ...(user.visualStyle && { visualStyle: user.visualStyle as 'memphis' | 'minimalist' })
       };
-      setAppearance(newAppearance);
-      applyTheme(newAppearance);
+      
+      // Apply the theme and update state
+      const updatedTheme = applyTheme(newAppearance);
+      setAppearance(updatedTheme);
+      
+      // Also update localStorage/sessionStorage for consistency
+      localStorage.setItem('diegoAppearance', JSON.stringify(updatedTheme));
+      sessionStorage.setItem('diegoAppearance', JSON.stringify(updatedTheme));
+      
+      console.log('Applied user theme from account:', user.uiTheme);
     }
   }, [user]);
 
