@@ -84,18 +84,39 @@ function DiegoGuideManager() {
   const [visualStyle, setVisualStyle] = useState('memphis');
   const [colorScheme, setColorScheme] = useState('aquaBlue');
   
-  // Check localStorage on mount to get user preferences
+  // Check localStorage on mount to get user preferences and set up storage listener
   useEffect(() => {
-    const savedAppearance = localStorage.getItem('appearance');
-    if (savedAppearance) {
-      try {
-        const parsed = JSON.parse(savedAppearance);
-        setVisualStyle(parsed.visualStyle || 'memphis');
-        setColorScheme(parsed.colorScheme || 'aquaBlue');
-      } catch (e) {
-        console.error('Failed to parse appearance settings', e);
+    // Function to update state from storage
+    const updateFromStorage = () => {
+      const savedAppearance = localStorage.getItem('diegoAppearance');
+      if (savedAppearance) {
+        try {
+          const parsed = JSON.parse(savedAppearance);
+          setVisualStyle(parsed.visualStyle || 'memphis');
+          setColorScheme(parsed.colorScheme || 'aquaBlue');
+          console.log('Theme applied:', parsed.visualStyle, parsed.colorScheme);
+        } catch (e) {
+          console.error('Failed to parse appearance settings', e);
+        }
       }
-    }
+    };
+    
+    // Initial load
+    updateFromStorage();
+    
+    // Set up listener for storage changes (for when settings are updated in another tab/component)
+    const handleStorageChange = (event: StorageEvent) => {
+      if (event.key === 'diegoAppearance') {
+        updateFromStorage();
+      }
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Cleanup
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, []);
   
   // Show welcome banner after tutorial is completed
