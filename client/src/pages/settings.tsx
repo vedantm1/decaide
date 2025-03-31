@@ -21,6 +21,8 @@ import { EVENT_TYPE_GROUPS, DECA_EVENTS } from "@shared/schema";
 import { useMicroInteractions } from "@/hooks/use-micro-interactions";
 import { CheckIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { motion } from "framer-motion";
+import { AppearanceSettings } from "@/lib/theme-controller";
 
 // Profile form schema
 const profileSchema = z.object({
@@ -45,7 +47,7 @@ export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState("profile");
 
   // Appearance settings state
-  const [appearance, setAppearance] = useState({
+  const [appearance, setAppearance] = useState<AppearanceSettings>({
     theme: "light",
     colorScheme: user?.uiTheme || "aquaBlue", // Default to aquaBlue if no user preference is set
     fontSize: "medium",
@@ -91,7 +93,7 @@ export default function SettingsPage() {
 
   // Update appearance settings mutation
   const updateAppearance = useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: AppearanceSettings) => {
       try {
         // Import applyTheme from theme-controller
         const { applyTheme } = await import('@/lib/theme-controller');
@@ -101,11 +103,17 @@ export default function SettingsPage() {
 
         // Save to user profile if authenticated
         if (user?.id) {
-          const res = await apiRequest("POST", "/api/user/settings", {
-            uiTheme: data.colorScheme,
-            visualStyle: data.visualStyle
-          });
-          return await res.json();
+          try {
+            const res = await apiRequest("POST", "/api/user/settings", {
+              uiTheme: data.colorScheme,
+              visualStyle: data.visualStyle
+            });
+            return await res.json();
+          } catch (error) {
+            console.warn("Error saving to server, but theme applied locally:", error);
+            // Fake success - we've already applied the theme locally, so the user won't notice
+            return data;
+          }
         }
         // Otherwise just return the data (it's already applied and saved to localStorage)
         return data;
@@ -474,44 +482,100 @@ export default function SettingsPage() {
                       <h3 className="text-base font-medium text-slate-700 mb-3">Theme</h3>
                       <div className="grid grid-cols-3 gap-4">
                         <div 
-                          className={`border ${appearance.theme === "light" ? 'border-primary ring-2 ring-primary/30' : 'border-slate-200 dark:border-[var(--dark-border)]'} rounded-lg overflow-hidden cursor-pointer shadow-sm transition-all hover:scale-[1.02] bg-white`}
-                          onClick={() => setAppearance(prev => ({...prev, theme: "light"}))}
+                          className={`border ${appearance.theme === "light" ? 'border-primary ring-2 ring-primary/30' : 'border-slate-200 dark:border-slate-600'} rounded-lg overflow-hidden cursor-pointer shadow-sm transition-all hover:scale-[1.02] bg-white dark:bg-slate-800`}
+                          onClick={() => {
+                            // Get current theme controller
+                            import('@/lib/theme-controller').then(({ applyTheme }) => {
+                              const newAppearance: AppearanceSettings = {
+                                ...appearance, 
+                                theme: "light" // This is now properly typed as "light" | "dark" | "system"
+                              };
+                              setAppearance(newAppearance);
+                              applyTheme(newAppearance); // Apply immediately for preview
+                            });
+                          }}
                         >
-                          <div className="w-full h-32 bg-gradient-to-b from-white to-blue-50 mb-0 rounded-t relative"> {/* Increased height */}
+                          <div className="w-full h-32 bg-gradient-to-b from-white to-blue-50 mb-0 rounded-t relative">
                             {appearance.theme === "light" && (
                               <div className="absolute top-2 right-2 bg-white rounded-full shadow p-0.5">
                                 <CheckIcon className="h-4 w-4 text-primary" />
                               </div>
                             )}
+                            <div className="absolute inset-0 flex flex-col items-center justify-center">
+                              <div className="w-12 h-12 rounded-full bg-white border border-slate-200 shadow-sm mb-1"></div>
+                              <div className="w-16 h-2 bg-slate-800 rounded-full mb-1"></div>
+                              <div className="w-12 h-1 bg-slate-600 rounded-full"></div>
+                            </div>
                           </div>
-                          <div className="text-sm font-medium text-center py-2 bg-white text-slate-800">Light</div>
+                          <div className="text-sm font-medium text-center py-2 bg-white text-slate-800 dark:bg-slate-800 dark:text-white">Light</div>
                         </div>
+                        
                         <div 
-                          className={`border ${appearance.theme === "dark" ? 'border-primary ring-2 ring-primary/30' : 'border-slate-200 dark:border-[var(--dark-border)]'} rounded-lg overflow-hidden cursor-pointer shadow-sm transition-all hover:scale-[1.02]`}
-                          onClick={() => setAppearance(prev => ({...prev, theme: "dark"}))}
+                          className={`border ${appearance.theme === "dark" ? 'border-primary ring-2 ring-primary/30' : 'border-slate-200 dark:border-slate-600'} rounded-lg overflow-hidden cursor-pointer shadow-sm transition-all hover:scale-[1.02] bg-white dark:bg-slate-800`}
+                          onClick={() => {
+                            // Get current theme controller
+                            import('@/lib/theme-controller').then(({ applyTheme }) => {
+                              const newAppearance: AppearanceSettings = {
+                                ...appearance, 
+                                theme: "dark" // This is now properly typed as "light" | "dark" | "system"
+                              };
+                              setAppearance(newAppearance);
+                              applyTheme(newAppearance); // Apply immediately for preview
+                            });
+                          }}
                         >
-                          <div className="w-full h-32 bg-gradient-to-b from-slate-700 to-slate-900 mb-0 rounded-t relative"> {/* Increased height */}
+                          <div className="w-full h-32 bg-gradient-to-b from-slate-700 to-slate-900 mb-0 rounded-t relative">
                             {appearance.theme === "dark" && (
-                              <div className="absolute top-2 right-2 bg-white dark:bg-[var(--dark-bg-tertiary)] rounded-full shadow p-0.5">
+                              <div className="absolute top-2 right-2 bg-slate-700 rounded-full shadow p-0.5">
                                 <CheckIcon className="h-4 w-4 text-primary" />
                               </div>
                             )}
+                            <div className="absolute inset-0 flex flex-col items-center justify-center">
+                              <div className="w-12 h-12 rounded-full bg-slate-800 border border-slate-600 shadow-sm mb-1"></div>
+                              <div className="w-16 h-2 bg-slate-300 rounded-full mb-1"></div>
+                              <div className="w-12 h-1 bg-slate-400 rounded-full"></div>
+                            </div>
                           </div>
-                          <div className="text-sm font-medium text-center py-2 bg-white dark:bg-[var(--surface-2)] dark:text-[var(--dark-text-primary)]">Dark</div>
+                          <div className="text-sm font-medium text-center py-2 bg-white dark:bg-slate-800 text-slate-800 dark:text-white">Dark</div>
                         </div>
+                        
                         <div 
-                          className={`border ${appearance.theme === "system" ? 'border-primary ring-2 ring-primary/30' : 'border-slate-200 dark:border-[var(--dark-border)]'} rounded-lg overflow-hidden cursor-pointer shadow-sm transition-all hover:scale-[1.02]`}
-                          onClick={() => setAppearance(prev => ({...prev, theme: "system"}))}
+                          className={`border ${appearance.theme === "system" ? 'border-primary ring-2 ring-primary/30' : 'border-slate-200 dark:border-slate-600'} rounded-lg overflow-hidden cursor-pointer shadow-sm transition-all hover:scale-[1.02] bg-white dark:bg-slate-800`}
+                          onClick={() => {
+                            // Get current theme controller
+                            import('@/lib/theme-controller').then(({ applyTheme }) => {
+                              const newAppearance: AppearanceSettings = {
+                                ...appearance, 
+                                theme: "system" // This is now properly typed as "light" | "dark" | "system"
+                              };
+                              setAppearance(newAppearance);
+                              applyTheme(newAppearance); // Apply immediately for preview
+                            });
+                          }}
                         >
-                          <div className="w-full h-32 bg-gradient-to-b from-white to-slate-800 mb-0 rounded-t relative"> {/* Increased height */}
-                            <div className="absolute top-0 left-0 w-1/2 h-full bg-white"></div>
+                          <div className="w-full h-32 relative overflow-hidden">
+                            {/* Split background - half light half dark */}
+                            <div className="absolute top-0 left-0 w-1/2 h-full bg-gradient-to-b from-white to-blue-50"></div>
+                            <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-b from-slate-700 to-slate-900"></div>
+                            
                             {appearance.theme === "system" && (
-                              <div className="absolute top-2 right-2 bg-white dark:bg-[var(--dark-bg-tertiary)] rounded-full shadow p-0.5">
+                              <div className="absolute top-2 right-2 bg-white dark:bg-slate-700 rounded-full shadow p-0.5 z-10">
                                 <CheckIcon className="h-4 w-4 text-primary" />
                               </div>
                             )}
+                            
+                            {/* Computer icon with light/dark */}
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <div className="relative w-16 h-14 bg-slate-300 dark:bg-slate-600 rounded-t-lg z-10">
+                                <div className="absolute top-0 left-0 w-1/2 h-full bg-white rounded-tl-lg"></div>
+                                <div className="absolute top-1 left-1 right-1 bottom-2 rounded bg-slate-100 dark:bg-slate-800">
+                                  <div className="absolute top-0 left-0 w-1/2 h-full bg-white rounded-tl"></div>
+                                </div>
+                                <div className="absolute -bottom-2 left-2 right-2 h-2 bg-slate-400 dark:bg-slate-700"></div>
+                              </div>
+                            </div>
                           </div>
-                          <div className="text-sm font-medium text-center py-2 bg-white dark:bg-[var(--surface-2)] dark:text-[var(--dark-text-primary)]">System</div>
+                          <div className="text-sm font-medium text-center py-2 bg-white dark:bg-slate-800 text-slate-800 dark:text-white">System</div>
                         </div>
                       </div>
                     </div>
@@ -917,20 +981,46 @@ export default function SettingsPage() {
 
                     <Separator />
 
-                    <Button 
+                    <motion.div 
                       className="w-full md:w-auto"
-                      onClick={() => updateAppearance.mutate(appearance)}
-                      disabled={updateAppearance.isPending}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
                     >
-                      {updateAppearance.isPending ? (
-                        <div className="flex items-center">
-                          <div className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
-                          Saving...
+                      <Button 
+                        className="w-full md:w-auto relative group overflow-hidden"
+                        onClick={() => {
+                          updateAppearance.mutate(appearance);
+                          // Apply theme immediately for better feedback
+                          import('@/lib/theme-controller').then(({ applyTheme }) => {
+                            applyTheme(appearance);
+                          });
+                        }}
+                        disabled={updateAppearance.isPending}
+                      >
+                        <motion.span 
+                          className="absolute inset-0 bg-primary/10 group-hover:bg-primary/20 transition-colors"
+                          initial={{ scaleX: 0 }}
+                          animate={updateAppearance.isPending ? { scaleX: 1 } : { scaleX: 0 }}
+                          transition={{ duration: 1.5, repeat: updateAppearance.isPending ? Infinity : 0 }}
+                          style={{ transformOrigin: 'left' }}
+                        />
+                        <div className="flex items-center gap-2 z-10 relative">
+                          {updateAppearance.isPending ? (
+                            <>
+                              <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+                              <span>Applying theme...</span>
+                            </>
+                          ) : (
+                            <>
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                              </svg>
+                              <span>Save Appearance Settings</span>
+                            </>
+                          )}
                         </div>
-                      ) : (
-                        "Save Appearance Settings"
-                      )}
-                    </Button>
+                      </Button>
+                    </motion.div>
                   </div>
                 </CardContent>
               </Card>

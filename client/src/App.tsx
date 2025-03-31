@@ -84,7 +84,7 @@ function DiegoGuideManager() {
   const [visualStyle, setVisualStyle] = useState('memphis');
   const [colorScheme, setColorScheme] = useState('aquaBlue');
   
-  // Check localStorage on mount to get user preferences and set up storage listener
+  // Check localStorage on mount to get user preferences and set up event listeners
   useEffect(() => {
     // Function to update state from storage
     const updateFromStorage = () => {
@@ -104,18 +104,29 @@ function DiegoGuideManager() {
     // Initial load
     updateFromStorage();
     
-    // Set up listener for storage changes (for when settings are updated in another tab/component)
+    // Set up listener for storage changes (for when settings are updated in another tab)
     const handleStorageChange = (event: StorageEvent) => {
       if (event.key === 'diegoAppearance') {
         updateFromStorage();
       }
     };
     
+    // Set up listener for theme change events (from within the same window)
+    const handleThemeChange = (event: Event) => {
+      const customEvent = event as CustomEvent<any>;
+      if (customEvent.detail) {
+        setVisualStyle(customEvent.detail.visualStyle || 'memphis');
+        setColorScheme(customEvent.detail.colorScheme || 'aquaBlue');
+      }
+    };
+    
     window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('themechange', handleThemeChange);
     
     // Cleanup
     return () => {
       window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('themechange', handleThemeChange);
     };
   }, []);
   

@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
+import { AppearanceSettings } from '@/lib/theme-controller';
 
 interface Shape {
   id: number;
@@ -18,10 +19,28 @@ interface PlayfulBackgroundProps {
   colorScheme: string;
 }
 
-const PlayfulBackground: React.FC<PlayfulBackgroundProps> = ({ enabled, colorScheme }) => {
+const PlayfulBackground: React.FC<PlayfulBackgroundProps> = ({ enabled: initialEnabled, colorScheme: initialColorScheme }) => {
   const [shapes, setShapes] = useState<Shape[]>([]);
   const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
+  const [enabled, setEnabled] = useState(initialEnabled);
+  const [colorScheme, setColorScheme] = useState(initialColorScheme);
   const isDarkMode = document.documentElement.classList.contains('dark');
+  
+  // Listen for theme change events
+  useEffect(() => {
+    const handleThemeChange = (event: Event) => {
+      const customEvent = event as CustomEvent<AppearanceSettings>;
+      if (customEvent.detail) {
+        setColorScheme(customEvent.detail.colorScheme || 'aquaBlue');
+        setEnabled(customEvent.detail.visualStyle === 'memphis');
+      }
+    };
+    
+    window.addEventListener('themechange', handleThemeChange);
+    return () => {
+      window.removeEventListener('themechange', handleThemeChange);
+    };
+  }, []);
 
   // Colors for light and dark mode
   const getColors = (): string[] => {

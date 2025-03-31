@@ -50,6 +50,10 @@ export function applyTheme(appearance: AppearanceSettings): AppearanceSettings {
   // This is a fallback for users who aren't logged in
   localStorage.setItem('diegoAppearance', JSON.stringify(appearance));
   
+  // Dispatch a custom event to notify other components about theme changes
+  const themeChangeEvent = new CustomEvent('themechange', { detail: appearance });
+  window.dispatchEvent(themeChangeEvent);
+  
   // 1. Handle dark/light/system mode
   const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
   const isDarkMode = appearance.theme === 'dark' || (appearance.theme === 'system' && prefersDark);
