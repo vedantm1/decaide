@@ -316,9 +316,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     
     try {
       const userId = req.user!.id;
-      const { uiTheme } = req.body;
+      const { uiTheme, colorScheme, theme, visualStyle } = req.body;
       
-      const updated = await storage.updateUserSettings(userId, { uiTheme });
+      // Create an object with the settings to update
+      const updateData: any = {};
+      if (uiTheme) updateData.uiTheme = uiTheme;
+      if (colorScheme) updateData.colorScheme = colorScheme; 
+      if (theme) updateData.theme = theme;
+      if (visualStyle && !colorScheme) updateData.colorScheme = visualStyle; // For backward compatibility
+      
+      const updated = await storage.updateUserSettings(userId, updateData);
       res.json(updated);
     } catch (error) {
       res.status(500).json({ error: "Failed to update appearance settings" });

@@ -38,7 +38,8 @@ export interface IStorage {
     eventType?: string,
     instructionalArea?: string,
     uiTheme?: string,
-    colorScheme?: string
+    colorScheme?: string,
+    theme?: string
   }): Promise<User | undefined>;
   updateSubscription(id: number, tier: string): Promise<User | undefined>;
   
@@ -154,6 +155,7 @@ export class MemStorage implements IStorage {
       instructionalArea: insertUser.instructionalArea || null,
       uiTheme: insertUser.uiTheme || "aquaBlue",
       colorScheme: insertUser.colorScheme || "memphis",
+      theme: insertUser.theme || "light", // Default to light theme
       subscriptionTier: "standard",
       streak: 0,
       lastLoginDate: now,
@@ -239,7 +241,8 @@ export class MemStorage implements IStorage {
     eventType?: string,
     instructionalArea?: string,
     uiTheme?: string,
-    colorScheme?: string
+    colorScheme?: string,
+    theme?: string
   }): Promise<User | undefined> {
     const user = await this.getUser(id);
     if (!user) return undefined;
@@ -250,6 +253,7 @@ export class MemStorage implements IStorage {
     if (settings.instructionalArea) user.instructionalArea = settings.instructionalArea;
     if (settings.uiTheme) user.uiTheme = settings.uiTheme;
     if (settings.colorScheme) user.colorScheme = settings.colorScheme;
+    if (settings.theme) user.theme = settings.theme;
     
     this.users.set(id, user);
     return user;
@@ -632,6 +636,7 @@ export class DatabaseStorage implements IStorage {
       instructionalArea: insertUser.instructionalArea || null,
       uiTheme: insertUser.uiTheme || "aquaBlue",
       colorScheme: insertUser.colorScheme || "memphis",
+      theme: insertUser.theme || "light", // Default to light theme
       subscriptionTier: "standard",
       streak: 0,
       lastLoginDate: now,
@@ -711,7 +716,8 @@ export class DatabaseStorage implements IStorage {
     eventType?: string,
     instructionalArea?: string,
     uiTheme?: string,
-    colorScheme?: string
+    colorScheme?: string,
+    theme?: string
   }): Promise<User | undefined> {
     const user = await this.getUser(id);
     if (!user) return undefined;
@@ -723,6 +729,7 @@ export class DatabaseStorage implements IStorage {
     if (settings.instructionalArea) updateData.instructionalArea = settings.instructionalArea;
     if (settings.uiTheme) updateData.uiTheme = settings.uiTheme;
     if (settings.colorScheme) updateData.colorScheme = settings.colorScheme;
+    if (settings.theme) updateData.theme = settings.theme;
     
     const [updatedUser] = await db.update(users)
       .set(updateData)

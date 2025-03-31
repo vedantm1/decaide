@@ -104,9 +104,10 @@ export default function SettingsPage() {
         // Save to user profile if authenticated
         if (user?.id) {
           try {
-            const res = await apiRequest("POST", "/api/user/settings", {
+            const res = await apiRequest("POST", "/api/user/appearance", {
               uiTheme: data.colorScheme,
-              visualStyle: data.visualStyle
+              colorScheme: data.visualStyle,
+              theme: data.theme
             });
             return await res.json();
           } catch (error) {

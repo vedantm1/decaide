@@ -15,6 +15,7 @@ export const users = pgTable("users", {
   sessionId: text("session_id"),     // Current session ID for multi-device control
   uiTheme: text("ui_theme").default("aquaBlue"), // UI theme preference
   colorScheme: text("color_scheme").default("memphis"), // UI color scheme (memphis, modern, classic)
+  theme: text("theme").default("light"), // Theme preference (light, dark, system)
   subscriptionTier: text("subscription_tier").default("standard"),
   streak: integer("streak").default(0),
   lastLoginDate: timestamp("last_login_date"),
@@ -33,6 +34,7 @@ export const insertUserSchema = createInsertSchema(users).pick({
   instructionalArea: true,
   uiTheme: true,
   colorScheme: true,
+  theme: true,
 });
 
 // Performance Indicators model

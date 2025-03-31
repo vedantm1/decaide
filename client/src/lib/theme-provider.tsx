@@ -28,13 +28,32 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
 
   // Handle user theme preferences
   useEffect(() => {
-    if (user?.uiTheme && user.uiTheme !== appearance.colorScheme) {
-      const newAppearance = {
-        ...appearance,
-        colorScheme: user.uiTheme
-      };
-      setAppearance(newAppearance);
-      applyTheme(newAppearance);
+    if (user) {
+      let shouldUpdate = false;
+      const newAppearance = { ...appearance };
+
+      // Update colorScheme (color theme)
+      if (user.uiTheme && user.uiTheme !== appearance.colorScheme) {
+        newAppearance.colorScheme = user.uiTheme;
+        shouldUpdate = true;
+      }
+
+      // Update theme (light/dark mode)
+      if (user.theme && user.theme !== appearance.theme) {
+        newAppearance.theme = user.theme as 'light' | 'dark' | 'system';
+        shouldUpdate = true;
+      }
+
+      // Update visual style (memphis/minimalist)
+      if (user.colorScheme && user.colorScheme !== appearance.visualStyle) {
+        newAppearance.visualStyle = user.colorScheme as 'memphis' | 'minimalist';
+        shouldUpdate = true;
+      }
+
+      if (shouldUpdate) {
+        setAppearance(newAppearance);
+        applyTheme(newAppearance);
+      }
     }
   }, [user]);
 

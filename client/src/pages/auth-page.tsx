@@ -61,6 +61,7 @@ const registerSchema = z.object({
   instructionalArea: z.string().optional(),
   uiTheme: z.string().default("aquaBlue"),
   colorScheme: z.string().default("memphis"),
+  theme: z.enum(["light", "dark", "system"]).default("light"),
 });
 
 export default function AuthPage() {
@@ -95,7 +96,8 @@ export default function AuthPage() {
       eventType: "",
       instructionalArea: "",
       uiTheme: "aquaBlue",
-      colorScheme: "memphis"
+      colorScheme: "memphis",
+      theme: "light"
     },
   });
 
@@ -173,7 +175,7 @@ export default function AuthPage() {
     // Apply the selected theme immediately upon registration
     import('../lib/theme-controller').then(({ applyTheme }) => {
       applyTheme({
-        theme: window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light',
+        theme: 'light', // Always use light theme for new users
         colorScheme: values.uiTheme,
         fontSize: 'medium',
         visualStyle: values.colorScheme as 'memphis' | 'minimalist'
