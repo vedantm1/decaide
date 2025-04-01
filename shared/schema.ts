@@ -85,6 +85,7 @@ export const SUBSCRIPTION_LIMITS = {
   standard: {
     roleplays: 15,            // AI-generated roleplay scenarios per area
     tests: 15,                // Monthly test attempts
+    writtenEvents: 2,         // Written event feedback sessions per month
     piExplanations: "fundamental", // Fundamental PI explanations
     progressTracking: "standard", // Standard progress with leaderboard
     gamification: "basic",    // Points and achievement badges
@@ -94,6 +95,7 @@ export const SUBSCRIPTION_LIMITS = {
   plus: {
     roleplays: 25,             // More roleplay scenarios per month
     tests: 25,                 // More practice tests per month
+    writtenEvents: 7,          // More written event feedback sessions
     piExplanations: 30,        // More performance indicator explanations
     examplePapers: 7,          // More example written event papers
     exampleDialogues: 7,       // More example roleplay dialogues
@@ -111,6 +113,7 @@ export const SUBSCRIPTION_LIMITS = {
   pro: {
     roleplays: -1,             // Unlimited roleplay scenarios
     tests: -1,                 // Unlimited practice tests
+    writtenEvents: -1,         // Unlimited written event feedback
     piExplanations: -1,        // Unlimited performance indicator explanations
     examplePapers: -1,         // Unlimited example written event papers
     exampleDialogues: -1,      // Unlimited example roleplay dialogues

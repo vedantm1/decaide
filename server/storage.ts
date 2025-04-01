@@ -70,8 +70,10 @@ export interface IStorage {
   // Subscription checks
   checkRoleplayAllowance(userId: number): Promise<boolean>;
   checkTestAllowance(userId: number): Promise<boolean>;
+  checkWrittenEventAllowance(userId: number): Promise<boolean>;
   recordRoleplayGeneration(userId: number): Promise<void>;
   recordTestGeneration(userId: number): Promise<void>;
+  recordWrittenEventGeneration(userId: number): Promise<void>;
   
   // Daily challenge
   getDailyChallenge(userId: number): Promise<any>;
@@ -84,6 +86,7 @@ export class MemStorage implements IStorage {
   private practiceSessions: Map<number, PracticeSession>;
   private roleplayUsage: Map<number, number>; // userId -> count this month
   private testUsage: Map<number, number>; // userId -> count this month
+  private writtenEventUsage: Map<number, number>; // userId -> count this month
   private userSessions: Map<number, { id: string; createdAt: Date; lastActive: Date }>;
   currentId: number;
   currentPIId: number;
@@ -96,6 +99,7 @@ export class MemStorage implements IStorage {
     this.practiceSessions = new Map();
     this.roleplayUsage = new Map();
     this.testUsage = new Map();
+    this.writtenEventUsage = new Map();
     this.userSessions = new Map();
     this.currentId = 1;
     this.currentPIId = 1;
@@ -520,6 +524,25 @@ export class MemStorage implements IStorage {
   async recordTestGeneration(userId: number): Promise<void> {
     const currentCount = this.testUsage.get(userId) || 0;
     this.testUsage.set(userId, currentCount + 1);
+  }
+  
+  async checkWrittenEventAllowance(userId: number): Promise<boolean> {
+    const user = await this.getUser(userId);
+    if (!user) return false;
+    
+    const tier = user.subscriptionTier as keyof typeof SUBSCRIPTION_LIMITS;
+    const limit = SUBSCRIPTION_LIMITS[tier].writtenEvents;
+    
+    // Unlimited for pro
+    if (limit === -1) return true;
+    
+    const usageCount = this.writtenEventUsage.get(userId) || 0;
+    return usageCount < limit;
+  }
+  
+  async recordWrittenEventGeneration(userId: number): Promise<void> {
+    const currentCount = this.writtenEventUsage.get(userId) || 0;
+    this.writtenEventUsage.set(userId, currentCount + 1);
   }
 
   // Daily challenge
@@ -987,8 +1010,136 @@ export class DatabaseStorage implements IStorage {
     return allActivities.slice(0, 10);
   }
   
-  // Placeholder implementations for the rest of the required methods
-  // These would need to be completed for a full implementation
+  // Subscription checks
+  async checkRoleplayAllowance(userId: number): Promise<boolean> {
+    const [user] = await db.select()
+      .from(users)
+      .where(eq(users.id, userId));
+      
+    if (!user) return false;
+    
+    const tier = user.subscriptionTier as keyof typeof SUBSCRIPTION_LIMITS;
+    const limit = SUBSCRIPTION_LIMITS[tier].roleplays;
+    
+    // Unlimited for pro
+    if (limit === -1) return true;
+    
+    // Count roleplay usage from the practice sessions within current month
+    const startOfMonth = new Date();
+    startOfMonth.setDate(1); // First day of current month
+    startOfMonth.setHours(0, 0, 0, 0);
+    
+    const usageCount = await db.select({ count: count() })
+      .from(practiceSessions)
+      .where(
+        and(
+          eq(practiceSessions.userId, userId),
+          eq(practiceSessions.type, "roleplay"),
+          sql`${practiceSessions.completedAt} >= ${startOfMonth}`
+        )
+      );
+      
+    return usageCount[0].count < limit;
+  }
+  
+  async checkTestAllowance(userId: number): Promise<boolean> {
+    const [user] = await db.select()
+      .from(users)
+      .where(eq(users.id, userId));
+      
+    if (!user) return false;
+    
+    const tier = user.subscriptionTier as keyof typeof SUBSCRIPTION_LIMITS;
+    const limit = SUBSCRIPTION_LIMITS[tier].tests;
+    
+    // Unlimited for pro
+    if (limit === -1) return true;
+    
+    // Count test usage from the practice sessions within current month
+    const startOfMonth = new Date();
+    startOfMonth.setDate(1); // First day of current month
+    startOfMonth.setHours(0, 0, 0, 0);
+    
+    const usageCount = await db.select({ count: count() })
+      .from(practiceSessions)
+      .where(
+        and(
+          eq(practiceSessions.userId, userId),
+          eq(practiceSessions.type, "test"),
+          sql`${practiceSessions.completedAt} >= ${startOfMonth}`
+        )
+      );
+      
+    return usageCount[0].count < limit;
+  }
+  
+  async checkWrittenEventAllowance(userId: number): Promise<boolean> {
+    const [user] = await db.select()
+      .from(users)
+      .where(eq(users.id, userId));
+      
+    if (!user) return false;
+    
+    const tier = user.subscriptionTier as keyof typeof SUBSCRIPTION_LIMITS;
+    const limit = SUBSCRIPTION_LIMITS[tier].writtenEvents;
+    
+    // Unlimited for pro
+    if (limit === -1) return true;
+    
+    // Count written event usage from the practice sessions within current month
+    const startOfMonth = new Date();
+    startOfMonth.setDate(1); // First day of current month
+    startOfMonth.setHours(0, 0, 0, 0);
+    
+    const usageCount = await db.select({ count: count() })
+      .from(practiceSessions)
+      .where(
+        and(
+          eq(practiceSessions.userId, userId),
+          eq(practiceSessions.type, "written"),
+          sql`${practiceSessions.completedAt} >= ${startOfMonth}`
+        )
+      );
+      
+    return usageCount[0].count < limit;
+  }
+  
+  async recordRoleplayGeneration(userId: number): Promise<void> {
+    // Record the usage by creating a practice session
+    await db.insert(practiceSessions)
+      .values({
+        userId,
+        type: "roleplay",
+        completedAt: new Date(),
+        score: null,
+        details: null
+      });
+  }
+  
+  async recordTestGeneration(userId: number): Promise<void> {
+    // Record the usage by creating a practice session
+    await db.insert(practiceSessions)
+      .values({
+        userId,
+        type: "test",
+        completedAt: new Date(),
+        score: null,
+        details: null
+      });
+  }
+  
+  async recordWrittenEventGeneration(userId: number): Promise<void> {
+    // Record the usage by creating a practice session
+    await db.insert(practiceSessions)
+      .values({
+        userId,
+        type: "written",
+        completedAt: new Date(),
+        score: null,
+        details: null
+      });
+  }
+  
   async getLearningItems(userId: number): Promise<any[]> {
     // For demo purposes, returning similar data as MemStorage
     return [
@@ -1053,52 +1204,7 @@ export class DatabaseStorage implements IStorage {
     };
   }
   
-  // These would be implemented with tables tracking usage in real DB
-  async checkRoleplayAllowance(userId: number): Promise<boolean> {
-    const [user] = await db.select()
-      .from(users)
-      .where(eq(users.id, userId));
-    
-    if (!user) return false;
-    
-    const tier = user.subscriptionTier as keyof typeof SUBSCRIPTION_LIMITS;
-    const limit = SUBSCRIPTION_LIMITS[tier].roleplays;
-    
-    // Always allow for unlimited tier (pro)
-    if (limit === -1) return true;
-    
-    // TODO: Implement proper usage tracking in DB
-    // For now, we'll assume under limit
-    return true;
-  }
-  
-  async checkTestAllowance(userId: number): Promise<boolean> {
-    const [user] = await db.select()
-      .from(users)
-      .where(eq(users.id, userId));
-    
-    if (!user) return false;
-    
-    const tier = user.subscriptionTier as keyof typeof SUBSCRIPTION_LIMITS;
-    const limit = SUBSCRIPTION_LIMITS[tier].tests;
-    
-    // Always allow for unlimited tier (pro)
-    if (limit === -1) return true;
-    
-    // TODO: Implement proper usage tracking in DB
-    // For now, we'll assume under limit
-    return true;
-  }
-  
-  async recordRoleplayGeneration(userId: number): Promise<void> {
-    // TODO: Implement usage tracking
-  }
-  
-  async recordTestGeneration(userId: number): Promise<void> {
-    // TODO: Implement usage tracking
-  }
-  
-  // Daily challenge - simplified 
+  // Daily challenge
   async getDailyChallenge(userId: number): Promise<any> {
     const [user] = await db.select()
       .from(users)
