@@ -1135,40 +1135,152 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.username, username));
-    return user;
+    try {
+      const [user] = await db.select().from(users).where(eq(users.username, username));
+      return user;
+    } catch (error) {
+      console.error("Error in getUserByUsername:", error.message);
+      
+      // Fallback to a simpler query if column issues occur
+      const result = await pool.query(`
+        SELECT * FROM users WHERE username = $1
+      `, [username]);
+      
+      if (result.rows.length === 0) return undefined;
+      
+      // Convert snake_case to camelCase for consistency
+      const userData = result.rows[0];
+      const user: User = {
+        id: userData.id,
+        username: userData.username,
+        password: userData.password,
+        email: userData.email,
+        eventFormat: userData.event_format,
+        eventCode: userData.event_code,
+        eventType: userData.event_type,
+        instructionalArea: userData.instructional_area,
+        createdAt: userData.created_at,
+        lastLogin: userData.last_login_date,
+        subscription: userData.subscription_tier || "standard",
+        uiTheme: userData.ui_theme || "aquaBlue",
+        colorScheme: userData.color_scheme || "memphis",
+        theme: userData.theme || "light",
+        streak: userData.streak || 0,
+        points: userData.points || 0,
+        sessionId: userData.session_id,
+        lastActive: userData.last_active,
+        stripeCustomerId: userData.stripe_customer_id,
+        stripeSubscriptionId: userData.stripe_subscription_id
+      };
+      return user;
+    }
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const now = new Date();
     const sessionId = `session_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
     
-    // Create the user with the default values
-    const [user] = await db.insert(users).values({
-      ...insertUser,
-      email: insertUser.email || null,
-      eventFormat: insertUser.eventFormat || null,
-      eventCode: insertUser.eventCode || null,
-      eventType: insertUser.eventType || null,
-      instructionalArea: insertUser.instructionalArea || null,
-      createdAt: now,
-      lastLogin: now,
-      subscription: "standard", // Default subscription tier
-      uiTheme: "light", // Default UI theme
-      colorScheme: "blue", // Default color scheme
-      theme: "default", // Default theme setting
-      streak: 0, // Starting streak
-      points: 0, // Starting points
-      sessionId: sessionId, // Current session ID
-      lastActive: now, // Last activity timestamp
-      stripeCustomerId: null, // Stripe customer ID
-      stripeSubscriptionId: null, // Stripe subscription ID
-    }).returning();
-    
-    // Create default performance indicators for the user
-    await this.createDefaultPIs(user.id);
-    
-    return user;
+    try {
+      // Create the user with the default values
+      const [user] = await db.insert(users).values({
+        ...insertUser,
+        email: insertUser.email || null,
+        eventFormat: insertUser.eventFormat || null,
+        eventCode: insertUser.eventCode || null,
+        eventType: insertUser.eventType || null,
+        instructionalArea: insertUser.instructionalArea || null,
+        sessionId: sessionId,
+        lastLoginDate: now,
+        subscriptionTier: "standard", // Default subscription tier
+        uiTheme: insertUser.uiTheme || "aquaBlue", // Default UI theme
+        colorScheme: insertUser.colorScheme || "memphis", // Default color scheme
+        theme: insertUser.theme || "light", // Default theme setting
+        streak: 0, // Starting streak
+        points: 0, // Starting points
+        roleplayCount: 0,
+        testCount: 0,
+        writtenEventCount: 0,
+        roleplayResetDate: now,
+        testResetDate: now,
+        writtenEventResetDate: now,
+        stripeCustomerId: null, // Stripe customer ID
+        stripeSubscriptionId: null, // Stripe subscription ID
+      }).returning();
+      
+      // Create default performance indicators for the user
+      await this.createDefaultPIs(user.id);
+      
+      return user;
+    } catch (error) {
+      console.error("Error in createUser:", error.message);
+      
+      // Manual insertion as fallback
+      const result = await pool.query(`
+        INSERT INTO users (
+          username, password, email, event_format, event_code, event_type, 
+          instructional_area, session_id, last_login_date, subscription_tier,
+          ui_theme, color_scheme, theme, streak, points,
+          roleplay_count, test_count, written_event_count,
+          roleplay_reset_date, test_reset_date, written_event_reset_date
+        ) VALUES (
+          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21
+        ) RETURNING *
+      `, [
+        insertUser.username,
+        insertUser.password,
+        insertUser.email || null,
+        insertUser.eventFormat || null,
+        insertUser.eventCode || null,
+        insertUser.eventType || null,
+        insertUser.instructionalArea || null,
+        sessionId,
+        now,
+        "standard",
+        insertUser.uiTheme || "aquaBlue",
+        insertUser.colorScheme || "memphis",
+        insertUser.theme || "light",
+        0, 0, 0, 0, 0, now, now, now
+      ]);
+      
+      if (result.rows.length === 0) {
+        throw new Error("Failed to create user");
+      }
+      
+      const userData = result.rows[0];
+      
+      // Create default performance indicators for the user
+      await this.createDefaultPIs(userData.id);
+      
+      // Convert to User type
+      const user: User = {
+        id: userData.id,
+        username: userData.username,
+        password: userData.password,
+        email: userData.email,
+        eventFormat: userData.event_format,
+        eventCode: userData.event_code,
+        eventType: userData.event_type,
+        instructionalArea: userData.instructional_area,
+        sessionId: userData.session_id,
+        lastLoginDate: userData.last_login_date,
+        subscriptionTier: userData.subscription_tier,
+        uiTheme: userData.ui_theme,
+        colorScheme: userData.color_scheme,
+        theme: userData.theme,
+        streak: userData.streak,
+        points: userData.points,
+        roleplayCount: userData.roleplay_count,
+        testCount: userData.test_count,
+        writtenEventCount: userData.written_event_count,
+        roleplayResetDate: userData.roleplay_reset_date,
+        testResetDate: userData.test_reset_date,
+        writtenEventResetDate: userData.written_event_reset_date,
+        stripeCustomerId: userData.stripe_customer_id,
+        stripeSubscriptionId: userData.stripe_subscription_id
+      };
+      
+      return user;
+    }
   }
 
   private async createDefaultPIs(userId: number) {
@@ -1177,16 +1289,58 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateLastLogin(id: number, date: Date): Promise<User | undefined> {
-    const [user] = await db
-      .update(users)
-      .set({ 
-        lastLogin: date,
-        // Update streak logic would be here
-      })
-      .where(eq(users.id, id))
-      .returning();
-    
-    return user;
+    try {
+      const [user] = await db
+        .update(users)
+        .set({ 
+          lastLoginDate: date,
+          // Update streak logic would be here
+        })
+        .where(eq(users.id, id))
+        .returning();
+      
+      return user;
+    } catch (error) {
+      console.error("Error in updateLastLogin:", error);
+      
+      // Fallback to direct SQL query
+      const result = await pool.query(`
+        UPDATE users SET last_login_date = $1 WHERE id = $2 RETURNING *
+      `, [date, id]);
+      
+      if (result.rows.length === 0) return undefined;
+      
+      // Convert to User type
+      const userData = result.rows[0];
+      const user: User = {
+        id: userData.id,
+        username: userData.username,
+        password: userData.password,
+        email: userData.email,
+        eventFormat: userData.event_format,
+        eventCode: userData.event_code,
+        eventType: userData.event_type,
+        instructionalArea: userData.instructional_area,
+        sessionId: userData.session_id,
+        lastLoginDate: userData.last_login_date,
+        subscriptionTier: userData.subscription_tier,
+        uiTheme: userData.ui_theme,
+        colorScheme: userData.color_scheme,
+        theme: userData.theme,
+        streak: userData.streak,
+        points: userData.points,
+        roleplayCount: userData.roleplay_count,
+        testCount: userData.test_count,
+        writtenEventCount: userData.written_event_count,
+        roleplayResetDate: userData.roleplay_reset_date,
+        testResetDate: userData.test_reset_date,
+        writtenEventResetDate: userData.written_event_reset_date,
+        stripeCustomerId: userData.stripe_customer_id,
+        stripeSubscriptionId: userData.stripe_subscription_id
+      };
+      
+      return user;
+    }
   }
 
   async updateUserSettings(id: number, settings: { 
@@ -1208,13 +1362,55 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateSubscription(id: number, tier: string): Promise<User | undefined> {
-    const [user] = await db
-      .update(users)
-      .set({ subscription: tier })
-      .where(eq(users.id, id))
-      .returning();
-    
-    return user;
+    try {
+      const [user] = await db
+        .update(users)
+        .set({ subscriptionTier: tier })
+        .where(eq(users.id, id))
+        .returning();
+      
+      return user;
+    } catch (error) {
+      console.error("Error in updateSubscription:", error);
+      
+      // Fallback to direct SQL query
+      const result = await pool.query(`
+        UPDATE users SET subscription_tier = $1 WHERE id = $2 RETURNING *
+      `, [tier, id]);
+      
+      if (result.rows.length === 0) return undefined;
+      
+      // Convert to User type
+      const userData = result.rows[0];
+      const user: User = {
+        id: userData.id,
+        username: userData.username,
+        password: userData.password,
+        email: userData.email,
+        eventFormat: userData.event_format,
+        eventCode: userData.event_code,
+        eventType: userData.event_type,
+        instructionalArea: userData.instructional_area,
+        sessionId: userData.session_id,
+        lastLoginDate: userData.last_login_date,
+        subscriptionTier: userData.subscription_tier,
+        uiTheme: userData.ui_theme,
+        colorScheme: userData.color_scheme,
+        theme: userData.theme,
+        streak: userData.streak,
+        points: userData.points,
+        roleplayCount: userData.roleplay_count,
+        testCount: userData.test_count,
+        writtenEventCount: userData.written_event_count,
+        roleplayResetDate: userData.roleplay_reset_date,
+        testResetDate: userData.test_reset_date,
+        writtenEventResetDate: userData.written_event_reset_date,
+        stripeCustomerId: userData.stripe_customer_id,
+        stripeSubscriptionId: userData.stripe_subscription_id
+      };
+      
+      return user;
+    }
   }
 
   async updateStripeCustomerId(userId: number, customerId: string): Promise<User | undefined> {
@@ -1449,117 +1645,357 @@ export class DatabaseStorage implements IStorage {
   }
 
   async checkRoleplayAllowance(userId: number): Promise<boolean> {
-    const [user] = await db
-      .select()
-      .from(users)
-      .where(eq(users.id, userId));
-    
-    if (!user) return false;
-    
-    // Get subscription limits
-    const subscriptionTier = user.subscription || 'standard';
-    const limit = SUBSCRIPTION_LIMITS[subscriptionTier]?.roleplayLimit || 0;
-    
-    // Check if unlimited
-    if (limit === -1) return true;
-    
-    // Get current month's usage
-    const now = new Date();
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
-    
-    const [{ count }] = await db
-      .select({ count: count() })
-      .from(practiceSessions)
-      .where(and(
-        eq(practiceSessions.userId, userId),
-        eq(practiceSessions.type, 'roleplay'),
-        sql`${practiceSessions.completedAt} >= ${startOfMonth}`,
-        sql`${practiceSessions.completedAt} <= ${endOfMonth}`
-      ));
-    
-    return Number(count) < limit;
+    try {
+      const [user] = await db
+        .select()
+        .from(users)
+        .where(eq(users.id, userId));
+      
+      if (!user) return false;
+      
+      // Get subscription limits
+      const subscriptionTier = user.subscriptionTier || 'standard';
+      
+      let limit: number;
+      if (subscriptionTier === 'standard') {
+        limit = 15;  // Standard tier: 15 roleplays per month
+      } else if (subscriptionTier === 'plus') {
+        limit = 25;  // Plus tier: 25 roleplays per month
+      } else if (subscriptionTier === 'pro') {
+        limit = -1;  // Pro tier: unlimited
+      } else {
+        limit = 15;  // Default to standard limits
+      }
+      
+      // Check if unlimited
+      if (limit === -1) return true;
+      
+      // Get current month's usage from roleplay_count (if user has count in DB)
+      if (user.roleplayCount !== undefined && user.roleplayCount !== null) {
+        return user.roleplayCount < limit;
+      }
+      
+      // Fallback: Get current month's usage from sessions
+      const now = new Date();
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+      
+      const result = await db
+        .select({ count: count() })
+        .from(practiceSessions)
+        .where(and(
+          eq(practiceSessions.userId, userId),
+          eq(practiceSessions.type, 'roleplay'),
+          sql`${practiceSessions.completedAt} >= ${startOfMonth}`,
+          sql`${practiceSessions.completedAt} <= ${endOfMonth}`
+        ));
+      
+      if (!result.length) return true;
+      
+      const currentCount = Number(result[0].count) || 0;
+      return currentCount < limit;
+    } catch (error) {
+      console.error("Error in checkRoleplayAllowance:", error);
+      
+      // Fallback to direct SQL query
+      const result = await pool.query(`
+        SELECT subscription_tier, roleplay_count FROM users WHERE id = $1
+      `, [userId]);
+      
+      if (result.rows.length === 0) return false;
+      
+      const userData = result.rows[0];
+      const subscriptionTier = userData.subscription_tier || 'standard';
+      
+      let limit: number;
+      if (subscriptionTier === 'standard') {
+        limit = 15;
+      } else if (subscriptionTier === 'plus') {
+        limit = 25;
+      } else if (subscriptionTier === 'pro') {
+        limit = -1;
+      } else {
+        limit = 15;
+      }
+      
+      if (limit === -1) return true;
+      
+      // Use roleplay_count if available
+      if (userData.roleplay_count !== null && userData.roleplay_count !== undefined) {
+        return userData.roleplay_count < limit;
+      }
+      
+      // Otherwise fall back to counting sessions for the current month
+      const now = new Date();
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+      const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999).toISOString();
+      
+      const sessionResult = await pool.query(`
+        SELECT COUNT(*) AS count FROM practice_sessions 
+        WHERE user_id = $1 AND type = 'roleplay' 
+        AND completed_at >= $2 AND completed_at <= $3
+      `, [userId, startOfMonth, endOfMonth]);
+      
+      const currentCount = Number(sessionResult.rows[0].count) || 0;
+      return currentCount < limit;
+    }
   }
 
   async checkTestAllowance(userId: number): Promise<boolean> {
-    const [user] = await db
-      .select()
-      .from(users)
-      .where(eq(users.id, userId));
-    
-    if (!user) return false;
-    
-    // Get subscription limits
-    const subscriptionTier = user.subscription || 'standard';
-    const limit = SUBSCRIPTION_LIMITS[subscriptionTier]?.testLimit || 0;
-    
-    // Check if unlimited
-    if (limit === -1) return true;
-    
-    // Get current month's usage
-    const now = new Date();
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
-    
-    const [{ count }] = await db
-      .select({ count: count() })
-      .from(practiceSessions)
-      .where(and(
-        eq(practiceSessions.userId, userId),
-        eq(practiceSessions.type, 'test'),
-        sql`${practiceSessions.completedAt} >= ${startOfMonth}`,
-        sql`${practiceSessions.completedAt} <= ${endOfMonth}`
-      ));
-    
-    return Number(count) < limit;
+    try {
+      const [user] = await db
+        .select()
+        .from(users)
+        .where(eq(users.id, userId));
+      
+      if (!user) return false;
+      
+      // Get subscription limits
+      const subscriptionTier = user.subscriptionTier || 'standard';
+      
+      let limit: number;
+      if (subscriptionTier === 'standard') {
+        limit = 15;  // Standard tier: 15 tests per month
+      } else if (subscriptionTier === 'plus') {
+        limit = 25;  // Plus tier: 25 tests per month
+      } else if (subscriptionTier === 'pro') {
+        limit = -1;  // Pro tier: unlimited
+      } else {
+        limit = 15;  // Default to standard limits
+      }
+      
+      // Check if unlimited
+      if (limit === -1) return true;
+      
+      // Get current month's usage from test_count (if user has count in DB)
+      if (user.testCount !== undefined && user.testCount !== null) {
+        return user.testCount < limit;
+      }
+      
+      // Fallback: Get current month's usage from sessions
+      const now = new Date();
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+      
+      const result = await db
+        .select({ count: count() })
+        .from(practiceSessions)
+        .where(and(
+          eq(practiceSessions.userId, userId),
+          eq(practiceSessions.type, 'test'),
+          sql`${practiceSessions.completedAt} >= ${startOfMonth}`,
+          sql`${practiceSessions.completedAt} <= ${endOfMonth}`
+        ));
+      
+      if (!result.length) return true;
+      
+      const currentCount = Number(result[0].count) || 0;
+      return currentCount < limit;
+    } catch (error) {
+      console.error("Error in checkTestAllowance:", error);
+      
+      // Fallback to direct SQL query
+      const result = await pool.query(`
+        SELECT subscription_tier, test_count FROM users WHERE id = $1
+      `, [userId]);
+      
+      if (result.rows.length === 0) return false;
+      
+      const userData = result.rows[0];
+      const subscriptionTier = userData.subscription_tier || 'standard';
+      
+      let limit: number;
+      if (subscriptionTier === 'standard') {
+        limit = 15;
+      } else if (subscriptionTier === 'plus') {
+        limit = 25;
+      } else if (subscriptionTier === 'pro') {
+        limit = -1;
+      } else {
+        limit = 15;
+      }
+      
+      if (limit === -1) return true;
+      
+      // Use test_count if available
+      if (userData.test_count !== null && userData.test_count !== undefined) {
+        return userData.test_count < limit;
+      }
+      
+      // Otherwise fall back to counting sessions for the current month
+      const now = new Date();
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+      const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999).toISOString();
+      
+      const sessionResult = await pool.query(`
+        SELECT COUNT(*) AS count FROM practice_sessions 
+        WHERE user_id = $1 AND type = 'test' 
+        AND completed_at >= $2 AND completed_at <= $3
+      `, [userId, startOfMonth, endOfMonth]);
+      
+      const currentCount = Number(sessionResult.rows[0].count) || 0;
+      return currentCount < limit;
+    }
   }
 
   async checkWrittenEventAllowance(userId: number): Promise<boolean> {
-    const [user] = await db
-      .select()
-      .from(users)
-      .where(eq(users.id, userId));
-    
-    if (!user) return false;
-    
-    // Get subscription limits
-    const subscriptionTier = user.subscription || 'standard';
-    const limit = SUBSCRIPTION_LIMITS[subscriptionTier]?.writtenEventLimit || 0;
-    
-    // Check if unlimited
-    if (limit === -1) return true;
-    
-    // Get current month's usage
-    const now = new Date();
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
-    
-    const [{ count }] = await db
-      .select({ count: count() })
-      .from(practiceSessions)
-      .where(and(
-        eq(practiceSessions.userId, userId),
-        eq(practiceSessions.type, 'written'),
-        sql`${practiceSessions.completedAt} >= ${startOfMonth}`,
-        sql`${practiceSessions.completedAt} <= ${endOfMonth}`
-      ));
-    
-    return Number(count) < limit;
+    try {
+      const [user] = await db
+        .select()
+        .from(users)
+        .where(eq(users.id, userId));
+      
+      if (!user) return false;
+      
+      // Get subscription limits
+      const subscriptionTier = user.subscriptionTier || 'standard';
+      
+      let limit: number;
+      if (subscriptionTier === 'standard') {
+        limit = 2;   // Standard tier: 2 written events per month
+      } else if (subscriptionTier === 'plus') {
+        limit = 7;   // Plus tier: 7 written events per month
+      } else if (subscriptionTier === 'pro') {
+        limit = -1;  // Pro tier: unlimited
+      } else {
+        limit = 2;   // Default to standard limits
+      }
+      
+      // Check if unlimited
+      if (limit === -1) return true;
+      
+      // Get current month's usage from written_event_count (if user has count in DB)
+      if (user.writtenEventCount !== undefined && user.writtenEventCount !== null) {
+        return user.writtenEventCount < limit;
+      }
+      
+      // Fallback: Get current month's usage from sessions
+      const now = new Date();
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+      
+      const result = await db
+        .select({ count: count() })
+        .from(practiceSessions)
+        .where(and(
+          eq(practiceSessions.userId, userId),
+          eq(practiceSessions.type, 'written'),
+          sql`${practiceSessions.completedAt} >= ${startOfMonth}`,
+          sql`${practiceSessions.completedAt} <= ${endOfMonth}`
+        ));
+      
+      if (!result.length) return true;
+      
+      const currentCount = Number(result[0].count) || 0;
+      return currentCount < limit;
+    } catch (error) {
+      console.error("Error in checkWrittenEventAllowance:", error);
+      
+      // Fallback to direct SQL query
+      const result = await pool.query(`
+        SELECT subscription_tier, written_event_count FROM users WHERE id = $1
+      `, [userId]);
+      
+      if (result.rows.length === 0) return false;
+      
+      const userData = result.rows[0];
+      const subscriptionTier = userData.subscription_tier || 'standard';
+      
+      let limit: number;
+      if (subscriptionTier === 'standard') {
+        limit = 2;
+      } else if (subscriptionTier === 'plus') {
+        limit = 7;
+      } else if (subscriptionTier === 'pro') {
+        limit = -1;
+      } else {
+        limit = 2;
+      }
+      
+      if (limit === -1) return true;
+      
+      // Use written_event_count if available
+      if (userData.written_event_count !== null && userData.written_event_count !== undefined) {
+        return userData.written_event_count < limit;
+      }
+      
+      // Otherwise fall back to counting sessions for the current month
+      const now = new Date();
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+      const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999).toISOString();
+      
+      const sessionResult = await pool.query(`
+        SELECT COUNT(*) AS count FROM practice_sessions 
+        WHERE user_id = $1 AND type = 'written' 
+        AND completed_at >= $2 AND completed_at <= $3
+      `, [userId, startOfMonth, endOfMonth]);
+      
+      const currentCount = Number(sessionResult.rows[0].count) || 0;
+      return currentCount < limit;
+    }
   }
 
   async recordRoleplayGeneration(userId: number): Promise<void> {
-    // We don't need to do anything here as we count the actual sessions
-    // stored in the database when checking allowances
+    try {
+      await db
+        .update(users)
+        .set({
+          roleplayCount: sql`COALESCE(${users.roleplayCount}, 0) + 1`,
+          roleplayResetDate: new Date()
+        })
+        .where(eq(users.id, userId));
+    } catch (error) {
+      console.error("Error recording roleplay generation:", error);
+      // Fallback to direct SQL
+      await pool.query(`
+        UPDATE users 
+        SET roleplay_count = COALESCE(roleplay_count, 0) + 1,
+            roleplay_reset_date = CURRENT_TIMESTAMP
+        WHERE id = $1
+      `, [userId]);
+    }
   }
 
   async recordTestGeneration(userId: number): Promise<void> {
-    // We don't need to do anything here as we count the actual sessions
-    // stored in the database when checking allowances
+    try {
+      await db
+        .update(users)
+        .set({
+          testCount: sql`COALESCE(${users.testCount}, 0) + 1`,
+          testResetDate: new Date()
+        })
+        .where(eq(users.id, userId));
+    } catch (error) {
+      console.error("Error recording test generation:", error);
+      // Fallback to direct SQL
+      await pool.query(`
+        UPDATE users 
+        SET test_count = COALESCE(test_count, 0) + 1,
+            test_reset_date = CURRENT_TIMESTAMP
+        WHERE id = $1
+      `, [userId]);
+    }
   }
 
   async recordWrittenEventGeneration(userId: number): Promise<void> {
-    // We don't need to do anything here as we count the actual sessions
-    // stored in the database when checking allowances
+    try {
+      await db
+        .update(users)
+        .set({
+          writtenEventCount: sql`COALESCE(${users.writtenEventCount}, 0) + 1`,
+          writtenEventResetDate: new Date()
+        })
+        .where(eq(users.id, userId));
+    } catch (error) {
+      console.error("Error recording written event generation:", error);
+      // Fallback to direct SQL
+      await pool.query(`
+        UPDATE users 
+        SET written_event_count = COALESCE(written_event_count, 0) + 1,
+            written_event_reset_date = CURRENT_TIMESTAMP
+        WHERE id = $1
+      `, [userId]);
+    }
   }
 
   async updateUserSession(userId: number, sessionInfo: { id: string, createdAt: Date, lastActive: Date }): Promise<boolean> {
