@@ -19,7 +19,7 @@ if (!process.env.STRIPE_SECRET_KEY) {
 }
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2023-10-16',
+  apiVersion: '2023-10-16' as any, // Using as any to fix type mismatch with newer versions
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -399,7 +399,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         res.send({
           subscriptionId: subscription.id,
-          clientSecret: subscription.latest_invoice?.payment_intent?.client_secret,
+          clientSecret: (subscription.latest_invoice as any)?.payment_intent?.client_secret,
         });
         
         return;

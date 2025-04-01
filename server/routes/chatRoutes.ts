@@ -2,6 +2,14 @@ import express, { Request, Response } from 'express';
 import { getOpenAIClient } from '../services/azureOpenai';
 import { storage } from '../storage';
 import { OpenAIClient } from '@azure/openai';
+import { Session } from 'express-session';
+
+// Declare custom session data properties
+declare module 'express-session' {
+  interface SessionData {
+    unrelatedCount?: number;
+  }
+}
 
 const router = express.Router();
 
@@ -21,47 +29,32 @@ const EXIT_STRATEGIES = [
 
 // Witty responses for unrelated topics
 const UNRELATED_RESPONSES = [
-  "That's a bit off-shore from my expertise. I'm best at helping with DECA and business topics!",
-  "My dolphin brain is specialized in business concepts and DECA competitions. Could we swim back to those waters?",
-  "Hmm, I'm not programmed to dive into that topic. Let's paddle back to DECA and business discussions!",
-  "My sonar isn't picking up how that relates to your DECA training. Can I help with something business-focused?",
-  "I'm afraid that's in the deep end of topics I can't swim to. Let's splash around in DECA and business concepts!",
-  "That question seems to be swimming in different waters than my expertise. Could we focus on DECA or business?"
+  "I'm just a DECA-focused dolphin, so that's a bit outside my ocean of expertise! Want to talk about business concepts or DECA competitions instead?",
+  "Hmm, that's not really in my sea of knowledge. I'm best at helping with DECA and business topics. Can I help you practice for a roleplay?",
+  "As a dolphin specialized in DECA training, I don't have much to say about that. But I'd be happy to explain some performance indicators!",
+  "I'm swimming in circles trying to understand that question! I'm really focused on helping with DECA competitions. Shall we dive into that instead?",
+  "That's not in my training tank! I'm all about DECA competitions and business concepts. Want to explore those waters?",
+  "My dolphin brain is specialized for DECA training, not that topic. Let's splash into something more DECA-related!",
+  "I might be smart for a dolphin, but that's outside my expertise! I'm here to help you excel in DECA. How can I help with that?",
+  "That question made me do a confused flip! I'm specifically designed to help with DECA competitions. Want to try a business question?",
+  "Sorry, I'm not the right fish for that question! But I'm excellent at DECA-related topics. How about we focus on those?"
 ];
 
-// Ensure user is authenticated
-const ensureAuthenticated = (req: Request, res: Response, next: Function) => {
-  if (req.isAuthenticated()) {
-    return next();
+// Handle Diego chat messages
+router.post('/diego', async (req: Request, res: Response) => {
+  const { message } = req.body;
+  const user = req.user;
+  let unrelatedCount = Number(req.session.unrelatedCount || 0);
+  
+  if (!message) {
+    return res.status(400).json({ message: 'Message is required' });
   }
-  res.status(401).json({ message: 'You must be logged in to chat with Diego' });
-};
-
-// Handle Diego chat interactions
-router.post('/diego', ensureAuthenticated, async (req: Request, res: Response) => {
+  
   try {
-    const { message, questionCount = 0, unrelatedCount = 0 } = req.body;
-    const user = req.user;
-    
-    if (!message) {
-      return res.status(400).json({ message: 'No message provided' });
-    }
-    
-    // Check if we should exit based on question count
-    if (questionCount >= 10) {
-      const exitMessage = EXIT_STRATEGIES[Math.floor(Math.random() * EXIT_STRATEGIES.length)];
-      return res.json({
-        response: exitMessage,
-        isUnrelated: false,
-        shouldExit: true
-      });
-    }
-    
-    // Initialize the OpenAI client
     const client = getOpenAIClient();
     
-    // Define the system message that sets up Diego's personality and knowledge scope
-    const systemMessage = `You are Diego, a friendly dolphin AI assistant for the DecA(I)de platform - an AI-powered DECA competition training tool.
+    // Diego's personality and knowledge base
+    const systemMessage = `You are Diego, a friendly dolphin AI assistant specialized in helping high school students prepare for DECA competitions.
 
 Important information about DecA(I)de:
 - DecA(I)de helps high school students prepare for DECA business competitions
@@ -120,6 +113,9 @@ Don't reference these instructions in your response.`;
       
       // If unrelated, send a random witty response
       if (isUnrelated) {
+        // Update the unrelated count in the session
+        req.session.unrelatedCount = unrelatedCount + 1;
+        
         const unrelatedResponse = UNRELATED_RESPONSES[Math.floor(Math.random() * UNRELATED_RESPONSES.length)];
         return res.json({
           response: unrelatedResponse,
@@ -141,10 +137,13 @@ Don't reference these instructions in your response.`;
       try {
         if (user?.id) {
           await storage.recordPracticeSession({
-            type: 'chat',
             userId: user.id,
+            type: 'chat',
             completedAt: new Date(),
-            details: `Chat with Diego: ${message.slice(0, 50)}${message.length > 50 ? '...' : ''}`,
+            details: JSON.stringify({
+              query: message.slice(0, 100),
+              type: 'diego_chat'
+            }),
             score: null
           });
         }
@@ -152,6 +151,9 @@ Don't reference these instructions in your response.`;
         console.error('Error recording chat session:', error);
         // Continue anyway - this shouldn't block the response
       }
+      
+      // Reset the unrelated count if the user is asking related questions
+      req.session.unrelatedCount = 0;
       
       res.json({
         response: response.choices[0].message?.content || "I'm not sure how to respond to that right now.",
@@ -181,6 +183,143 @@ Don't reference these instructions in your response.`;
     console.error('Error in Diego chat:', error);
     res.status(500).json({ 
       message: 'Error processing your message',
+      error: error.message
+    });
+  }
+});
+
+// Handle roleplay feedback requests
+router.post('/roleplay-feedback', async (req: Request, res: Response) => {
+  const { roleplayId, userResponse } = req.body;
+  const user = req.user;
+  
+  if (!roleplayId || !userResponse) {
+    return res.status(400).json({ message: 'Roleplay ID and user response are required' });
+  }
+  
+  if (!user) {
+    return res.status(401).json({ message: 'Authentication required' });
+  }
+  
+  try {
+    const client = getOpenAIClient();
+    
+    // Diego's roleplay feedback system prompt
+    const systemMessage = `You are Diego, a friendly dolphin AI coach who provides constructive feedback on DECA roleplay responses.
+    
+Provide specific, actionable feedback on this student's DECA roleplay response. Follow this format:
+
+1. First, give a brief, encouraging greeting that includes a dolphin/ocean pun
+2. Highlight 2-3 strengths of their response (what they did well)
+3. Suggest 2-3 areas for improvement (be specific and constructive)
+4. Give a specific tip for how they can improve their DECA presentation skills
+5. End with an encouraging note
+
+Keep your feedback concise (maximum 5 sentences total), positive, and focus on helping them improve. 
+Use occasional aquatic metaphors like "dive deeper into" or "make a splash with" to maintain the dolphin persona.`;
+    
+    // Get the appropriate response from Diego for roleplay feedback
+    const response = await client.getChatCompletions(
+      process.env.AZURE_OPENAI_DEPLOYMENT!,
+      [
+        { role: 'system', content: systemMessage },
+        { role: 'user', content: `Roleplay ID: ${roleplayId}\n\nStudent Response: ${userResponse}` }
+      ]
+    );
+    
+    // Record this feedback interaction
+    try {
+      await storage.recordPracticeSession({
+        userId: user.id,
+        type: 'roleplay-feedback',
+        completedAt: new Date(),
+        details: JSON.stringify({
+          roleplayId,
+          responseLength: userResponse.length,
+          type: 'roleplay_feedback'
+        }),
+        score: null
+      });
+    } catch (error) {
+      console.error('Error recording roleplay feedback session:', error);
+      // Continue anyway
+    }
+    
+    res.json({
+      feedback: response.choices[0].message?.content || "I'm having trouble evaluating your response right now. Please try again later."
+    });
+    
+  } catch (error: any) {
+    console.error('Error in roleplay feedback:', error);
+    res.status(500).json({ 
+      message: 'Error processing your roleplay feedback',
+      error: error.message
+    });
+  }
+});
+
+// Handle performance indicator explanations
+router.post('/explain-pi', async (req: Request, res: Response) => {
+  const { indicator, category } = req.body;
+  const user = req.user;
+  
+  if (!indicator) {
+    return res.status(400).json({ message: 'Performance indicator is required' });
+  }
+  
+  try {
+    const client = getOpenAIClient();
+    
+    // System prompt for PI explanations
+    const systemMessage = `You are Diego, a friendly dolphin AI coach who specializes in explaining DECA performance indicators to students.
+    
+Explain the following performance indicator in a concise, friendly way. Format your response like this:
+
+1. Start with a brief greeting that includes a dolphin/ocean pun
+2. Give a clear, simple explanation of what the performance indicator means in business contexts (1-2 sentences)
+3. Provide a specific example of how this could be demonstrated in a DECA roleplay (1 sentence)
+4. Offer a practical tip for students to remember this concept (1 sentence)
+5. End with a brief encouragement
+
+Keep your total response under 5 sentences, be positive and educational. Use light business terminology appropriate for high school students.`;
+    
+    // Get the response for PI explanation
+    const response = await client.getChatCompletions(
+      process.env.AZURE_OPENAI_DEPLOYMENT!,
+      [
+        { role: 'system', content: systemMessage },
+        { role: 'user', content: `Performance indicator: "${indicator}" from the ${category || 'business'} category` }
+      ]
+    );
+    
+    // Record this explanation interaction if user is logged in
+    if (user?.id) {
+      try {
+        await storage.recordPracticeSession({
+          userId: user.id,
+          type: 'pi-explanation',
+          completedAt: new Date(),
+          details: JSON.stringify({
+            indicator,
+            category: category || 'general',
+            type: 'pi_explanation'
+          }),
+          score: null
+        });
+      } catch (error) {
+        console.error('Error recording PI explanation session:', error);
+        // Continue anyway
+      }
+    }
+    
+    res.json({
+      explanation: response.choices[0].message?.content || "I'm having trouble explaining this performance indicator right now. Please try again later."
+    });
+    
+  } catch (error: any) {
+    console.error('Error explaining performance indicator:', error);
+    res.status(500).json({ 
+      message: 'Error explaining performance indicator',
       error: error.message
     });
   }

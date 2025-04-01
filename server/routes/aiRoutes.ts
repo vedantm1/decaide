@@ -1,228 +1,210 @@
-import { Router, Request, Response } from "express";
-import { storage } from "../storage";
-import { 
-  generateRoleplayScenario, 
-  generatePracticeTest, 
-  explainPerformanceIndicator,
-  generateWrittenEventFeedback
-} from "../services/azureOpenai";
-import { DECA_EVENTS } from "@shared/schema";
+import express, { Request, Response } from 'express';
+import { getOpenAIClient, generateRoleplay, generateTestQuestions } from '../services/azureOpenai';
+import { storage } from '../storage';
 
-const router = Router();
+const router = express.Router();
 
-// Middleware to check if user is authenticated
-const ensureAuthenticated = (req: Request, res: Response, next: Function) => {
-  if (req.isAuthenticated()) {
-    return next();
-  }
-  res.status(401).json({ error: "Unauthorized: Please login first" });
-};
-
-// Middleware to check if user has permission to access this AI feature
-// based on their subscription tier
-const checkSubscriptionAccess = async (req: Request, res: Response, next: Function) => {
-  if (!req.user) {
-    return res.status(401).json({ error: "Unauthorized: Please login first" });
-  }
-
+// Get Azure OpenAI status
+router.get('/status', async (_req: Request, res: Response) => {
   try {
-    // For roleplays
-    if (req.path.includes('/roleplay')) {
-      const hasAllowance = await storage.checkRoleplayAllowance(req.user.id);
-      if (!hasAllowance) {
-        return res.status(403).json({ 
-          error: "Subscription limit reached", 
-          message: "You've reached your roleplay generation limit for this month. Please upgrade your subscription for unlimited access." 
-        });
+    const client = getOpenAIClient();
+    const deployment = process.env.AZURE_OPENAI_DEPLOYMENT || "gpt-4o-mini";
+    
+    // Try a simple completion to check if it works
+    const response = await client.getChatCompletions(
+      deployment,
+      [
+        { role: "system", content: "You are a helpful assistant." },
+        { role: "user", content: "Say 'Azure OpenAI is working properly'." }
+      ],
+      {
+        maxTokens: 20
       }
-    }
+    );
     
-    // For tests
-    if (req.path.includes('/test')) {
-      const hasAllowance = await storage.checkTestAllowance(req.user.id);
-      if (!hasAllowance) {
-        return res.status(403).json({ 
-          error: "Subscription limit reached", 
-          message: "You've reached your practice test generation limit for this month. Please upgrade your subscription for unlimited access." 
-        });
-      }
-    }
-
-    next();
-  } catch (error) {
-    console.error("Error checking subscription access:", error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-};
-
-// Generate a roleplay scenario based on the user's event
-router.post("/roleplay/generate", ensureAuthenticated, checkSubscriptionAccess, async (req: Request, res: Response) => {
-  try {
-    const user = req.user;
-    if (!user.eventFormat || !user.eventCode) {
-      return res.status(400).json({ error: "Please select an event in your user settings first" });
-    }
-
-    // Find the event details from the user's event code
-    const format = user.eventFormat === "roleplay" ? "roleplay" : "written";
-    const event = DECA_EVENTS[format as keyof typeof DECA_EVENTS]?.find(e => e.code === user.eventCode);
+    const isWorking = response.choices[0]?.message?.content?.includes('working');
     
-    if (!event) {
-      return res.status(400).json({ error: "Invalid event code or event not found" });
-    }
-
-    // Get difficulty from request or default to medium
-    const { difficulty = "medium", selectedPIs = [] } = req.body;
-    
-    // If no PIs were selected, get random ones from the user's PIs
-    let performanceIndicators = selectedPIs;
-    if (!performanceIndicators || performanceIndicators.length === 0) {
-      const userPIs = await storage.getUserPIs(user.id);
-      // Randomly select 3-5 PIs
-      const count = Math.floor(Math.random() * 3) + 3; // 3 to 5 PIs
-      performanceIndicators = userPIs
-        .sort(() => 0.5 - Math.random()) // Shuffle
-        .slice(0, count)
-        .map(pi => pi.indicator);
-    }
-
-    // Generate the roleplay scenario
-    const roleplayScenario = await generateRoleplayScenario({
-      eventCode: event.code,
-      eventName: event.name,
-      category: event.category,
-      performanceIndicators,
-      difficulty
+    res.json({
+      status: isWorking ? 'operational' : 'degraded',
+      deployment,
+      message: response.choices[0]?.message?.content || "No response"
     });
+  } catch (error: any) {
+    console.error("Azure OpenAI status check failed:", error);
+    res.status(500).json({
+      status: 'unavailable',
+      error: error.message
+    });
+  }
+});
 
-    // Record this generation to track usage
-    await storage.recordRoleplayGeneration(user.id);
-
-    // Return the generated scenario
-    res.json(roleplayScenario);
-  } catch (error) {
+// Generate AI roleplay scenario
+router.post('/generate-roleplay', async (req: Request, res: Response) => {
+  if (!req.isAuthenticated()) {
+    return res.status(401).json({ error: "Authentication required" });
+  }
+  
+  try {
+    const { 
+      instructionalArea, 
+      performanceIndicators, 
+      difficultyLevel, 
+      businessType 
+    } = req.body;
+    
+    if (!instructionalArea || !performanceIndicators || !difficultyLevel) {
+      return res.status(400).json({ 
+        error: "Missing required parameters: instructionalArea, performanceIndicators, and difficultyLevel are required" 
+      });
+    }
+    
+    // Check user subscription
+    const canGenerate = await storage.checkRoleplayAllowance(req.user!.id);
+    if (!canGenerate) {
+      return res.status(403).json({ 
+        error: "You have reached your roleplay generation limit for your subscription tier" 
+      });
+    }
+    
+    // Generate the roleplay
+    const roleplay = await generateRoleplay({
+      instructionalArea,
+      performanceIndicators: Array.isArray(performanceIndicators) ? performanceIndicators : [performanceIndicators],
+      difficultyLevel,
+      businessType
+    });
+    
+    // Record usage
+    await storage.recordRoleplayGeneration(req.user!.id);
+    
+    res.json(roleplay);
+  } catch (error: any) {
     console.error("Error generating roleplay:", error);
     res.status(500).json({ 
       error: "Failed to generate roleplay scenario", 
-      message: error instanceof Error ? error.message : "Unknown error" 
+      details: error.message 
     });
   }
 });
 
-// Generate a practice test based on the user's event
-router.post("/test/generate", ensureAuthenticated, checkSubscriptionAccess, async (req: Request, res: Response) => {
+// Generate test questions
+router.post('/generate-test', async (req: Request, res: Response) => {
+  if (!req.isAuthenticated()) {
+    return res.status(401).json({ error: "Authentication required" });
+  }
+  
   try {
-    const user = req.user;
-    if (!user.eventFormat || !user.eventCode) {
-      return res.status(400).json({ error: "Please select an event in your user settings first" });
-    }
-
-    // Find the event details from the user's event code
-    const format = user.eventFormat === "roleplay" ? "roleplay" : "written";
-    const event = DECA_EVENTS[format as keyof typeof DECA_EVENTS]?.find(e => e.code === user.eventCode);
+    const { testType, categories, numQuestions } = req.body;
     
-    if (!event) {
-      return res.status(400).json({ error: "Invalid event code or event not found" });
+    if (!testType || !categories || !numQuestions) {
+      return res.status(400).json({ 
+        error: "Missing required parameters: testType, categories, and numQuestions are required" 
+      });
     }
-
-    // Get parameters from request
-    const { 
-      testType = event.type, 
-      categories = [], 
-      numQuestions = 25,
-      difficulty = "medium" 
-    } = req.body;
-
-    // Validate number of questions
-    const questionsCount = Math.min(Math.max(5, numQuestions), 50); // Between 5 and 50
-
-    // Generate the practice test
-    const practiceTest = await generatePracticeTest({
-      eventCode: event.code,
-      eventName: event.name,
-      categories: categories.length > 0 ? categories : [event.category],
-      numQuestions: questionsCount,
-      difficulty
+    
+    // Check user subscription
+    const canGenerate = await storage.checkTestAllowance(req.user!.id);
+    if (!canGenerate) {
+      return res.status(403).json({ 
+        error: "You have reached your test generation limit for your subscription tier" 
+      });
+    }
+    
+    // Generate the test questions
+    const test = await generateTestQuestions({
+      testType,
+      categories: Array.isArray(categories) ? categories : [categories],
+      numQuestions: Number(numQuestions)
     });
-
-    // Record this generation to track usage
-    await storage.recordTestGeneration(user.id);
-
-    // Return the generated test
-    res.json(practiceTest);
-  } catch (error) {
-    console.error("Error generating practice test:", error);
+    
+    // Record usage
+    await storage.recordTestGeneration(req.user!.id);
+    
+    res.json(test);
+  } catch (error: any) {
+    console.error("Error generating test:", error);
     res.status(500).json({ 
-      error: "Failed to generate practice test", 
-      message: error instanceof Error ? error.message : "Unknown error" 
+      error: "Failed to generate test questions", 
+      details: error.message 
     });
   }
 });
 
-// Get explanation for a performance indicator
-router.post("/pi/explain", ensureAuthenticated, async (req: Request, res: Response) => {
-  try {
-    const { indicator, category, format = "detailed" } = req.body;
-    
-    if (!indicator || !category) {
-      return res.status(400).json({ error: "Performance indicator and category are required" });
-    }
-
-    // Generate explanation
-    const explanation = await explainPerformanceIndicator({
-      indicator,
-      category,
-      format: format as "concise" | "detailed"
-    });
-
-    // Return the explanation
-    res.json(explanation);
-  } catch (error) {
-    console.error("Error explaining performance indicator:", error);
-    res.status(500).json({ 
-      error: "Failed to generate explanation", 
-      message: error instanceof Error ? error.message : "Unknown error" 
-    });
+// Generate written event feedback
+router.post('/written-event-feedback', async (req: Request, res: Response) => {
+  if (!req.isAuthenticated()) {
+    return res.status(401).json({ error: "Authentication required" });
   }
-});
-
-// Generate feedback for written event sections
-router.post("/written/feedback", ensureAuthenticated, async (req: Request, res: Response) => {
+  
   try {
-    const user = req.user;
-    if (!user.eventFormat || !user.eventCode) {
-      return res.status(400).json({ error: "Please select an event in your user settings first" });
-    }
-
-    // Find the event details from the user's event code
-    const format = user.eventFormat === "written" ? "written" : "roleplay";
-    const event = DECA_EVENTS[format as keyof typeof DECA_EVENTS]?.find(e => e.code === user.eventCode);
+    const { eventType, content, sections } = req.body;
     
-    if (!event) {
-      return res.status(400).json({ error: "Invalid event code or event not found" });
+    if (!eventType || !content) {
+      return res.status(400).json({ 
+        error: "Missing required parameters: eventType and content are required" 
+      });
     }
-
-    const { projectDescription, section } = req.body;
     
-    if (!projectDescription || !section) {
-      return res.status(400).json({ error: "Project description and section are required" });
+    // Check user subscription for written event feedback
+    const canGenerate = await storage.checkWrittenEventAllowance(req.user!.id);
+    if (!canGenerate) {
+      return res.status(403).json({ 
+        error: "You have reached your written event feedback limit for your subscription tier" 
+      });
     }
-
-    // Generate feedback
-    const feedback = await generateWrittenEventFeedback({
-      eventCode: event.code,
-      eventName: event.name,
-      projectDescription,
-      section
-    });
-
-    // Return the feedback
+    
+    const client = getOpenAIClient();
+    const deployment = process.env.AZURE_OPENAI_DEPLOYMENT || "gpt-4o-mini";
+    
+    // Create prompt for written event feedback
+    const prompt = `
+    You are a DECA judge reviewing a ${eventType} written event. Provide constructive feedback on the following content.
+    
+    Focus on these areas:
+    - Organization and presentation
+    - Business strategy and relevance
+    - Financial analysis (if applicable)
+    - Marketing approach (if applicable)
+    - Overall quality and professionalism
+    
+    The following sections were submitted:
+    ${sections ? JSON.stringify(sections) : "Complete document review"}
+    
+    Content to review:
+    ${content}
+    
+    Format your response as a JSON object with these properties:
+    - overallScore: A number from 1-100
+    - strengths: Array of 3-5 specific strengths
+    - improvements: Array of 3-5 specific areas for improvement
+    - sectionFeedback: Object with section names as keys and specific feedback as values (if sections were provided)
+    - summary: Brief overall assessment (2-3 sentences)
+    `;
+    
+    const response = await client.getChatCompletions(
+      deployment,
+      [
+        { role: "system", content: "You are a DECA judge with experience evaluating written business documents." },
+        { role: "user", content: prompt }
+      ],
+      {
+        temperature: 0.7,
+        maxTokens: 1000,
+        responseFormat: { type: "json_object" }
+      }
+    );
+    
+    const feedback = JSON.parse(response.choices[0].message?.content || "{}");
+    
+    // Record usage
+    await storage.recordWrittenEventGeneration(req.user!.id);
+    
     res.json(feedback);
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error generating written event feedback:", error);
     res.status(500).json({ 
-      error: "Failed to generate feedback", 
-      message: error instanceof Error ? error.message : "Unknown error" 
+      error: "Failed to generate written event feedback", 
+      details: error.message 
     });
   }
 });
