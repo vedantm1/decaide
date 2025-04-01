@@ -1130,8 +1130,49 @@ export class DatabaseStorage implements IStorage {
 
   // User methods
   async getUser(id: number): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.id, id));
-    return user;
+    try {
+      const [user] = await db.select().from(users).where(eq(users.id, id));
+      return user;
+    } catch (error) {
+      console.error("Error in getUser:", error.message);
+      
+      // Fallback to a simpler query if column issues occur
+      const result = await pool.query(`
+        SELECT * FROM users WHERE id = $1
+      `, [id]);
+      
+      if (result.rows.length === 0) return undefined;
+      
+      // Convert snake_case to camelCase for consistency
+      const userData = result.rows[0];
+      const user: User = {
+        id: userData.id,
+        username: userData.username,
+        password: userData.password,
+        email: userData.email,
+        eventFormat: userData.event_format,
+        eventCode: userData.event_code,
+        eventType: userData.event_type,
+        instructionalArea: userData.instructional_area,
+        sessionId: userData.session_id,
+        uiTheme: userData.ui_theme || "aquaBlue",
+        colorScheme: userData.color_scheme || "memphis",
+        theme: userData.theme || "light",
+        subscriptionTier: userData.subscription_tier || "standard",
+        streak: userData.streak || 0,
+        lastLoginDate: userData.last_login_date,
+        points: userData.points || 0,
+        roleplayCount: userData.roleplay_count || 0,
+        testCount: userData.test_count || 0,
+        writtenEventCount: userData.written_event_count || 0,
+        roleplayResetDate: userData.roleplay_reset_date,
+        testResetDate: userData.test_reset_date,
+        writtenEventResetDate: userData.written_event_reset_date,
+        stripeCustomerId: userData.stripe_customer_id,
+        stripeSubscriptionId: userData.stripe_subscription_id
+      };
+      return user;
+    }
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
@@ -1159,16 +1200,20 @@ export class DatabaseStorage implements IStorage {
         eventCode: userData.event_code,
         eventType: userData.event_type,
         instructionalArea: userData.instructional_area,
-        createdAt: userData.created_at,
-        lastLogin: userData.last_login_date,
-        subscription: userData.subscription_tier || "standard",
+        sessionId: userData.session_id,
         uiTheme: userData.ui_theme || "aquaBlue",
         colorScheme: userData.color_scheme || "memphis",
         theme: userData.theme || "light",
+        subscriptionTier: userData.subscription_tier || "standard",
         streak: userData.streak || 0,
+        lastLoginDate: userData.last_login_date,
         points: userData.points || 0,
-        sessionId: userData.session_id,
-        lastActive: userData.last_active,
+        roleplayCount: userData.roleplay_count || 0,
+        testCount: userData.test_count || 0,
+        writtenEventCount: userData.written_event_count || 0,
+        roleplayResetDate: userData.roleplay_reset_date,
+        testResetDate: userData.test_reset_date,
+        writtenEventResetDate: userData.written_event_reset_date,
         stripeCustomerId: userData.stripe_customer_id,
         stripeSubscriptionId: userData.stripe_subscription_id
       };
