@@ -20,6 +20,12 @@ export const users = pgTable("users", {
   streak: integer("streak").default(0),
   lastLoginDate: timestamp("last_login_date"),
   points: integer("points").default(0),
+  roleplayCount: integer("roleplay_count").default(0),
+  testCount: integer("test_count").default(0), 
+  writtenEventCount: integer("written_event_count").default(0),
+  roleplayResetDate: timestamp("roleplay_reset_date"),
+  testResetDate: timestamp("test_reset_date"),
+  writtenEventResetDate: timestamp("written_event_reset_date"),
   stripeCustomerId: text("stripe_customer_id"),
   stripeSubscriptionId: text("stripe_subscription_id"),
 });

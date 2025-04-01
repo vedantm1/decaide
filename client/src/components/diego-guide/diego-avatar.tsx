@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion, Variants } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 interface DiegoAvatarProps {
@@ -8,8 +8,8 @@ interface DiegoAvatarProps {
   className?: string;
 }
 
-// Animation variants for each emotion
-const emotionVariants: Record<string, Variants> = {
+// Animation properties for each emotion, using direct animation objects instead of variants
+const emotionAnimations = {
   neutral: {
     eyes: {},
     smile: {},
@@ -184,8 +184,8 @@ const sizeMappings = {
 export default function DiegoAvatar({ emotion = 'neutral', size = 'md', className }: DiegoAvatarProps) {
   const { viewBox, height, width } = sizeMappings[size];
 
-  // Get the appropriate variants for the current emotion
-  const variants = emotionVariants[emotion];
+  // Get the appropriate animations for the current emotion
+  const animations = emotionAnimations[emotion as keyof typeof emotionAnimations];
 
   return (
     <div className={cn("relative", className)}>
@@ -195,14 +195,14 @@ export default function DiegoAvatar({ emotion = 'neutral', size = 'md', classNam
         height={height}
         width={width}
         className="overflow-visible"
-        initial="initial"
-        animate="animate"
       >
         {/* Background circle for button */}
         <circle cx="0" cy="0" r="20" fill="#3B82F6" />
         
         {/* Dolphin body */}
-        <motion.g variants={variants.body}>
+        <motion.g 
+          animate={animations.body}
+        >
           {/* Main body */}
           <path
             d="M-10,10 Q-15,-5 -5,-15 Q5,-22 15,-10 Q18,0 10,15 Q0,20 -10,10 Z"
@@ -228,7 +228,9 @@ export default function DiegoAvatar({ emotion = 'neutral', size = 'md', classNam
           />
           
           {/* Eyes */}
-          <motion.g variants={variants.eyes}>
+          <motion.g 
+            animate={animations.eyes}
+          >
             <circle cx="-5" cy="-8" r="2.5" fill="white" />
             <circle cx="5" cy="-10" r="2.5" fill="white" />
             <circle cx="-5" cy="-8" r="1.25" fill="black" />
@@ -242,7 +244,7 @@ export default function DiegoAvatar({ emotion = 'neutral', size = 'md', classNam
             stroke="#0284C7"
             strokeWidth="1.5"
             strokeLinecap="round"
-            variants={variants.smile}
+            animate={animations.smile}
           />
           
           {/* Water splash effect */}
