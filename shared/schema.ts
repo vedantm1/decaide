@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, pgEnum } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -628,6 +628,146 @@ export const DECA_EVENTS = {
 };
 
 // Performance Indicator categories
+// Achievement types and categories enum
+export const achievementTypeEnum = pgEnum('achievement_type', [
+  'streak', 
+  'practice', 
+  'test_score', 
+  'roleplay_complete', 
+  'written_event',
+  'performance_indicator',
+  'daily_challenge'
+]);
+
+// Achievement model for gamification
+export const achievements = pgTable("achievements", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description").notNull(),
+  type: achievementTypeEnum("type").notNull(),
+  threshold: integer("threshold").notNull(), // Number needed to achieve (e.g., 5 day streak)
+  points: integer("points").notNull(),
+  iconName: text("icon_name"), // Lucide icon name
+  category: text("category"), // Category grouping for achievements
+  tier: integer("tier").default(1), // 1 = bronze, 2 = silver, 3 = gold
+});
+
+export const insertAchievementSchema = createInsertSchema(achievements).pick({
+  name: true,
+  description: true,
+  type: true,
+  threshold: true,
+  points: true,
+  iconName: true,
+  category: true,
+  tier: true,
+});
+
+// User Achievements model to track earned achievements
+export const userAchievements = pgTable("user_achievements", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  achievementId: integer("achievement_id").notNull(),
+  earnedAt: timestamp("earned_at").notNull(),
+  displayed: boolean("displayed").default(false), // For showing new achievement notifications
+});
+
+export const insertUserAchievementSchema = createInsertSchema(userAchievements).pick({
+  userId: true,
+  achievementId: true,
+  earnedAt: true,
+  displayed: true,
+});
+
+// Daily Challenge model
+export const dailyChallenges = pgTable("daily_challenges", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  type: text("type").notNull(), // roleplay, test, pi, written
+  points: integer("points").notNull(),
+  date: timestamp("date").notNull(),
+  details: text("details"), // JSON string with challenge-specific data
+});
+
+export const insertDailyChallengeSchema = createInsertSchema(dailyChallenges).pick({
+  title: true,
+  description: true,
+  type: true,
+  points: true,
+  date: true,
+  details: true,
+});
+
+// User Daily Challenge progress
+export const userDailyChallenges = pgTable("user_daily_challenges", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  challengeId: integer("challenge_id").notNull(),
+  completed: boolean("completed").default(false),
+  completedAt: timestamp("completed_at"),
+});
+
+export const insertUserDailyChallengeSchema = createInsertSchema(userDailyChallenges).pick({
+  userId: true,
+  challengeId: true,
+  completed: true,
+  completedAt: true,
+});
+
+// Break Timer sessions
+export const breakSessions = pgTable("break_sessions", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  startTime: timestamp("start_time").notNull(),
+  endTime: timestamp("end_time"),
+  duration: integer("duration"), // In seconds
+  activityType: text("activity_type"), // relax, memory_game, block_blast
+  completed: boolean("completed").default(false),
+});
+
+export const insertBreakSessionSchema = createInsertSchema(breakSessions).pick({
+  userId: true,
+  startTime: true,
+  endTime: true,
+  duration: true,
+  activityType: true,
+  completed: true,
+});
+
+// Mini-game scores
+export const miniGameScores = pgTable("mini_game_scores", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  gameType: text("game_type").notNull(), // memory_game, block_blast
+  score: integer("score").notNull(),
+  playedAt: timestamp("played_at").notNull(),
+  duration: integer("duration"), // In seconds
+});
+
+export const insertMiniGameScoreSchema = createInsertSchema(miniGameScores).pick({
+  userId: true,
+  gameType: true,
+  score: true,
+  playedAt: true,
+  duration: true,
+});
+
+// Export types for the new tables
+export type Achievement = typeof achievements.$inferSelect;
+export type InsertAchievement = z.infer<typeof insertAchievementSchema>;
+export type UserAchievement = typeof userAchievements.$inferSelect;
+export type InsertUserAchievement = z.infer<typeof insertUserAchievementSchema>;
+export type DailyChallenge = typeof dailyChallenges.$inferSelect;
+export type InsertDailyChallenge = z.infer<typeof insertDailyChallengeSchema>;
+export type UserDailyChallenge = typeof userDailyChallenges.$inferSelect;
+export type InsertUserDailyChallenge = z.infer<typeof insertUserDailyChallengeSchema>;
+export type BreakSession = typeof breakSessions.$inferSelect;
+export type InsertBreakSession = z.infer<typeof insertBreakSessionSchema>;
+export type MiniGameScore = typeof miniGameScores.$inferSelect;
+export type InsertMiniGameScore = z.infer<typeof insertMiniGameScoreSchema>;
+
+// Performance indicator categories
 export const PI_CATEGORIES = [
   "Financial Analysis",
   "Business Law",
