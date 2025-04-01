@@ -201,7 +201,7 @@ export default function DiegoAvatar({ emotion = 'neutral', size = 'md', classNam
         
         {/* Dolphin body */}
         <motion.g 
-          animate={animations.body}
+          animate={animations?.body || {}}
         >
           {/* Main body */}
           <path
@@ -229,7 +229,7 @@ export default function DiegoAvatar({ emotion = 'neutral', size = 'md', classNam
           
           {/* Eyes */}
           <motion.g 
-            animate={animations.eyes}
+            animate={animations?.eyes || {}}
           >
             <circle cx="-5" cy="-8" r="2.5" fill="white" />
             <circle cx="5" cy="-10" r="2.5" fill="white" />
@@ -244,7 +244,7 @@ export default function DiegoAvatar({ emotion = 'neutral', size = 'md', classNam
             stroke="#0284C7"
             strokeWidth="1.5"
             strokeLinecap="round"
-            animate={animations.smile}
+            animate={animations?.smile || {}}
           />
           
           {/* Water splash effect */}

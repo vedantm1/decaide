@@ -589,7 +589,14 @@ export default function SettingsPage() {
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
                         <div 
                           className={`relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ${appearance.colorScheme === "business" ? 'ring-yellow-500 ring-2' : 'ring-border'} hover:scale-[1.02] shadow-sm`}
-                          onClick={() => setAppearance(prev => ({...prev, colorScheme: "business"}))}
+                          onClick={() => {
+                            // Check if switching from additional theme to DECA theme
+                            const additionalThemes = ["aquaBlue", "coralPink", "mintGreen", "royalPurple"];
+                            if (additionalThemes.includes(appearance.colorScheme)) {
+                              triggerAnimation('stars', 'Theme Category Changed');
+                            }
+                            setAppearance(prev => ({...prev, colorScheme: "business"}));
+                          }}
                         >
                           <div className="p-4 h-36 flex flex-col justify-between bg-gradient-to-b from-white to-yellow-50 relative"> {/* Increased height */}
                             {appearance.colorScheme === "business" ? (
@@ -619,7 +626,14 @@ export default function SettingsPage() {
 
                         <div 
                           className={`relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ${appearance.colorScheme === "finance" ? 'ring-green-500 ring-2' : 'ring-border'} hover:scale-[1.02] shadow-sm`}
-                          onClick={() => setAppearance(prev => ({...prev, colorScheme: "finance"}))}
+                          onClick={() => {
+                            // Check if switching from additional theme to DECA theme
+                            const additionalThemes = ["aquaBlue", "coralPink", "mintGreen", "royalPurple"];
+                            if (additionalThemes.includes(appearance.colorScheme)) {
+                              triggerAnimation('stars', 'Theme Category Changed');
+                            }
+                            setAppearance(prev => ({...prev, colorScheme: "finance"}));
+                          }}
                         >
                           <div className="p-4 h-36 flex flex-col justify-between bg-gradient-to-b from-white to-green-50 relative"> {/* Increased height */}
                             {appearance.colorScheme === "finance" ? (
@@ -649,7 +663,14 @@ export default function SettingsPage() {
 
                         <div 
                           className={`relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ${appearance.colorScheme === "hospitality" ? 'ring-blue-500 ring-2' : 'ring-border'} hover:scale-[1.02] shadow-sm`}
-                          onClick={() => setAppearance(prev => ({...prev, colorScheme: "hospitality"}))}
+                          onClick={() => {
+                            // Check if switching from additional theme to DECA theme
+                            const additionalThemes = ["aquaBlue", "coralPink", "mintGreen", "royalPurple"];
+                            if (additionalThemes.includes(appearance.colorScheme)) {
+                              triggerAnimation('stars', 'Theme Category Changed');
+                            }
+                            setAppearance(prev => ({...prev, colorScheme: "hospitality"}));
+                          }}
                         >
                           <div className="p-4 h-36 flex flex-col justify-between bg-gradient-to-b from-white to-blue-50 relative"> {/* Increased height */}
                             {appearance.colorScheme === "hospitality" ? (
@@ -679,7 +700,14 @@ export default function SettingsPage() {
 
                         <div 
                           className={`relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ${appearance.colorScheme === "marketing" ? 'ring-red-500 ring-2' : 'ring-border'} hover:scale-[1.02] shadow-sm`}
-                          onClick={() => setAppearance(prev => ({...prev, colorScheme: "marketing"}))}
+                          onClick={() => {
+                            // Check if switching from additional theme to DECA theme
+                            const additionalThemes = ["aquaBlue", "coralPink", "mintGreen", "royalPurple"];
+                            if (additionalThemes.includes(appearance.colorScheme)) {
+                              triggerAnimation('stars', 'Theme Category Changed');
+                            }
+                            setAppearance(prev => ({...prev, colorScheme: "marketing"}));
+                          }}
                         >
                           <div className="p-4 h-36 flex flex-col justify-between bg-gradient-to-b from-white to-red-50 relative"> {/* Increased height */}
                             {appearance.colorScheme === "marketing" ? (
@@ -709,7 +737,14 @@ export default function SettingsPage() {
 
                         <div 
                           className={`relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ${appearance.colorScheme === "entrepreneurship" ? 'ring-gray-500 ring-2' : 'ring-border'} hover:scale-[1.02] shadow-sm`}
-                          onClick={() => setAppearance(prev => ({...prev, colorScheme: "entrepreneurship"}))}
+                          onClick={() => {
+                            // Check if switching from additional theme to DECA theme
+                            const additionalThemes = ["aquaBlue", "coralPink", "mintGreen", "royalPurple"];
+                            if (additionalThemes.includes(appearance.colorScheme)) {
+                              triggerAnimation('stars', 'Theme Category Changed');
+                            }
+                            setAppearance(prev => ({...prev, colorScheme: "entrepreneurship"}));
+                          }}
                         >
                           <div className="p-4 h-36 flex flex-col justify-between bg-gradient-to-b from-white to-gray-50 relative"> {/* Increased height */}
                             {appearance.colorScheme === "entrepreneurship" ? (
@@ -739,7 +774,14 @@ export default function SettingsPage() {
 
                         <div 
                           className={`relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ${appearance.colorScheme === "admin" ? 'ring-indigo-700 ring-2' : 'ring-border'} hover:scale-[1.02] shadow-sm`}
-                          onClick={() => setAppearance(prev => ({...prev, colorScheme: "admin"}))}
+                          onClick={() => {
+                            // Check if switching from additional theme to DECA theme
+                            const additionalThemes = ["aquaBlue", "coralPink", "mintGreen", "royalPurple"];
+                            if (additionalThemes.includes(appearance.colorScheme)) {
+                              triggerAnimation('stars', 'Theme Category Changed');
+                            }
+                            setAppearance(prev => ({...prev, colorScheme: "admin"}));
+                          }}
                         >
                           <div className="p-4 h-36 flex flex-col justify-between bg-gradient-to-b from-white to-indigo-50 relative"> {/* Increased height */}
                             {appearance.colorScheme === "admin" ? (
@@ -775,7 +817,14 @@ export default function SettingsPage() {
                       <div className="grid grid-cols-4 gap-3 mb-2">
                         <div 
                           className={`relative overflow-hidden rounded-md cursorpointer transition-all ring-1 ${appearance.colorScheme === "aquaBlue" ? 'ring-blue-500 ring-2' : 'ring-border'} hover:scale-[1.02] shadow-sm`}
-                          onClick={() => setAppearance(prev => ({...prev, colorScheme: "aquaBlue"}))}
+                          onClick={() => {
+                            // Check if switching from DECA theme to additional theme
+                            const decaThemes = ["business", "finance", "hospitality", "marketing", "entrepreneurship", "admin"];
+                            if (decaThemes.includes(appearance.colorScheme)) {
+                              triggerAnimation('stars', 'Theme Category Changed');
+                            }
+                            setAppearance(prev => ({...prev, colorScheme: "aquaBlue"}));
+                          }}
                         >
                           <div className="p-4 h-32 flex flex-col justify-between bg-gradient-to-b from-white to-blue-50 dark:from-slate-800 dark:to-blue-950 relative"> {/* Increased height */}
                             {appearance.colorScheme === "aquaBlue" && (
@@ -797,7 +846,14 @@ export default function SettingsPage() {
 
                         <div 
                           className={`relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ${appearance.colorScheme === "coralPink" ? 'ring-pink-500 ring-2' : 'ring-border'} hover:scale-[1.02] shadow-sm`}
-                          onClick={() => setAppearance(prev => ({...prev, colorScheme: "coralPink"}))}
+                          onClick={() => {
+                            // Check if switching from DECA theme to additional theme
+                            const decaThemes = ["business", "finance", "hospitality", "marketing", "entrepreneurship", "admin"];
+                            if (decaThemes.includes(appearance.colorScheme)) {
+                              triggerAnimation('stars', 'Theme Category Changed');
+                            }
+                            setAppearance(prev => ({...prev, colorScheme: "coralPink"}));
+                          }}
                         >
                           <div className="p-4 h-32 flex flex-col justify-between bg-gradient-to-b from-white to-pink-50 dark:from-slate-800 dark:to-pink-950 relative"> {/* Increased height */}
                             {appearance.colorScheme === "coralPink" && (
@@ -819,7 +875,14 @@ export default function SettingsPage() {
 
                         <div 
                           className={`relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ${appearance.colorScheme === "mintGreen" ? 'ring-green-500 ring-2' : 'ring-border'} hover:scale-[1.02] shadow-sm`}
-                          onClick={() => setAppearance(prev => ({...prev, colorScheme: "mintGreen"}))}
+                          onClick={() => {
+                            // Check if switching from DECA theme to additional theme
+                            const decaThemes = ["business", "finance", "hospitality", "marketing", "entrepreneurship", "admin"];
+                            if (decaThemes.includes(appearance.colorScheme)) {
+                              triggerAnimation('stars', 'Theme Category Changed');
+                            }
+                            setAppearance(prev => ({...prev, colorScheme: "mintGreen"}));
+                          }}
                         >
                           <div className="p-4 h-32 flex flex-col justify-between bg-gradient-to-b from-white to-green-50 dark:from-slate-800 dark:to-green-950 relative"> {/* Increased height */}
                             {appearance.colorScheme === "mintGreen" && (
@@ -841,7 +904,14 @@ export default function SettingsPage() {
 
                         <div 
                           className={`relative overflow-hidden rounded-md cursor-pointer transition-all ring-1 ${appearance.colorScheme === "royalPurple" ? 'ring-purple-500 ring-2' : 'ring-border'} hover:scale-[1.02] shadow-sm`}
-                          onClick={() => setAppearance(prev => ({...prev, colorScheme: "royalPurple"}))}
+                          onClick={() => {
+                            // Check if switching from DECA theme to additional theme
+                            const decaThemes = ["business", "finance", "hospitality", "marketing", "entrepreneurship", "admin"];
+                            if (decaThemes.includes(appearance.colorScheme)) {
+                              triggerAnimation('stars', 'Theme Category Changed');
+                            }
+                            setAppearance(prev => ({...prev, colorScheme: "royalPurple"}));
+                          }}
                         >
                           <div className="p-4 h-32 flex flex-col justify-between bg-gradient-to-b from-white to-purple-50 dark:from-slate-800 dark:to-purple-950 relative"> {/* Increased height */}
                             {appearance.colorScheme === "royalPurple" && (
