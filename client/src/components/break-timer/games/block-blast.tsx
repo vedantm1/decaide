@@ -49,7 +49,17 @@ interface Tile {
 }
 
 export default function BlockBlast() {
-  const { triggerAnimation, showAchievement } = useMicroInteractions();
+  // Use try-catch to handle potential context errors
+  let triggerAnimation = (_type?: any, _message?: any) => {};
+  let showAchievement = (_title: string, _description: string, _points?: number) => {};
+  
+  try {
+    const microInteractions = useMicroInteractions();
+    triggerAnimation = microInteractions.triggerAnimation;
+    showAchievement = microInteractions.showAchievement;
+  } catch (error) {
+    console.warn('MicroInteractions context not available, using fallback');
+  }
   const [grid, setGrid] = useState<Cell[][]>([]);
   const [availableTiles, setAvailableTiles] = useState<Tile[]>([]);
   const [activeTile, setActiveTile] = useState<Tile | null>(null);
@@ -71,9 +81,9 @@ export default function BlockBlast() {
     setScore(0);
     setGameOver(false);
     
-    // Generate initial tiles
-    generateNewTiles();
-  }, []);
+    // Note: we'll call generateNewTiles after the grid is set
+    // This is handled in useEffect to ensure grid is ready
+  }, [gridSize]);
   
   // Generate a single new tile
   const generateTile = useCallback((existingTiles: Tile[] = []): Tile => {
@@ -112,6 +122,58 @@ export default function BlockBlast() {
     };
   }, []);
   
+  // Helper function to check if a tile can be placed at a specific position
+  const canPlaceTileAtPosition = (tile: Tile, startX: number, startY: number, currentGrid: Cell[][]) => {
+    // Check if grid is initialized
+    if (!currentGrid || currentGrid.length === 0) {
+      return false;
+    }
+    
+    // Check each cell of the tile shape
+    for (let y = 0; y < tile.height; y++) {
+      for (let x = 0; x < tile.width; x++) {
+        if (tile.shape[y] && tile.shape[y][x]) {
+          // Position on the grid
+          const gridX = startX + x;
+          const gridY = startY + y;
+          
+          // Check if out of bounds
+          if (gridX < 0 || gridX >= gridSize || gridY < 0 || gridY >= gridSize) {
+            return false;
+          }
+          
+          // Check if grid cell exists before checking if filled
+          if (currentGrid[gridY] && currentGrid[gridY][gridX] && currentGrid[gridY][gridX].filled) {
+            return false;
+          }
+        }
+      }
+    }
+    return true;
+  };
+
+  // Helper function to check if a tile can be placed anywhere on the grid
+  const canPlaceTileAnywhereOnGrid = (tile: Tile, currentGrid: Cell[][]) => {
+    for (let y = 0; y <= gridSize - tile.height; y++) {
+      for (let x = 0; x <= gridSize - tile.width; x++) {
+        if (canPlaceTileAtPosition(tile, x, y, currentGrid)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  };
+  
+  // Check if a tile can be placed at a specific position
+  const canPlaceTile = useCallback((tile: Tile, startX: number, startY: number) => {
+    return canPlaceTileAtPosition(tile, startX, startY, grid);
+  }, [grid]);
+  
+  // Check if a tile can be placed anywhere on the grid
+  const canPlaceTileAnywhere = useCallback((tile: Tile) => {
+    return canPlaceTileAnywhereOnGrid(tile, grid);
+  }, [grid]);
+  
   // Generate new tiles when needed
   const generateNewTiles = useCallback(() => {
     // Generate 3 new available tiles
@@ -123,7 +185,7 @@ export default function BlockBlast() {
     // Check if any of the new tiles can be placed
     let canPlace = false;
     for (const tile of newTiles) {
-      if (canPlaceTileAnywhere(tile)) {
+      if (canPlaceTileAnywhereOnGrid(tile, grid)) {
         canPlace = true;
         break;
       }
@@ -140,44 +202,7 @@ export default function BlockBlast() {
     }
     
     setAvailableTiles(newTiles);
-  }, [generateTile, score, showAchievement]);
-  
-  // Check if a tile can be placed anywhere on the grid
-  const canPlaceTileAnywhere = useCallback((tile: Tile) => {
-    for (let y = 0; y <= gridSize - tile.height; y++) {
-      for (let x = 0; x <= gridSize - tile.width; x++) {
-        if (canPlaceTile(tile, x, y)) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }, []);
-  
-  // Check if a tile can be placed at a specific position
-  const canPlaceTile = useCallback((tile: Tile, startX: number, startY: number) => {
-    // Check each cell of the tile shape
-    for (let y = 0; y < tile.height; y++) {
-      for (let x = 0; x < tile.width; x++) {
-        if (tile.shape[y][x]) {
-          // Position on the grid
-          const gridX = startX + x;
-          const gridY = startY + y;
-          
-          // Check if out of bounds
-          if (gridX < 0 || gridX >= gridSize || gridY < 0 || gridY >= gridSize) {
-            return false;
-          }
-          
-          // Check if cell is already filled
-          if (grid[gridY][gridX].filled) {
-            return false;
-          }
-        }
-      }
-    }
-    return true;
-  }, [grid]);
+  }, [generateTile, grid, score, showAchievement]);
   
   // Place a tile on the grid
   const placeTile = useCallback((tile: Tile, startX: number, startY: number) => {
@@ -192,11 +217,13 @@ export default function BlockBlast() {
       // Place each cell of the tile
       for (let y = 0; y < tile.height; y++) {
         for (let x = 0; x < tile.width; x++) {
-          if (tile.shape[y][x]) {
-            newGrid[startY + y][startX + x] = {
-              filled: true,
-              color: tile.color
-            };
+          if (tile.shape[y] && tile.shape[y][x]) {
+            if (newGrid[startY + y] && newGrid[startY + y][startX + x]) {
+              newGrid[startY + y][startX + x] = {
+                filled: true,
+                color: tile.color
+              };
+            }
           }
         }
       }
@@ -209,6 +236,11 @@ export default function BlockBlast() {
   
   // Check and clear rows and columns
   const checkAndClearLines = useCallback(() => {
+    // Ensure grid is initialized
+    if (!grid || grid.length === 0) {
+      return false;
+    }
+    
     let rowsCleared = 0;
     let colsCleared = 0;
     const rowsToClear: number[] = [];
@@ -216,9 +248,11 @@ export default function BlockBlast() {
     
     // Check rows
     for (let y = 0; y < gridSize; y++) {
+      if (!grid[y]) continue;
+      
       let isRowFull = true;
       for (let x = 0; x < gridSize; x++) {
-        if (!grid[y][x].filled) {
+        if (!grid[y][x] || !grid[y][x].filled) {
           isRowFull = false;
           break;
         }
@@ -233,7 +267,7 @@ export default function BlockBlast() {
     for (let x = 0; x < gridSize; x++) {
       let isColFull = true;
       for (let y = 0; y < gridSize; y++) {
-        if (!grid[y][x].filled) {
+        if (!grid[y] || !grid[y][x] || !grid[y][x].filled) {
           isColFull = false;
           break;
         }
@@ -309,18 +343,24 @@ export default function BlockBlast() {
     const placed = placeTile(activeTile, gridX, gridY);
     
     if (placed) {
-      // Remove the placed tile from available tiles
-      setAvailableTiles(prev => prev.filter(t => t.id !== activeTile.id));
+      const currentTileId = activeTile.id;
       
-      // Check if any rows or columns can be cleared
-      setTimeout(() => {
-        const linesCleared = checkAndClearLines();
+      // Remove the placed tile from available tiles
+      setAvailableTiles(prev => {
+        const updated = prev.filter(t => t.id !== currentTileId);
         
-        // If no tiles remain, generate new ones
-        if (availableTiles.length === 1) {
-          setTimeout(generateNewTiles, 300);
-        }
-      }, 100);
+        // Check if any rows or columns can be cleared
+        setTimeout(() => {
+          const linesCleared = checkAndClearLines();
+          
+          // If no tiles remain, generate new ones
+          if (updated.length === 0) {
+            setTimeout(generateNewTiles, 300);
+          }
+        }, 100);
+        
+        return updated;
+      });
     }
     
     setActiveTile(null);
@@ -335,6 +375,16 @@ export default function BlockBlast() {
   useEffect(() => {
     initializeGame();
   }, [initializeGame]);
+  
+  // Generate new tiles when grid is ready
+  useEffect(() => {
+    if (grid && grid.length === gridSize) {
+      // Only generate tiles if we don't have any yet
+      if (availableTiles.length === 0) {
+        generateNewTiles();
+      }
+    }
+  }, [grid, gridSize, availableTiles.length, generateNewTiles]);
   
   // Render the tile preview
   const renderTilePreview = (tile: Tile, index: number) => {

@@ -53,7 +53,17 @@ const decaTerms = [
 ];
 
 export default function MemoryGame() {
-  const { triggerAnimation, showAchievement } = useMicroInteractions();
+  // Use try-catch to handle potential context errors
+  let triggerAnimation = (_type?: any, _message?: any) => {};
+  let showAchievement = (_title: string, _description: string, _points?: number) => {};
+  
+  try {
+    const microInteractions = useMicroInteractions();
+    triggerAnimation = microInteractions.triggerAnimation;
+    showAchievement = microInteractions.showAchievement;
+  } catch (error) {
+    console.warn('MicroInteractions context not available, using fallback');
+  }
   const [cards, setCards] = useState<Card[]>([]);
   const [flippedCards, setFlippedCards] = useState<number[]>([]);
   const [matchedPairs, setMatchedPairs] = useState(0);
