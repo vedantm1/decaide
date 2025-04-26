@@ -95,7 +95,7 @@
     "stripe": "^17.7.0",
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",
-    "three": "^0.176.0",
+    "three": "^0.150.1",
     "vaul": "^1.1.0",
     "vite-plugin-pwa": "^0.21.2",
     "vitest": "^3.0.9",
