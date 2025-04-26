@@ -74,7 +74,6 @@
     "input-otp": "^1.2.4",
     "lottie-react": "^2.4.1",
     "lucide-react": "^0.453.0",
-    "mcp-remote": "^0.0.22",
     "memorystore": "^1.6.7",
     "motion": "^12.5.0",
     "openai": "^4.89.0",
