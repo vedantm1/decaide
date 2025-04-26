@@ -20,13 +20,12 @@ import { ProtectedRoute } from "./lib/protected-route";
 import { AuthProvider } from "@/hooks/use-auth";
 import { MicroInteractionsProvider } from "@/hooks/use-micro-interactions";
 import { DiegoGuideProvider, useDiegoGuide } from "@/hooks/use-diego-guide";
-import { ThreeEnvironmentProvider } from "@/hooks/use-three-environment";
 import Diego from "@/components/diego-guide/diego";
 import DiegoChat from "@/components/diego-guide/diego-chat";
 import ThemeProvider from "@/lib/theme-provider";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import MainThreeEnvironment from "@/components/three-environment/main-environment";
+import Simple3DBackground from "@/components/simple-3d-background";
 
 function Router() {
   return (
@@ -56,11 +55,9 @@ function App() {
         <ThemeProvider>
           <MicroInteractionsProvider>
             <DiegoGuideProvider>
-              <ThreeEnvironmentProvider>
-                <Router />
-                <Toaster />
-                <DiegoGuideManager />
-              </ThreeEnvironmentProvider>
+              <Router />
+              <Toaster />
+              <DiegoGuideManager />
             </DiegoGuideProvider>
           </MicroInteractionsProvider>
         </ThemeProvider>
@@ -160,8 +157,8 @@ function DiegoGuideManager() {
   
   return (
     <>
-      {/* 3D Environment replaces the playful background */}
-      <MainThreeEnvironment />
+      {/* Simple 3D Environment */}
+      <Simple3DBackground colorScheme={colorScheme} />
 
       {/* Welcome banner removed as requested */}
 
