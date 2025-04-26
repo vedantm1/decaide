@@ -1,5 +1,5 @@
 // Script to connect this Replit project to Figma
-const { spawn } = require('child_process');
+import { spawn } from 'child_process';
 
 // The MCP server URL from the Figma connection dialog
 const MCP_SERVER_URL = 'https://h2d-mcp.divriots.com/f467b14a-1737-48b1-a60f-7428ec595fae/sse';

@@ -1,34 +1,61 @@
-# Connecting This Replit Project to Figma
+# Replit-Figma Connection Guide
 
-This guide provides simple instructions to connect this specific Replit project to Figma using the Message Control Protocol (MCP).
+This guide explains how to connect your Replit project with Figma, allowing for seamless design-to-code workflows.
 
-## Quick Connection Steps
+## Prerequisites
 
-1. Open a new Replit shell/terminal window
-2. Run the following command:
+- A Figma account with access to design files
+- This Replit project
+- MCP connection URL from Figma (obtained from the Figma Dev Mode connection dialog)
+
+## Setup
+
+1. We've already installed the `mcp-remote` package in this project, which allows communication between Replit and Figma.
+
+2. Two connection scripts are provided:
+   - `connect-figma.js` - JavaScript version
+   - `connect-figma.sh` - Shell script version
+
+## Connecting to Figma
+
+### Using the JavaScript Script
+
+Run the JS script with:
 
 ```bash
-npx mcp-remote 'https://h2d-mcp.divriots.com/f467b14a-1737-48b1-a60f-7428ec595fae/sse'
+node connect-figma.js
 ```
 
-3. Keep this terminal window running while you work
+### Using the Shell Script
 
-## What This Does
+Make the script executable first (only needed once):
 
-- Creates a connection between this Replit project and Figma
-- Allows you to view and use Figma designs directly in this project
-- Synchronizes design changes in real-time
+```bash
+chmod +x connect-figma.sh
+```
+
+Then run it:
+
+```bash
+./connect-figma.sh
+```
+
+## How It Works
+
+1. When you run either script, it establishes a connection to the MCP (Message Control Protocol) server.
+2. Keep the terminal window open to maintain the connection.
+3. In Figma, open Dev Mode and use the connection dialog to link to this Replit project.
+4. You can now receive design tokens, assets, and code snippets directly from Figma.
+
+## Customizing the Connection
+
+If you receive a different MCP URL from Figma, update it in both scripts:
+
+- In `connect-figma.js`, modify the `MCP_SERVER_URL` variable
+- In `connect-figma.sh`, modify the `MCP_SERVER_URL` variable
 
 ## Troubleshooting
 
-If the connection fails:
-
-1. Make sure your Replit has internet access
-2. Try restarting the Replit environment
-3. Check if the MCP server is available
-
-## Additional Notes
-
-- This connection is temporary and will need to be reestablished if the Replit environment restarts
-- The MCP connection must remain running for the integration to work
-- You can open multiple terminal windows in Replit to keep the connection running while you work in other terminals
+- If the connection fails, ensure you're using the correct MCP URL from Figma
+- Make sure the terminal running the connection script remains open
+- Check that you have the necessary permissions in Figma
