@@ -1,55 +1,132 @@
 import React, { useRef, useEffect, useState } from 'react';
 import * as THREE from 'three';
 
-// Check for WebGL support
-const isWebGLAvailable = () => {
-  try {
-    const canvas = document.createElement('canvas');
-    return !!(
-      window.WebGLRenderingContext && 
-      (canvas.getContext('webgl') || canvas.getContext('experimental-webgl'))
-    );
-  } catch (e) {
-    return false;
-  }
-};
-
 interface Simple3DBackgroundProps {
   colorScheme?: string;
 }
 
+// Animated particles component
+const AnimatedParticles: React.FC<{color: string}> = ({ color }) => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const particles = useRef<{x: number; y: number; size: number; speedX: number; speedY: number}[]>([]);
+  const animationRef = useRef<number | null>(null);
+  
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    
+    // Set canvas dimensions
+    const setCanvasDimensions = () => {
+      if (canvas) {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+    };
+    
+    setCanvasDimensions();
+    window.addEventListener('resize', setCanvasDimensions);
+    
+    // Generate particles
+    const generateParticles = () => {
+      particles.current = [];
+      const particleCount = Math.min(window.innerWidth / 15, 100); // Responsive count
+      
+      for (let i = 0; i < particleCount; i++) {
+        particles.current.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          size: Math.random() * 3 + 1,
+          speedX: (Math.random() - 0.5) * 0.3,
+          speedY: (Math.random() - 0.5) * 0.3
+        });
+      }
+    };
+    
+    generateParticles();
+    
+    // Animation loop
+    const animate = () => {
+      if (!canvas || !ctx) return;
+      
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      // Update and draw particles
+      particles.current.forEach(particle => {
+        // Update position
+        particle.x += particle.speedX;
+        particle.y += particle.speedY;
+        
+        // Wrap around edges
+        if (particle.x < 0) particle.x = canvas.width;
+        if (particle.x > canvas.width) particle.x = 0;
+        if (particle.y < 0) particle.y = canvas.height;
+        if (particle.y > canvas.height) particle.y = 0;
+        
+        // Draw particle
+        ctx.beginPath();
+        ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+        ctx.fillStyle = color;
+        ctx.globalAlpha = 0.5;
+        ctx.fill();
+      });
+      
+      animationRef.current = requestAnimationFrame(animate);
+    };
+    
+    animate();
+    
+    // Cleanup
+    return () => {
+      window.removeEventListener('resize', setCanvasDimensions);
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
+  }, [color]);
+  
+  return (
+    <canvas 
+      ref={canvasRef} 
+      style={{ 
+        position: 'fixed', 
+        top: 0, 
+        left: 0,
+        width: '100%',
+        height: '100%',
+        zIndex: -9,
+        pointerEvents: 'none'
+      }} 
+    />
+  );
+};
+
 const Simple3DBackground: React.FC<Simple3DBackgroundProps> = ({ 
   colorScheme = 'aquaBlue' 
 }) => {
-  const [hasWebGL] = useState(isWebGLAvailable());
-  
-  // If WebGL is not available, render a simple gradient background
-  if (!hasWebGL) {
-    const getPrimaryGradient = () => {
-      const colors: Record<string, string> = {
-        'aquaBlue': 'linear-gradient(45deg, #1e3a8a 0%, #3b82f6 100%)',
-        'coralPink': 'linear-gradient(45deg, #831843 0%, #ec4899 100%)',
-        'mintGreen': 'linear-gradient(45deg, #14532d 0%, #22c55e 100%)',
-        'royalPurple': 'linear-gradient(45deg, #581c87 0%, #8b5cf6 100%)',
-      };
-      return colors[colorScheme] || colors.aquaBlue;
+  // Get gradient background styles
+  const getPrimaryGradient = () => {
+    const colors: Record<string, string> = {
+      'aquaBlue': 'radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.15) 0%, rgba(30, 58, 138, 0.05) 100%)',
+      'coralPink': 'radial-gradient(circle at 50% 50%, rgba(236, 72, 153, 0.15) 0%, rgba(131, 24, 67, 0.05) 100%)',
+      'mintGreen': 'radial-gradient(circle at 50% 50%, rgba(34, 197, 94, 0.15) 0%, rgba(20, 83, 45, 0.05) 100%)',
+      'royalPurple': 'radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.15) 0%, rgba(88, 28, 135, 0.05) 100%)',
     };
-    
-    return (
-      <div 
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          zIndex: -10,
-          background: getPrimaryGradient(),
-          opacity: 0.4
-        }}
-      />
-    );
-  }
+    return colors[colorScheme] || colors.aquaBlue;
+  };
+  
+  // Get color for particles
+  const getParticleColor = () => {
+    const colors: Record<string, string> = {
+      'aquaBlue': 'rgba(59, 130, 246, 0.6)',
+      'coralPink': 'rgba(236, 72, 153, 0.6)',
+      'mintGreen': 'rgba(34, 197, 94, 0.6)',
+      'royalPurple': 'rgba(139, 92, 246, 0.6)',
+    };
+    return colors[colorScheme] || colors.aquaBlue;
+  };
   const containerRef = useRef<HTMLDivElement>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
@@ -235,19 +312,40 @@ const Simple3DBackground: React.FC<Simple3DBackgroundProps> = ({
   }, [colorScheme]);
   
   return (
-    <div 
-      ref={containerRef} 
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%',
-        zIndex: -10,
-        pointerEvents: 'none',
-        overflow: 'hidden'
-      }}
-    />
+    <>
+      {/* Gradient background */}
+      <div 
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          zIndex: -10,
+          background: getPrimaryGradient(),
+          pointerEvents: 'none'
+        }}
+      />
+      
+      {/* Animated particles */}
+      <AnimatedParticles color={getParticleColor()} />
+      
+      {/* Three.js container (hidden but still running for future use) */}
+      <div 
+        ref={containerRef} 
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          zIndex: -8,
+          opacity: 0,
+          pointerEvents: 'none',
+          overflow: 'hidden'
+        }}
+      />
+    </>
   );
 };
 
