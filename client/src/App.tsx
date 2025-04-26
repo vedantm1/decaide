@@ -25,7 +25,7 @@ import DiegoChat from "@/components/diego-guide/diego-chat";
 import ThemeProvider from "@/lib/theme-provider";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import Simple3DBackground from "@/components/simple-3d-background";
+import AnimatedBackground from "@/components/animated-background";
 
 function Router() {
   return (
@@ -157,8 +157,8 @@ function DiegoGuideManager() {
   
   return (
     <>
-      {/* Simple 3D Environment */}
-      <Simple3DBackground colorScheme={colorScheme} />
+      {/* Animated background */}
+      <AnimatedBackground colorScheme={colorScheme} />
 
       {/* Welcome banner removed as requested */}
 
