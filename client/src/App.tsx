@@ -25,7 +25,7 @@ import DiegoChat from "@/components/diego-guide/diego-chat";
 import ThemeProvider from "@/lib/theme-provider";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import AnimatedBackground from "@/components/animated-background";
+import PlayfulBackground from "@/components/playful-background";
 
 function Router() {
   return (
@@ -157,8 +157,8 @@ function DiegoGuideManager() {
   
   return (
     <>
-      {/* Animated background */}
-      <AnimatedBackground colorScheme={colorScheme} />
+      {/* Playful background animation for Memphis style */}
+      <PlayfulBackground enabled={visualStyle === 'memphis'} colorScheme={colorScheme} />
 
       {/* Welcome banner removed as requested */}
 
