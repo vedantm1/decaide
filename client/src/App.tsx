@@ -14,7 +14,6 @@ import SettingsPage from "@/pages/settings";
 import PricingPage from "@/pages/pricing";
 import WhyDecadePage from "@/pages/why-decade";
 import InteractionShowcasePage from "@/pages/interaction-showcase";
-import ModelViewerPage from "@/pages/model-viewer";
 import Checkout from "@/pages/checkout";
 import Subscribe from "@/pages/subscribe";
 import { ProtectedRoute } from "./lib/protected-route";
@@ -42,7 +41,6 @@ function Router() {
       <ProtectedRoute path="/checkout" component={Checkout} />
       <ProtectedRoute path="/subscribe" component={Subscribe} />
       <ProtectedRoute path="/interactions" component={InteractionShowcasePage} />
-      <Route path="/model-viewer" component={ModelViewerPage} />
       <Route path="/why-decade" component={WhyDecadePage} />
       <Route path="/auth" component={AuthPage} />
       <Route component={NotFound} />
