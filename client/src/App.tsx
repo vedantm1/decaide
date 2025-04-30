@@ -49,14 +49,39 @@ function Router() {
 }
 
 function App() {
+  // Set the underwater background directly on document body
+  useEffect(() => {
+    document.body.style.background = 'linear-gradient(to bottom, #22d3ee, #0369a1)'; // cyan-400 to blue-700
+    
+    return () => {
+      document.body.style.background = '';
+    };
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <ThemeProvider>
           <MicroInteractionsProvider>
             <DiegoGuideProvider>
-              {/* Add underwater background to the entire app */}
-              <UnderwaterBackground />
+              {/* Add bubble elements directly */}
+              <div className="bubble"></div>
+              <div className="bubble"></div>
+              <div className="bubble"></div>
+              <div className="bubble"></div>
+              
+              {/* Add Diego the dolphin */}
+              <div className="diego-dolphin">
+                <div className="diego-body"></div>
+                <div className="diego-head"></div>
+                <div className="diego-snout"></div>
+                <div className="diego-eye">
+                  <div className="diego-pupil"></div>
+                </div>
+                <div className="diego-fin"></div>
+                <div className="diego-tail"></div>
+                <div className="diego-belly"></div>
+              </div>
               <Router />
               <Toaster />
               <DiegoGuideManager />

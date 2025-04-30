@@ -7,12 +7,12 @@ export interface UnderwaterBackgroundProps {
 
 const UnderwaterBackground: React.FC<UnderwaterBackgroundProps> = ({ className }) => {
   return (
-    <div className={`fixed top-0 left-0 w-full h-full pointer-events-none overflow-hidden z-0 ${className || ''}`} style={{zIndex: -1}}>
+    <div className={`fixed top-0 left-0 w-full h-full pointer-events-none overflow-hidden ${className || ''}`} style={{zIndex: -5}} id="underwater-background">
       <motion.div 
         className="w-full h-full relative"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 1.5 }}
+        transition={{ duration: 0.5 }}
       >
         {/* Gradient background */}
         <div className="absolute inset-0 bg-gradient-to-b from-cyan-400 to-blue-700" />
