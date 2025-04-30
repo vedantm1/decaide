@@ -1,90 +1,53 @@
 /* 
- * Dark Mode Gradient Backgrounds
+ * COMPLETELY REBUILT DARK MODE FOR VANTA WAVES
  *
- * This file implements the universal rule that in dark mode, all boxes/containers 
- * should use black gradient backgrounds rather than plain white or solid colors.
- *
- * Exceptions:
- * - Login page (handled separately)
- * - White UI option in settings (handled by theme controller)
+ * This file removes ALL solid black backgrounds in dark mode
+ * to ensure the Vanta.js background waves show through properly.
  */
 
-/* Base gradient definitions */
+/* Reset all gradients to be fully transparent */
 html.dark,
 html[data-theme="dark"] {
-  /* Vertical gradients (top to bottom) */
-  --dark-gradient-v-subtle: linear-gradient(to bottom, 
-    hsl(222.2 84% 6%) 0%, 
-    hsl(222.2 84% 4.9%) 100%
-  );
+  /* Vertical gradients - transparent with slight blur */
+  --dark-gradient-v-subtle: none;
+  --dark-gradient-v-default: none;
+  --dark-gradient-v-pronounced: none;
   
-  --dark-gradient-v-default: linear-gradient(to bottom, 
-    hsl(222.2 84% 9%) 0%, 
-    hsl(222.2 84% 4.9%) 100%
-  );
+  /* Diagonal gradients - transparent with slight blur */
+  --dark-gradient-diag-subtle: none;
+  --dark-gradient-diag-default: none;
+  --dark-gradient-diag-pronounced: none;
   
-  --dark-gradient-v-pronounced: linear-gradient(to bottom, 
-    hsl(222.2 84% 12%) 0%, 
-    hsl(222.2 84% 4.9%) 100%
-  );
-  
-  /* Diagonal gradients */
-  --dark-gradient-diag-subtle: linear-gradient(135deg, 
-    hsl(222.2 84% 6%) 0%, 
-    hsl(222.2 84% 4.9%) 100%
-  );
-  
-  --dark-gradient-diag-default: linear-gradient(135deg, 
-    hsl(222.2 84% 9%) 0%, 
-    hsl(222.2 84% 4.9%) 100%
-  );
-  
-  --dark-gradient-diag-pronounced: linear-gradient(135deg, 
-    hsl(222.2 84% 12%) 0%, 
-    hsl(222.2 84% 4.9%) 100%
-  );
-  
-  /* Radial gradients */
-  --dark-gradient-radial-subtle: radial-gradient(
-    circle at center,
-    hsl(222.2 84% 6%) 0%,
-    hsl(222.2 84% 4.9%) 70%
-  );
-  
-  --dark-gradient-radial-default: radial-gradient(
-    circle at center,
-    hsl(222.2 84% 9%) 0%,
-    hsl(222.2 84% 4.9%) 70%
-  );
-  
-  --dark-gradient-radial-pronounced: radial-gradient(
-    circle at center,
-    hsl(222.2 84% 12%) 0%,
-    hsl(222.2 84% 4.9%) 70%
-  );
+  /* Radial gradients - transparent with slight blur */
+  --dark-gradient-radial-subtle: none;
+  --dark-gradient-radial-default: none;
+  --dark-gradient-radial-pronounced: none;
 }
 
-/* Apply the universal rule to all card-like components */
+/* Apply pure transparency to all card-like components */
 html.dark .card,
 html.dark [class*="card"],
 html[data-theme="dark"] .card,
 html[data-theme="dark"] [class*="card"] {
-  background-image: var(--dark-gradient-v-default) !important;
-  background-color: transparent !important;
+  background-image: none !important;
+  background-color: rgba(24, 24, 27, 0.4) !important;
+  backdrop-filter: blur(8px) !important;
 }
 
 /* Target shadcn/ui Card components by their .bg-card class */
 html.dark .bg-card,
 html[data-theme="dark"] .bg-card {
-  background-image: var(--dark-gradient-v-default) !important;
-  background-color: transparent !important;
+  background-image: none !important;
+  background-color: rgba(24, 24, 27, 0.4) !important;
+  backdrop-filter: blur(8px) !important;
 }
 
 /* Dialog/Modal components */
 html.dark [role="dialog"],
 html[data-theme="dark"] [role="dialog"] {
-  background-image: var(--dark-gradient-diag-pronounced) !important;
-  background-color: transparent !important;
+  background-image: none !important;
+  background-color: rgba(24, 24, 27, 0.6) !important;
+  backdrop-filter: blur(8px) !important;
 }
 
 /* Primary UI containers */
@@ -92,7 +55,7 @@ html.dark .container,
 html.dark [class*="container"],
 html[data-theme="dark"] .container,
 html[data-theme="dark"] [class*="container"] {
-  background-image: var(--dark-gradient-v-subtle) !important;
+  background-image: none !important;
   background-color: transparent !important;
 }
 
@@ -101,8 +64,9 @@ html.dark aside,
 html.dark nav,
 html[data-theme="dark"] aside,
 html[data-theme="dark"] nav {
-  background-image: var(--dark-gradient-v-default) !important;
-  background-color: transparent !important;
+  background-image: none !important;
+  background-color: rgba(24, 24, 27, 0.6) !important;
+  backdrop-filter: blur(8px) !important;
 }
 
 /* Dropdown and popover components */
@@ -120,8 +84,9 @@ html[data-theme="dark"] [data-radix-popper-content-wrapper],
 html[data-theme="dark"] .popover-content,
 html[data-theme="dark"] .dropdown-content,
 html[data-theme="dark"] .tooltip-content {
-  background-image: var(--dark-gradient-diag-default) !important;
-  background-color: transparent !important;
+  background-image: none !important;
+  background-color: rgba(24, 24, 27, 0.7) !important;
+  backdrop-filter: blur(8px) !important;
 }
 
 /* Dashboard cards and stats boxes */
@@ -129,8 +94,9 @@ html.dark .dashboard-card,
 html.dark .stats-box,
 html[data-theme="dark"] .dashboard-card,
 html[data-theme="dark"] .stats-box {
-  background-image: var(--dark-gradient-diag-default) !important;
-  background-color: transparent !important;
+  background-image: none !important;
+  background-color: rgba(24, 24, 27, 0.5) !important;
+  backdrop-filter: blur(8px) !important;
 }
 
 /* Panels and sections */
@@ -138,19 +104,21 @@ html.dark .panel-bg,
 html.dark .section-bg,
 html[data-theme="dark"] .panel-bg,
 html[data-theme="dark"] .section-bg {
-  background-image: var(--dark-gradient-v-default) !important;
-  background-color: transparent !important;
+  background-image: none !important;
+  background-color: rgba(24, 24, 27, 0.5) !important;
+  backdrop-filter: blur(8px) !important;
 }
 
-/* Form elements and inputs remain solid colors for readability */
+/* Form elements and inputs remain slightly opaque for readability */
 html.dark input, 
 html.dark select, 
 html.dark textarea,
 html[data-theme="dark"] input, 
 html[data-theme="dark"] select, 
 html[data-theme="dark"] textarea {
-  background-color: var(--dark-bg-tertiary) !important;
+  background-color: rgba(24, 24, 27, 0.6) !important;
   background-image: none !important;
+  backdrop-filter: blur(8px) !important;
 }
 
 /* Form item containers and other shadcn/ui form elements */
@@ -160,97 +128,110 @@ html.dark [class*="form-item"],
 html[data-theme="dark"] .rounded-lg.border,
 html[data-theme="dark"] .form-container,
 html[data-theme="dark"] [class*="form-item"] {
-  background-image: var(--dark-gradient-diag-subtle) !important;
-  background-color: transparent !important;
+  background-image: none !important;
+  background-color: rgba(24, 24, 27, 0.4) !important;
+  backdrop-filter: blur(8px) !important;
 }
 
 /* Tables */
 html.dark table,
 html[data-theme="dark"] table {
-  background-image: var(--dark-gradient-v-subtle) !important;
-  background-color: transparent !important;
+  background-image: none !important;
+  background-color: rgba(24, 24, 27, 0.5) !important;
+  backdrop-filter: blur(8px) !important;
 }
 
 /* Table rows (alternate rows) */
 html.dark tr:nth-child(even),
 html[data-theme="dark"] tr:nth-child(even) {
-  background-image: var(--dark-gradient-diag-subtle) !important;
-  background-color: transparent !important;
+  background-image: none !important;
+  background-color: rgba(24, 24, 27, 0.3) !important;
 }
 
-/* White backgrounds - override any white backgrounds with gradients */
+/* White backgrounds - override any white backgrounds to be translucent */
 html.dark .bg-white,
 html.dark [class*="bg-white"],
 html[data-theme="dark"] .bg-white,
 html[data-theme="dark"] [class*="bg-white"] {
-  background-image: var(--dark-gradient-v-default) !important;
-  background-color: transparent !important;
+  background-image: none !important;
+  background-color: rgba(24, 24, 27, 0.4) !important;
+  backdrop-filter: blur(8px) !important;
 }
 
-/* Slate backgrounds - reuse the variables to avoid duplicating code */
+/* Slate backgrounds - make them transparent */
 html.dark .bg-slate-50, 
 html.dark .bg-slate-100, 
 html.dark .bg-slate-200,
 html[data-theme="dark"] .bg-slate-50, 
 html[data-theme="dark"] .bg-slate-100, 
 html[data-theme="dark"] .bg-slate-200 {
-  background-image: var(--dark-gradient-v-subtle) !important;
-  background-color: transparent !important;
+  background-image: none !important;
+  background-color: rgba(24, 24, 27, 0.3) !important;
+  backdrop-filter: blur(6px) !important;
 }
 
-/* Utility classes for applying specific gradients manually */
+/* Utility classes for applying transparency */
 html.dark .dark-gradient-v-subtle,
 html[data-theme="dark"] .dark-gradient-v-subtle {
-  background-image: var(--dark-gradient-v-subtle) !important;
-  background-color: transparent !important;
+  background-image: none !important;
+  background-color: rgba(24, 24, 27, 0.3) !important;
+  backdrop-filter: blur(6px) !important;
 }
 
 html.dark .dark-gradient-v-default,
 html[data-theme="dark"] .dark-gradient-v-default {
-  background-image: var(--dark-gradient-v-default) !important;
-  background-color: transparent !important;
+  background-image: none !important;
+  background-color: rgba(24, 24, 27, 0.4) !important;
+  backdrop-filter: blur(6px) !important;
 }
 
 html.dark .dark-gradient-v-pronounced,
 html[data-theme="dark"] .dark-gradient-v-pronounced {
-  background-image: var(--dark-gradient-v-pronounced) !important;
-  background-color: transparent !important;
+  background-image: none !important;
+  background-color: rgba(24, 24, 27, 0.5) !important;
+  backdrop-filter: blur(6px) !important;
 }
 
 html.dark .dark-gradient-diag-subtle,
 html[data-theme="dark"] .dark-gradient-diag-subtle {
-  background-image: var(--dark-gradient-diag-subtle) !important;
-  background-color: transparent !important;
+  background-image: none !important;
+  background-color: rgba(24, 24, 27, 0.3) !important;
+  backdrop-filter: blur(6px) !important;
 }
 
 html.dark .dark-gradient-diag-default,
 html[data-theme="dark"] .dark-gradient-diag-default {
-  background-image: var(--dark-gradient-diag-default) !important;
-  background-color: transparent !important;
+  background-image: none !important;
+  background-color: rgba(24, 24, 27, 0.4) !important;
+  backdrop-filter: blur(6px) !important;
 }
 
 html.dark .dark-gradient-diag-pronounced,
 html[data-theme="dark"] .dark-gradient-diag-pronounced {
-  background-image: var(--dark-gradient-diag-pronounced) !important;
-  background-color: transparent !important;
+  background-image: none !important;
+  background-color: rgba(24, 24, 27, 0.5) !important;
+  backdrop-filter: blur(6px) !important;
 }
 
 html.dark .dark-gradient-radial-subtle,
 html[data-theme="dark"] .dark-gradient-radial-subtle {
-  background-image: var(--dark-gradient-radial-subtle) !important;
-  background-color: transparent !important;
+  background-image: none !important;
+  background-color: rgba(24, 24, 27, 0.3) !important;
+  backdrop-filter: blur(6px) !important;
 }
 
 html.dark .dark-gradient-radial-default,
 html[data-theme="dark"] .dark-gradient-radial-default {
-  background-image: var(--dark-gradient-radial-default) !important;
-  background-color: transparent !important;
+  background-image: none !important;
+  background-color: rgba(24, 24, 27, 0.4) !important;
+  backdrop-filter: blur(6px) !important;
 }
 
 html.dark .dark-gradient-radial-pronounced,
 html[data-theme="dark"] .dark-gradient-radial-pronounced {
-  background-image: var(--dark-gradient-radial-pronounced) !important;
-  background-color: transparent !important;
+  background-image: none !important;
+  background-color: rgba(24, 24, 27, 0.5) !important;
+  backdrop-filter: blur(6px) !important;
 }
 
 /* Tabs and tab content */
@@ -258,15 +239,17 @@ html.dark [role="tablist"],
 html.dark [role="tabpanel"],
 html[data-theme="dark"] [role="tablist"],
 html[data-theme="dark"] [role="tabpanel"] {
-  background-image: var(--dark-gradient-v-subtle) !important;
-  background-color: transparent !important;
+  background-image: none !important;
+  background-color: rgba(24, 24, 27, 0.4) !important;
+  backdrop-filter: blur(6px) !important;
 }
 
 /* Active tabs */
 html.dark [role="tab"][aria-selected="true"],
 html[data-theme="dark"] [role="tab"][aria-selected="true"] {
-  background-image: var(--dark-gradient-diag-pronounced) !important;
-  background-color: transparent !important;
+  background-image: none !important;
+  background-color: rgba(24, 24, 27, 0.6) !important;
+  backdrop-filter: blur(6px) !important;
 }
 
 /* Shadow enhancements for dark mode elements to create depth */
@@ -303,11 +286,12 @@ html[data-theme="dark"] .accordion-content,
 html[data-theme="dark"] .hover-card-content,
 html[data-theme="dark"] .alert-dialog-content,
 html[data-theme="dark"] [data-radix-scroll-area-viewport] {
-  background-image: var(--dark-gradient-diag-default) !important;
-  background-color: transparent !important;
+  background-image: none !important;
+  background-color: rgba(24, 24, 27, 0.5) !important;
+  backdrop-filter: blur(8px) !important;
 }
 
-/* Auth page exception - keep the original styling */
+/* Auth page exception - keep the original styling but still make it translucent */
 html.dark .auth-page .card,
 html.dark .auth-page [class*="card"],
 html.dark .auth-page [role="dialog"],
@@ -325,6 +309,8 @@ html[data-theme="dark"] .auth-page .sheet-content,
 html[data-theme="dark"] .auth-page .dialog-content,
 html[data-theme="dark"] .auth-page .drawer-content {
   background-image: none !important;
+  background-color: rgba(24, 24, 27, 0.6) !important;
+  backdrop-filter: blur(8px) !important;
 }
 
 /* Ensure inputs are properly styled in auth page too */
@@ -334,7 +320,8 @@ html.dark .auth-page textarea,
 html[data-theme="dark"] .auth-page input, 
 html[data-theme="dark"] .auth-page select, 
 html[data-theme="dark"] .auth-page textarea {
-  background-color: var(--dark-bg-tertiary) !important;
+  background-color: rgba(24, 24, 27, 0.7) !important;
+  backdrop-filter: blur(8px) !important;
 }
 
 /* Handle accent backgrounds in dark mode */
@@ -346,8 +333,9 @@ html[data-theme="dark"] .bg-accent,
 html[data-theme="dark"] .bg-accent-foreground,
 html[data-theme="dark"] [class*="bg-muted"],
 html[data-theme="dark"] [class*="bg-secondary"] {
-  background-image: var(--dark-gradient-v-subtle) !important;
-  background-color: transparent !important;
+  background-image: none !important;
+  background-color: rgba(24, 24, 27, 0.4) !important;
+  backdrop-filter: blur(6px) !important;
 }
 
 /* Additional utilities for specific gradient usage */
