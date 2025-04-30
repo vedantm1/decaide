@@ -229,14 +229,14 @@ export default function SettingsPage() {
       />
 
       <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="mb-6">
-        <TabsList className="grid grid-cols-3 max-w-md mb-8">
-          <TabsTrigger value="profile">Profile</TabsTrigger>
-          <TabsTrigger value="notifications">Notifications</TabsTrigger>
-          <TabsTrigger value="appearance">Appearance</TabsTrigger>
+        <TabsList className="grid grid-cols-3 max-w-md mb-8 bg-background/40 backdrop-blur">
+          <TabsTrigger value="profile" className="data-[state=active]:bg-primary/20">Profile</TabsTrigger>
+          <TabsTrigger value="notifications" className="data-[state=active]:bg-primary/20">Notifications</TabsTrigger>
+          <TabsTrigger value="appearance" className="data-[state=active]:bg-primary/20">Appearance</TabsTrigger>
         </TabsList>
 
         <TabsContent value="profile">
-          <Card className="bg-background/60 backdrop-blur-sm border-muted">
+          <Card className="bg-background/40 backdrop-blur border-muted/50">
             <CardHeader>
               <CardTitle>Profile Settings</CardTitle>
             </CardHeader>
