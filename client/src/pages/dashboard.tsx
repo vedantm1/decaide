@@ -224,7 +224,9 @@ export default function Dashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-2xl font-heading font-bold text-slate-800">Dashboard</h1>
-                <p className="text-slate-500 mt-1">Welcome back, {user?.username}! Ready to practice for DECA?</p>
+                <p className="text-slate-500 mt-1">
+                  Welcome back, <span className="text-primary font-medium">{user?.username || 'User'}</span>! Ready to practice for DECA?
+                </p>
               </div>
               
               {/* Practice Quick Actions */}
