@@ -1,0 +1,799 @@
+/*
+  Enhanced UI Components for DecA(I)de
+  Professional, polished UI components with micro-interactions
+*/
+
+/* ===== BUTTONS ===== */
+
+/* Primary Button - Bold and confident */
+.btn-primary {
+  background-color: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  font-weight: var(--font-medium);
+  font-size: var(--text-sm);
+  padding: 0.625rem 1.25rem;
+  border-radius: var(--radius);
+  border: none;
+  box-shadow: 0 1px 2px hsl(var(--shadow-subtle));
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary:hover {
+  background-color: hsl(var(--brand-700));
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px hsl(var(--shadow-medium));
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px hsl(var(--shadow-subtle));
+}
+
+/* Primary Button Animation */
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  background-image: radial-gradient(circle, hsla(var(--ui-white), 0.4) 1%, transparent 1%);
+  background-position: 50%;
+  background-repeat: no-repeat;
+  transform: scale(10, 10);
+  opacity: 0;
+  transition: transform 0.5s, opacity 0.5s;
+}
+
+.btn-primary:active::after {
+  transform: scale(0, 0);
+  opacity: 0.3;
+  transition: 0s;
+}
+
+/* Secondary Button - Subtle and supportive */
+.btn-secondary {
+  background-color: hsl(var(--secondary));
+  color: hsl(var(--secondary-foreground));
+  font-weight: var(--font-medium);
+  font-size: var(--text-sm);
+  padding: 0.625rem 1.25rem;
+  border-radius: var(--radius);
+  border: 1px solid hsl(var(--border));
+  box-shadow: 0 1px 2px hsl(var(--shadow-subtle));
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background-color: hsl(var(--grey-200));
+  border-color: hsl(var(--grey-300));
+}
+
+.btn-secondary:active {
+  background-color: hsl(var(--grey-300));
+}
+
+/* Outline Button - Minimal and elegant */
+.btn-outline {
+  background-color: transparent;
+  color: hsl(var(--primary));
+  font-weight: var(--font-medium);
+  font-size: var(--text-sm);
+  padding: 0.625rem 1.25rem;
+  border-radius: var(--radius);
+  border: 1px solid hsl(var(--primary));
+  transition: all 0.2s ease;
+}
+
+.btn-outline:hover {
+  background-color: hsla(var(--primary), 0.1);
+}
+
+.btn-outline:active {
+  background-color: hsla(var(--primary), 0.2);
+}
+
+/* Ghost Button - Ultra minimal */
+.btn-ghost {
+  background-color: transparent;
+  color: hsl(var(--foreground));
+  font-weight: var(--font-medium);
+  font-size: var(--text-sm);
+  padding: 0.625rem 1.25rem;
+  border-radius: var(--radius);
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.btn-ghost:hover {
+  background-color: hsla(var(--grey-200), 0.8);
+}
+
+.btn-ghost:active {
+  background-color: hsla(var(--grey-300), 0.8);
+}
+
+/* Link Button */
+.btn-link {
+  background-color: transparent;
+  color: hsl(var(--primary));
+  font-weight: var(--font-medium);
+  font-size: var(--text-sm);
+  padding: 0.5rem;
+  border-radius: var(--radius);
+  border: none;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.btn-link:hover {
+  text-decoration: underline;
+  background-color: hsla(var(--primary), 0.05);
+}
+
+/* Destructive Button */
+.btn-destructive {
+  background-color: hsl(var(--destructive));
+  color: hsl(var(--destructive-foreground));
+  font-weight: var(--font-medium);
+  font-size: var(--text-sm);
+  padding: 0.625rem 1.25rem;
+  border-radius: var(--radius);
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.btn-destructive:hover {
+  background-color: hsl(var(--error-dark));
+}
+
+/* Success Button */
+.btn-success {
+  background-color: hsl(var(--success));
+  color: hsl(var(--success-foreground));
+  font-weight: var(--font-medium);
+  font-size: var(--text-sm);
+  padding: 0.625rem 1.25rem;
+  border-radius: var(--radius);
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.btn-success:hover {
+  background-color: hsl(var(--success-dark));
+}
+
+/* Button Sizes */
+.btn-sm {
+  padding: 0.375rem 0.75rem;
+  font-size: calc(var(--text-sm) - 0.125rem);
+}
+
+.btn-lg {
+  padding: 0.75rem 1.5rem;
+  font-size: calc(var(--text-base) + 0.125rem);
+}
+
+/* Button with Icon */
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-icon-only {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border-radius: 50%;
+}
+
+.btn-icon-only.btn-sm {
+  width: 2rem;
+  height: 2rem;
+}
+
+.btn-icon-only.btn-lg {
+  width: 3rem;
+  height: 3rem;
+}
+
+/* Button Group */
+.btn-group {
+  display: inline-flex;
+}
+
+.btn-group .btn {
+  border-radius: 0;
+}
+
+.btn-group .btn:first-child {
+  border-top-left-radius: var(--radius);
+  border-bottom-left-radius: var(--radius);
+}
+
+.btn-group .btn:last-child {
+  border-top-right-radius: var(--radius);
+  border-bottom-right-radius: var(--radius);
+}
+
+/* ===== CARDS ===== */
+
+/* Standard Card */
+.card-standard {
+  background-color: hsl(var(--card));
+  border-radius: var(--radius);
+  border: 1px solid hsl(var(--border));
+  box-shadow: 0 2px 8px hsl(var(--shadow-subtle));
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.card-standard:hover {
+  box-shadow: 0 4px 12px hsl(var(--shadow-medium));
+  transform: translateY(-2px);
+}
+
+/* Elevated Card */
+.card-elevated {
+  background-color: hsl(var(--card));
+  border-radius: var(--radius);
+  border: 1px solid hsl(var(--border));
+  box-shadow: 0 4px 12px hsl(var(--shadow-medium)),
+              0 8px 24px hsl(var(--shadow-medium));
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.card-elevated:hover {
+  box-shadow: 0 8px 24px hsl(var(--shadow-medium)),
+              0 16px 40px hsl(var(--shadow-strong));
+  transform: translateY(-4px);
+}
+
+/* Glass Card */
+.card-glass {
+  background-color: hsla(var(--ui-white), 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: var(--radius);
+  border: 1px solid hsla(var(--ui-white), 0.2);
+  box-shadow: 0 4px 12px hsla(var(--shadow-medium), 0.1);
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.dark .card-glass {
+  background-color: hsla(222.2 84% 4.9%, 0.6);
+  border: 1px solid hsla(var(--grey-800), 0.2);
+}
+
+.card-glass:hover {
+  box-shadow: 0 8px 24px hsla(var(--shadow-medium), 0.2);
+  border: 1px solid hsla(var(--ui-white), 0.3);
+}
+
+/* ===== INPUTS ===== */
+
+/* Standard Input */
+.input-standard {
+  background-color: hsl(var(--ui-background));
+  border: 1px solid hsl(var(--input));
+  border-radius: var(--radius);
+  padding: 0.625rem 0.875rem;
+  font-size: var(--text-sm);
+  transition: all 0.2s ease;
+  width: 100%;
+  color: hsl(var(--foreground));
+}
+
+.input-standard:focus {
+  outline: none;
+  border-color: hsl(var(--primary));
+  box-shadow: 0 0 0 2px hsla(var(--glow-brand));
+}
+
+.input-standard::placeholder {
+  color: hsl(var(--muted-foreground));
+}
+
+/* Input with Icon */
+.input-with-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-with-icon input {
+  padding-left: 2.5rem;
+}
+
+.input-with-icon .icon {
+  position: absolute;
+  left: 0.875rem;
+  color: hsl(var(--muted-foreground));
+}
+
+.input-with-icon.icon-right input {
+  padding-left: 0.875rem;
+  padding-right: 2.5rem;
+}
+
+.input-with-icon.icon-right .icon {
+  left: auto;
+  right: 0.875rem;
+}
+
+/* Checkbox */
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkbox-container input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 1px solid hsl(var(--input));
+  border-radius: 0.25rem;
+  background-color: hsl(var(--ui-background));
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.checkbox-container input[type="checkbox"]:checked {
+  background-color: hsl(var(--primary));
+  border-color: hsl(var(--primary));
+}
+
+.checkbox-container input[type="checkbox"]:checked::after {
+  content: '';
+  position: absolute;
+  left: 7px;
+  top: 3px;
+  width: 5px;
+  height: 10px;
+  border: solid hsl(var(--primary-foreground));
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+/* Switch */
+.switch-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 2.75rem;
+  height: 1.5rem;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.switch-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: hsl(var(--input));
+  transition: 0.3s;
+  border-radius: 1.5rem;
+}
+
+.switch-slider:before {
+  position: absolute;
+  content: "";
+  height: 1.25rem;
+  width: 1.25rem;
+  left: 0.125rem;
+  bottom: 0.125rem;
+  background-color: hsl(var(--ui-background));
+  transition: 0.3s;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px hsl(var(--shadow-medium));
+}
+
+input:checked + .switch-slider {
+  background-color: hsl(var(--primary));
+}
+
+input:checked + .switch-slider:before {
+  transform: translateX(1.25rem);
+}
+
+/* ===== BADGES ===== */
+
+/* Standard Badge */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: hsl(var(--muted));
+  color: hsl(var(--muted-foreground));
+  font-size: var(--text-xs);
+  font-weight: var(--font-medium);
+  line-height: 1;
+  padding: 0.25rem 0.5rem;
+  border-radius: 1rem;
+  white-space: nowrap;
+}
+
+.badge-primary {
+  background-color: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+}
+
+.badge-secondary {
+  background-color: hsl(var(--secondary));
+  color: hsl(var(--secondary-foreground));
+}
+
+.badge-success {
+  background-color: hsl(var(--success-light));
+  color: hsl(var(--success-dark));
+}
+
+.badge-error {
+  background-color: hsl(var(--error-light));
+  color: hsl(var(--error-dark));
+}
+
+.badge-warning {
+  background-color: hsl(var(--warning-light));
+  color: hsl(var(--warning-dark));
+}
+
+.badge-info {
+  background-color: hsl(var(--info-light));
+  color: hsl(var(--info-dark));
+}
+
+/* Outline Badge */
+.badge-outline {
+  background-color: transparent;
+  border: 1px solid currentColor;
+}
+
+/* Badge with Icon */
+.badge-with-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* ===== LOADERS ===== */
+
+/* Spinner */
+.spinner {
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 3px solid hsla(var(--primary), 0.2);
+  border-radius: 50%;
+  border-top-color: hsl(var(--primary));
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Pulse Loader */
+.pulse {
+  width: 1rem;
+  height: 1rem;
+  background-color: hsl(var(--primary));
+  border-radius: 50%;
+  animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(0.8);
+  }
+}
+
+/* Skeleton Loader */
+.skeleton {
+  background-color: hsl(var(--muted));
+  background-image: linear-gradient(
+    90deg,
+    hsla(var(--muted), 0.6) 0%,
+    hsla(var(--muted), 0.8) 50%,
+    hsla(var(--muted), 0.6) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton 1.5s ease-in-out infinite;
+  border-radius: var(--radius);
+}
+
+@keyframes skeleton {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* ===== PROGRESS ===== */
+
+/* Standard Progress Bar */
+.progress-container {
+  width: 100%;
+  height: 0.5rem;
+  background-color: hsl(var(--muted));
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background-color: hsl(var(--primary));
+  border-radius: 1rem;
+  transition: width 0.4s ease;
+}
+
+/* Animated Progress Bar */
+.progress-animated .progress-bar {
+  background-image: linear-gradient(
+    45deg,
+    hsla(var(--primary), 0.8) 25%,
+    transparent 25%,
+    transparent 50%,
+    hsla(var(--primary), 0.8) 50%,
+    hsla(var(--primary), 0.8) 75%,
+    transparent 75%,
+    transparent
+  );
+  background-size: 1rem 1rem;
+  animation: progress-stripes 1s linear infinite;
+}
+
+@keyframes progress-stripes {
+  0% {
+    background-position: 1rem 0;
+  }
+  100% {
+    background-position: 0 0;
+  }
+}
+
+/* ===== ALERTS ===== */
+
+/* Standard Alert */
+.alert {
+  display: flex;
+  align-items: flex-start;
+  padding: 1rem;
+  border-radius: var(--radius);
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.alert-icon {
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+}
+
+.alert-content {
+  flex: 1;
+}
+
+.alert-title {
+  font-weight: var(--font-semibold);
+  margin-bottom: 0.25rem;
+}
+
+.alert-description {
+  font-size: var(--text-sm);
+  color: currentColor;
+  opacity: 0.9;
+}
+
+.alert-info {
+  background-color: hsl(var(--info-light));
+  color: hsl(var(--info-dark));
+}
+
+.alert-success {
+  background-color: hsl(var(--success-light));
+  color: hsl(var(--success-dark));
+}
+
+.alert-warning {
+  background-color: hsl(var(--warning-light));
+  color: hsl(var(--warning-dark));
+}
+
+.alert-error {
+  background-color: hsl(var(--error-light));
+  color: hsl(var(--error-dark));
+}
+
+/* ===== AVATARS ===== */
+
+/* Standard Avatar */
+.avatar {
+  position: relative;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background-color: hsl(var(--muted));
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: var(--font-medium);
+  color: hsl(var(--foreground));
+  font-size: var(--text-sm);
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Avatar Sizes */
+.avatar-sm {
+  width: 2rem;
+  height: 2rem;
+  font-size: calc(var(--text-xs) + 0.125rem);
+}
+
+.avatar-lg {
+  width: 3.5rem;
+  height: 3.5rem;
+  font-size: var(--text-lg);
+}
+
+/* Avatar with Status */
+.avatar-with-status {
+  position: relative;
+}
+
+.avatar-status {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 50%;
+  border: 2px solid hsl(var(--ui-background));
+}
+
+.avatar-status-online {
+  background-color: hsl(var(--success-base));
+}
+
+.avatar-status-offline {
+  background-color: hsl(var(--grey-400));
+}
+
+.avatar-status-busy {
+  background-color: hsl(var(--error-base));
+}
+
+.avatar-status-away {
+  background-color: hsl(var(--warning-base));
+}
+
+/* ===== TOOLTIPS ===== */
+
+/* Tooltip Container */
+.tooltip-container {
+  position: relative;
+  display: inline-block;
+}
+
+/* Tooltip Text */
+.tooltip {
+  visibility: hidden;
+  position: absolute;
+  z-index: 50;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius);
+  background-color: hsl(var(--ui-foreground));
+  color: hsl(var(--ui-background));
+  font-size: var(--text-xs);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.2s, visibility 0.2s;
+  pointer-events: none;
+}
+
+/* Tooltip Arrow */
+.tooltip::before {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 5px;
+  border-style: solid;
+  border-color: hsl(var(--ui-foreground)) transparent transparent;
+}
+
+/* Show Tooltip on Hover */
+.tooltip-container:hover .tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Tooltip Positions */
+.tooltip-top {
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.tooltip-bottom {
+  top: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.tooltip-bottom::before {
+  top: -10px;
+  border-color: transparent transparent hsl(var(--ui-foreground));
+}
+
+.tooltip-left {
+  top: 50%;
+  right: 125%;
+  transform: translateY(-50%);
+}
+
+.tooltip-left::before {
+  top: 50%;
+  left: 100%;
+  transform: translateY(-50%);
+  border-color: transparent transparent transparent hsl(var(--ui-foreground));
+}
+
+.tooltip-right {
+  top: 50%;
+  left: 125%;
+  transform: translateY(-50%);
+}
+
+.tooltip-right::before {
+  top: 50%;
+  right: 100%;
+  transform: translateY(-50%);
+  border-color: transparent hsl(var(--ui-foreground)) transparent transparent;
+}
