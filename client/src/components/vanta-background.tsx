@@ -58,7 +58,7 @@ export function VantaBackground({ children }: VantaBackgroundProps) {
           });
           
           setVantaEffect(effect);
-          console.log("Vanta effect initialized with color:", isDarkMode ? "0x292929 (dark)" : "0xa2a2a7 (light)");
+          console.log("Vanta effect initialized with color:", isDarkMode ? "0x292929 (dark)" : "0xa7a2a2 (light)");
           return;
         }
         
@@ -89,7 +89,7 @@ export function VantaBackground({ children }: VantaBackgroundProps) {
                   minWidth: 200.00,
                   scale: 1.00,
                   scaleMobile: 1.00,
-                  color: isDarkMode ? 0x292929 : 0xa2a2a7,
+                  color: isDarkMode ? 0x292929 : 0xa7a2a2,
                   shininess: 0.00,
                   waveHeight: 28.00,
                   waveSpeed: 1.50,
@@ -97,7 +97,7 @@ export function VantaBackground({ children }: VantaBackgroundProps) {
                 });
                 
                 setVantaEffect(effect);
-                console.log("Vanta effect initialized with color:", isDarkMode ? "0x292929 (dark)" : "0xa2a2a7 (light)");
+                console.log("Vanta effect initialized with color:", isDarkMode ? "0x292929 (dark)" : "0xa7a2a2 (light)");
               }
             };
             

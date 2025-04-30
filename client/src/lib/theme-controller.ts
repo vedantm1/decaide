@@ -175,19 +175,27 @@ export function applyTheme(appearance: AppearanceSettings): AppearanceSettings {
     document.documentElement.classList.add('dark');
     document.documentElement.classList.remove('light');
     document.documentElement.setAttribute('data-theme', 'dark');
-    // Force apply background color to body and main elements directly
-    document.body.style.backgroundColor = 'hsl(222.2 84% 4.9%)';
+    
+    // Set text color only, not background - let the Vanta background show through
     document.body.style.color = 'hsl(210 40% 98%)';
     
-    // Try to get the main element and set its background color
+    // Remove any inline background styles to ensure translucency works
+    document.body.style.backgroundColor = '';
+    
+    // Clear any explicitly set background colors to maintain translucency
     const mainElement = document.querySelector('main');
     if (mainElement) {
-      (mainElement as HTMLElement).style.backgroundColor = 'hsl(222.2 84% 4.9%)';
+      (mainElement as HTMLElement).style.backgroundColor = '';
     }
     
-    // Force background color on all elements with bg-slate-50 class
+    // Remove inline background colors to ensure translucency
     document.querySelectorAll('.bg-slate-50').forEach(el => {
-      (el as HTMLElement).style.backgroundColor = 'hsl(222.2 84% 4.9%)';
+      (el as HTMLElement).style.backgroundColor = '';
+    });
+    
+    // Ensure all cards and content areas maintain translucency
+    document.querySelectorAll('.card, [class*="card"], .bg-card, [class*="bg-background"]').forEach(el => {
+      (el as HTMLElement).style.backgroundColor = '';
     });
     
     // In dark mode, adjust some colors for better contrast
@@ -197,18 +205,27 @@ export function applyTheme(appearance: AppearanceSettings): AppearanceSettings {
     document.documentElement.classList.remove('dark');
     document.documentElement.classList.add('light');
     document.documentElement.setAttribute('data-theme', 'light');
-    // Apply light mode colors directly
-    document.body.style.backgroundColor = 'hsl(0 0% 100%)';
+    
+    // Set text color only, not background - let the Vanta background show through
     document.body.style.color = 'hsl(222.2 47.4% 11.2%)';
     
+    // Remove any inline background styles to ensure translucency works
+    document.body.style.backgroundColor = '';
+    
+    // Clear any explicitly set background colors to maintain translucency
     const mainElement = document.querySelector('main');
     if (mainElement) {
-      (mainElement as HTMLElement).style.backgroundColor = 'hsl(0 0% 100%)';
+      (mainElement as HTMLElement).style.backgroundColor = '';
     }
     
-    // Set light background for bg-slate-50 elements
+    // Remove inline background colors to ensure translucency
     document.querySelectorAll('.bg-slate-50').forEach(el => {
-      (el as HTMLElement).style.backgroundColor = 'hsl(210 40% 98%)';
+      (el as HTMLElement).style.backgroundColor = '';
+    });
+    
+    // Ensure all cards and content areas maintain translucency
+    document.querySelectorAll('.card, [class*="card"], .bg-card, [class*="bg-background"]').forEach(el => {
+      (el as HTMLElement).style.backgroundColor = '';
     });
     
     document.documentElement.style.setProperty('--color-contrast', colors.contrast);

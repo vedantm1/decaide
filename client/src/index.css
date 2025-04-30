@@ -36,11 +36,20 @@
 
 /* Dark mode RGB values */
 html.dark {
+  /* Slightly darkened values for dark mode that still allow Vanta waves to show through */
   --card-rgb: 24, 24, 27;
   --background-rgb: 9, 9, 11;
   --border-rgb: 39, 39, 42;
   --muted-rgb: 39, 39, 42;
   --primary-rgb: 59, 130, 246;
+  
+  /* Adjust translucency values for dark mode to ensure Vanta waves visibility */
+  --translucency-card: 0.65;      /* More translucent in dark mode */
+  --translucency-header: 0.65;    /* More translucent in dark mode */
+  --translucency-sidebar: 0.7;    /* More translucent in dark mode */
+  --translucency-dialog: 0.8;     /* Same translucency as light mode */
+  --translucency-dropdown: 0.9;   /* Same translucency as light mode */
+  --translucency-border: 0.4;     /* Same translucency as light mode */
 }
 
 /* Modern UI App Container */
