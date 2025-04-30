@@ -1,3 +1,6 @@
+@import './styles/professional-theme.css';
+@import './styles/typography.css';
+@import './styles/micro-interactions.css';
 @import './styles/theme-variables.css';
 @import './styles/visual-styles.css';
 @import './lib/theme-colors.css';
