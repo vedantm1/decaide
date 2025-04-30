@@ -6,9 +6,104 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1"
     />
+    <title>DecA(I)de - DECA Practice Platform</title>
+    <!-- Vanta.js Dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.waves.min.js"></script>
   </head>
   <body>
     <div id="root"></div>
+    <!-- Background element for Vanta (outside of React) -->
+    <div id="vanta-bg" class="fixed inset-0 -z-50"></div>
+    
+    <!-- Initialize Vanta waves effect with exact code provided -->
+    <script>
+      // Initialize Vanta background
+      let vantaEffect = null;
+      
+      function initVantaBackground(isDarkMode = false) {
+        // Destroy existing effect if any
+        if (vantaEffect) {
+          vantaEffect.destroy();
+        }
+        
+        // Create new effect with specified configuration
+        if (isDarkMode) {
+          // Dark mode code
+          vantaEffect = VANTA.WAVES({
+            el: "#vanta-bg",
+            mouseControls: true,
+            touchControls: true,
+            gyroControls: false,
+            minHeight: 200.00,
+            minWidth: 200.00,
+            scale: 1.00,
+            scaleMobile: 1.00,
+            color: 0x292929,
+            shininess: 0.00,
+            waveHeight: 28.00,
+            waveSpeed: 1.50,
+            zoom: 0.65
+          });
+        } else {
+          // Light mode code
+          vantaEffect = VANTA.WAVES({
+            el: "#vanta-bg",
+            mouseControls: true,
+            touchControls: true,
+            gyroControls: false,
+            minHeight: 200.00,
+            minWidth: 200.00,
+            scale: 1.00,
+            scaleMobile: 1.00,
+            color: 0xa2a2a7,
+            shininess: 0.00,
+            waveHeight: 28.00,
+            waveSpeed: 1.50,
+            zoom: 0.65
+          });
+        }
+        
+        // Make sure Vanta covers the entire screen
+        const vantaBg = document.getElementById('vanta-bg');
+        vantaBg.style.position = 'fixed';
+        vantaBg.style.top = '0';
+        vantaBg.style.left = '0';
+        vantaBg.style.width = '100%';
+        vantaBg.style.height = '100%';
+        vantaBg.style.zIndex = '-1';
+      }
+      
+      // Initialize the background once DOM is loaded
+      document.addEventListener('DOMContentLoaded', () => {
+        // Check for dark mode in HTML element class or via media query
+        const isDarkMode = document.documentElement.classList.contains('dark') || 
+                          (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        
+        // Initial background setup
+        initVantaBackground(isDarkMode);
+        
+        // Watch for theme changes via custom event from our React app
+        window.addEventListener('theme-change', (e) => {
+          if (e.detail && typeof e.detail.isDarkMode === 'boolean') {
+            initVantaBackground(e.detail.isDarkMode);
+          }
+        });
+        
+        // Also watch for changes to the document's class for dark mode
+        const observer = new MutationObserver((mutations) => {
+          mutations.forEach((mutation) => {
+            if (mutation.attributeName === 'class') {
+              const isDark = document.documentElement.classList.contains('dark');
+              initVantaBackground(isDark);
+            }
+          });
+        });
+        
+        observer.observe(document.documentElement, { attributes: true });
+      });
+    </script>
+    
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { Link, useLocation } from 'wouter';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -14,17 +14,6 @@ import {
   IconMenu, 
   IconX 
 } from '@/components/ui/icons';
-import * as THREE from 'three';
-
-// Declare Vanta.js global types
-declare global {
-  interface Window {
-    THREE: typeof THREE;
-    VANTA: {
-      WAVES: (config: any) => any;
-    };
-  }
-}
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -34,8 +23,6 @@ export function MainLayout({ children }: MainLayoutProps) {
   const [location] = useLocation();
   const { isDarkMode, isMobile } = useUIState();
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(!isMobile);
-  const bgRef = useRef<HTMLDivElement>(null);
-  const vantaEffect = useRef<any>(null);
 
   // Define navigation items
   const navigationItems = [
@@ -48,62 +35,8 @@ export function MainLayout({ children }: MainLayoutProps) {
     { icon: <IconSettings className="w-5 h-5" />, label: 'Settings', href: '/settings' },
   ];
 
-  // Initialize Vanta.js background
-  useEffect(() => {
-    // Load necessary scripts dynamically
-    const loadScripts = async () => {
-      // Check if Three.js is already loaded
-      if (!window.THREE) {
-        window.THREE = THREE;
-      }
-      
-      // Check if Vanta.js is already loaded
-      if (!window.VANTA) {
-        const vantaScript = document.createElement('script');
-        vantaScript.src = 'https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.waves.min.js';
-        vantaScript.async = true;
-        document.head.appendChild(vantaScript);
-        
-        // Wait for script to load
-        await new Promise<void>((resolve) => {
-          vantaScript.onload = () => resolve();
-        });
-      }
-      
-      // Initialize Vanta effect
-      if (bgRef.current && window.VANTA) {
-        if (vantaEffect.current) {
-          vantaEffect.current.destroy();
-        }
-        
-        vantaEffect.current = window.VANTA.WAVES({
-          el: bgRef.current,
-          THREE: window.THREE,
-          mouseControls: true,
-          touchControls: true,
-          gyroControls: false,
-          minHeight: 200.00,
-          minWidth: 200.00,
-          scale: 1.00,
-          scaleMobile: 1.00,
-          color: isDarkMode ? 0x292929 : 0xa2a2a7,
-          shininess: 0.00,
-          waveHeight: 28.00,
-          waveSpeed: 1.50,
-          zoom: 0.65
-        });
-      }
-    };
-    
-    loadScripts();
-    
-    // Cleanup function
-    return () => {
-      if (vantaEffect.current) {
-        vantaEffect.current.destroy();
-      }
-    };
-  }, [isDarkMode]); // Re-initialize when theme changes
+  // The Vanta.js background is now initialized in index.html
+  // No need for useEffect to initialize Vanta.js here anymore
 
   // Track window size changes
   React.useEffect(() => {
@@ -213,9 +146,6 @@ export function MainLayout({ children }: MainLayoutProps) {
 
   return (
     <div className="min-h-screen flex flex-col relative overflow-hidden">
-      {/* Vanta Background Container - covers the entire app */}
-      <div ref={bgRef} className="fixed inset-0 z-[-1]"></div>
-      
       {/* Header */}
       <header className="h-16 border-b bg-card/80 backdrop-blur-sm shadow-sm z-40 sticky top-0 left-0 right-0">
         <div className="px-4 h-full flex items-center justify-between">

@@ -140,6 +140,12 @@ export const UIStateProvider: React.FC<{ children: React.ReactNode }> = ({ child
       
       setIsDarkMode(isDark);
       document.documentElement.classList.toggle('dark', isDark);
+      
+      // Dispatch a custom event for Vanta background to update
+      const themeChangeEvent = new CustomEvent('theme-change', {
+        detail: { isDarkMode: isDark }
+      });
+      window.dispatchEvent(themeChangeEvent);
     };
     
     updateTheme();
