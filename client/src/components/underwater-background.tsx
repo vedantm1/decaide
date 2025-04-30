@@ -7,7 +7,7 @@ export interface UnderwaterBackgroundProps {
 
 const UnderwaterBackground: React.FC<UnderwaterBackgroundProps> = ({ className }) => {
   return (
-    <div className={`fixed top-0 left-0 w-full h-full pointer-events-none overflow-hidden -z-10 ${className || ''}`}>
+    <div className={`fixed top-0 left-0 w-full h-full pointer-events-none overflow-hidden z-[-1] ${className || ''}`}>
       <motion.div 
         className="w-full h-full relative"
         initial={{ opacity: 0 }}

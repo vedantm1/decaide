@@ -25,7 +25,6 @@ import DiegoChat from "@/components/diego-guide/diego-chat";
 import ThemeProvider from "@/lib/theme-provider";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import PlayfulBackground from "@/components/playful-background";
 import UnderwaterBackground from "@/components/underwater-background";
 
 function Router() {
