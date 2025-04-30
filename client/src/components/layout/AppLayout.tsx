@@ -87,7 +87,7 @@ export function AppLayout({ children, className }: AppLayoutProps) {
   return (
     <div className={cn('min-h-screen flex flex-col', className)}>
       {/* Header */}
-      <header className="h-16 border-b bg-card shadow-sm flex items-center justify-between px-4 z-40">
+      <header className="h-16 border-b bg-card/50 backdrop-blur-md shadow-sm flex items-center justify-between px-4 z-40">
         <div className="flex items-center">
           {isMobile ? (
             <button 

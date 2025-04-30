@@ -17,7 +17,8 @@ import WhyDecadePage from "@/pages/why-decade";
 import InteractionShowcasePage from "@/pages/interaction-showcase";
 import Checkout from "@/pages/checkout";
 import Subscribe from "@/pages/subscribe";
-import VantaBackground from "@/components/vanta-background";
+// Import removed - now using direct script tags in index.html
+// import VantaBackground from "@/components/vanta-background";
 import { ProtectedRoute } from "./lib/protected-route";
 import { AuthProvider } from "@/hooks/use-auth";
 import { MicroInteractionsProvider } from "@/hooks/use-micro-interactions";
@@ -72,9 +73,7 @@ function App() {
         <UIStateProvider>
           <ThemeProvider>
             <MicroInteractionsProvider>
-              {/* Vanta background effect - underneath all content */}
-              <VantaBackground />
-              
+              {/* Vanta background effect now handled via index.html */}
               <div className="app-container fade-in new-design">
                 <AnimatePresence mode="wait">
                   <Router />

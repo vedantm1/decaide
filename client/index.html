@@ -41,44 +41,67 @@
       body, body::before {
         transition: background-color 0.3s ease, background 0.3s ease;
       }
-      
-      /* Basic wave pattern using CSS */
-      .wave-pattern {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        height: 40vh;
-        background-image: 
-          repeating-linear-gradient(
-            -45deg, 
-            rgba(162, 162, 167, 0.05) 0px, 
-            rgba(162, 162, 167, 0.05) 20px, 
-            transparent 20px, 
-            transparent 40px
-          );
-        z-index: -1;
-        opacity: 0.3;
-        pointer-events: none;
-      }
-      
-      html.dark .wave-pattern {
-        background-image: 
-          repeating-linear-gradient(
-            -45deg, 
-            rgba(41, 41, 41, 0.1) 0px, 
-            rgba(41, 41, 41, 0.1) 20px, 
-            transparent 20px, 
-            transparent 40px
-          );
-      }
     </style>
+    <!-- Load Three.js and Vanta.js libraries directly -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanta@0.5.24/dist/vanta.waves.min.js"></script>
   </head>
   <body>
-    <!-- CSS-based wave pattern that's simpler but still provides visual interest -->
-    <div class="wave-pattern"></div>
+    <!-- We'll use this div as a target for the Vanta effect -->
+    <div id="vanta-bg" style="position: fixed; z-index: -1; top: 0; left: 0; width: 100%; height: 100%;"></div>
     <div id="root"></div>
     
     <script type="module" src="/src/main.tsx"></script>
+    
+    <!-- Initialize Vanta effect using light mode by default -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // Initialize with light mode by default
+        const isDark = document.documentElement.classList.contains('dark');
+        const color = isDark ? 0x292929 : 0xa2a2a7;
+        
+        // Create the VANTA effect
+        const vantaEffect = VANTA.WAVES({
+          el: "#vanta-bg",
+          mouseControls: true,
+          touchControls: true,
+          gyroControls: false,
+          minHeight: 200.00,
+          minWidth: 200.00,
+          scale: 1.00,
+          scaleMobile: 1.00,
+          color: color,
+          shininess: 0.00,
+          waveHeight: 28.00,
+          waveSpeed: 1.50,
+          zoom: 0.65
+        });
+        
+        // Watch for theme changes and update the VANTA effect
+        const observer = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.attributeName === 'class') {
+              const isDarkMode = document.documentElement.classList.contains('dark');
+              if (vantaEffect && vantaEffect.options) {
+                vantaEffect.setOptions({
+                  color: isDarkMode ? 0x292929 : 0xa2a2a7
+                });
+                console.log("Updated VANTA effect for", isDarkMode ? "dark mode" : "light mode");
+              }
+            }
+          });
+        });
+        
+        observer.observe(document.documentElement, { attributes: true });
+        
+        // Clean up on page unload
+        window.addEventListener('beforeunload', function() {
+          if (vantaEffect) {
+            vantaEffect.destroy();
+          }
+          observer.disconnect();
+        });
+      });
+    </script>
   </body>
 </html>
