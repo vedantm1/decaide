@@ -5,7 +5,7 @@ import { useMemo } from "react";
 
 export default function SidebarNavigation() {
   const [location] = useLocation();
-  const { user, logoutMutation } = useAuth();
+  const { user, logout } = useAuth();
 
   const subscriptionTier = user?.subscriptionTier || "standard";
   const stars = SUBSCRIPTION_LIMITS[subscriptionTier as keyof typeof SUBSCRIPTION_LIMITS]?.stars || 2;
@@ -219,7 +219,7 @@ export default function SidebarNavigation() {
                 <span>Settings</span>
               </div>
             <button 
-              onClick={() => logoutMutation.mutate()} 
+              onClick={() => logout()} 
               className="w-full flex items-center gap-3 text-slate-600 hover:bg-slate-100 px-4 py-2.5 rounded-lg font-medium text-sm text-left"
             >
               <i className="fas fa-sign-out-alt w-5 text-center text-slate-400"></i>

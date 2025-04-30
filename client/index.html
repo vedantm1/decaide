@@ -7,105 +7,77 @@
       content="width=device-width, initial-scale=1.0, maximum-scale=1"
     />
     <title>DecA(I)de - DECA Practice Platform</title>
-    <!-- Vanta.js Dependencies - Updated to latest versions -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.1/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vanta@0.5.24/dist/vanta.waves.min.js"></script>
     <style>
-      /* Ensure the Vanta background covers all white/blank areas */
-      #vanta-bg {
+      /* Full-screen background container */
+      body {
+        background-color: #f0f0f3;
+        position: relative;
+        min-height: 100vh;
+      }
+      
+      /* Background gradient for all pages */
+      body::before {
+        content: '';
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        z-index: -100;
+        background: linear-gradient(135deg, rgba(162, 162, 167, 0.1) 0%, rgba(162, 162, 167, 0.05) 100%);
+        z-index: -1;
         pointer-events: none;
       }
       
-      /* Higher z-index to ensure it's visible on all pages */
-      body {
-        position: relative;
-        overflow-x: hidden;
+      /* Dark mode styling */
+      html.dark body {
+        background-color: #121212;
+      }
+      
+      html.dark body::before {
+        background: linear-gradient(135deg, rgba(41, 41, 41, 0.2) 0%, rgba(41, 41, 41, 0.1) 100%);
+      }
+      
+      /* Smooth transitions */
+      body, body::before {
+        transition: background-color 0.3s ease, background 0.3s ease;
+      }
+      
+      /* Basic wave pattern using CSS */
+      .wave-pattern {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 40vh;
+        background-image: 
+          repeating-linear-gradient(
+            -45deg, 
+            rgba(162, 162, 167, 0.05) 0px, 
+            rgba(162, 162, 167, 0.05) 20px, 
+            transparent 20px, 
+            transparent 40px
+          );
+        z-index: -1;
+        opacity: 0.3;
+        pointer-events: none;
+      }
+      
+      html.dark .wave-pattern {
+        background-image: 
+          repeating-linear-gradient(
+            -45deg, 
+            rgba(41, 41, 41, 0.1) 0px, 
+            rgba(41, 41, 41, 0.1) 20px, 
+            transparent 20px, 
+            transparent 40px
+          );
       }
     </style>
   </head>
   <body>
-    <!-- Background element for Vanta (outside of React) -->
-    <div id="vanta-bg"></div>
+    <!-- CSS-based wave pattern that's simpler but still provides visual interest -->
+    <div class="wave-pattern"></div>
     <div id="root"></div>
-    
-    <!-- Initialize Vanta waves effect with more reliable initialization -->
-    <script>
-      (function() {
-        // Declare the effect
-        let vantaEffect = null;
-        
-        // Simplified function to check if dark mode is active
-        function isDarkModeEnabled() {
-          return document.documentElement.classList.contains('dark');
-        }
-        
-        // Initialize or reinitialize the Vanta effect
-        function setupVantaBackground() {
-          // Get the dark mode state
-          const isDarkMode = isDarkModeEnabled();
-          
-          // Destroy previous effect if it exists
-          if (vantaEffect) {
-            vantaEffect.destroy();
-          }
-          
-          console.log('Initializing Vanta with dark mode:', isDarkMode);
-          
-          // Setup the effect with the appropriate color
-          vantaEffect = VANTA.WAVES({
-            el: "#vanta-bg",  // This targets the div we created
-            THREE: THREE,     // Pass THREE explicitly to avoid issues
-            mouseControls: true,
-            touchControls: true,
-            gyroControls: false,
-            minHeight: 200.00,
-            minWidth: 200.00,
-            scale: 1.00,
-            scaleMobile: 1.00,
-            color: isDarkMode ? 0x292929 : 0xa2a2a7,  // Different colors for dark/light modes
-            shininess: 0.00,
-            waveHeight: 28.00,
-            waveSpeed: 1.50,
-            zoom: 0.65
-          });
-        }
-        
-        // Wait for DOM to be ready before initializing
-        if (document.readyState === 'loading') {
-          document.addEventListener('DOMContentLoaded', setupVantaBackground);
-        } else {
-          setupVantaBackground();
-        }
-        
-        // Listen for theme changes - both from our custom event and DOM changes
-        window.addEventListener('theme-change', function(e) {
-          console.log('Theme change event detected:', e.detail);
-          setupVantaBackground();
-        });
-        
-        // Observer for class changes on the html element (for dark mode toggle)
-        const observer = new MutationObserver(function(mutations) {
-          mutations.forEach(function(mutation) {
-            if (mutation.attributeName === 'class') {
-              console.log('Class mutation detected, dark mode:', isDarkModeEnabled());
-              setupVantaBackground();
-            }
-          });
-        });
-        
-        // Start observing
-        observer.observe(document.documentElement, { 
-          attributes: true,
-          attributeFilter: ['class']
-        });
-      })();
-    </script>
     
     <script type="module" src="/src/main.tsx"></script>
   </body>
