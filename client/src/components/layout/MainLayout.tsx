@@ -168,8 +168,32 @@ export function MainLayout({ children }: MainLayoutProps) {
             </Link>
           </div>
           
-          <div className="flex items-center space-x-2">
-            {/* Add profile or other header actions here */}
+          <div className="flex items-center space-x-4">
+            {/* User subscription and stats */}
+            {useAuth().user && (
+              <div className="flex items-center gap-4">
+                {/* Stars/Points */}
+                <div className="hidden md:flex items-center gap-1.5 bg-primary/10 px-2.5 py-1 rounded-full">
+                  <span className="text-primary text-lg">★</span>
+                  <span className="font-medium text-sm">{useAuth().user?.points || 0}</span>
+                </div>
+                
+                {/* Subscription Type */}
+                <div className="hidden md:block">
+                  <span className="text-xs font-medium px-2 py-1 rounded-full bg-accent/10 text-accent capitalize">
+                    {useAuth().user?.subscriptionTier || 'Standard'} Plan
+                  </span>
+                </div>
+                
+                {/* Username */}
+                <div className="flex items-center gap-2">
+                  <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                    {useAuth().user?.username?.[0]?.toUpperCase() || 'U'}
+                  </div>
+                  <span className="hidden md:block text-sm font-medium">{useAuth().user?.username || 'User'}</span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </header>
