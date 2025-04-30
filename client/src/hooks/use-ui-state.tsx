@@ -1,214 +1,201 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 type ThemeMode = 'light' | 'dark' | 'system';
-type SidebarState = 'expanded' | 'collapsed' | 'hidden';
-type LayoutDensity = 'compact' | 'comfortable' | 'spacious';
-type AnimationMode = 'reduced' | 'full';
-type FontSize = 'small' | 'medium' | 'large';
-type ColorScheme = string;
-type VisualStyle = 'memphis' | 'minimalist';
+type AnimationMode = 'full' | 'reduced' | 'none';
+type SidebarState = 'expanded' | 'collapsed';
 
 interface UIStateContextType {
+  // Theme
   themeMode: ThemeMode;
   setThemeMode: (mode: ThemeMode) => void;
-  colorScheme: ColorScheme;
-  setColorScheme: (scheme: ColorScheme) => void;
-  visualStyle: VisualStyle;
-  setVisualStyle: (style: VisualStyle) => void;
   isDarkMode: boolean;
+  
+  // Layout
   sidebarState: SidebarState;
   setSidebarState: (state: SidebarState) => void;
-  layoutDensity: LayoutDensity;
-  setLayoutDensity: (density: LayoutDensity) => void;
+  isMobile: boolean;
+  
+  // Animation preferences
   animationMode: AnimationMode;
   setAnimationMode: (mode: AnimationMode) => void;
-  fontSize: FontSize;
-  setFontSize: (size: FontSize) => void;
-  isMobile: boolean;
-  isTablet: boolean;
-  isDesktop: boolean;
-  saveUIPreferences: () => void;
+  
+  // UI Preferences
+  fontScale: number;
+  setFontScale: (scale: number) => void;
+  highContrastMode: boolean;
+  setHighContrastMode: (enabled: boolean) => void;
 }
 
-const UIStateContext = createContext<UIStateContextType | undefined>(undefined);
+const defaultContext: UIStateContextType = {
+  themeMode: 'system',
+  setThemeMode: () => {},
+  isDarkMode: false,
+  sidebarState: 'expanded',
+  setSidebarState: () => {},
+  isMobile: false,
+  animationMode: 'full',
+  setAnimationMode: () => {},
+  fontScale: 1,
+  setFontScale: () => {},
+  highContrastMode: false,
+  setHighContrastMode: () => {},
+};
 
-interface UIStateProviderProps {
-  children: React.ReactNode;
-}
+const UIStateContext = createContext<UIStateContextType>(defaultContext);
 
-export function UIStateProvider({ children }: UIStateProviderProps) {
-  // Load saved preferences from localStorage or use defaults
-  const loadSavedPreferences = () => {
-    try {
-      const savedPreferences = localStorage.getItem('ui-preferences');
-      if (savedPreferences) {
-        return JSON.parse(savedPreferences);
-      }
-    } catch (error) {
-      console.error('Error loading saved UI preferences:', error);
-    }
-    
-    return {
-      themeMode: 'system',
-      colorScheme: 'aquaBlue',
-      visualStyle: 'memphis',
-      sidebarState: 'expanded',
-      layoutDensity: 'comfortable',
-      animationMode: 'full',
-      fontSize: 'medium'
-    };
-  };
-
-  const preferences = loadSavedPreferences();
-
-  // UI state
-  const [themeMode, setThemeMode] = useState<ThemeMode>(preferences.themeMode);
-  const [colorScheme, setColorScheme] = useState<ColorScheme>(preferences.colorScheme);
-  const [visualStyle, setVisualStyle] = useState<VisualStyle>(preferences.visualStyle);
-  const [sidebarState, setSidebarState] = useState<SidebarState>(preferences.sidebarState);
-  const [layoutDensity, setLayoutDensity] = useState<LayoutDensity>(preferences.layoutDensity);
-  const [animationMode, setAnimationMode] = useState<AnimationMode>(preferences.animationMode);
-  const [fontSize, setFontSize] = useState<FontSize>(preferences.fontSize);
+export const UIStateProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // Theme state
+  const [themeMode, setThemeModeState] = useState<ThemeMode>(() => {
+    if (typeof window === 'undefined') return 'system';
+    const saved = localStorage.getItem('theme-mode');
+    return (saved as ThemeMode) || 'system';
+  });
+  
   const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
   
-  // Responsive state
+  // Layout state
+  const [sidebarState, setSidebarStateValue] = useState<SidebarState>(() => {
+    if (typeof window === 'undefined') return 'expanded';
+    const saved = localStorage.getItem('sidebar-state');
+    return (saved as SidebarState) || 'expanded';
+  });
   const [isMobile, setIsMobile] = useState<boolean>(false);
-  const [isTablet, setIsTablet] = useState<boolean>(false);
-  const [isDesktop, setIsDesktop] = useState<boolean>(true);
-
-  // Save UI preferences to localStorage
-  const saveUIPreferences = () => {
-    try {
-      localStorage.setItem('ui-preferences', JSON.stringify({
-        themeMode,
-        colorScheme,
-        visualStyle,
-        sidebarState,
-        layoutDensity,
-        animationMode,
-        fontSize
-      }));
-    } catch (error) {
-      console.error('Error saving UI preferences:', error);
+  
+  // Animation preferences
+  const [animationMode, setAnimationModeState] = useState<AnimationMode>(() => {
+    if (typeof window === 'undefined') return 'full';
+    const saved = localStorage.getItem('animation-mode');
+    return (saved as AnimationMode) || 'full';
+  });
+  
+  // UI Preferences
+  const [fontScale, setFontScaleState] = useState<number>(() => {
+    if (typeof window === 'undefined') return 1;
+    const saved = localStorage.getItem('font-scale');
+    return saved ? parseFloat(saved) : 1;
+  });
+  
+  const [highContrastMode, setHighContrastModeState] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    const saved = localStorage.getItem('high-contrast-mode');
+    return saved === 'true';
+  });
+  
+  // Persist theme preference to localStorage
+  const setThemeMode = (mode: ThemeMode) => {
+    setThemeModeState(mode);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('theme-mode', mode);
     }
   };
-
-  // Effect to determine dark mode status
-  useEffect(() => {
-    const updateDarkModeStatus = () => {
-      if (themeMode === 'dark') {
-        setIsDarkMode(true);
-      } else if (themeMode === 'light') {
-        setIsDarkMode(false);
-      } else {
-        // System preference
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        setIsDarkMode(prefersDark);
-      }
-    };
-
-    updateDarkModeStatus();
-
-    // Listen for system preference changes if in 'system' mode
-    if (themeMode === 'system') {
-      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-      const handler = () => updateDarkModeStatus();
-      mediaQuery.addEventListener('change', handler);
-      return () => mediaQuery.removeEventListener('change', handler);
+  
+  // Persist sidebar state to localStorage
+  const setSidebarState = (state: SidebarState) => {
+    setSidebarStateValue(state);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('sidebar-state', state);
     }
-  }, [themeMode]);
-
-  // Effect to apply theme changes to the document
-  useEffect(() => {
-    // Apply dark/light mode
-    document.documentElement.classList.toggle('dark', isDarkMode);
-    document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
-    
-    // Apply color scheme
-    document.documentElement.className = document.documentElement.className
-      .replace(/\btheme-\S+/g, '')
-      .trim();
-    document.documentElement.classList.add(`theme-${colorScheme}`);
-    
-    // Apply visual style
-    document.documentElement.setAttribute('data-visual-style', visualStyle);
-    
-    // Apply font size
-    document.documentElement.setAttribute('data-font-size', fontSize);
-    
-    // Apply animation mode
-    document.documentElement.setAttribute('data-reduced-motion', animationMode === 'reduced' ? 'true' : 'false');
-    
-    // Apply layout density
-    document.documentElement.setAttribute('data-density', layoutDensity);
-    
-    // Save the updated preferences
-    saveUIPreferences();
-  }, [isDarkMode, colorScheme, visualStyle, fontSize, animationMode, layoutDensity]);
-
-  // Effect to detect viewport size
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 640);
-      setIsTablet(window.innerWidth >= 640 && window.innerWidth < 1024);
-      setIsDesktop(window.innerWidth >= 1024);
-      
-      // Auto-collapse sidebar on mobile
-      if (window.innerWidth < 640 && sidebarState === 'expanded') {
-        setSidebarState('collapsed');
+  };
+  
+  // Persist animation mode to localStorage
+  const setAnimationMode = (mode: AnimationMode) => {
+    setAnimationModeState(mode);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('animation-mode', mode);
+    }
+  };
+  
+  // Persist font scale to localStorage
+  const setFontScale = (scale: number) => {
+    setFontScaleState(scale);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('font-scale', scale.toString());
+      document.documentElement.style.fontSize = `${scale * 100}%`;
+    }
+  };
+  
+  // Persist high contrast mode to localStorage
+  const setHighContrastMode = (enabled: boolean) => {
+    setHighContrastModeState(enabled);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('high-contrast-mode', enabled.toString());
+      if (enabled) {
+        document.documentElement.classList.add('high-contrast');
+      } else {
+        document.documentElement.classList.remove('high-contrast');
       }
+    }
+  };
+  
+  // Detect system theme preference
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    
+    const updateTheme = () => {
+      const isDark = 
+        themeMode === 'dark' || 
+        (themeMode === 'system' && mediaQuery.matches);
+      
+      setIsDarkMode(isDark);
+      document.documentElement.classList.toggle('dark', isDark);
     };
-
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [sidebarState]);
-
-  // The context value
-  const contextValue: UIStateContextType = {
+    
+    updateTheme();
+    mediaQuery.addEventListener('change', updateTheme);
+    
+    return () => mediaQuery.removeEventListener('change', updateTheme);
+  }, [themeMode]);
+  
+  // Initialize font scale
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      document.documentElement.style.fontSize = `${fontScale * 100}%`;
+    }
+  }, [fontScale]);
+  
+  // Initialize high contrast mode
+  useEffect(() => {
+    if (typeof window !== 'undefined' && highContrastMode) {
+      document.documentElement.classList.add('high-contrast');
+    }
+  }, [highContrastMode]);
+  
+  // Detect mobile devices
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkIsMobile();
+    window.addEventListener('resize', checkIsMobile);
+    
+    return () => window.removeEventListener('resize', checkIsMobile);
+  }, []);
+  
+  const value = {
     themeMode,
     setThemeMode,
-    colorScheme,
-    setColorScheme,
-    visualStyle,
-    setVisualStyle,
     isDarkMode,
     sidebarState,
     setSidebarState,
-    layoutDensity,
-    setLayoutDensity,
+    isMobile,
     animationMode,
     setAnimationMode,
-    fontSize,
-    setFontSize,
-    isMobile,
-    isTablet,
-    isDesktop,
-    saveUIPreferences
+    fontScale,
+    setFontScale,
+    highContrastMode,
+    setHighContrastMode,
   };
-
+  
   return (
-    <UIStateContext.Provider value={contextValue}>
+    <UIStateContext.Provider value={value}>
       {children}
     </UIStateContext.Provider>
   );
-}
+};
 
-export function useUIState() {
-  const context = useContext(UIStateContext);
-  if (context === undefined) {
-    throw new Error('useUIState must be used within a UIStateProvider');
-  }
-  return context;
-}
-
-// Add this to App.tsx to use this context
-// import { UIStateProvider } from '@/hooks/use-ui-state';
-// 
-// function App() {
-//   return (
-//     <UIStateProvider>
-//       {/* Your app content */}
-//     </UIStateProvider>
-//   );
-// }
+export const useUIState = () => useContext(UIStateContext);
