@@ -26,7 +26,7 @@ import ThemeProvider from "@/lib/theme-provider";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import PlayfulBackground from "@/components/playful-background";
-import UnderwaterDiorama from "@/components/underwater-diorama";
+import UnderwaterBackground from "@/components/underwater-background";
 
 function Router() {
   return (
@@ -159,7 +159,7 @@ function DiegoGuideManager() {
   return (
     <>
       {/* Underwater diorama background */}
-      <UnderwaterDiorama />
+      <UnderwaterBackground />
 
       {/* Welcome banner removed as requested */}
 

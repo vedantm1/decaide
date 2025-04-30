@@ -1,6 +1,6 @@
-import React, { useRef, useMemo, useEffect } from 'react';
+import React, { useRef, useMemo, useEffect, Suspense } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { OrbitControls, useGLTF, useAnimations, PerspectiveCamera } from '@react-three/drei';
+import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
 import { motion } from 'framer-motion';
 
@@ -50,7 +50,6 @@ const Fish = ({ color, position, speed = 0.01, direction = 1, size = 1 }: {
 }) => {
   const ref = useRef<THREE.Group>(null);
   const tailRef = useRef<THREE.Mesh>(null);
-  const initialX = useMemo(() => position[0], [position]);
   
   // Animate fish swimming
   useFrame((state) => {
@@ -97,7 +96,7 @@ const Seaweed = ({ position, height = 1, color = '#48CFAD' }: {
 }) => {
   const ref = useRef<THREE.Group>(null);
   const segments = useMemo(() => Math.floor(height * 5), [height]);
-  const segmentRefs = useRef<THREE.Mesh[]>([]);
+  const segmentRefs = useRef<Array<THREE.Mesh | null>>([]);
   
   // Initialize segment refs array
   useEffect(() => {
@@ -559,7 +558,45 @@ export interface UnderwaterDioramaProps {
   className?: string;
 }
 
+// Component to detect if we can render Three.js
+const CanRender = () => {
+  const [canRender, setCanRender] = React.useState<boolean>(false);
+
+  React.useEffect(() => {
+    // Check if we're in a browser environment
+    if (typeof window !== 'undefined' && window.WebGLRenderingContext) {
+      try {
+        // Try to create a WebGL context
+        const canvas = document.createElement('canvas');
+        const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+        setCanRender(!!gl);
+      } catch (e) {
+        console.error('WebGL not supported', e);
+        setCanRender(false);
+      }
+    }
+  }, []);
+
+  return canRender;
+};
+
 const UnderwaterDiorama: React.FC<UnderwaterDioramaProps> = ({ className }) => {
+  const canRender = CanRender();
+  
+  if (!canRender) {
+    // Fallback to a simple gradient background if Three.js can't be rendered
+    return (
+      <div className={`fixed top-0 left-0 w-full h-full pointer-events-none overflow-hidden -z-10 ${className || ''}`}>
+        <motion.div 
+          className="w-full h-full bg-gradient-to-b from-cyan-300 to-blue-600"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1.5 }}
+        />
+      </div>
+    );
+  }
+  
   return (
     <div className={`fixed top-0 left-0 w-full h-full pointer-events-none overflow-hidden -z-10 ${className || ''}`}>
       <motion.div 
@@ -568,9 +605,11 @@ const UnderwaterDiorama: React.FC<UnderwaterDioramaProps> = ({ className }) => {
         animate={{ opacity: 1 }}
         transition={{ duration: 1.5 }}
       >
-        <Canvas shadows gl={{ antialias: true, alpha: false }}>
-          <UnderwaterScene />
-        </Canvas>
+        <Suspense fallback={<div className="w-full h-full bg-cyan-600/20"></div>}>
+          <Canvas shadows className="!pointer-events-none">
+            <UnderwaterScene />
+          </Canvas>
+        </Suspense>
       </motion.div>
     </div>
   );
