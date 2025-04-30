@@ -55,6 +55,8 @@ function App() {
         <ThemeProvider>
           <MicroInteractionsProvider>
             <DiegoGuideProvider>
+              {/* Add underwater background to the entire app */}
+              <UnderwaterBackground />
               <Router />
               <Toaster />
               <DiegoGuideManager />
@@ -157,9 +159,6 @@ function DiegoGuideManager() {
   
   return (
     <>
-      {/* Underwater diorama background */}
-      <UnderwaterBackground />
-
       {/* Welcome banner removed as requested */}
 
       <Diego 
