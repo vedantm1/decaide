@@ -50,7 +50,7 @@ export function VantaBackground({ children }: VantaBackgroundProps) {
             minWidth: 200.00,
             scale: 1.00,
             scaleMobile: 1.00,
-            color: isDarkMode ? 0x292929 : 0xa2a2a7,
+            color: isDarkMode ? 0x292929 : 0xa7a2a2,
             shininess: 0.00,
             waveHeight: 28.00,
             waveSpeed: 1.50,

@@ -58,9 +58,9 @@
       document.addEventListener('DOMContentLoaded', function() {
         // Initialize with light mode by default
         const isDark = document.documentElement.classList.contains('dark');
-        const color = isDark ? 0x292929 : 0xa2a2a7;
+        const color = isDark ? 0x292929 : 0xa7a2a2;
         
-        // Create the VANTA effect
+        // Create the VANTA effect with the exact configuration requested
         const vantaEffect = VANTA.WAVES({
           el: "#vanta-bg",
           mouseControls: true,
@@ -84,7 +84,8 @@
               const isDarkMode = document.documentElement.classList.contains('dark');
               if (vantaEffect && vantaEffect.options) {
                 vantaEffect.setOptions({
-                  color: isDarkMode ? 0x292929 : 0xa2a2a7
+                  // Apply exactly the same configuration as requested for dark mode
+                  color: isDarkMode ? 0x292929 : 0xa7a2a2
                 });
                 console.log("Updated VANTA effect for", isDarkMode ? "dark mode" : "light mode");
               }
