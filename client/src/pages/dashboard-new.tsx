@@ -110,7 +110,38 @@ export default function DashboardNew() {
     <MainLayout>
       <PageHeader
         title="Dashboard"
-        subtitle={user?.username ? `Welcome back, ${user.username}!` : "Welcome to DECA preparation made easy"}
+        subtitle={
+          <span className="flex items-center gap-2">
+            {user?.username ? (
+              <>
+                <span>Welcome back, <span className="font-semibold text-primary">{user.username}</span>!</span>
+                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-accent/10 text-accent">
+                  {user?.subscriptionTier ? (
+                    <>
+                      {user.subscriptionTier.charAt(0).toUpperCase() + user.subscriptionTier.slice(1)} Plan
+                      <span className="ml-1 inline-flex">
+                        {(() => {
+                          const tier = user.subscriptionTier || 'standard';
+                          const activeStars = tier.toLowerCase() === 'premium' || tier.toLowerCase() === 'pro' 
+                            ? 5 
+                            : tier.toLowerCase() === 'plus' 
+                              ? 3 
+                              : 2;
+                          
+                          return Array(activeStars).fill(0).map((_, i) => (
+                            <span key={i} className="text-yellow-400">★</span>
+                          ));
+                        })()}
+                      </span>
+                    </>
+                  ) : 'Standard Plan'}
+                </span>
+              </>
+            ) : (
+              "Welcome to DECA preparation made easy"
+            )}
+          </span>
+        }
         actions={
           <button className="px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-md text-sm font-medium flex items-center gap-2 shadow-sm transition-colors">
             <span>New Practice</span>
