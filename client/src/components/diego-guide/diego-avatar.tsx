@@ -197,64 +197,126 @@ export default function DiegoAvatar({ emotion = 'neutral', size = 'md', classNam
         className="overflow-visible"
       >
         {/* Background circle for button */}
-        <circle cx="0" cy="0" r="20" fill="#3B82F6" />
+        <circle cx="0" cy="0" r="20" fill="#1AB7EA" />
         
-        {/* Dolphin body */}
+        {/* Dolphin body - based on reference image */}
         <motion.g 
           animate={animations?.body || {}}
         >
-          {/* Main body */}
+          {/* Main body - simplified rounded shape */}
           <path
-            d="M-10,10 Q-15,-5 -5,-15 Q5,-22 15,-10 Q18,0 10,15 Q0,20 -10,10 Z"
-            fill="#0EA5E9"
-            stroke="#0284C7"
-            strokeWidth="1"
+            d="M-12,12 C-18,5 -18,-5 -10,-13 C-5,-18 5,-18 10,-13 C18,-5 18,5 12,12 C5,18 -5,18 -12,12 Z"
+            fill="#1AB7EA"
+            stroke="#000000"
+            strokeWidth="2"
           />
           
-          {/* Fin */}
+          {/* Left fin */}
           <path
-            d="M10,-5 Q15,-10 20,-5 Q17,0 10,5 Z"
-            fill="#0EA5E9"
-            stroke="#0284C7"
-            strokeWidth="1"
+            d="M-17,0 C-22,-5 -22,-10 -17,-10 C-12,-10 -10,-5 -15,0 Z"
+            fill="#1AB7EA"
+            stroke="#000000"
+            strokeWidth="2"
           />
           
-          {/* Tail */}
+          {/* Right fin */}
           <path
-            d="M-12,8 Q-25,0 -20,-5 Q-18,-8 -15,-5 Q-13,-2 -10,0 Z"
-            fill="#0EA5E9"
-            stroke="#0284C7"
-            strokeWidth="1"
+            d="M17,0 C22,-5 22,-10 17,-10 C12,-10 10,-5 15,0 Z"
+            fill="#1AB7EA"
+            stroke="#000000"
+            strokeWidth="2"
           />
           
-          {/* Eyes */}
+          {/* Mouth/beak - elongated snout */}
+          <path
+            d="M0,0 C5,0 10,-3 15,-3 C20,-3 20,3 15,5 C10,7 0,7 0,0 Z"
+            fill="#1AB7EA"
+            stroke="#000000"
+            strokeWidth="2"
+          />
+          
+          {/* Sound wave indicators - small arcs */}
+          <path
+            d="M18,-5 C20,-5 20,-7 18,-7"
+            fill="none"
+            stroke="#000000"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+          <path
+            d="M18,-9 C21,-9 21,-11 18,-11"
+            fill="none"
+            stroke="#000000"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+          <path
+            d="M18,-13 C22,-13 22,-15 18,-15"
+            fill="none"
+            stroke="#000000"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+          
+          {/* Eyes - curved lines instead of circles for cartoonish look */}
           <motion.g 
             animate={animations?.eyes || {}}
           >
-            <circle cx="-5" cy="-8" r="2.5" fill="white" />
-            <circle cx="5" cy="-10" r="2.5" fill="white" />
-            <circle cx="-5" cy="-8" r="1.25" fill="black" />
-            <circle cx="5" cy="-10" r="1.25" fill="black" />
+            {/* Left eye arcs */}
+            <path
+              d="M-10,-5 C-8,-3 -6,-3 -4,-5"
+              fill="none"
+              stroke="#000000"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+            <path
+              d="M-10,-8 C-8,-6 -6,-6 -4,-8"
+              fill="none"
+              stroke="#000000"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+            <path
+              d="M-10,-11 C-8,-9 -6,-9 -4,-11"
+              fill="none"
+              stroke="#000000"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+            
+            {/* Right eye arcs */}
+            <path
+              d="M4,-5 C6,-3 8,-3 10,-5"
+              fill="none"
+              stroke="#000000"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+            <path
+              d="M4,-8 C6,-6 8,-6 10,-8"
+              fill="none"
+              stroke="#000000"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+            <path
+              d="M4,-11 C6,-9 8,-9 10,-11"
+              fill="none"
+              stroke="#000000"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
           </motion.g>
           
-          {/* Smile */}
+          {/* Smile - curved for a happy expression */}
           <motion.path
-            d="M-6,3 C-3,6 3,6 6,3"
+            d="M0,3 C5,7 10,7 15,3"
             fill="none"
-            stroke="#0284C7"
-            strokeWidth="1.5"
+            stroke="#000000"
+            strokeWidth="2"
             strokeLinecap="round"
             animate={animations?.smile || {}}
-          />
-          
-          {/* Water splash effect */}
-          <path 
-            d="M-15,15 C-10,12 -5,18 0,15 C5,18 10,12 15,15" 
-            fill="none" 
-            stroke="#BAE6FD" 
-            strokeWidth="1.5" 
-            strokeDasharray="2,2" 
-            opacity="0.8" 
           />
         </motion.g>
       </motion.svg>

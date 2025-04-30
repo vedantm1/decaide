@@ -189,12 +189,26 @@ function DiegoGuideManager() {
               className="w-10 h-10 text-primary-foreground"
               fill="currentColor"
             >
-              {/* Dolphin silhouette - simplified for button */}
-              <path d="M12 3C7 3 4 6 3 9C2 12 2 15 4 18C6 21 9 22 12 22C15 22 18 21 20 18C22 15 22 12 21 9C20 6 17 3 12 3Z" />
-              {/* Blowhole */}
-              <circle cx="12" cy="4" r="0.5" fill="white" />
-              {/* Eye */}
-              <circle cx="8" cy="8" r="1.2" fill="white" />
+              {/* New Diego dolphin design based on reference */}
+              <path d="M12 3C7 3 3 7 3 12C3 17 7 21 12 21C17 21 21 17 21 12C21 7 17 3 12 3Z" />
+              
+              {/* Snout/beak */}
+              <path d="M12 12C14 12 16 11 18 11C20 11 20 13 18 14C16 15 12 15 12 12Z" fill="white" stroke="black" strokeWidth="0.5" />
+              
+              {/* Left eye arcs */}
+              <path d="M7 8C8 9 9 9 10 8" fill="none" stroke="black" strokeWidth="0.5" />
+              <path d="M7 7C8 8 9 8 10 7" fill="none" stroke="black" strokeWidth="0.5" />
+              <path d="M7 6C8 7 9 7 10 6" fill="none" stroke="black" strokeWidth="0.5" />
+              
+              {/* Right eye arcs */}
+              <path d="M14 8C15 9 16 9 17 8" fill="none" stroke="black" strokeWidth="0.5" />
+              <path d="M14 7C15 8 16 8 17 7" fill="none" stroke="black" strokeWidth="0.5" />
+              <path d="M14 6C15 7 16 7 17 6" fill="none" stroke="black" strokeWidth="0.5" />
+              
+              {/* Sound waves */}
+              <path d="M19 8C20 8 20 7 19 7" fill="none" stroke="black" strokeWidth="0.5" />
+              <path d="M19 6C21 6 21 5 19 5" fill="none" stroke="black" strokeWidth="0.5" />
+              <path d="M19 4C22 4 22 3 19 3" fill="none" stroke="black" strokeWidth="0.5" />
             </svg>
             <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
             <span className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-white text-primary text-xs px-2 py-1 rounded-full shadow-sm whitespace-nowrap font-medium">
