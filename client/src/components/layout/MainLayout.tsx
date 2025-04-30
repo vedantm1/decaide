@@ -3,6 +3,7 @@ import { Link, useLocation } from 'wouter';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUIState } from '@/hooks/use-ui-state';
+import { useAuth } from '@/hooks/use-auth';
 import { 
   IconHome, 
   IconBarChart, 
@@ -12,7 +13,8 @@ import {
   IconActivity, 
   IconClipboard, 
   IconMenu, 
-  IconX 
+  IconX,
+  IconLogOut
 } from '@/components/ui/icons';
 
 interface MainLayoutProps {
@@ -22,6 +24,7 @@ interface MainLayoutProps {
 export function MainLayout({ children }: MainLayoutProps) {
   const [location] = useLocation();
   const { isDarkMode, isMobile } = useUIState();
+  const { logout } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(!isMobile);
 
   // Define navigation items
@@ -230,7 +233,23 @@ export function MainLayout({ children }: MainLayoutProps) {
                 </nav>
                 
                 <div className="pt-4 mt-4 border-t">
-                  <div className="px-3 py-2 text-xs text-muted-foreground">
+                  {/* Logout button */}
+                  <motion.div 
+                    variants={navItemVariants}
+                    custom={navigationItems.length}
+                  >
+                    <button
+                      onClick={() => logout()}
+                      className="flex items-center w-full px-3 py-2.5 text-base rounded-lg relative group text-foreground/70 hover:text-foreground transition-all hover:bg-primary/5"
+                    >
+                      <span className="mr-3 text-current opacity-70 group-hover:opacity-100">
+                        <IconLogOut className="w-5 h-5" />
+                      </span>
+                      <span className="font-medium">Logout</span>
+                    </button>
+                  </motion.div>
+                  
+                  <div className="px-3 py-2 text-xs text-muted-foreground mt-4">
                     <div>DecA(I)de</div>
                     <div>© 2025 All rights reserved</div>
                   </div>
