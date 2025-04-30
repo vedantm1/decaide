@@ -6,7 +6,8 @@ import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
-import MainLayout from "@/components/layout/MainLayout";
+import { MainLayout } from "@/components/layout/MainLayout"; 
+import { PageHeader } from "@/components/layout/PageHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -221,115 +222,344 @@ export default function SettingsPage() {
 
   return (
     <MainLayout>
-      <div>
-        <header className="mb-6">
-          <h1 className="text-2xl font-heading font-bold text-slate-800">Settings</h1>
-          <p className="text-slate-500 mt-1">Manage your account preferences and settings</p>
-        </header>
+      <PageHeader
+        title="Settings"
+        subtitle="Manage your account preferences and settings"
+      />
 
-        <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="mb-6">
-          <TabsList className="grid grid-cols-3 max-w-md mb-8">
-            <TabsTrigger value="profile">Profile</TabsTrigger>
-            <TabsTrigger value="notifications">Notifications</TabsTrigger>
-            <TabsTrigger value="appearance">Appearance</TabsTrigger>
-          </TabsList>
+      <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="mb-6">
+        <TabsList className="grid grid-cols-3 max-w-md mb-8">
+          <TabsTrigger value="profile">Profile</TabsTrigger>
+          <TabsTrigger value="notifications">Notifications</TabsTrigger>
+          <TabsTrigger value="appearance">Appearance</TabsTrigger>
+        </TabsList>
 
-          <TabsContent value="profile">
-            <Card>
-              <CardHeader>
-                <CardTitle>Profile Settings</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Form {...profileForm}>
-                  <form onSubmit={profileForm.handleSubmit(onProfileSubmit)} className="space-y-6">
-                    {/* Profile form fields */}
-                    {/* ... (rest of form content) */}
-                    <Button 
-                      type="submit" 
-                      className="w-full md:w-auto"
-                      disabled={updateProfile.isPending}
-                    >
-                      {updateProfile.isPending ? (
-                        <div className="flex items-center">
-                          <div className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
-                          Saving...
-                        </div>
-                      ) : (
-                        "Save Changes"
-                      )}
-                    </Button>
-                  </form>
-                </Form>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="notifications">
-            <Card>
-              <CardHeader>
-                <CardTitle>Notification Preferences</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Form {...notificationForm}>
-                  <form onSubmit={notificationForm.handleSubmit(onNotificationSubmit)} className="space-y-6">
-                    {/* Notification form fields */}
-                    {/* ... (rest of form content) */}
-                    <Button 
-                      type="submit" 
-                      className="w-full md:w-auto"
-                      disabled={updateNotifications.isPending}
-                    >
-                      {updateNotifications.isPending ? (
-                        <div className="flex items-center">
-                          <div className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
-                          Saving...
-                        </div>
-                      ) : (
-                        "Save Preferences"
-                      )}
-                    </Button>
-                  </form>
-                </Form>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="appearance">
-            <Card>
-              <CardHeader>
-                <CardTitle>Appearance Settings</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-6">
-                  {/* Appearance settings content */}
-                  {/* ... (rest of appearance content) */}
+        <TabsContent value="profile">
+          <Card className="bg-background/60 backdrop-blur-sm border-muted">
+            <CardHeader>
+              <CardTitle>Profile Settings</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Form {...profileForm}>
+                <form onSubmit={profileForm.handleSubmit(onProfileSubmit)} className="space-y-6">
+                  <FormField
+                    control={profileForm.control}
+                    name="username"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-foreground/80">Username</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Your username" className="bg-background/80" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={profileForm.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-foreground/80">Email</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Your email address" className="bg-background/80" {...field} />
+                        </FormControl>
+                        <FormDescription className="text-muted-foreground">
+                          This email will be used for notifications and account recovery.
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={profileForm.control}
+                    name="eventType"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-foreground/80">DECA Event Type</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger className="bg-background/80">
+                              <SelectValue placeholder="Select your event type" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {EVENT_TYPE_GROUPS.map((type) => (
+                              <SelectItem key={type} value={type}>{type}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={profileForm.control}
+                    name="instructionalArea"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-foreground/80">Instructional Area</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger className="bg-background/80">
+                              <SelectValue placeholder="Select your instructional area" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="marketing">Marketing</SelectItem>
+                            <SelectItem value="finance">Finance</SelectItem>
+                            <SelectItem value="hospitality">Hospitality & Tourism</SelectItem>
+                            <SelectItem value="business">Business Administration</SelectItem>
+                            <SelectItem value="entrepreneurship">Entrepreneurship</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormDescription className="text-muted-foreground">
+                          Your instructional area helps us personalize content.
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
                   <Button 
-                    onClick={() => updateAppearance.mutate(appearance)}
-                    className="w-full md:w-auto"
-                    disabled={updateAppearance.isPending}
+                    type="submit" 
+                    className="w-full md:w-auto mt-4"
+                    disabled={updateProfile.isPending}
                   >
-                    <div className="flex items-center justify-center gap-2">
-                      {updateAppearance.isPending ? (
-                        <>
-                          <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
-                          <span>Applying theme...</span>
-                        </>
-                      ) : (
-                        <>
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                          </svg>
-                          <span>Save Appearance Settings</span>
-                        </>
+                    {updateProfile.isPending ? (
+                      <div className="flex items-center">
+                        <div className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+                        Saving...
+                      </div>
+                    ) : (
+                      "Save Changes"
+                    )}
+                  </Button>
+                </form>
+              </Form>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="notifications">
+          <Card className="bg-background/60 backdrop-blur-sm border-muted">
+            <CardHeader>
+              <CardTitle>Notification Preferences</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Form {...notificationForm}>
+                <form onSubmit={notificationForm.handleSubmit(onNotificationSubmit)} className="space-y-6">
+                  <FormField
+                    control={notificationForm.control}
+                    name="emailNotifications"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center justify-between p-4 rounded-lg border bg-background/80">
+                        <div className="space-y-0.5">
+                          <FormLabel className="text-foreground">Email Notifications</FormLabel>
+                          <FormDescription className="text-muted-foreground">
+                            Receive notifications and updates via email
+                          </FormDescription>
+                        </div>
+                        <FormControl>
+                          <Switch 
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={notificationForm.control}
+                    name="dailyReminders"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center justify-between p-4 rounded-lg border bg-background/80">
+                        <div className="space-y-0.5">
+                          <FormLabel className="text-foreground">Daily Reminders</FormLabel>
+                          <FormDescription className="text-muted-foreground">
+                            Get daily practice reminders
+                          </FormDescription>
+                        </div>
+                        <FormControl>
+                          <Switch 
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={notificationForm.control}
+                    name="weeklyProgressReports"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center justify-between p-4 rounded-lg border bg-background/80">
+                        <div className="space-y-0.5">
+                          <FormLabel className="text-foreground">Weekly Progress Reports</FormLabel>
+                          <FormDescription className="text-muted-foreground">
+                            Receive weekly summaries of your DECA preparation progress
+                          </FormDescription>
+                        </div>
+                        <FormControl>
+                          <Switch 
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={notificationForm.control}
+                    name="streakAlerts"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center justify-between p-4 rounded-lg border bg-background/80">
+                        <div className="space-y-0.5">
+                          <FormLabel className="text-foreground">Streak Alerts</FormLabel>
+                          <FormDescription className="text-muted-foreground">
+                            Get notifications about your study streak status
+                          </FormDescription>
+                        </div>
+                        <FormControl>
+                          <Switch 
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <Button 
+                    type="submit" 
+                    className="w-full md:w-auto mt-4"
+                    disabled={updateNotifications.isPending}
+                  >
+                    {updateNotifications.isPending ? (
+                      <div className="flex items-center">
+                        <div className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+                        Saving...
+                      </div>
+                    ) : (
+                      "Save Preferences"
+                    )}
+                  </Button>
+                </form>
+              </Form>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="appearance">
+          <Card className="bg-background/60 backdrop-blur-sm border-muted">
+            <CardHeader>
+              <CardTitle>Appearance Settings</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <h3 className="text-lg font-medium text-foreground">Theme</h3>
+                  <p className="text-sm text-muted-foreground">Choose your preferred application theme</p>
+                  
+                  <div className="grid grid-cols-2 gap-4 pt-2">
+                    <div 
+                      className={`cursor-pointer rounded-lg border-2 p-4 flex items-center gap-2 transition-all
+                        ${appearance.theme === 'light' ? 'border-primary bg-primary/5' : 'border-border hover:border-border/80'}`}
+                      onClick={() => setAppearance({...appearance, theme: 'light'})}
+                    >
+                      <div className="p-1.5 rounded-full bg-background flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-amber-500" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <span className="font-medium">Light</span>
+                      {appearance.theme === 'light' && (
+                        <CheckIcon className="h-4 w-4 text-primary ml-auto" />
                       )}
                     </div>
-                  </Button>
+                    
+                    <div 
+                      className={`cursor-pointer rounded-lg border-2 p-4 flex items-center gap-2 transition-all
+                        ${appearance.theme === 'dark' ? 'border-primary bg-primary/5' : 'border-border hover:border-border/80'}`}
+                      onClick={() => setAppearance({...appearance, theme: 'dark'})}
+                    >
+                      <div className="p-1.5 rounded-full bg-background flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-indigo-400" viewBox="0 0 20 20" fill="currentColor">
+                          <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+                        </svg>
+                      </div>
+                      <span className="font-medium">Dark</span>
+                      {appearance.theme === 'dark' && (
+                        <CheckIcon className="h-4 w-4 text-primary ml-auto" />
+                      )}
+                    </div>
+                  </div>
                 </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-      </div>
+                
+                <Separator />
+                
+                <div className="space-y-2">
+                  <h3 className="text-lg font-medium text-foreground">Color Scheme</h3>
+                  <p className="text-sm text-muted-foreground">Select a color scheme for the application</p>
+                  
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-2">
+                    {['aquaBlue', 'coralPink', 'mintGreen', 'royalPurple'].map((scheme) => (
+                      <div 
+                        key={scheme}
+                        className={`cursor-pointer p-4 rounded-lg border-2 flex flex-col items-center gap-2 transition-all
+                          ${appearance.colorScheme === scheme ? 'border-primary bg-primary/5' : 'border-border hover:border-border/80'}`}
+                        onClick={() => setAppearance({...appearance, colorScheme: scheme})}
+                      >
+                        <div 
+                          className="w-6 h-6 rounded-full mb-1"
+                          style={{ backgroundColor: getColorForScheme(scheme) }}
+                        ></div>
+                        <span className="text-sm font-medium capitalize">
+                          {scheme === 'aquaBlue' ? 'Aqua Blue' : 
+                           scheme === 'coralPink' ? 'Coral Pink' : 
+                           scheme === 'mintGreen' ? 'Mint Green' : 
+                           'Royal Purple'}
+                        </span>
+                        {appearance.colorScheme === scheme && (
+                          <Badge className="mt-1 bg-primary/20 text-primary border-primary">Active</Badge>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
+                <Button 
+                  onClick={() => updateAppearance.mutate(appearance)}
+                  className="w-full md:w-auto mt-6"
+                  disabled={updateAppearance.isPending}
+                >
+                  <div className="flex items-center justify-center gap-2">
+                    {updateAppearance.isPending ? (
+                      <>
+                        <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+                        <span>Applying theme...</span>
+                      </>
+                    ) : (
+                      <>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span>Save Appearance Settings</span>
+                      </>
+                    )}
+                  </div>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </MainLayout>
   );
 }
