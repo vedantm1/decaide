@@ -196,128 +196,147 @@ export default function DiegoAvatar({ emotion = 'neutral', size = 'md', classNam
         width={width}
         className="overflow-visible"
       >
-        {/* Background circle for button */}
+        {/* Simplified background for the button */}
         <circle cx="0" cy="0" r="20" fill="#1AB7EA" />
         
-        {/* Dolphin body - based on reference image */}
+        {/* Dolphin body - Exact match to reference image */}
         <motion.g 
           animate={animations?.body || {}}
         >
-          {/* Main body - simplified rounded shape */}
+          {/* Main body - simplified oval with straight bottom */}
           <path
-            d="M-12,12 C-18,5 -18,-5 -10,-13 C-5,-18 5,-18 10,-13 C18,-5 18,5 12,12 C5,18 -5,18 -12,12 Z"
+            d="M-16,10 C-16,-10 -10,-16 0,-16 C10,-16 16,-10 16,10 L-16,10 Z"
             fill="#1AB7EA"
             stroke="#000000"
             strokeWidth="2"
           />
           
-          {/* Left fin */}
+          {/* Spikes on the back/head - simplified */}
           <path
-            d="M-17,0 C-22,-5 -22,-10 -17,-10 C-12,-10 -10,-5 -15,0 Z"
+            d="M-14,-14 L-13,-15 L-11,-14 L-10,-15 L-8,-14 L-7,-15 L-5,-14 L-4,-15 L-2,-14 L-1,-15 L1,-14"
+            fill="none"
+            stroke="#000000"
+            strokeWidth="1.5"
+          />
+          
+          {/* Left side fin */}
+          <path
+            d="M-15,0 L-22,-5 L-15,-8 L-15,0"
             fill="#1AB7EA"
             stroke="#000000"
             strokeWidth="2"
           />
           
-          {/* Right fin */}
+          {/* Right side fin */}
           <path
-            d="M17,0 C22,-5 22,-10 17,-10 C12,-10 10,-5 15,0 Z"
+            d="M15,0 L22,-5 L15,-8 L15,0"
             fill="#1AB7EA"
             stroke="#000000"
             strokeWidth="2"
           />
           
-          {/* Mouth/beak - elongated snout */}
+          {/* Bottom fins */}
           <path
-            d="M0,0 C5,0 10,-3 15,-3 C20,-3 20,3 15,5 C10,7 0,7 0,0 Z"
+            d="M-10,10 L-15,17 L-8,15 L-10,10"
             fill="#1AB7EA"
             stroke="#000000"
             strokeWidth="2"
           />
           
-          {/* Sound wave indicators - small arcs */}
           <path
-            d="M18,-5 C20,-5 20,-7 18,-7"
+            d="M10,10 L15,17 L8,15 L10,10"
+            fill="#1AB7EA"
+            stroke="#000000"
+            strokeWidth="2"
+          />
+          
+          {/* Large mouth/beak - the distinctive feature */}
+          <path
+            d="M0,0 C8,-2 15,-2 18,0 C20,3 18,8 15,10 C10,12 5,10 0,5 Z"
+            fill="#000000"
+            strokeWidth="1"
+          />
+          
+          {/* Inner mouth detail (white) */}
+          <path
+            d="M2,2 C8,0 12,1 15,3 C18,5 15,8 10,9 C6,9 2,7 2,2 Z"
+            fill="#FFFFFF"
+            strokeWidth="0"
+          />
+          
+          {/* Sound wave indicators - curved lines */}
+          <path
+            d="M20,-2 C22,-2 22,-4 20,-4"
             fill="none"
             stroke="#000000"
             strokeWidth="2"
             strokeLinecap="round"
           />
           <path
-            d="M18,-9 C21,-9 21,-11 18,-11"
+            d="M20,-6 C24,-6 24,-8 20,-8"
             fill="none"
             stroke="#000000"
             strokeWidth="2"
             strokeLinecap="round"
           />
           <path
-            d="M18,-13 C22,-13 22,-15 18,-15"
+            d="M20,-10 C26,-10 26,-12 20,-12"
             fill="none"
             stroke="#000000"
             strokeWidth="2"
             strokeLinecap="round"
           />
           
-          {/* Eyes - curved lines instead of circles for cartoonish look */}
+          {/* Eyes - curved lines in exact match to reference */}
           <motion.g 
             animate={animations?.eyes || {}}
           >
-            {/* Left eye arcs */}
+            {/* Left column of eye arcs */}
             <path
-              d="M-10,-5 C-8,-3 -6,-3 -4,-5"
+              d="M-10,-2 C-8,0 -6,0 -4,-2"
               fill="none"
               stroke="#000000"
               strokeWidth="2"
               strokeLinecap="round"
             />
             <path
-              d="M-10,-8 C-8,-6 -6,-6 -4,-8"
+              d="M-10,-6 C-8,-4 -6,-4 -4,-6"
               fill="none"
               stroke="#000000"
               strokeWidth="2"
               strokeLinecap="round"
             />
             <path
-              d="M-10,-11 C-8,-9 -6,-9 -4,-11"
+              d="M-10,-10 C-8,-8 -6,-8 -4,-10"
               fill="none"
               stroke="#000000"
               strokeWidth="2"
               strokeLinecap="round"
             />
             
-            {/* Right eye arcs */}
+            {/* Right column of eye arcs */}
             <path
-              d="M4,-5 C6,-3 8,-3 10,-5"
+              d="M3,-2 C5,0 7,0 9,-2"
               fill="none"
               stroke="#000000"
               strokeWidth="2"
               strokeLinecap="round"
             />
             <path
-              d="M4,-8 C6,-6 8,-6 10,-8"
+              d="M3,-6 C5,-4 7,-4 9,-6"
               fill="none"
               stroke="#000000"
               strokeWidth="2"
               strokeLinecap="round"
             />
             <path
-              d="M4,-11 C6,-9 8,-9 10,-11"
+              d="M3,-10 C5,-8 7,-8 9,-10"
               fill="none"
               stroke="#000000"
               strokeWidth="2"
               strokeLinecap="round"
             />
           </motion.g>
-          
-          {/* Smile - curved for a happy expression */}
-          <motion.path
-            d="M0,3 C5,7 10,7 15,3"
-            fill="none"
-            stroke="#000000"
-            strokeWidth="2"
-            strokeLinecap="round"
-            animate={animations?.smile || {}}
-          />
         </motion.g>
       </motion.svg>
     </div>

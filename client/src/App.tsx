@@ -189,26 +189,76 @@ function DiegoGuideManager() {
               className="w-10 h-10 text-primary-foreground"
               fill="currentColor"
             >
-              {/* New Diego dolphin design based on reference */}
-              <path d="M12 3C7 3 3 7 3 12C3 17 7 21 12 21C17 21 21 17 21 12C21 7 17 3 12 3Z" />
+              {/* Main body - Diego design based on reference */}
+              <path 
+                d="M12 3C7 3 3 7 3 12C3 17 7 21 12 21C17 21 21 17 21 12C21 7 17 3 12 3Z" 
+                fill="#1AB7EA"
+                stroke="#000000"
+                strokeWidth="1"
+              />
               
-              {/* Snout/beak */}
-              <path d="M12 12C14 12 16 11 18 11C20 11 20 13 18 14C16 15 12 15 12 12Z" fill="white" stroke="black" strokeWidth="0.5" />
+              {/* Spikes on top/back */}
+              <path 
+                d="M6 6L7 5L8 6L9 5L10 6L11 5L12 6L13 5L14 6" 
+                fill="none" 
+                stroke="#000000" 
+                strokeWidth="0.5"
+              />
+              
+              {/* Side fins */}
+              <path 
+                d="M4 11L2 9L4 8Z" 
+                fill="#1AB7EA" 
+                stroke="#000000" 
+                strokeWidth="0.5"
+              />
+              <path 
+                d="M20 11L22 9L20 8Z" 
+                fill="#1AB7EA" 
+                stroke="#000000" 
+                strokeWidth="0.5"
+              />
+              
+              {/* Bottom fins */}
+              <path 
+                d="M8 20L6 22L9 21Z" 
+                fill="#1AB7EA" 
+                stroke="#000000" 
+                strokeWidth="0.5"
+              />
+              <path 
+                d="M16 20L18 22L15 21Z" 
+                fill="#1AB7EA" 
+                stroke="#000000" 
+                strokeWidth="0.5"
+              />
+              
+              {/* Large mouth/beak - black */}
+              <path 
+                d="M12 12C15 11 18 11 19 12C21 14 19 17 16 18C13 18 12 15 12 12Z" 
+                fill="#000000"
+              />
+              
+              {/* Inner mouth detail - white */}
+              <path 
+                d="M13 13C15 12 17 13 18 14C19 15 17 16 15 16C13 16 12 15 13 13Z" 
+                fill="#FFFFFF"
+              />
               
               {/* Left eye arcs */}
-              <path d="M7 8C8 9 9 9 10 8" fill="none" stroke="black" strokeWidth="0.5" />
-              <path d="M7 7C8 8 9 8 10 7" fill="none" stroke="black" strokeWidth="0.5" />
-              <path d="M7 6C8 7 9 7 10 6" fill="none" stroke="black" strokeWidth="0.5" />
+              <path d="M7 8C8 9 9 9 10 8" fill="none" stroke="#000000" strokeWidth="0.75" strokeLinecap="round" />
+              <path d="M7 10C8 11 9 11 10 10" fill="none" stroke="#000000" strokeWidth="0.75" strokeLinecap="round" />
+              <path d="M7 6C8 7 9 7 10 6" fill="none" stroke="#000000" strokeWidth="0.75" strokeLinecap="round" />
               
               {/* Right eye arcs */}
-              <path d="M14 8C15 9 16 9 17 8" fill="none" stroke="black" strokeWidth="0.5" />
-              <path d="M14 7C15 8 16 8 17 7" fill="none" stroke="black" strokeWidth="0.5" />
-              <path d="M14 6C15 7 16 7 17 6" fill="none" stroke="black" strokeWidth="0.5" />
+              <path d="M14 8C15 9 16 9 17 8" fill="none" stroke="#000000" strokeWidth="0.75" strokeLinecap="round" />
+              <path d="M14 10C15 11 16 11 17 10" fill="none" stroke="#000000" strokeWidth="0.75" strokeLinecap="round" />
+              <path d="M14 6C15 7 16 7 17 6" fill="none" stroke="#000000" strokeWidth="0.75" strokeLinecap="round" />
               
               {/* Sound waves */}
-              <path d="M19 8C20 8 20 7 19 7" fill="none" stroke="black" strokeWidth="0.5" />
-              <path d="M19 6C21 6 21 5 19 5" fill="none" stroke="black" strokeWidth="0.5" />
-              <path d="M19 4C22 4 22 3 19 3" fill="none" stroke="black" strokeWidth="0.5" />
+              <path d="M19 7C20 7 20 6 19 6" fill="none" stroke="#000000" strokeWidth="0.75" strokeLinecap="round" />
+              <path d="M20 5C22 5 22 4 20 4" fill="none" stroke="#000000" strokeWidth="0.75" strokeLinecap="round" />
+              <path d="M21 3C24 3 24 2 21 2" fill="none" stroke="#000000" strokeWidth="0.75" strokeLinecap="round" />
             </svg>
             <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
             <span className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-white text-primary text-xs px-2 py-1 rounded-full shadow-sm whitespace-nowrap font-medium">
