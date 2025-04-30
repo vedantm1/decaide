@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Link, useLocation } from 'wouter';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -14,6 +14,17 @@ import {
   IconMenu, 
   IconX 
 } from '@/components/ui/icons';
+import * as THREE from 'three';
+
+// Declare Vanta.js global types
+declare global {
+  interface Window {
+    THREE: typeof THREE;
+    VANTA: {
+      WAVES: (config: any) => any;
+    };
+  }
+}
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -23,6 +34,8 @@ export function MainLayout({ children }: MainLayoutProps) {
   const [location] = useLocation();
   const { isDarkMode, isMobile } = useUIState();
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(!isMobile);
+  const bgRef = useRef<HTMLDivElement>(null);
+  const vantaEffect = useRef<any>(null);
 
   // Define navigation items
   const navigationItems = [
@@ -34,6 +47,63 @@ export function MainLayout({ children }: MainLayoutProps) {
     { icon: <IconBook className="w-5 h-5" />, label: 'My Progress', href: '/progress' },
     { icon: <IconSettings className="w-5 h-5" />, label: 'Settings', href: '/settings' },
   ];
+
+  // Initialize Vanta.js background
+  useEffect(() => {
+    // Load necessary scripts dynamically
+    const loadScripts = async () => {
+      // Check if Three.js is already loaded
+      if (!window.THREE) {
+        window.THREE = THREE;
+      }
+      
+      // Check if Vanta.js is already loaded
+      if (!window.VANTA) {
+        const vantaScript = document.createElement('script');
+        vantaScript.src = 'https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.waves.min.js';
+        vantaScript.async = true;
+        document.head.appendChild(vantaScript);
+        
+        // Wait for script to load
+        await new Promise<void>((resolve) => {
+          vantaScript.onload = () => resolve();
+        });
+      }
+      
+      // Initialize Vanta effect
+      if (bgRef.current && window.VANTA) {
+        if (vantaEffect.current) {
+          vantaEffect.current.destroy();
+        }
+        
+        vantaEffect.current = window.VANTA.WAVES({
+          el: bgRef.current,
+          THREE: window.THREE,
+          mouseControls: true,
+          touchControls: true,
+          gyroControls: false,
+          minHeight: 200.00,
+          minWidth: 200.00,
+          scale: 1.00,
+          scaleMobile: 1.00,
+          color: isDarkMode ? 0x292929 : 0xa2a2a7,
+          shininess: 0.00,
+          waveHeight: 28.00,
+          waveSpeed: 1.50,
+          zoom: 0.65
+        });
+      }
+    };
+    
+    loadScripts();
+    
+    // Cleanup function
+    return () => {
+      if (vantaEffect.current) {
+        vantaEffect.current.destroy();
+      }
+    };
+  }, [isDarkMode]); // Re-initialize when theme changes
 
   // Track window size changes
   React.useEffect(() => {
@@ -142,9 +212,12 @@ export function MainLayout({ children }: MainLayoutProps) {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen flex flex-col relative overflow-hidden">
+      {/* Vanta Background Container - covers the entire app */}
+      <div ref={bgRef} className="fixed inset-0 z-[-1]"></div>
+      
       {/* Header */}
-      <header className="h-16 border-b bg-card shadow-sm z-40 sticky top-0 left-0 right-0">
+      <header className="h-16 border-b bg-card/80 backdrop-blur-sm shadow-sm z-40 sticky top-0 left-0 right-0">
         <div className="px-4 h-full flex items-center justify-between">
           <div className="flex items-center">
             <button
@@ -182,7 +255,7 @@ export function MainLayout({ children }: MainLayoutProps) {
           {isSidebarOpen && (
             <motion.aside
               className={cn(
-                "fixed top-16 bottom-0 z-30 border-r bg-card shadow-md",
+                "fixed top-16 bottom-0 z-30 border-r bg-card/95 backdrop-blur-sm shadow-md",
                 isMobile ? "left-0" : "left-0"
               )}
               initial="closed"
@@ -239,7 +312,7 @@ export function MainLayout({ children }: MainLayoutProps) {
         
         {/* Main content */}
         <motion.main
-          className="flex-1 min-w-0"
+          className="flex-1 min-w-0 relative"
           initial="collapsed"
           animate={isSidebarOpen && !isMobile ? "expanded" : "collapsed"}
           variants={contentVariants}
@@ -254,7 +327,10 @@ export function MainLayout({ children }: MainLayoutProps) {
                 transition={{ duration: 0.3 }}
                 className="pb-12"
               >
-                {children}
+                {/* Content card with glass effect */}
+                <div className="bg-card/70 backdrop-blur-md rounded-xl shadow-lg p-6 border">
+                  {children}
+                </div>
               </motion.div>
             </AnimatePresence>
           </div>
