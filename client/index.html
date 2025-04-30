@@ -8,14 +8,14 @@
     />
     <title>DecA(I)de - DECA Practice Platform</title>
     <style>
-      /* Full-screen background container */
+      /* Full-screen background container - transparent to show Vanta waves */
       body {
-        background-color: #f0f0f3;
+        background-color: transparent;
         position: relative;
         min-height: 100vh;
       }
       
-      /* Background gradient for all pages */
+      /* No background gradient to ensure Vanta waves visibility */
       body::before {
         content: '';
         position: fixed;
@@ -23,18 +23,18 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: linear-gradient(135deg, rgba(162, 162, 167, 0.1) 0%, rgba(162, 162, 167, 0.05) 100%);
+        background: none;
         z-index: -1;
         pointer-events: none;
       }
       
-      /* Dark mode styling */
+      /* Dark mode styling - transparent to show Vanta waves */
       html.dark body {
-        background-color: #121212;
+        background-color: transparent;
       }
       
       html.dark body::before {
-        background: linear-gradient(135deg, rgba(41, 41, 41, 0.2) 0%, rgba(41, 41, 41, 0.1) 100%);
+        background: none;
       }
       
       /* Smooth transitions */
