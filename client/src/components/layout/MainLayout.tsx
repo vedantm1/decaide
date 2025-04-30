@@ -150,7 +150,7 @@ export function MainLayout({ children }: MainLayoutProps) {
   return (
     <div className="min-h-screen flex flex-col relative overflow-hidden">
       {/* Header */}
-      <header className="h-16 border-b bg-card/80 backdrop-blur-sm shadow-sm z-40 sticky top-0 left-0 right-0">
+      <header className="h-16 border-b bg-card/50 backdrop-blur-md shadow-sm z-40 sticky top-0 left-0 right-0">
         <div className="px-4 h-full flex items-center justify-between">
           <div className="flex items-center">
             <button
@@ -212,7 +212,7 @@ export function MainLayout({ children }: MainLayoutProps) {
           {isSidebarOpen && (
             <motion.aside
               className={cn(
-                "fixed top-16 bottom-0 z-30 border-r bg-card/95 backdrop-blur-sm shadow-md",
+                "fixed top-16 bottom-0 z-30 border-r bg-card/50 backdrop-blur-md shadow-md",
                 isMobile ? "left-0" : "left-0"
               )}
               initial="closed"
@@ -301,7 +301,7 @@ export function MainLayout({ children }: MainLayoutProps) {
                 className="pb-12"
               >
                 {/* Content card with glass effect */}
-                <div className="bg-card/70 backdrop-blur-md rounded-xl shadow-lg p-6 border">
+                <div className="bg-card/50 backdrop-blur-md rounded-xl shadow-lg p-6 border border-border/40">
                   {children}
                 </div>
               </motion.div>

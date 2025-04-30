@@ -12,6 +12,15 @@ interface VantaBackgroundProps {
   children?: React.ReactNode;
 }
 
+// This fixes the TypeScript error related to importing Vanta
+declare global {
+  interface Window {
+    VANTA: {
+      WAVES: (options: any) => VantaWavesEffect;
+    }
+  }
+}
+
 export function VantaBackground({ children }: VantaBackgroundProps) {
   const backgroundRef = useRef<HTMLDivElement>(null);
   const [vantaEffect, setVantaEffect] = useState<VantaWavesEffect | null>(null);
@@ -28,29 +37,77 @@ export function VantaBackground({ children }: VantaBackgroundProps) {
       try {
         if (!backgroundRef.current) return;
         
-        // Dynamically import Vanta
-        const VANTA = await import('vanta/dist/vanta.waves.min');
+        // Using direct script tag approach instead of import
+        // First check if VANTA is already available (from script tags)
+        if (window.VANTA) {
+          const effect = window.VANTA.WAVES({
+            el: backgroundRef.current,
+            THREE: THREE,
+            mouseControls: true,
+            touchControls: true,
+            gyroControls: false,
+            minHeight: 200.00,
+            minWidth: 200.00,
+            scale: 1.00,
+            scaleMobile: 1.00,
+            color: isDarkMode ? 0x292929 : 0xa2a2a7,
+            shininess: 0.00,
+            waveHeight: 28.00,
+            waveSpeed: 1.50,
+            zoom: 0.65
+          });
+          
+          setVantaEffect(effect);
+          console.log("Vanta effect initialized with color:", isDarkMode ? "0x292929 (dark)" : "0xa2a2a7 (light)");
+          return;
+        }
         
-        // Initialize Vanta with appropriate color based on theme
-        const effect = VANTA.default({
-          el: backgroundRef.current,
-          THREE: THREE,
-          mouseControls: true,
-          touchControls: true,
-          gyroControls: false,
-          minHeight: 200.00,
-          minWidth: 200.00,
-          scale: 1.00,
-          scaleMobile: 1.00,
-          color: isDarkMode ? 0x292929 : 0xa2a2a7,
-          shininess: 0.00,
-          waveHeight: 28.00,
-          waveSpeed: 1.50,
-          zoom: 0.65
-        });
-        
-        setVantaEffect(effect);
-        console.log("Vanta effect initialized with color:", isDarkMode ? "0x292929 (dark)" : "0xa2a2a7 (light)");
+        // Fallback to dynamic import if window.VANTA is not available
+        try {
+          // Import the THREE.js library first
+          await import('three');
+          
+          // Use script tags approach to load Vanta
+          const threeScript = document.createElement('script');
+          threeScript.src = 'https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js';
+          threeScript.async = true;
+          
+          threeScript.onload = () => {
+            const vantaScript = document.createElement('script');
+            vantaScript.src = 'https://cdn.jsdelivr.net/npm/vanta@0.5.24/dist/vanta.waves.min.js';
+            vantaScript.async = true;
+            
+            vantaScript.onload = () => {
+              if (window.VANTA && backgroundRef.current) {
+                const effect = window.VANTA.WAVES({
+                  el: backgroundRef.current,
+                  THREE: THREE,
+                  mouseControls: true,
+                  touchControls: true,
+                  gyroControls: false,
+                  minHeight: 200.00,
+                  minWidth: 200.00,
+                  scale: 1.00,
+                  scaleMobile: 1.00,
+                  color: isDarkMode ? 0x292929 : 0xa2a2a7,
+                  shininess: 0.00,
+                  waveHeight: 28.00,
+                  waveSpeed: 1.50,
+                  zoom: 0.65
+                });
+                
+                setVantaEffect(effect);
+                console.log("Vanta effect initialized with color:", isDarkMode ? "0x292929 (dark)" : "0xa2a2a7 (light)");
+              }
+            };
+            
+            document.head.appendChild(vantaScript);
+          };
+          
+          document.head.appendChild(threeScript);
+        } catch (importError) {
+          console.error("Failed to import Vanta:", importError);
+        }
       } catch (error) {
         console.error("Failed to load Vanta:", error);
       }

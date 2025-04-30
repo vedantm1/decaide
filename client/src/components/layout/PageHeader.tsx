@@ -5,13 +5,14 @@ import { motion } from 'framer-motion';
 import { useUIState } from '@/hooks/use-ui-state';
 
 interface PageHeaderProps {
-  title: string;
-  subtitle?: string;
+  title: React.ReactNode;
+  subtitle?: React.ReactNode;
   actions?: React.ReactNode;
   breadcrumbs?: { label: string; href: string }[];
   decorative?: boolean;
   className?: string;
   id?: string;
+  centered?: boolean;
 }
 
 /**
@@ -25,7 +26,8 @@ export function PageHeader({
   breadcrumbs,
   decorative = false,
   className,
-  id
+  id,
+  centered = false
 }: PageHeaderProps) {
   const { animationMode } = useUIState();
   const isReducedMotion = animationMode === 'reduced';
@@ -87,13 +89,27 @@ export function PageHeader({
         </motion.div>
       )}
 
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <motion.div variants={itemVariants}>
-          <h1 className="text-2xl sm:text-3xl md:text-3xl font-bold tracking-tight text-foreground leading-tight">
+      <div className={cn(
+        "flex flex-col gap-4",
+        centered ? "items-center text-center" : "sm:flex-row sm:items-center sm:justify-between"
+      )}>
+        <motion.div 
+          variants={itemVariants}
+          className={cn(
+            centered && "flex flex-col items-center"
+          )}
+        >
+          <h1 className={cn(
+            "text-2xl sm:text-3xl md:text-3xl font-bold tracking-tight text-foreground leading-tight",
+            centered && "text-center"
+          )}>
             {title}
           </h1>
           {subtitle && (
-            <p className="mt-2 text-lg text-muted-foreground max-w-3xl">
+            <p className={cn(
+              "mt-2 text-lg text-muted-foreground",
+              centered ? "max-w-2xl text-center mx-auto" : "max-w-3xl"
+            )}>
               {subtitle}
             </p>
           )}
@@ -101,7 +117,10 @@ export function PageHeader({
 
         {actions && (
           <motion.div 
-            className="flex items-center gap-3 mt-2 sm:mt-0"
+            className={cn(
+              "flex items-center gap-3 mt-2",
+              !centered && "sm:mt-0"
+            )}
             variants={itemVariants}
           >
             {actions}
