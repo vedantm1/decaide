@@ -25,27 +25,29 @@ html[data-theme="dark"] {
   --surface-4: hsl(222.2 84% 13%);   /* Highest elevation (tooltips) */
 }
 
-/* Body background */
+/* Body text color only - no background set to allow Vanta to show through */
 html.dark body,
 html[data-theme="dark"] body {
-  background-color: var(--dark-bg-primary) !important;
+  /* Remove background color to allow Vanta to show through */
+  background-color: transparent !important;
   color: var(--dark-text-primary) !important;
 }
 
-/* Main container background */
+/* Main container - transparent background to allow Vanta to show through */
 html.dark main,
 html[data-theme="dark"] main {
-  background-color: var(--dark-bg-primary) !important;
+  background-color: transparent !important;
 }
 
-/* Cards in dark mode */
+/* Cards in dark mode - translucent to allow Vanta waves to show through */
 html.dark .card,
 html.dark [class*="card"],
 html[data-theme="dark"] .card,
 html[data-theme="dark"] [class*="card"] {
-  background-color: var(--dark-bg-secondary) !important;
+  background-color: rgba(var(--card-rgb), var(--translucency-card)) !important;
   color: var(--dark-text-primary) !important;
   border-color: var(--dark-border) !important;
+  backdrop-filter: blur(4px) !important;
 }
 
 /* Headings and descriptive text */
@@ -81,10 +83,11 @@ html.dark [class*="text-"], html[data-theme="dark"] [class*="text-"] {
   color: var(--dark-text-primary) !important;
 }
 
-/* Sidebar fixes */
+/* Sidebar fixes - translucent to allow Vanta waves to show through */
 html.dark aside, html[data-theme="dark"] aside {
-  background-color: var(--dark-bg-secondary) !important;
+  background-color: rgba(var(--card-rgb), var(--translucency-sidebar)) !important;
   border-color: var(--dark-border) !important;
+  backdrop-filter: blur(4px) !important;
 }
 
 /* Input elements */
@@ -102,10 +105,11 @@ html[data-theme="dark"] table, html[data-theme="dark"] tr, html[data-theme="dark
   color: var(--dark-text-primary) !important;
 }
 
-/* White card backgrounds - specifically fixes the cards in Why DecA(I)de */
+/* White card backgrounds - specifically fixes the cards in Why DecA(I)de - translucent for Vanta */
 html.dark .bg-white, html[data-theme="dark"] .bg-white {
-  background-color: var(--dark-bg-secondary) !important;
+  background-color: rgba(var(--card-rgb), var(--translucency-card)) !important;
   color: var(--dark-text-primary) !important;
+  backdrop-filter: blur(4px) !important;
 }
 
 /* Fix slate backgrounds, but preserve light theme box */
@@ -115,7 +119,7 @@ html.dark .bg-slate-200:not([data-theme-option="light"]),
 html[data-theme="dark"] .bg-slate-50:not([data-theme-option="light"]), 
 html[data-theme="dark"] .bg-slate-100:not([data-theme-option="light"]), 
 html[data-theme="dark"] .bg-slate-200:not([data-theme-option="light"]) {
-  background-color: var(--dark-bg-primary) !important;
+  background-color: transparent !important;
 }
 
 /* Light theme box in dark mode */
@@ -125,16 +129,17 @@ html[data-theme="dark"] [data-theme-option="light"] {
   color: #000000 !important;
 }
 
-/* Settings page fixes */
+/* Settings page fixes - translucent for Vanta */
 html.dark .bg-white, 
 html.dark [class*="bg-white"],
 html.dark div[class*="from-white"], 
 html[data-theme="dark"] .bg-white,
 html[data-theme="dark"] [class*="bg-white"],
 html[data-theme="dark"] div[class*="from-white"] {
-  background-color: var(--dark-bg-secondary) !important;
+  background-color: rgba(var(--card-rgb), var(--translucency-card)) !important;
   background-image: none !important;
   color: var(--dark-text-primary) !important;
+  backdrop-filter: blur(4px) !important;
 }
 
 /* All color scheme boxes in settings to use dark mode proper styling */
@@ -241,11 +246,12 @@ html[data-theme="dark"] [role="option"]:hover {
   background-color: var(--dark-bg-highlight) !important;
 }
 
-/* Dashboard cards */
+/* Dashboard cards - translucent to allow Vanta waves to show through */
 html.dark .dashboard-card,
 html[data-theme="dark"] .dashboard-card {
-  background-color: var(--dark-bg-secondary) !important;
+  background-color: rgba(var(--card-rgb), var(--translucency-card)) !important;
   border-color: var(--dark-border) !important;
+  backdrop-filter: blur(4px) !important;
 }
 
 /* Progress bars and sliders */
