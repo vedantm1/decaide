@@ -25,10 +25,10 @@ import ThemeProvider from "@/lib/theme-provider";
 import { useEffect, useState } from "react";
 import { AnimatePresence } from "framer-motion";
 
-function Router({ useNewDesign }: { useNewDesign: boolean }) {
+function Router() {
   return (
     <Switch>
-      <ProtectedRoute path="/" component={useNewDesign ? DashboardNew : Dashboard} />
+      <ProtectedRoute path="/" component={DashboardNew} />
       <ProtectedRoute path="/roleplay" component={RoleplayPage} />
       <ProtectedRoute path="/performance-indicators" component={PerformanceIndicatorsPage} />
       <ProtectedRoute path="/tests" component={PracticeTestsPage} />
@@ -40,22 +40,13 @@ function Router({ useNewDesign }: { useNewDesign: boolean }) {
       <ProtectedRoute path="/subscribe" component={Subscribe} />
       <ProtectedRoute path="/interactions" component={InteractionShowcasePage} />
       <Route path="/why-decade" component={WhyDecadePage} />
-      <Route path="/auth" component={useNewDesign ? AuthNew : AuthNew} />
-      <Route path="/new" component={DashboardNew} />
+      <Route path="/auth" component={AuthNew} />
       <Route component={NotFound} />
     </Switch>
   );
 }
 
 function App() {
-  // Toggle between old and new design
-  const [useNewDesign, setUseNewDesign] = useState(() => {
-    if (typeof window === 'undefined') return true;
-    // Default to new design or check URL parameter for design preference
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get('design') === 'new' || localStorage.getItem('use-new-design') === 'true';
-  });
-  
   // Use the theme system instead of hardcoded background
   useEffect(() => {
     // Clean up previous background to use theme system
@@ -69,23 +60,8 @@ function App() {
     // Log theme applied
     console.log('Applied theme: aquaBlue, dark mode:', document.documentElement.classList.contains('dark'));
     
-    // Add keyboard shortcut for toggling design
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Alt+Shift+D to toggle design
-      if (e.altKey && e.shiftKey && e.key === 'D') {
-        setUseNewDesign(prev => {
-          const newValue = !prev;
-          localStorage.setItem('use-new-design', newValue.toString());
-          return newValue;
-        });
-      }
-    };
-    
-    window.addEventListener('keydown', handleKeyDown);
-    
     return () => {
       document.documentElement.classList.remove('theme-aquaBlue');
-      window.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
 
@@ -95,29 +71,11 @@ function App() {
         <UIStateProvider>
           <ThemeProvider>
             <MicroInteractionsProvider>
-              <div className={`app-container fade-in ${useNewDesign ? 'new-design' : ''}`}>
+              <div className="app-container fade-in new-design">
                 <AnimatePresence mode="wait">
-                  <Router useNewDesign={useNewDesign} />
+                  <Router />
                 </AnimatePresence>
                 <Toaster />
-                
-                {/* Design Toggle */}
-                <div className="fixed bottom-4 right-4 z-50">
-                  <button
-                    onClick={() => {
-                      setUseNewDesign(prev => {
-                        const newValue = !prev;
-                        localStorage.setItem('use-new-design', newValue.toString());
-                        return newValue;
-                      });
-                    }}
-                    className="bg-primary hover:bg-primary/90 text-white text-xs rounded-full p-2 shadow-lg"
-                    style={{ opacity: 0.7 }}
-                    title="Toggle UI Design (Alt+Shift+D)"
-                  >
-                    {useNewDesign ? 'Classic UI' : 'New UI'}
-                  </button>
-                </div>
               </div>
             </MicroInteractionsProvider>
           </ThemeProvider>
