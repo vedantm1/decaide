@@ -9,11 +9,12 @@ html[data-theme="dark"] {
   color-scheme: dark !important;
 }
 
-/* Card backgrounds in dark mode - specifically fixes Why DecA(I)de cards */
+/* Card backgrounds in dark mode - translucent for Vanta waves visibility */
 html.dark .bg-white,
 html[data-theme="dark"] .bg-white {
-  background-color: hsl(222.2 84% 8%) !important;
+  background-color: rgba(var(--card-rgb), var(--translucency-card)) !important;
   color: hsl(210 40% 98%) !important;
+  backdrop-filter: blur(var(--backdrop-blur)) !important;
 }
 
 /* Card content in dark mode */
@@ -48,16 +49,17 @@ html[data-theme="dark"] .bg-white td {
   color: hsl(210 40% 98%) !important;
 }
 
-/* Text inputs in dark mode */
+/* Text inputs in dark mode - translucent to allow Vanta waves */
 html.dark input,
 html.dark textarea,
 html.dark select,
 html[data-theme="dark"] input,
 html[data-theme="dark"] textarea,
 html[data-theme="dark"] select {
-  background-color: hsl(222.2 84% 12%) !important;
+  background-color: rgba(var(--card-rgb), 0.7) !important;
   color: hsl(210 40% 98%) !important;
-  border-color: hsl(217.2 32.6% 17.5%) !important;
+  border-color: rgba(var(--border-rgb), 0.5) !important;
+  backdrop-filter: blur(var(--backdrop-blur)) !important;
 }
 
 /* Input placeholders */
@@ -105,18 +107,21 @@ html[data-theme="dark"] table {
   border-color: hsl(217.2 32.6% 17.5%) !important;
 }
 
-/* Subtle background differentiation for UI elements */
+/* Subtle background differentiation for UI elements - translucent for Vanta waves */
 html.dark .dark-surface-1,
 html[data-theme="dark"] .dark-surface-1 {
-  background-color: hsl(222.2 84% 7%) !important;
+  background-color: rgba(var(--card-rgb), 0.5) !important;
+  backdrop-filter: blur(var(--backdrop-blur)) !important;
 }
 
 html.dark .dark-surface-2,
 html[data-theme="dark"] .dark-surface-2 {
-  background-color: hsl(222.2 84% 9%) !important;
+  background-color: rgba(var(--card-rgb), 0.6) !important;
+  backdrop-filter: blur(var(--backdrop-blur)) !important;
 }
 
 html.dark .dark-surface-3,
 html[data-theme="dark"] .dark-surface-3 {
-  background-color: hsl(222.2 84% 11%) !important;
+  background-color: rgba(var(--card-rgb), 0.7) !important;
+  backdrop-filter: blur(var(--backdrop-blur)) !important;
 }
