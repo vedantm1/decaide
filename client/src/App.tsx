@@ -25,7 +25,6 @@ import DiegoChat from "@/components/diego-guide/diego-chat";
 import ThemeProvider from "@/lib/theme-provider";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import UnderwaterBackground from "@/components/underwater-background";
 
 function Router() {
   return (
@@ -64,24 +63,7 @@ function App() {
         <ThemeProvider>
           <MicroInteractionsProvider>
             <DiegoGuideProvider>
-              {/* Add bubble elements directly */}
-              <div className="bubble"></div>
-              <div className="bubble"></div>
-              <div className="bubble"></div>
-              <div className="bubble"></div>
-              
-              {/* Add Diego the dolphin */}
-              <div className="diego-dolphin">
-                <div className="diego-body"></div>
-                <div className="diego-head"></div>
-                <div className="diego-snout"></div>
-                <div className="diego-eye">
-                  <div className="diego-pupil"></div>
-                </div>
-                <div className="diego-fin"></div>
-                <div className="diego-tail"></div>
-                <div className="diego-belly"></div>
-              </div>
+              {/* Use only the clean background with no extra elements */}
               <Router />
               <Toaster />
               <DiegoGuideManager />
