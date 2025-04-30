@@ -11,73 +11,125 @@ interface DiegoAvatarProps {
 // Animation properties for each emotion, using direct animation objects instead of variants
 const emotionAnimations = {
   neutral: {
-    eyes: {},
-    smile: {},
-    body: {
-      y: [0, -3, 0],
-      transition: {
-        y: {
-          repeat: Infinity,
-          duration: 2,
-          ease: "easeInOut"
-        }
-      }
-    }
-  },
-  happy: {
-    eyes: {
-      scaleY: [1, 0.8, 1],
-      transition: {
-        scaleY: {
-          repeat: Infinity,
-          duration: 2,
-          ease: "easeInOut",
-          repeatDelay: 3
-        }
-      }
-    },
-    smile: {
-      d: [
-        "M-6,3 C-3,6 3,6 6,3",
-        "M-6,3 C-3,8 3,8 6,3",
-        "M-6,3 C-3,6 3,6 6,3"
-      ],
-      transition: {
-        d: {
-          repeat: Infinity,
-          duration: 2,
-          ease: "easeInOut",
-          repeatDelay: 3
-        }
-      }
-    },
     body: {
       y: [0, -5, 0],
       transition: {
         y: {
-          repeat: Infinity,
-          duration: 1.5,
-          ease: "easeInOut"
-        }
-      }
-    }
-  },
-  thinking: {
-    eyes: {
-      x: [0, 3, 0, -3, 0],
-      transition: {
-        x: {
           repeat: Infinity,
           duration: 3,
           ease: "easeInOut"
         }
       }
     },
-    smile: {
-      d: "M-8,3 C-5,2 5,2 8,3",
+    fins: {
+      rotate: [0, 5, 0],
+      transition: {
+        rotate: {
+          repeat: Infinity,
+          duration: 3.5,
+          ease: "easeInOut"
+        }
+      }
     },
+    bottomFins: {
+      rotate: [0, -3, 0],
+      transition: {
+        rotate: {
+          repeat: Infinity,
+          duration: 2.5,
+          ease: "easeInOut"
+        }
+      }
+    },
+    beak: {
+      scale: [1, 1.03, 1],
+      transition: {
+        scale: {
+          repeat: Infinity,
+          duration: 2,
+          ease: "easeInOut"
+        }
+      }
+    },
+    soundWaves: {
+      opacity: [0, 1, 0],
+      transition: {
+        opacity: {
+          repeat: Infinity,
+          duration: 2,
+          ease: "easeInOut",
+          repeatDelay: 1
+        }
+      }
+    }
+  },
+  happy: {
     body: {
-      rotate: [0, -3, 0, 3, 0],
+      y: [0, -8, 0],
+      rotate: [0, 2, 0],
+      transition: {
+        y: {
+          repeat: Infinity,
+          duration: 2,
+          ease: "easeInOut"
+        },
+        rotate: {
+          repeat: Infinity,
+          duration: 2,
+          ease: "easeInOut"
+        }
+      }
+    },
+    fins: {
+      rotate: [0, 10, 0],
+      transition: {
+        rotate: {
+          repeat: Infinity,
+          duration: 1.5,
+          ease: "easeInOut"
+        }
+      }
+    },
+    bottomFins: {
+      rotate: [0, -5, 0],
+      transition: {
+        rotate: {
+          repeat: Infinity,
+          duration: 1.5,
+          ease: "easeInOut"
+        }
+      }
+    },
+    beak: {
+      scale: [1, 1.08, 1],
+      transition: {
+        scale: {
+          repeat: Infinity,
+          duration: 1.5,
+          ease: "easeInOut"
+        }
+      }
+    },
+    soundWaves: {
+      opacity: [0, 1, 0],
+      scale: [0.9, 1.1, 0.9],
+      transition: {
+        opacity: {
+          repeat: Infinity,
+          duration: 1,
+          ease: "easeInOut",
+        },
+        scale: {
+          repeat: Infinity,
+          duration: 1,
+          ease: "easeInOut"
+        }
+      }
+    }
+  },
+  thinking: {
+    body: {
+      rotate: [-2, 2, -2],
       transition: {
         rotate: {
           repeat: Infinity,
@@ -85,88 +137,173 @@ const emotionAnimations = {
           ease: "easeInOut"
         }
       }
+    },
+    fins: {
+      rotate: [0, 3, 0],
+      transition: {
+        rotate: {
+          repeat: Infinity,
+          duration: 3,
+          ease: "easeInOut"
+        }
+      }
+    },
+    bottomFins: {
+      rotate: [0, -2, 0],
+      transition: {
+        rotate: {
+          repeat: Infinity,
+          duration: 4,
+          ease: "easeInOut"
+        }
+      }
+    },
+    beak: {
+      scale: [1, 1.02, 1],
+      rotate: [0, -1, 0],
+      transition: {
+        scale: {
+          repeat: Infinity,
+          duration: 3,
+          ease: "easeInOut"
+        },
+        rotate: {
+          repeat: Infinity,
+          duration: 3,
+          ease: "easeInOut"
+        }
+      }
+    },
+    soundWaves: {
+      opacity: 0
     }
   },
   excited: {
-    eyes: {
-      scaleY: [1, 0.7, 1],
-      transition: {
-        scaleY: {
-          repeat: Infinity,
-          duration: 0.5,
-          ease: "easeInOut",
-        }
-      }
-    },
-    smile: {
-      d: [
-        "M-6,3 C-3,7 3,7 6,3",
-        "M-6,3 C-3,9 3,9 6,3",
-        "M-6,3 C-3,7 3,7 6,3"
-      ],
-      transition: {
-        d: {
-          repeat: Infinity,
-          duration: 0.5,
-          ease: "easeInOut",
-        }
-      }
-    },
     body: {
-      y: [0, -8, 0],
-      rotate: [0, -5, 5, -5, 0],
+      y: [0, -10, 0],
+      rotate: [-5, 5, -5],
       transition: {
         y: {
           repeat: Infinity,
           duration: 0.7,
-          ease: "easeInOut",
+          ease: "easeInOut"
         },
         rotate: {
           repeat: Infinity,
           duration: 0.7,
-          ease: "easeInOut",
+          ease: "easeInOut"
+        }
+      }
+    },
+    fins: {
+      rotate: [0, 15, 0, -15, 0],
+      transition: {
+        rotate: {
+          repeat: Infinity,
+          duration: 0.8,
+          ease: "easeInOut"
+        }
+      }
+    },
+    bottomFins: {
+      rotate: [0, -10, 0, 10, 0],
+      transition: {
+        rotate: {
+          repeat: Infinity,
+          duration: 0.8,
+          ease: "easeInOut"
+        }
+      }
+    },
+    beak: {
+      scale: [1, 1.1, 1],
+      rotate: [0, 2, 0, -2, 0],
+      transition: {
+        scale: {
+          repeat: Infinity,
+          duration: 0.7,
+          ease: "easeInOut"
+        },
+        rotate: {
+          repeat: Infinity,
+          duration: 0.7,
+          ease: "easeInOut"
+        }
+      }
+    },
+    soundWaves: {
+      opacity: [0, 1, 0],
+      scale: [0.8, 1.2, 0.8],
+      transition: {
+        opacity: {
+          repeat: Infinity,
+          duration: 0.5,
+          ease: "easeInOut"
+        },
+        scale: {
+          repeat: Infinity,
+          duration: 0.5,
+          ease: "easeInOut"
         }
       }
     }
   },
   confused: {
-    eyes: {
-      x: [0, 4, 0],
-      scaleX: [1, 1.2, 1],
-      transition: {
-        x: {
-          repeat: Infinity,
-          duration: 2.5,
-          ease: "easeInOut",
-        },
-        scaleX: {
-          repeat: Infinity,
-          duration: 2.5,
-          ease: "easeInOut",
-        }
-      }
-    },
-    smile: {
-      d: [
-        "M-6,3 C-2,0 2,0 6,3",
-        "M-6,3 C-2,-1 2,-1 6,3",
-        "M-6,3 C-2,0 2,0 6,3"
-      ],
-      transition: {
-        d: {
-          repeat: Infinity,
-          duration: 2.5,
-          ease: "easeInOut",
-        }
-      }
-    },
     body: {
       rotate: [0, -3, 3, 0],
+      y: [0, -2, 0],
       transition: {
         rotate: {
           repeat: Infinity,
           duration: 3,
+          ease: "easeInOut"
+        },
+        y: {
+          repeat: Infinity,
+          duration: 2.5,
+          ease: "easeInOut"
+        }
+      }
+    },
+    fins: {
+      rotate: [0, 3, -3, 0],
+      transition: {
+        rotate: {
+          repeat: Infinity,
+          duration: 2.5,
+          ease: "easeInOut"
+        }
+      }
+    },
+    bottomFins: {
+      rotate: [0, -2, 2, 0],
+      transition: {
+        rotate: {
+          repeat: Infinity,
+          duration: 2.5,
+          ease: "easeInOut"
+        }
+      }
+    },
+    beak: {
+      rotate: [0, -2, 0],
+      transition: {
+        rotate: {
+          repeat: Infinity,
+          duration: 2,
           ease: "easeInOut",
+          repeatDelay: 1
+        }
+      }
+    },
+    soundWaves: {
+      opacity: [0, 0.5, 0],
+      transition: {
+        opacity: {
+          repeat: Infinity,
+          duration: 3,
+          ease: "easeInOut",
+          repeatDelay: 2
         }
       }
     }
@@ -196,147 +333,158 @@ export default function DiegoAvatar({ emotion = 'neutral', size = 'md', classNam
         width={width}
         className="overflow-visible"
       >
-        {/* Simplified background for the button */}
-        <circle cx="0" cy="0" r="20" fill="#1AB7EA" />
-        
-        {/* Dolphin body - Exact match to reference image */}
+        {/* Main body - three-quarter view of Diego as a ghost-shape */}
         <motion.g 
           animate={animations?.body || {}}
         >
-          {/* Main body - simplified oval with straight bottom */}
+          {/* Base body shape - slightly angled for 3D effect */}
           <path
-            d="M-16,10 C-16,-10 -10,-16 0,-16 C10,-16 16,-10 16,10 L-16,10 Z"
+            d="M-18,12 C-18,-8 -12,-18 0,-18 C12,-18 18,-8 18,12 L-18,12 Z"
             fill="#1AB7EA"
             stroke="#000000"
             strokeWidth="2"
           />
           
-          {/* Spikes on the back/head - simplified */}
+          {/* Ridges/spikes along the back */}
           <path
-            d="M-14,-14 L-13,-15 L-11,-14 L-10,-15 L-8,-14 L-7,-15 L-5,-14 L-4,-15 L-2,-14 L-1,-15 L1,-14"
+            d="M-16,-14 L-15,-16 L-14,-14 L-13,-16 L-12,-14 L-11,-16 L-10,-14 L-9,-16 L-8,-14 L-7,-16 L-6,-14 L-5,-16 L-4,-14 L-3,-16 L-2,-14 L-1,-16 L0,-14 L1,-16 L2,-14"
             fill="none"
             stroke="#000000"
             strokeWidth="1.5"
           />
           
-          {/* Left side fin */}
-          <path
-            d="M-15,0 L-22,-5 L-15,-8 L-15,0"
-            fill="#1AB7EA"
-            stroke="#000000"
-            strokeWidth="2"
-          />
-          
-          {/* Right side fin */}
-          <path
-            d="M15,0 L22,-5 L15,-8 L15,0"
-            fill="#1AB7EA"
-            stroke="#000000"
-            strokeWidth="2"
-          />
-          
-          {/* Bottom fins */}
-          <path
-            d="M-10,10 L-15,17 L-8,15 L-10,10"
-            fill="#1AB7EA"
-            stroke="#000000"
-            strokeWidth="2"
-          />
-          
-          <path
-            d="M10,10 L15,17 L8,15 L10,10"
-            fill="#1AB7EA"
-            stroke="#000000"
-            strokeWidth="2"
-          />
-          
-          {/* Large mouth/beak - the distinctive feature */}
-          <path
-            d="M0,0 C8,-2 15,-2 18,0 C20,3 18,8 15,10 C10,12 5,10 0,5 Z"
-            fill="#000000"
-            strokeWidth="1"
-          />
-          
-          {/* Inner mouth detail (white) */}
-          <path
-            d="M2,2 C8,0 12,1 15,3 C18,5 15,8 10,9 C6,9 2,7 2,2 Z"
-            fill="#FFFFFF"
-            strokeWidth="0"
-          />
-          
-          {/* Sound wave indicators - curved lines */}
-          <path
-            d="M20,-2 C22,-2 22,-4 20,-4"
-            fill="none"
-            stroke="#000000"
-            strokeWidth="2"
-            strokeLinecap="round"
-          />
-          <path
-            d="M20,-6 C24,-6 24,-8 20,-8"
-            fill="none"
-            stroke="#000000"
-            strokeWidth="2"
-            strokeLinecap="round"
-          />
-          <path
-            d="M20,-10 C26,-10 26,-12 20,-12"
-            fill="none"
-            stroke="#000000"
-            strokeWidth="2"
-            strokeLinecap="round"
-          />
-          
-          {/* Eyes - curved lines in exact match to reference */}
-          <motion.g 
-            animate={animations?.eyes || {}}
-          >
-            {/* Left column of eye arcs */}
+          {/* Left side fin with origin point for animation */}
+          <motion.g animate={animations?.fins || {}}>
             <path
-              d="M-10,-2 C-8,0 -6,0 -4,-2"
-              fill="none"
+              d="M-15,0 L-25,-6 L-15,-10 L-15,0"
+              fill="#1AB7EA"
               stroke="#000000"
               strokeWidth="2"
-              strokeLinecap="round"
+              style={{ transformOrigin: "-15px 0px" }}
             />
+          </motion.g>
+          
+          {/* Right side fin with origin point for animation */}
+          <motion.g animate={animations?.fins || {}}>
             <path
-              d="M-10,-6 C-8,-4 -6,-4 -4,-6"
-              fill="none"
+              d="M15,0 L25,-6 L15,-10 L15,0"
+              fill="#1AB7EA"
               stroke="#000000"
               strokeWidth="2"
-              strokeLinecap="round"
+              style={{ transformOrigin: "15px 0px" }}
             />
+          </motion.g>
+          
+          {/* Bottom left fin with animation */}
+          <motion.g animate={animations?.bottomFins || {}}>
             <path
-              d="M-10,-10 C-8,-8 -6,-8 -4,-10"
-              fill="none"
+              d="M-10,12 L-18,18 L-8,16 L-10,12"
+              fill="#1AB7EA"
               stroke="#000000"
               strokeWidth="2"
-              strokeLinecap="round"
+              style={{ transformOrigin: "-10px 12px" }}
+            />
+          </motion.g>
+          
+          {/* Bottom right fin with animation */}
+          <motion.g animate={animations?.bottomFins || {}}>
+            <path
+              d="M10,12 L18,18 L8,16 L10,12"
+              fill="#1AB7EA"
+              stroke="#000000"
+              strokeWidth="2"
+              style={{ transformOrigin: "10px 12px" }}
+            />
+          </motion.g>
+          
+          {/* Animated beak/snout - angled for 3D effect */}
+          <motion.g animate={animations?.beak || {}}>
+            <path
+              d="M2,0 C10,-3 18,-3 22,0 C26,4 22,10 18,12 C10,14 0,12 2,0 Z"
+              fill="#000000"
+              stroke="#000000"
+              strokeWidth="0.5"
+              style={{ transformOrigin: "12px 4px" }}
             />
             
-            {/* Right column of eye arcs */}
+            {/* Inner mouth detail - white part */}
             <path
-              d="M3,-2 C5,0 7,0 9,-2"
+              d="M6,2 C12,0 16,0 19,3 C22,6 20,10 16,11 C10,12 4,9 6,2 Z"
+              fill="#FFFFFF"
+              strokeWidth="0"
+            />
+          </motion.g>
+          
+          {/* Sound wave indicators - curved lines with animations */}
+          <motion.g animate={animations?.soundWaves || {}}>
+            <path
+              d="M22,-1 C24,-1 24,-3 22,-3"
               fill="none"
               stroke="#000000"
               strokeWidth="2"
               strokeLinecap="round"
             />
             <path
-              d="M3,-6 C5,-4 7,-4 9,-6"
+              d="M23,-5 C26,-5 26,-7 23,-7"
               fill="none"
               stroke="#000000"
               strokeWidth="2"
               strokeLinecap="round"
             />
             <path
-              d="M3,-10 C5,-8 7,-8 9,-10"
+              d="M24,-9 C28,-9 28,-11 24,-11"
               fill="none"
               stroke="#000000"
               strokeWidth="2"
               strokeLinecap="round"
             />
           </motion.g>
+          
+          {/* Left eye arcs - exactly as in reference */}
+          <path
+            d="M-12,-3 C-10,-1 -8,-1 -6,-3"
+            fill="none"
+            stroke="#000000"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+          <path
+            d="M-12,-7 C-10,-5 -8,-5 -6,-7"
+            fill="none"
+            stroke="#000000"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+          <path
+            d="M-12,-11 C-10,-9 -8,-9 -6,-11"
+            fill="none"
+            stroke="#000000"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+          
+          {/* Right eye arcs - exactly as in reference */}
+          <path
+            d="M2,-3 C4,-1 6,-1 8,-3"
+            fill="none"
+            stroke="#000000"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+          <path
+            d="M2,-7 C4,-5 6,-5 8,-7"
+            fill="none"
+            stroke="#000000"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+          <path
+            d="M2,-11 C4,-9 6,-9 8,-11"
+            fill="none"
+            stroke="#000000"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
         </motion.g>
       </motion.svg>
     </div>
