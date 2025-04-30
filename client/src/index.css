@@ -13,6 +13,36 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Vanta.js translucency system
+   These variables control the translucency of UI elements
+   so the Vanta wave background shows through consistently */
+:root {
+  /* Translucency levels */
+  --translucency-card: 0.5;       /* For card backgrounds */
+  --translucency-header: 0.5;     /* For headers */
+  --translucency-sidebar: 0.5;    /* For sidebars */
+  --translucency-dialog: 0.8;     /* For dialogs/modals (more opaque) */
+  --translucency-dropdown: 0.9;   /* For dropdowns (mostly opaque) */
+  --translucency-border: 0.4;     /* For borders */
+  --backdrop-blur: 8px;           /* Consistent blur amount */
+  
+  /* Light mode RGB values for translucent elements */
+  --card-rgb: 255, 255, 255;
+  --background-rgb: 248, 250, 252;
+  --border-rgb: 226, 232, 240;
+  --muted-rgb: 241, 245, 249;
+  --primary-rgb: 37, 99, 235;
+}
+
+/* Dark mode RGB values */
+html.dark {
+  --card-rgb: 24, 24, 27;
+  --background-rgb: 9, 9, 11;
+  --border-rgb: 39, 39, 42;
+  --muted-rgb: 39, 39, 42;
+  --primary-rgb: 59, 130, 246;
+}
+
 /* Modern UI App Container */
 .app-container {
   display: flex;
@@ -67,15 +97,17 @@
   animation: fadeInScale 0.3s ease-out forwards;
 }
 
-/* Enhanced Card styles */
+/* Enhanced Card styles with Vanta.js translucency */
 .enhanced-card {
   border-radius: var(--radius);
-  background-color: var(--card);
-  border: 1px solid var(--border);
+  background-color: rgba(var(--card-rgb), var(--translucency-card));
+  backdrop-filter: blur(var(--backdrop-blur));
+  border: 1px solid rgba(var(--border-rgb), var(--translucency-border));
   padding: 1.5rem;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
 
 .enhanced-card::before {
@@ -95,6 +127,13 @@
   transform: scaleX(1);
 }
 
+/* Enhance readability for all text on translucent backgrounds */
+.enhanced-card h1, .enhanced-card h2, .enhanced-card h3, 
+.enhanced-card h4, .enhanced-card h5, .enhanced-card h6, 
+.enhanced-card p, .enhanced-card li, .enhanced-card a {
+  text-shadow: 0 0 1px rgba(var(--background-rgb), 0.1);
+}
+
 @layer base {
   * {
     @apply border-border;
@@ -106,6 +145,7 @@
 }
 
 @layer components {
+  /* Text contrast enhancements */
   .bubble-text-visible {
     @apply text-slate-900; /* Enhanced text contrast */
   }
@@ -114,6 +154,38 @@
     @apply text-slate-900; /* Enhanced marketing text contrast */
   }
 
+  /* Translucent UI elements for Vanta background visibility */
+  .translucent-header {
+    background-color: rgba(var(--card-rgb), var(--translucency-header));
+    backdrop-filter: blur(var(--backdrop-blur));
+    border-color: rgba(var(--border-rgb), var(--translucency-border));
+  }
+
+  .translucent-sidebar {
+    background-color: rgba(var(--card-rgb), var(--translucency-sidebar));
+    backdrop-filter: blur(var(--backdrop-blur));
+    border-color: rgba(var(--border-rgb), var(--translucency-border));
+  }
+
+  .translucent-card {
+    background-color: rgba(var(--card-rgb), var(--translucency-card));
+    backdrop-filter: blur(var(--backdrop-blur));
+    border-color: rgba(var(--border-rgb), var(--translucency-border));
+  }
+
+  .translucent-dialog {
+    background-color: rgba(var(--card-rgb), var(--translucency-dialog));
+    backdrop-filter: blur(var(--backdrop-blur));
+    border-color: rgba(var(--border-rgb), var(--translucency-border));
+  }
+
+  .translucent-dropdown {
+    background-color: rgba(var(--card-rgb), var(--translucency-dropdown));
+    backdrop-filter: blur(var(--backdrop-blur));
+    border-color: rgba(var(--border-rgb), var(--translucency-border));
+  }
+
+  /* Original components */
   .deca-cluster-badge {
     @apply absolute top-2 right-2 px-2 py-1 text-xs font-bold rounded-md text-white 
            shadow-sm transform rotate-3 border border-white border-opacity-30
