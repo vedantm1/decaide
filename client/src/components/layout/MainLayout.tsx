@@ -175,22 +175,51 @@ export function MainLayout({ children }: MainLayoutProps) {
                 {/* Stars/Points */}
                 <div className="hidden md:flex items-center gap-1.5 bg-primary/10 px-2.5 py-1 rounded-full">
                   <span className="text-primary text-lg">★</span>
-                  <span className="font-medium text-sm">{useAuth().user?.points || 0}</span>
+                  <span className="font-medium text-sm">{useAuth().user?.points || 0} points</span>
                 </div>
                 
-                {/* Subscription Type */}
-                <div className="hidden md:block">
-                  <span className="text-xs font-medium px-2 py-1 rounded-full bg-accent/10 text-accent capitalize">
-                    {useAuth().user?.subscriptionTier || 'Standard'} Plan
+                {/* Subscription Type with Stars */}
+                <div className="hidden md:flex items-center bg-accent/10 px-3 py-1.5 rounded-full">
+                  <span className="text-xs font-medium text-accent capitalize mr-1.5">
+                    {useAuth().user?.subscriptionTier || 'Standard'}
                   </span>
+                  {/* Display stars based on subscription tier */}
+                  <div className="flex">
+                    {(() => {
+                      const tier = useAuth().user?.subscriptionTier || 'standard';
+                      const totalStars = 5;
+                      let activeStars = 0;
+                      
+                      switch(tier.toLowerCase()) {
+                        case 'premium':
+                        case 'pro':
+                          activeStars = 5;
+                          break;
+                        case 'plus':
+                          activeStars = 3;
+                          break;
+                        default: // standard or free
+                          activeStars = 2;
+                      }
+                      
+                      return Array(totalStars).fill(0).map((_, i) => (
+                        <span 
+                          key={i}
+                          className={`text-xs ${i < activeStars ? 'text-yellow-400' : 'text-gray-400'}`}
+                        >
+                          ★
+                        </span>
+                      ));
+                    })()}
+                  </div>
                 </div>
                 
                 {/* Username */}
                 <div className="flex items-center gap-2">
                   <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                    {useAuth().user?.username?.[0]?.toUpperCase() || 'U'}
+                    {useAuth().user?.username?.[0]?.toUpperCase() || 'D'}
                   </div>
-                  <span className="hidden md:block text-sm font-medium">{useAuth().user?.username || 'User'}</span>
+                  <span className="hidden md:block text-sm font-medium">{useAuth().user?.username || 'DecAide User'}</span>
                 </div>
               </div>
             )}
