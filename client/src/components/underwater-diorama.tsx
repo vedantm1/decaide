@@ -510,14 +510,20 @@ const UnderwaterScene = () => {
       ))}
       
       {/* Coral */}
-      {coralPositions.map((position, i) => (
-        <Coral 
-          key={i} 
-          position={position} 
-          color={CORAL_COLORS[i % CORAL_COLORS.length]} 
-          type={['branch', 'fan', 'brain'][Math.floor(Math.random() * 3) as 0 | 1 | 2]} 
-        />
-      ))}
+      {coralPositions.map((position, i) => {
+        // Determine coral type safely with TypeScript
+        const coralTypes: Array<'branch' | 'fan' | 'brain'> = ['branch', 'fan', 'brain'];
+        const randomType = coralTypes[Math.floor(Math.random() * coralTypes.length)];
+        
+        return (
+          <Coral 
+            key={i} 
+            position={position} 
+            color={CORAL_COLORS[i % CORAL_COLORS.length]} 
+            type={randomType} 
+          />
+        );
+      })}
       
       {/* Treasure chest */}
       <TreasureChest position={[2, 0, 1]} />

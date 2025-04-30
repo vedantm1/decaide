@@ -158,8 +158,8 @@ function DiegoGuideManager() {
   
   return (
     <>
-      {/* Playful background animation for Memphis style */}
-      <PlayfulBackground enabled={visualStyle === 'memphis'} colorScheme={colorScheme} />
+      {/* Underwater diorama background */}
+      <UnderwaterDiorama />
 
       {/* Welcome banner removed as requested */}
 
