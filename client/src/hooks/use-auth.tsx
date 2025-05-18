@@ -57,7 +57,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
         
         if (isLoggedIn) {
-          setUser(MOCK_USER);
+          // Get stored username if available
+          const storedUsername = localStorage.getItem('username');
+          if (storedUsername) {
+            // Use the stored username instead of the mock one
+            setUser({
+              ...MOCK_USER,
+              username: storedUsername
+            });
+          } else {
+            setUser(MOCK_USER);
+          }
         } else {
           setUser(null);
         }
@@ -73,7 +83,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
   
   // Login function
-  const login = async (email: string, password: string) => {
+  const login = async (username: string, password: string) => {
     setLoading(true);
     
     try {
@@ -81,10 +91,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       // In a real app, validate credentials with a backend service
-      if (email && password) {
-        // Set auth token in localStorage (in a real app, this would be a JWT token)
+      if (username && password) {
+        // Set auth token and username in localStorage
         localStorage.setItem('isLoggedIn', 'true');
-        setUser(MOCK_USER);
+        localStorage.setItem('username', username);
+        // Create user data with the actual username entered by the user
+        const userData = {
+          ...MOCK_USER,
+          username: username,
+        };
+        setUser(userData);
         return;
       }
       
@@ -105,8 +121,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Simulate network request delay
       await new Promise(resolve => setTimeout(resolve, 500));
       
-      // Clear auth token from localStorage
+      // Clear auth token and username from localStorage
       localStorage.removeItem('isLoggedIn');
+      localStorage.removeItem('username');
       setUser(null);
     } catch (error) {
       console.error('Logout failed:', error);
