@@ -15,6 +15,7 @@ import SettingsPage from "@/pages/settings";
 import PricingPage from "@/pages/pricing";
 import WhyDecadePage from "@/pages/why-decade";
 import InteractionShowcasePage from "@/pages/interaction-showcase";
+
 import Checkout from "@/pages/checkout";
 import Subscribe from "@/pages/subscribe";
 // Import removed - now using direct script tags in index.html

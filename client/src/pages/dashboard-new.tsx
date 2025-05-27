@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useQuery } from "@tanstack/react-query";
 import { motion } from 'framer-motion';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { StatCard } from '@/components/ui/stat-card';
+import { EnhancedCard, AnimatedHeading, MotionButton, StaggerContainer, FloatingIcon } from '@/components/animations/enhanced-effects';
 import { 
   IconBarChart, 
   IconUsers, 
@@ -20,6 +21,14 @@ import { useAuth } from '@/hooks/use-auth';
 export default function DashboardNew() {
   const { user } = useAuth();
   const { themeMode } = useUIState();
+
+  // Initialize animations on component mount
+  useEffect(() => {
+    // Refresh AOS animations for dynamic content
+    if (typeof window !== 'undefined' && (window as any).AOS) {
+      (window as any).AOS.refresh();
+    }
+  }, []);
   
   // Animation variants
   const containerVariants = {
@@ -155,6 +164,7 @@ export default function DashboardNew() {
         <motion.div 
           className="mb-8 border rounded-xl overflow-hidden shadow-sm bg-card"
           variants={itemVariants}
+          data-aos="fade-up"
         >
           <div className="p-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
