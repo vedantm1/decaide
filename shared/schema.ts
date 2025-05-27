@@ -8,6 +8,7 @@ export const users = pgTable("users", {
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
   email: text("email"),
+  googleId: text("google_id").unique(),
   eventFormat: text("event_format"), // roleplay or written
   eventCode: text("event_code"),     // event code like PBM, ACT, etc.
   eventType: text("event_type"),     // Principles, Individual Series, etc.

@@ -13,5 +13,4 @@
   { "pi_code": "EC:017", "instructional_area": "Economics", "description": "Explain the concept of Gross Domestic Product (GDP)" },
   { "pi_code": "EI:001", "instructional_area": "Emotional Intelligence", "description": "Describe the nature of emotional intelligence" },
   { "pi_code": "EI:016", "instructional_area": "Emotional Intelligence", "description": "Explain the concept of self-esteem" }
-  // Continue by copying more PIs from the PDFs as needed!
 ]
