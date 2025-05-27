@@ -39,7 +39,10 @@ export interface IStorage {
   // User methods
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
+  getUserByGoogleId(googleId: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  linkGoogleAccount(userId: number, googleId: string): Promise<User | undefined>;
   updateLastLogin(id: number, date: Date): Promise<User | undefined>;
   updateUserSettings(id: number, settings: { 
     eventFormat?: string, 
@@ -177,6 +180,34 @@ export class MemStorage implements IStorage {
       if (user.username === username) {
         return user;
       }
+    }
+    return undefined;
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    for (const user of this.users.values()) {
+      if (user.email === email) {
+        return user;
+      }
+    }
+    return undefined;
+  }
+
+  async getUserByGoogleId(googleId: string): Promise<User | undefined> {
+    for (const user of this.users.values()) {
+      if (user.googleId === googleId) {
+        return user;
+      }
+    }
+    return undefined;
+  }
+
+  async linkGoogleAccount(userId: number, googleId: string): Promise<User | undefined> {
+    const user = this.users.get(userId);
+    if (user) {
+      user.googleId = googleId;
+      this.users.set(userId, user);
+      return user;
     }
     return undefined;
   }
@@ -1218,6 +1249,36 @@ export class DatabaseStorage implements IStorage {
         stripeSubscriptionId: userData.stripe_subscription_id
       };
       return user;
+    }
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    try {
+      const [user] = await db.select().from(users).where(eq(users.email, email));
+      return user;
+    } catch (error) {
+      console.error("Error in getUserByEmail:", error);
+      return undefined;
+    }
+  }
+
+  async getUserByGoogleId(googleId: string): Promise<User | undefined> {
+    try {
+      const [user] = await db.select().from(users).where(eq(users.googleId, googleId));
+      return user;
+    } catch (error) {
+      console.error("Error in getUserByGoogleId:", error);
+      return undefined;
+    }
+  }
+
+  async linkGoogleAccount(userId: number, googleId: string): Promise<User | undefined> {
+    try {
+      await db.update(users).set({ googleId }).where(eq(users.id, userId));
+      return await this.getUser(userId);
+    } catch (error) {
+      console.error("Error in linkGoogleAccount:", error);
+      return undefined;
     }
   }
 
