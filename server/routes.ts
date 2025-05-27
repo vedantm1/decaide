@@ -13,6 +13,8 @@ import aiRoutes from "./routes/aiRoutes";
 import chatRoutes from "./routes/chatRoutes";
 import { getOpenAIClient } from "./services/azureOpenai";
 import Stripe from "stripe";
+import mappingRoutes from "./mappingRoutes";
+
 
 if (!process.env.STRIPE_SECRET_KEY) {
   console.warn('Missing Stripe secret key. Stripe features will not work properly.');
@@ -31,6 +33,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Register Chat routes
   app.use("/api/chat", chatRoutes);
+
+  app.use("/api", mappingRoutes);
 
   // API routes
   // Get subscription info
