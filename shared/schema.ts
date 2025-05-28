@@ -165,18 +165,15 @@ export const DECA_CATEGORIES = {
   }
 };
 
-// DECA event types for grouping
+// DECA test types for practice tests
 export const EVENT_TYPE_GROUPS = [
-  "Principles",
-  "Team Decision Making",
-  "Individual Series",
-  "Professional Selling and Consulting",
-  "Business Operations Research",
-  "Project Management",
+  "Business Administration Core",
+  "Business Management and Administration", 
   "Entrepreneurship",
-  "Integrated Marketing Campaign",
-  "Personal Financial Literacy",
-  "Online Events"
+  "Finance",
+  "Hospitality and Tourism",
+  "Marketing",
+  "Personal Financial Literacy"
 ];
 
 // All DECA events organized by type
