@@ -14,7 +14,7 @@ import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { EVENT_TYPE_GROUPS } from "@shared/schema";
+
 
 // Form schema for test generation
 const testSchema = z.object({
@@ -25,6 +25,16 @@ const testSchema = z.object({
 });
 
 type TestFormValues = z.infer<typeof testSchema>;
+
+// Updated test types as requested
+const TEST_TYPES = [
+  "Business Management & Administration",
+  "Entrepreneurship", 
+  "Finance",
+  "Hospitality & Tourism",
+  "Marketing",
+  "Personal Financial Literacy"
+];
 
 // Test categories
 const TEST_CATEGORIES = [
@@ -138,7 +148,7 @@ export default function PracticeTestsPage() {
                     <SelectValue placeholder="Select test type" />
                   </SelectTrigger>
                   <SelectContent>
-                    {EVENT_TYPE_GROUPS.map((type) => (
+                    {TEST_TYPES.map((type) => (
                       <SelectItem key={type} value={type}>{type}</SelectItem>
                     ))}
                   </SelectContent>
