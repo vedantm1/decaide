@@ -151,17 +151,17 @@ export default function MobileHeader() {
                       <span>Performance Indicators</span>
                     </a>
                   </Link>
-                  <Link href="/tests">
+                  <Link href="/practice-tests">
                     <a 
                       onClick={() => setIsOpen(false)}
                       className={`flex items-center gap-3 px-4 py-2.5 rounded-lg font-medium text-sm ${
-                        isActive("/tests") 
+                        isActive("/practice-tests") 
                           ? "text-slate-800 bg-slate-100" 
                           : "text-slate-600 hover:bg-slate-100"
                       }`}
                     >
                       <i className={`fas fa-clipboard-check w-5 text-center ${
-                        isActive("/tests") ? "text-primary" : "text-slate-400"
+                        isActive("/practice-tests") ? "text-primary" : "text-slate-400"
                       }`}></i>
                       <span>Practice Tests</span>
                     </a>
