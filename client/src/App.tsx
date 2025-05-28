@@ -34,7 +34,7 @@ function Router() {
       <ProtectedRoute path="/" component={DashboardNew} />
       <ProtectedRoute path="/roleplay" component={RoleplayPage} />
       <ProtectedRoute path="/performance-indicators" component={PerformanceIndicatorsPage} />
-      <ProtectedRoute path="/practice-tests" component={PracticeTestsPage} />
+      <ProtectedRoute path="/tests" component={PracticeTestsPage} />
       <ProtectedRoute path="/written-events" component={WrittenEventsPage} />
       <ProtectedRoute path="/progress" component={MyProgressPage} />
       <ProtectedRoute path="/settings" component={SettingsPage} />
