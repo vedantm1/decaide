@@ -51,8 +51,8 @@ const TIME_LIMITS = [
   "No Time Limit",
   "30 Minutes",
   "60 Minutes",
-  "90 Minutes",
-  "120 Minutes (Standard)",
+  "90 Minutes (Standard)",
+  "120 Minutes",
 ];
 
 export default function PracticeTestsPage() {
