@@ -29,6 +29,7 @@ type TestFormValues = z.infer<typeof testSchema>;
 // Updated test types as requested
 const TEST_TYPES = [
   "Business Management & Administration",
+  "Business Administration Core",
   "Entrepreneurship", 
   "Finance",
   "Hospitality & Tourism",
