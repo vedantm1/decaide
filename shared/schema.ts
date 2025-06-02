@@ -778,3 +778,31 @@ export const PI_CATEGORIES = [
   "Hospitality & Tourism",
   "Business Administration"
 ];
+
+// Export arrays for practice test functionality
+export const testTypes = Object.keys(DECA_CATEGORIES);
+
+export const categoriesList = [
+  "Marketing Mix",
+  "Market Research", 
+  "Consumer Behavior",
+  "Digital Marketing",
+  "Sales Strategies",
+  "Financial Analysis",
+  "Investment Planning",
+  "Risk Management",
+  "Banking Services",
+  "Insurance Fundamentals",
+  "Business Operations",
+  "Management Principles",
+  "Human Resources",
+  "Strategic Planning",
+  "Leadership Skills",
+  "Customer Service",
+  "Hospitality Management",
+  "Tourism Marketing",
+  "Event Planning",
+  "Business Planning",
+  "Entrepreneurial Mindset",
+  "Innovation Strategies"
+];

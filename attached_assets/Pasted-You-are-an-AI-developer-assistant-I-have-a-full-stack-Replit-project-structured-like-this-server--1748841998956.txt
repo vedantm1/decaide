@@ -1,0 +1,130 @@
+You are an AI developer assistant. I have a full‑stack Replit project structured like this:
+
+server/
+
+index.ts (TypeScript + Express, listening on port 5000)
+
+routes/aiRoutes.ts (already defines a POST /api/ai/generate-test that calls generateTestQuestions)
+
+services/azureOpenai.ts (exports async function generateTestQuestions(params: { testType: string; categories: string[]; numQuestions: number; }): Promise<{ question: string; answer: string; }[]>)
+
+client/ (React + TypeScript, built with Vite)
+
+public/ (static assets)
+
+src/
+
+pages/practice-tests.tsx (the React page where users pick a DECA cluster, categories, and number of questions)
+
+pages/dashboard-new.tsx
+
+shared/schema.ts (exports arrays/objects for DECA Clusters and Categories)
+
+Environment variables for Azure OpenAI are already set in Replit as:
+AZURE_OPENAI_KEY
+AZURE_OPENAI_ENDPOINT
+AZURE_OPENAI_DEPLOYMENT
+
+The endpoint /api/ai/generate-test is already working if called with a POST JSON body of the form:
+{
+"testType": "Finance",
+"categories": ["Investing","Saving"],
+"numQuestions": 20
+}
+and it returns an array of { question, answer } pairs.
+
+Goal:
+
+Backend: Ensure the Express server (server/index.ts)
+
+Enables CORS so that Vite’s front end (running on the same host/port in dev) can call /api/ai/generate-test.
+
+Serves the React/Vite app in production (if requested).
+
+Keeps /api/ai/generate-test wired to call generateTestQuestions in services/azureOpenai.ts.
+
+Frontend: Update the React page client/src/pages/practice-tests.tsx so that:
+
+It renders a form with:
+
+A dropdown for testType (DECA Clusters, imported from shared/schema.ts).
+
+A multi‑select or checkboxes for categories (imported from shared/schema.ts).
+
+An input (number) for numQuestions.
+
+A “Generate” button.
+
+When the user clicks “Generate,” the code sends a POST to /api/ai/generate-test with JSON { testType, categories, numQuestions }.
+
+The page then displays the returned JSON array as a list of questions with their answers beneath them.
+
+Add loading/error states (simple “Loading…” text, “Error: …” text).
+
+Deliverables:
+
+server/index.ts (show me the full file, with:
+
+import cors from "cors"
+
+app.use(cors())
+
+Body parsing middleware for JSON
+
+Static‑file serving in production (app.use(express.static("client/dist"));)
+
+Mounting the existing routes/aiRoutes.ts under /api/ai.
+
+Listening on process.env.PORT || 5000.
+
+server/routes/aiRoutes.ts (if any updates needed):
+
+It should import generateTestQuestions from services/azureOpenai.ts.
+
+Define router.post("/generate-test", ...) that reads req.body.testType, req.body.categories, req.body.numQuestions, calls generateTestQuestions({ testType, categories, numQuestions }), and returns { test: [ { question, answer }, … ] } in JSON or res.status(400) if any field is missing, or res.status(500) on error.
+
+Export the router via export default router;.
+
+server/services/azureOpenai.ts (only if modified; otherwise say “No changes needed.”)
+
+client/src/pages/practice‑tests.tsx (full contents):
+
+Import React, useState, useEffect.
+
+Import testTypes and categoriesList from shared/schema.ts.
+
+Render a <select> for testType, checkboxes or a <MultiSelect> for categories, an <input type="number"> for numQuestions, and a “Generate” <button>.
+
+On click, run fetch("/api/ai/generate-test", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({ testType, categories, numQuestions }) }).
+
+Display “Loading…” while waiting, render errors if any, and once data arrives, loop through test to print each question and answer.
+
+client/src/shared/schema.ts (confirm exports or show modifications)
+
+README snippet at the bottom of your response that explains:
+
+How to set the three Azure env vars (AZURE_OPENAI_KEY, AZURE_OPENAI_ENDPOINT, AZURE_OPENAI_DEPLOYMENT) in Replit.
+
+How to run the full stack in development: npm run dev.
+
+How to build for production (npm run build for Vite + ensure Express serves client/dist`).
+
+Additional Constraints:
+
+Use only ES modules (import/export) and TypeScript syntax.
+
+In index.ts, do not add any extra routes beyond serving static files and mounting aiRoutes.
+
+The front‑end React code must use functional components and hooks (useState, useEffect).
+
+Do not hard‑code the Azure key in code—always read process.env.AZURE_OPENAI_KEY, etc.
+
+If the agent detects any missing information (like an import path from schema.ts), it should ask a clarifying question instead of guessing.
+
+Output exactly the requested files in the order below (with no extra commentary):
+— server/index.ts (full contents)
+— server/routes/aiRoutes.ts (full contents)
+— server/services/azureOpenai.ts (only if modified; otherwise say “No changes needed.”)
+— client/src/pages/practice‑tests.tsx (full contents)
+— client/src/shared/schema.ts (confirm exports or show modifications)
+— README snippet
