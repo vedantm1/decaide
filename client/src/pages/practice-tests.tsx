@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -45,14 +45,418 @@ const DIFFICULTY_TYPES = [
   "ICDC"
 ];
 
-// Test categories
-const TEST_CATEGORIES = [
-  { name: "Business Law", count: 15 },
-  { name: "Economics", count: 10 },
-  { name: "Finance", count: 8 },
-  { name: "Management", count: 12 },
-  { name: "Marketing", count: 15 },
-];
+// Test categories with authentic DECA exam blueprint data
+const EXAM_BLUEPRINTS = {
+  "Business Administration Core": {
+    "District": {
+      "Business Law": 1,
+      "Communications": 15,
+      "Customer Relations": 5,
+      "Economics": 7,
+      "Emotional Intelligence": 22,
+      "Entrepreneurship": 0,
+      "Financial Analysis": 16,
+      "Human Resources Management": 1,
+      "Information Management": 10,
+      "Marketing": 1,
+      "Operations": 11,
+      "Professional Development": 11,
+      "Strategic Management": 0
+    },
+    "Association": {
+      "Business Law": 1,
+      "Communications": 15,
+      "Customer Relations": 5,
+      "Economics": 7,
+      "Emotional Intelligence": 22,
+      "Entrepreneurship": 0,
+      "Financial Analysis": 16,
+      "Human Resources Management": 1,
+      "Information Management": 10,
+      "Marketing": 1,
+      "Operations": 11,
+      "Professional Development": 11,
+      "Strategic Management": 0
+    },
+    "ICDC": {
+      "Business Law": 4,
+      "Communications": 11,
+      "Customer Relations": 4,
+      "Economics": 12,
+      "Emotional Intelligence": 19,
+      "Entrepreneurship": 1,
+      "Financial Analysis": 13,
+      "Human Resources Management": 1,
+      "Information Management": 11,
+      "Marketing": 1,
+      "Operations": 13,
+      "Professional Development": 9,
+      "Strategic Management": 1
+    }
+  },
+  "Business Management & Administration": {
+    "District": {
+      "Business Law": 5,
+      "Communications": 7,
+      "Customer Relations": 2,
+      "Economics": 6,
+      "Emotional Intelligence": 9,
+      "Entrepreneurship": 1,
+      "Financial Analysis": 7,
+      "Human Resources Management": 1,
+      "Information Management": 7,
+      "Knowledge Management": 6,
+      "Marketing": 1,
+      "Operations": 21,
+      "Professional Development": 6,
+      "Project Management": 6,
+      "Quality Management": 3,
+      "Risk Management": 4,
+      "Strategic Management": 8
+    },
+    "Association": {
+      "Business Law": 5,
+      "Communications": 6,
+      "Customer Relations": 2,
+      "Economics": 5,
+      "Emotional Intelligence": 8,
+      "Entrepreneurship": 0,
+      "Financial Analysis": 6,
+      "Human Resources Management": 0,
+      "Information Management": 6,
+      "Knowledge Management": 7,
+      "Marketing": 1,
+      "Operations": 24,
+      "Professional Development": 5,
+      "Project Management": 7,
+      "Quality Management": 4,
+      "Risk Management": 5,
+      "Strategic Management": 9
+    },
+    "ICDC": {
+      "Business Law": 5,
+      "Communications": 6,
+      "Customer Relations": 1,
+      "Economics": 4,
+      "Emotional Intelligence": 6,
+      "Entrepreneurship": 0,
+      "Financial Analysis": 5,
+      "Human Resources Management": 0,
+      "Information Management": 6,
+      "Knowledge Management": 9,
+      "Marketing": 1,
+      "Operations": 26,
+      "Professional Development": 4,
+      "Project Management": 8,
+      "Quality Management": 5,
+      "Risk Management": 5,
+      "Strategic Management": 10
+    }
+  },
+  "Entrepreneurship": {
+    "District": {
+      "Business Law": 4,
+      "Channel Management": 3,
+      "Communications": 1,
+      "Customer Relations": 1,
+      "Economics": 3,
+      "Emotional Intelligence": 6,
+      "Entrepreneurship": 14,
+      "Financial Analysis": 10,
+      "Human Resources Management": 5,
+      "Information Management": 4,
+      "Market Planning": 5,
+      "Marketing": 1,
+      "Marketing-Information Management": 2,
+      "Operations": 13,
+      "Pricing": 2,
+      "Product/Service Management": 4,
+      "Professional Development": 5,
+      "Promotion": 6,
+      "Quality Management": 1,
+      "Risk Management": 2,
+      "Selling": 1,
+      "Strategic Management": 7
+    },
+    "Association": {
+      "Business Law": 4,
+      "Channel Management": 3,
+      "Communications": 0,
+      "Customer Relations": 1,
+      "Economics": 3,
+      "Emotional Intelligence": 6,
+      "Entrepreneurship": 13,
+      "Financial Analysis": 9,
+      "Human Resources Management": 4,
+      "Information Management": 3,
+      "Market Planning": 6,
+      "Marketing": 1,
+      "Marketing-Information Management": 3,
+      "Operations": 13,
+      "Pricing": 3,
+      "Product/Service Management": 4,
+      "Professional Development": 5,
+      "Promotion": 7,
+      "Quality Management": 1,
+      "Risk Management": 3,
+      "Selling": 1,
+      "Strategic Management": 7
+    },
+    "ICDC": {
+      "Business Law": 3,
+      "Channel Management": 3,
+      "Communications": 1,
+      "Customer Relations": 1,
+      "Economics": 2,
+      "Emotional Intelligence": 4,
+      "Entrepreneurship": 14,
+      "Financial Analysis": 11,
+      "Human Resources Management": 4,
+      "Information Management": 2,
+      "Market Planning": 6,
+      "Marketing": 1,
+      "Marketing-Information Management": 2,
+      "Operations": 14,
+      "Pricing": 2,
+      "Product/Service Management": 4,
+      "Professional Development": 4,
+      "Promotion": 8,
+      "Quality Management": 1,
+      "Risk Management": 4,
+      "Selling": 1,
+      "Strategic Management": 8
+    }
+  },
+  "Finance": {
+    "District": {
+      "Business Law": 7,
+      "Communications": 5,
+      "Customer Relations": 5,
+      "Economics": 6,
+      "Emotional Intelligence": 9,
+      "Entrepreneurship": 1,
+      "Financial Analysis": 24,
+      "Financial-Information Management": 9,
+      "Human Resources Management": 1,
+      "Information Management": 6,
+      "Marketing": 1,
+      "Operations": 6,
+      "Professional Development": 13,
+      "Risk Management": 6,
+      "Strategic Management": 1
+    },
+    "Association": {
+      "Business Law": 8,
+      "Communications": 4,
+      "Customer Relations": 5,
+      "Economics": 5,
+      "Emotional Intelligence": 8,
+      "Entrepreneurship": 0,
+      "Financial Analysis": 28,
+      "Financial-Information Management": 10,
+      "Human Resources Management": 0,
+      "Information Management": 5,
+      "Marketing": 1,
+      "Operations": 5,
+      "Professional Development": 14,
+      "Risk Management": 7,
+      "Strategic Management": 0
+    },
+    "ICDC": {
+      "Business Law": 7,
+      "Communications": 3,
+      "Customer Relations": 4,
+      "Economics": 4,
+      "Emotional Intelligence": 6,
+      "Entrepreneurship": 0,
+      "Financial Analysis": 30,
+      "Financial-Information Management": 12,
+      "Human Resources Management": 0,
+      "Information Management": 5,
+      "Marketing": 1,
+      "Operations": 4,
+      "Professional Development": 15,
+      "Risk Management": 9,
+      "Strategic Management": 0
+    }
+  },
+  "Hospitality & Tourism": {
+    "District": {
+      "Business Law": 3,
+      "Communications": 5,
+      "Customer Relations": 8,
+      "Economics": 6,
+      "Emotional Intelligence": 9,
+      "Entrepreneurship": 1,
+      "Financial Analysis": 8,
+      "Human Resources Management": 2,
+      "Information Management": 14,
+      "Knowledge Management": 0,
+      "Market Planning": 1,
+      "Marketing": 1,
+      "Operations": 13,
+      "Pricing": 1,
+      "Product/Service Management": 6,
+      "Professional Development": 8,
+      "Promotion": 2,
+      "Quality Management": 1,
+      "Risk Management": 1,
+      "Selling": 7,
+      "Strategic Management": 3
+    },
+    "Association": {
+      "Business Law": 3,
+      "Communications": 4,
+      "Customer Relations": 9,
+      "Economics": 6,
+      "Emotional Intelligence": 9,
+      "Entrepreneurship": 0,
+      "Financial Analysis": 7,
+      "Human Resources Management": 1,
+      "Information Management": 15,
+      "Knowledge Management": 1,
+      "Market Planning": 1,
+      "Marketing": 1,
+      "Operations": 13,
+      "Pricing": 1,
+      "Product/Service Management": 7,
+      "Professional Development": 7,
+      "Promotion": 3,
+      "Quality Management": 1,
+      "Risk Management": 1,
+      "Selling": 8,
+      "Strategic Management": 2
+    },
+    "ICDC": {
+      "Business Law": 2,
+      "Communications": 3,
+      "Customer Relations": 9,
+      "Economics": 5,
+      "Emotional Intelligence": 7,
+      "Entrepreneurship": 0,
+      "Financial Analysis": 7,
+      "Human Resources Management": 1,
+      "Information Management": 15,
+      "Knowledge Management": 1,
+      "Market Planning": 2,
+      "Marketing": 2,
+      "Operations": 13,
+      "Pricing": 1,
+      "Product/Service Management": 9,
+      "Professional Development": 6,
+      "Promotion": 3,
+      "Quality Management": 1,
+      "Risk Management": 2,
+      "Selling": 9,
+      "Strategic Management": 2
+    }
+  },
+  "Marketing": {
+    "District": {
+      "Business Law": 2,
+      "Channel Management": 5,
+      "Communications": 5,
+      "Customer Relations": 2,
+      "Economics": 6,
+      "Emotional Intelligence": 9,
+      "Entrepreneurship": 1,
+      "Financial Analysis": 6,
+      "Human Resources Management": 1,
+      "Information Management": 5,
+      "Market Planning": 4,
+      "Marketing": 1,
+      "Marketing-Information Management": 11,
+      "Operations": 6,
+      "Pricing": 3,
+      "Product/Service Management": 11,
+      "Professional Development": 6,
+      "Promotion": 9,
+      "Selling": 6,
+      "Strategic Management": 1
+    },
+    "Association": {
+      "Business Law": 2,
+      "Channel Management": 6,
+      "Communications": 4,
+      "Customer Relations": 2,
+      "Economics": 5,
+      "Emotional Intelligence": 8,
+      "Entrepreneurship": 0,
+      "Financial Analysis": 5,
+      "Human Resources Management": 0,
+      "Information Management": 4,
+      "Market Planning": 4,
+      "Marketing": 1,
+      "Marketing-Information Management": 14,
+      "Operations": 5,
+      "Pricing": 4,
+      "Product/Service Management": 13,
+      "Professional Development": 5,
+      "Promotion": 11,
+      "Selling": 7,
+      "Strategic Management": 0
+    },
+    "ICDC": {
+      "Business Law": 1,
+      "Channel Management": 7,
+      "Communications": 3,
+      "Customer Relations": 1,
+      "Economics": 4,
+      "Emotional Intelligence": 6,
+      "Entrepreneurship": 0,
+      "Financial Analysis": 4,
+      "Human Resources Management": 0,
+      "Information Management": 3,
+      "Market Planning": 5,
+      "Marketing": 1,
+      "Marketing-Information Management": 16,
+      "Operations": 4,
+      "Pricing": 4,
+      "Product/Service Management": 15,
+      "Professional Development": 5,
+      "Promotion": 13,
+      "Selling": 8,
+      "Strategic Management": 0
+    }
+  },
+  "Personal Financial Literacy": {
+    "District": {
+      "Earning Income": 25,
+      "Spending": 14,
+      "Saving": 15,
+      "Investing": 15,
+      "Managing Credit": 16,
+      "Managing Risk": 15
+    },
+    "Association": {
+      "Earning Income": 20,
+      "Spending": 14,
+      "Saving": 14,
+      "Investing": 19,
+      "Managing Credit": 19,
+      "Managing Risk": 14
+    },
+    "ICDC": {
+      "Earning Income": 16,
+      "Spending": 14,
+      "Saving": 13,
+      "Investing": 21,
+      "Managing Credit": 21,
+      "Managing Risk": 15
+    }
+  }
+};
+
+// Function to get categories for selected test type and difficulty
+const getTestCategories = (testType: string, difficultyType: string) => {
+  const blueprint = EXAM_BLUEPRINTS[testType as keyof typeof EXAM_BLUEPRINTS];
+  if (!blueprint) return [];
+  
+  const categories = blueprint[difficultyType as keyof typeof blueprint];
+  if (!categories) return [];
+  
+  return Object.entries(categories).map(([name, count]) => ({ name, count }));
+};
 
 // Time limit options
 const TIME_LIMITS = [
@@ -75,7 +479,7 @@ export default function PracticeTestsPage() {
     defaultValues: {
       testType: "Business Management & Administration",
       difficultyType: "District",
-      categories: TEST_CATEGORIES.map(cat => cat.name),
+      categories: getTestCategories("Business Management & Administration", "District").map(cat => cat.name),
       numQuestions: 50,
       timeLimit: "120 Minutes (Standard)",
     },
@@ -83,6 +487,17 @@ export default function PracticeTestsPage() {
   
   // Watch for form values
   const numQuestions = watch("numQuestions");
+  const selectedTestType = watch("testType");
+  const selectedDifficultyType = watch("difficultyType");
+  
+  // Get current test categories based on selections
+  const currentCategories = getTestCategories(selectedTestType, selectedDifficultyType);
+  
+  // Update categories when test type or difficulty changes
+  useEffect(() => {
+    const newCategories = getTestCategories(selectedTestType, selectedDifficultyType);
+    setValue("categories", newCategories.map(cat => cat.name));
+  }, [selectedTestType, selectedDifficultyType, setValue]);
   
   // Generate test mutation
   const generateTest = useMutation({
@@ -191,7 +606,7 @@ export default function PracticeTestsPage() {
               <div>
                 <Label className="text-foreground/80">Question Categories</Label>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3">
-                  {TEST_CATEGORIES.map((category) => (
+                  {currentCategories.map((category) => (
                     <div key={category.name} className="flex items-center space-x-2">
                       <Checkbox 
                         id={`category-${category.name}`}
