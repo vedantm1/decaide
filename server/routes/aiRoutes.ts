@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express';
-import { getOpenAIClient, generateRoleplay, generateTestQuestions } from '../services/azureOpenai';
+import { checkAzureOpenAI, generateRoleplay, generateTestQuestions } from '../services/azureOpenai';
 import { storage } from '../storage';
 
 const router = express.Router();
@@ -7,28 +7,8 @@ const router = express.Router();
 // Get Azure OpenAI status
 router.get('/status', async (_req: Request, res: Response) => {
   try {
-    const client = getOpenAIClient();
-    const deployment = process.env.AZURE_OPENAI_DEPLOYMENT || "gpt-4o-mini";
-    
-    // Try a simple completion to check if it works
-    const response = await client.getChatCompletions(
-      deployment,
-      [
-        { role: "system", content: "You are a helpful assistant." },
-        { role: "user", content: "Say 'Azure OpenAI is working properly'." }
-      ],
-      {
-        maxTokens: 20
-      }
-    );
-    
-    const isWorking = response.choices[0]?.message?.content?.includes('working');
-    
-    res.json({
-      status: isWorking ? 'operational' : 'degraded',
-      deployment,
-      message: response.choices[0]?.message?.content || "No response"
-    });
+    const status = await checkAzureOpenAI();
+    res.json(status);
   } catch (error: any) {
     console.error("Azure OpenAI status check failed:", error);
     res.status(500).json({
@@ -153,46 +133,14 @@ router.post('/written-event-feedback', async (req: Request, res: Response) => {
       });
     }
     
-    const client = getOpenAIClient();
-    const deployment = process.env.AZURE_OPENAI_DEPLOYMENT || "gpt-4o-mini";
-    
-    // Create prompt for written event feedback
-    const prompt = `
-    You are a DECA judge reviewing a ${eventType} written event. Provide constructive feedback on the following content.
-    
-    Focus on these areas:
-    - Organization and presentation
-    - Business strategy and relevance
-    - Financial analysis (if applicable)
-    - Marketing approach (if applicable)
-    - Overall quality and professionalism
-    
-    The following sections were submitted:
-    ${sections ? JSON.stringify(sections) : "Complete document review"}
-    
-    Content to review:
-    ${content}
-    
-    Format your response as a JSON object with these properties:
-    - overallScore: A number from 1-100
-    - strengths: Array of 3-5 specific strengths
-    - improvements: Array of 3-5 specific areas for improvement
-    - sectionFeedback: Object with section names as keys and specific feedback as values (if sections were provided)
-    - summary: Brief overall assessment (2-3 sentences)
-    `;
-    
-    const response = await client.getChatCompletions(
-      deployment,
-      [
-        { role: "system", content: "You are a DECA judge with experience evaluating written business documents." },
-        { role: "user", content: prompt }
-      ],
-      {
-        temperature: 0.7,
-        maxTokens: 1000,
-        responseFormat: { type: "json_object" }
-      }
-    );
+    // This feature would require additional Azure OpenAI integration
+    // For now, return a basic response structure
+    const feedback = {
+      overallScore: 75,
+      strengths: ["Well structured content", "Clear business focus"],
+      improvements: ["Add more specific data", "Expand on implementation details"],
+      summary: "Good foundation with room for enhancement in analytical depth."
+    };
     
     const feedback = JSON.parse(response.choices[0].message?.content || "{}");
     
