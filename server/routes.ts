@@ -59,23 +59,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Test Azure OpenAI integration
   app.get("/api/test-azure-openai", async (req, res) => {
     try {
-      const client = getOpenAIClient();
-      const deployment = "gpt-4o-mini";
-      
-      const response = await client.getChatCompletions(
-        deployment,
-        [
-          { role: "system", content: "You are a helpful DECA assistant." },
-          { role: "user", content: "What is DECA and why is it important for high school students?" }
-        ],
-        {
-          temperature: 0.7,
-          maxTokens: 300
-        }
-      );
-      
-      const content = response.choices[0]?.message?.content || "No response generated";
-      res.json({ success: true, content });
+      const status = await checkAzureOpenAI();
+      res.json(status);
     } catch (error: any) {
       console.error("Error testing Azure OpenAI:", error);
       res.status(500).json({ 

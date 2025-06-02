@@ -225,8 +225,6 @@ router.post('/roleplay-feedback', async (req: Request, res: Response) => {
   }
   
   try {
-    const client = getOpenAIClient();
-    
     // Diego's roleplay feedback system prompt
     const systemMessage = `You are Diego, a friendly dolphin AI coach who provides constructive feedback on DECA roleplay responses.
     
@@ -242,8 +240,7 @@ Keep your feedback concise (maximum 5 sentences total), positive, and focus on h
 Use occasional aquatic metaphors like "dive deeper into" or "make a splash with" to maintain the dolphin persona.`;
     
     // Get the appropriate response from Diego for roleplay feedback
-    const response = await client.getChatCompletions(
-      process.env.AZURE_OPENAI_DEPLOYMENT!,
+    const response = await makeAzureRequest(
       [
         { role: 'system', content: systemMessage },
         { role: 'user', content: `Roleplay ID: ${roleplayId}\n\nStudent Response: ${userResponse}` }
@@ -291,8 +288,6 @@ router.post('/explain-pi', async (req: Request, res: Response) => {
   }
   
   try {
-    const client = getOpenAIClient();
-    
     // System prompt for PI explanations
     const systemMessage = `You are Diego, a friendly dolphin AI coach who specializes in explaining DECA performance indicators to students.
     
@@ -307,8 +302,7 @@ Explain the following performance indicator in a concise, friendly way. Format y
 Keep your total response under 5 sentences, be positive and educational. Use light business terminology appropriate for high school students.`;
     
     // Get the response for PI explanation
-    const response = await client.getChatCompletions(
-      process.env.AZURE_OPENAI_DEPLOYMENT!,
+    const response = await makeAzureRequest(
       [
         { role: 'system', content: systemMessage },
         { role: 'user', content: `Performance indicator: "${indicator}" from the ${category || 'business'} category` }
