@@ -149,17 +149,24 @@ export async function generateTestQuestions(params: {
   const numQuestions = Math.min(params.numQuestions || 10, 20); // Limit to 20 questions max
   
   const prompt = `
-  Create ${numQuestions} multiple-choice questions for a DECA ${params.testType} test.
+  Create ${numQuestions} high-quality multiple-choice questions for a DECA ${params.testType} test.
   The questions should cover the following categories: ${params.categories.join(", ")}.
   Distribute the questions evenly across the categories.
 
-  Format your response as a JSON array of question objects, where each object has:
-  - id: A unique numeric ID
-  - question: The question text
-  - options: An array of 4 possible answers labeled as strings "A", "B", "C", and "D"
+  Each question should:
+  - Be realistic and relevant to actual business scenarios
+  - Test practical knowledge and application of concepts
+  - Include plausible distractors that test common misconceptions
+  - Be at an appropriate difficulty level for high school DECA competitors
+
+  Format your response as a JSON object with a "questions" array, where each question object has:
+  - id: A unique numeric ID (starting from 1)
+  - question: The question text (clear and concise)
+  - options: An array of exactly 4 possible answers as strings
   - correctAnswer: The index of the correct answer (0-3)
-  - explanation: A brief explanation of why the correct answer is correct
-  - category: The category this question belongs to
+  - explanation: A detailed explanation of why the correct answer is right and why others are wrong
+  - category: The category this question belongs to (from the provided list)
+  - difficulty: Either "easy", "medium", or "hard"
   `;
   
   try {
