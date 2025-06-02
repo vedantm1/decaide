@@ -3,6 +3,7 @@ import cors from "cors";
 import { createServer } from "http";
 import path from "path";
 import aiRoutes from "./routes/aiRoutes.js";
+import { setupVite, serveStatic } from "./vite.js";
 
 const app = express();
 
@@ -47,14 +48,14 @@ app.use((req, res, next) => {
 // Mount AI routes
 app.use("/api/ai", aiRoutes);
 
-// Serve static files in production
+const port = process.env.PORT || 5000;
+const server = createServer(app);
+
+// Setup development or production serving
 if (process.env.NODE_ENV === "production") {
-  app.use(express.static("client/dist"));
-  
-  // Catch-all handler for SPA
-  app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "../client/dist/index.html"));
-  });
+  serveStatic(app);
+} else {
+  setupVite(app, server);
 }
 
 // Error handling middleware
@@ -65,9 +66,6 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
   res.status(status).json({ message });
   console.error(err);
 });
-
-const port = process.env.PORT || 5000;
-const server = createServer(app);
 
 server.listen(port, () => {
   console.log(`Server running on port ${port}`);
