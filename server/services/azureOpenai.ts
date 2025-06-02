@@ -49,7 +49,7 @@ export async function checkAzureOpenAI(): Promise<{
     const client = getOpenAIClient();
     
     // Try to get deployments
-    const deploymentId = process.env.AZURE_OPENAI_DEPLOYMENT || "gpt-4o-mini";
+    const deploymentId = process.env.AZURE_OPENAI_DEPLOYMENT || "decaide_test";
     
     // Try a simple chat completion to check connectivity
     await client.getChatCompletions(
@@ -90,7 +90,7 @@ export async function generateRoleplay(params: {
   businessType?: string;
 }) {
   const client = getOpenAIClient();
-  const deploymentId = process.env.AZURE_OPENAI_DEPLOYMENT || "gpt-4o-mini";
+  const deploymentId = process.env.AZURE_OPENAI_DEPLOYMENT || "decaide_test";
   
   const difficulty = params.difficultyLevel || "medium";
   const businessType = params.businessType || "retail business";
@@ -144,7 +144,7 @@ export async function generateTestQuestions(params: {
   numQuestions: number;
 }) {
   const client = getOpenAIClient();
-  const deploymentId = process.env.AZURE_OPENAI_DEPLOYMENT || "gpt-4o-mini";
+  const deploymentId = process.env.AZURE_OPENAI_DEPLOYMENT || "decaide_test";
   
   const numQuestions = Math.min(params.numQuestions || 10, 20); // Limit to 20 questions max
   
