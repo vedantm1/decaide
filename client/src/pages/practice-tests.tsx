@@ -19,6 +19,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 // Form schema for test generation
 const testSchema = z.object({
   testType: z.string().min(1, "Please select a test type"),
+  difficultyType: z.string().min(1, "Please select a difficulty type"),
   categories: z.array(z.string()).min(1, "Select at least one category"),
   numQuestions: z.number().min(10).max(100),
   timeLimit: z.string(),
@@ -35,6 +36,13 @@ const TEST_TYPES = [
   "Hospitality & Tourism",
   "Marketing",
   "Personal Financial Literacy"
+];
+
+// Difficulty types
+const DIFFICULTY_TYPES = [
+  "District",
+  "State", 
+  "ICDC"
 ];
 
 // Test categories
@@ -66,6 +74,7 @@ export default function PracticeTestsPage() {
     resolver: zodResolver(testSchema),
     defaultValues: {
       testType: "Business Management & Administration",
+      difficultyType: "District",
       categories: TEST_CATEGORIES.map(cat => cat.name),
       numQuestions: 50,
       timeLimit: "120 Minutes (Standard)",
@@ -156,6 +165,26 @@ export default function PracticeTestsPage() {
                 </Select>
                 {errors.testType && (
                   <p className="text-destructive text-sm mt-1">{errors.testType.message}</p>
+                )}
+              </div>
+
+              <div>
+                <Label htmlFor="difficultyType" className="text-foreground/80">Difficulty Type</Label>
+                <Select 
+                  defaultValue={watch("difficultyType")}
+                  onValueChange={(value) => setValue("difficultyType", value)}
+                >
+                  <SelectTrigger className="w-full bg-background/80 mt-2">
+                    <SelectValue placeholder="Select difficulty type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {DIFFICULTY_TYPES.map((type) => (
+                      <SelectItem key={type} value={type}>{type}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {errors.difficultyType && (
+                  <p className="text-destructive text-sm mt-1">{errors.difficultyType.message}</p>
                 )}
               </div>
               
