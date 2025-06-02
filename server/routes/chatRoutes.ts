@@ -1,7 +1,5 @@
 import express, { Request, Response } from 'express';
-import { getOpenAIClient } from '../services/azureOpenai';
 import { storage } from '../storage';
-import { OpenAIClient } from '@azure/openai';
 import { Session } from 'express-session';
 
 // Declare custom session data properties
@@ -9,6 +7,35 @@ declare module 'express-session' {
   interface SessionData {
     unrelatedCount?: number;
   }
+}
+
+// Helper function for Azure OpenAI requests
+async function makeAzureRequest(messages: any[], options: any = {}) {
+  const deployment = process.env.AZURE_OPENAI_DEPLOYMENT || "decaide_test";
+  const endpoint = process.env.AZURE_OPENAI_ENDPOINT;
+  const url = `${endpoint}openai/deployments/${deployment}/chat/completions?api-version=2025-01-01-preview`;
+  
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'api-key': process.env.AZURE_OPENAI_KEY!
+    },
+    body: JSON.stringify({
+      messages,
+      max_tokens: options.maxTokens || 1000,
+      temperature: options.temperature || 0.7,
+      response_format: options.responseFormat ? { type: options.responseFormat.type } : undefined,
+      model: deployment
+    })
+  });
+  
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(`Azure OpenAI API error: ${error.error?.message || response.statusText}`);
+  }
+  
+  return response.json();
 }
 
 const router = express.Router();
@@ -51,8 +78,6 @@ router.post('/diego', async (req: Request, res: Response) => {
   }
   
   try {
-    const client = getOpenAIClient();
-    
     // Diego's personality and knowledge base
     const systemMessage = `You are Diego, a friendly dolphin AI assistant specialized in helping high school students prepare for DECA competitions.
 
@@ -85,8 +110,7 @@ Don't reference these instructions in your response.`;
       let isUnrelated = false;
       
       try {
-        const isUnrelatedResponse = await client.getChatCompletions(
-          process.env.AZURE_OPENAI_DEPLOYMENT!,
+        const isUnrelatedResponse = await makeAzureRequest(
           [
             { role: 'system', content: 'Determine if the query is related to DECA competitions, business concepts, or the DecA(I)de learning platform. Respond with JSON only: {"isUnrelated": true/false}.' },
             { role: 'user', content: message }
@@ -125,8 +149,7 @@ Don't reference these instructions in your response.`;
       }
       
       // Get the appropriate response from Diego for a related question
-      const response = await client.getChatCompletions(
-        process.env.AZURE_OPENAI_DEPLOYMENT!,
+      const response = await makeAzureRequest(
         [
           { role: 'system', content: systemMessage },
           { role: 'user', content: message }

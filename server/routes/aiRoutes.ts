@@ -135,19 +135,17 @@ router.post('/written-event-feedback', async (req: Request, res: Response) => {
     
     // This feature would require additional Azure OpenAI integration
     // For now, return a basic response structure
-    const feedback = {
+    const writtenFeedback = {
       overallScore: 75,
       strengths: ["Well structured content", "Clear business focus"],
       improvements: ["Add more specific data", "Expand on implementation details"],
       summary: "Good foundation with room for enhancement in analytical depth."
     };
     
-    const feedback = JSON.parse(response.choices[0].message?.content || "{}");
-    
     // Record usage
     await storage.recordWrittenEventGeneration(req.user!.id);
     
-    res.json(feedback);
+    res.json(writtenFeedback);
   } catch (error: any) {
     console.error("Error generating written event feedback:", error);
     res.status(500).json({ 

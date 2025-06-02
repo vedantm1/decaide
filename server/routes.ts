@@ -11,7 +11,7 @@ import {
 } from "@shared/schema";
 import aiRoutes from "./routes/aiRoutes";
 import chatRoutes from "./routes/chatRoutes";
-import { getOpenAIClient } from "./services/azureOpenai";
+import { checkAzureOpenAI } from "./services/azureOpenai";
 import Stripe from "stripe";
 import mappingRoutes from "./mappingRoutes";
 
