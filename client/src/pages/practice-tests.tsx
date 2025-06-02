@@ -452,7 +452,10 @@ const getTestCategories = (testType: string, difficultyType: string) => {
   const blueprint = EXAM_BLUEPRINTS[testType as keyof typeof EXAM_BLUEPRINTS];
   if (!blueprint) return [];
   
-  const categories = blueprint[difficultyType as keyof typeof blueprint];
+  // Map "State" to "District" since they have the same question counts
+  const mappedDifficulty = difficultyType === "State" ? "District" : difficultyType;
+  
+  const categories = blueprint[mappedDifficulty as keyof typeof blueprint];
   if (!categories) return [];
   
   return Object.entries(categories).map(([name, count]) => ({ name, count }));
