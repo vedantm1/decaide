@@ -1,33 +1,49 @@
-// server/services/azureOpenai.ts
-import 'dotenv/config';
-import { OpenAIClient, AzureKeyCredential } from '@azure/openai';
-
 /**
- * We keep your existing helper that lazily creates a single OpenAIClient instance.
+ * Make a direct HTTP request to Azure OpenAI
+ * Uses environment variables for configuration:
+ * - AZURE_OPENAI_KEY: API key for Azure OpenAI
+ * - AZURE_OPENAI_ENDPOINT: Azure OpenAI service endpoint URL
+ * - AZURE_OPENAI_DEPLOYMENT: Deployment name
  */
-let openaiClient: OpenAIClient | null = null;
-
-/**
- * Returns a singleton OpenAIClient, throwing if the environment variables are missing.
- */
-export function getOpenAIClient(): OpenAIClient {
-  if (!openaiClient) {
-    if (!process.env.AZURE_OPENAI_KEY) {
-      throw new Error('AZURE_OPENAI_KEY environment variable is required');
-    }
-    if (!process.env.AZURE_OPENAI_ENDPOINT) {
-      throw new Error('AZURE_OPENAI_ENDPOINT environment variable is required');
-    }
-
-    const credential = new AzureKeyCredential(process.env.AZURE_OPENAI_KEY);
-    openaiClient = new OpenAIClient(process.env.AZURE_OPENAI_ENDPOINT, credential);
+async function makeAzureOpenAIRequest(messages: any[], options: any = {}) {
+  if (!process.env.AZURE_OPENAI_KEY) {
+    throw new Error("AZURE_OPENAI_KEY environment variable is required");
   }
-  return openaiClient;
+  
+  if (!process.env.AZURE_OPENAI_ENDPOINT) {
+    throw new Error("AZURE_OPENAI_ENDPOINT environment variable is required");
+  }
+  
+  const deployment = process.env.AZURE_OPENAI_DEPLOYMENT || "decaide_test";
+  const endpoint = process.env.AZURE_OPENAI_ENDPOINT;
+  const url = `${endpoint}openai/deployments/${deployment}/chat/completions?api-version=2025-01-01-preview`;
+  
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'api-key': process.env.AZURE_OPENAI_KEY
+    },
+    body: JSON.stringify({
+      messages,
+      max_tokens: options.maxTokens || 1000,
+      temperature: options.temperature || 0.7,
+      response_format: options.responseFormat ? { type: options.responseFormat.type } : undefined,
+      model: deployment
+    })
+  });
+  
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(`Azure OpenAI API error: ${error.error?.message || response.statusText}`);
+  }
+  
+  return response.json();
 }
 
 /**
- * Checks whether Azure OpenAI is configured and reachable.
- * (This is presumably already in your file; we leave it as-is.)
+ * Check if the Azure OpenAI configuration is valid and the service is accessible
+ * @returns Object with status and details of the check
  */
 export async function checkAzureOpenAI(): Promise<{
   isConfigured: boolean;
@@ -36,160 +52,148 @@ export async function checkAzureOpenAI(): Promise<{
   error?: string;
 }> {
   try {
-    // 1) Check if env vars are set
+    // Check if environment variables are set
     if (!process.env.AZURE_OPENAI_KEY || !process.env.AZURE_OPENAI_ENDPOINT) {
       return {
         isConfigured: false,
         isConnected: false,
-        error: 'Azure OpenAI environment variables are not configured',
+        error: "Azure OpenAI environment variables are not configured"
       };
     }
-
-    // 2) Create client
-    const client = getOpenAIClient();
-
-    // 3) Attempt a simple chat call to verify connectivity
-    const deploymentId = process.env.AZURE_OPENAI_DEPLOYMENT || 'gpt-4o-mini';
-
-    await client.getChatCompletions(deploymentId, [
-      { role: 'system', content: 'You are a helpful assistant.' },
-      { role: 'user', content: 'Hello!' },
-    ], {
-      maxTokens: 10,
-    });
-
+    
+    const deploymentId = process.env.AZURE_OPENAI_DEPLOYMENT || "decaide_test";
+    
+    // Try a simple chat completion to check connectivity
+    await makeAzureOpenAIRequest(
+      [
+        { role: "system", content: "You are a helpful assistant." },
+        { role: "user", content: "Hello!" }
+      ],
+      { maxTokens: 10 }
+    );
+    
     return {
       isConfigured: true,
       isConnected: true,
-      deploymentId,
+      deploymentId
     };
+    
   } catch (error: any) {
     return {
-      isConfigured: !!(process.env.AZURE_OPENAI_KEY && process.env.AZURE_OPENAI_ENDPOINT),
+      isConfigured: !!process.env.AZURE_OPENAI_KEY && !!process.env.AZURE_OPENAI_ENDPOINT,
       isConnected: false,
-      error: error.message || 'Unknown error connecting to Azure OpenAI',
+      error: error.message
     };
   }
 }
 
 /**
- * ========================
- *  ADD THE FOLLOWING AT THE BOTTOM:
- * ========================
+ * Generate a roleplay scenario using Azure OpenAI
+ * @param params Parameters for the roleplay generation
+ * @returns Generated roleplay scenario
  */
+export async function generateRoleplay(params: {
+  instructionalArea: string;
+  performanceIndicators: string[];
+  difficultyLevel: string;
+  businessType?: string;
+}) {
+  const difficulty = params.difficultyLevel || "medium";
+  const businessType = params.businessType || "retail business";
+  
+  const prompt = `
+  Create a realistic DECA roleplay scenario for a ${difficulty} difficulty level. 
+  The scenario should focus on the instructional area of "${params.instructionalArea}" 
+  and include the following performance indicators: ${params.performanceIndicators.join(", ")}.
+  The scenario should involve a ${businessType}.
+
+  Format your response as a JSON object with the following properties:
+  - title: A catchy title for the roleplay
+  - scenario: A 2-3 paragraph description of the business situation
+  - performanceIndicators: An array of the provided performance indicators
+  - difficulty: The difficulty level provided
+  - businessType: The type of business involved
+  - meetWith: The title/role of the person the student will be meeting with in the roleplay
+  `;
+  
+  try {
+    const response = await makeAzureOpenAIRequest(
+      [
+        { role: "system", content: "You are a DECA roleplay scenario generator. Create realistic, challenging, and educational DECA roleplay scenarios for high school students." },
+        { role: "user", content: prompt }
+      ],
+      {
+        temperature: 0.7,
+        maxTokens: 800,
+        responseFormat: { type: "json_object" }
+      }
+    );
+    
+    const roleplay = JSON.parse(response.choices[0].message?.content || "{}");
+    return roleplay;
+    
+  } catch (error) {
+    console.error("Error generating roleplay:", error);
+    throw error;
+  }
+}
 
 /**
- * Parameters for test question generation (simple version for API routes).
+ * Generate practice test questions using Azure OpenAI
+ * @param params Parameters for test question generation
+ * @returns Generated test questions
  */
-export interface GenerateTestParams {
+export async function generateTestQuestions(params: {
   testType: string;
   categories: string[];
   numQuestions: number;
-}
-
-/**
- * Generates DECA test questions using Azure OpenAI.
- */
-export async function generateTestQuestions(params: GenerateTestParams): Promise<any> {
-  const { testType, categories, numQuestions } = params;
-
+}) {
+  const numQuestions = Math.min(params.numQuestions || 10, 50); // Allow up to 50 questions
+  
   const prompt = `
-You are a DECA test question generator. Create ${numQuestions} multiple-choice questions for the ${testType} event.
+  Create ${numQuestions} high-quality multiple-choice questions for a DECA ${params.testType} test.
+  The questions should cover the following categories: ${params.categories.join(", ")}.
+  Distribute the questions evenly across the categories.
 
-Requirements:
-- Focus on these categories: ${categories.join(', ')}
-- Each question should present a realistic business scenario
-- Provide 4 multiple choice options (A, B, C, D)
-- Include the correct answer
-- Questions should be appropriate for high school DECA competition level
+  Each question should:
+  - Be realistic and relevant to actual business scenarios
+  - Test practical knowledge and application of concepts
+  - Include plausible distractors that test common misconceptions
+  - Be at an appropriate difficulty level for high school DECA competitors
 
-Format your response as a JSON object with this structure:
-{
-  "questions": [
-    {
-      "id": 1,
-      "question": "Question text here...",
-      "options": ["A) Option 1", "B) Option 2", "C) Option 3", "D) Option 4"],
-      "correctAnswer": "A",
-      "category": "Category name",
-      "explanation": "Brief explanation of why this is correct"
-    }
-  ]
-}
-`;
-
-  const client = getOpenAIClient();
-  const deploymentName = process.env.AZURE_OPENAI_DEPLOYMENT || 'gpt-4o-mini';
-
-  const response = await client.getChatCompletions(deploymentName, [
-    { role: 'system', content: 'You are a DECA competition expert who creates realistic business test questions.' },
-    { role: 'user', content: prompt }
-  ], {
-    maxTokens: 2000,
-    temperature: 0.7,
-    responseFormat: { type: "json_object" }
-  });
-
-  const content = response.choices[0].message?.content || '{"questions": []}';
-  const testData = JSON.parse(content);
-  return testData;
-}
-
-/**
- * Parameters for roleplay scenario generation.
- */
-export interface GenerateRoleplayParams {
-  instructionalArea: string;
-  performanceIndicators: string[];
-  difficultyLevel: 'District' | 'State' | 'ICDC';
-  businessType?: string;
-}
-
-/**
- * Generates a DECA roleplay scenario using Azure OpenAI.
- */
-export async function generateRoleplay(params: GenerateRoleplayParams): Promise<any> {
-  const { instructionalArea, performanceIndicators, difficultyLevel, businessType } = params;
-
-  const prompt = `
-You are a DECA roleplay scenario generator. Create a realistic business scenario for the ${difficultyLevel} competition level.
-
-Requirements:
-- Instructional Area: ${instructionalArea}
-- Performance Indicators to assess: ${performanceIndicators.join(', ')}
-- Business Type: ${businessType || 'General business'}
-- Difficulty Level: ${difficultyLevel}
-
-Generate a complete roleplay scenario that includes:
-1. A realistic business situation/problem
-2. Background context about the company
-3. Your role in the scenario
-4. Specific tasks or decisions you need to make
-5. Key stakeholders involved
-
-Format your response as a JSON object with these properties:
-- title: Brief title for the scenario
-- situation: The main business situation/problem
-- background: Company background and context
-- yourRole: Description of the participant's role
-- tasks: Array of specific tasks or decisions to make
-- stakeholders: Array of key people involved
-- performanceIndicators: The PIs being assessed
-- difficultyLevel: The competition level
-`;
-
-  const client = getOpenAIClient();
-  const deploymentName = process.env.AZURE_OPENAI_DEPLOYMENT || 'gpt-4o-mini';
-
-  const response = await client.getChatCompletions(deploymentName, [
-    { role: 'system', content: 'You are a DECA competition expert who creates realistic business roleplay scenarios.' },
-    { role: 'user', content: prompt }
-  ], {
-    maxTokens: 1000,
-    temperature: 0.7,
-    responseFormat: { type: "json_object" }
-  });
-
-  const roleplayData = JSON.parse(response.choices[0].message?.content || '{}');
-  return roleplayData;
+  Format your response as a JSON object with a "questions" array, where each question object has:
+  - id: A unique numeric ID (starting from 1)
+  - question: The question text (clear and concise)
+  - options: An array of exactly 4 possible answers as strings
+  - correctAnswer: The index of the correct answer (0-3)
+  - explanation: A detailed explanation of why the correct answer is right and why others are wrong
+  - category: The category this question belongs to (from the provided list)
+  - difficulty: Either "easy", "medium", or "hard"
+  `;
+  
+  try {
+    const response = await makeAzureOpenAIRequest(
+      [
+        { role: "system", content: "You are a DECA test question generator. Create realistic, challenging, and educational multiple-choice questions for high school DECA students." },
+        { role: "user", content: prompt }
+      ],
+      {
+        temperature: 0.7,
+        maxTokens: 3000,
+        responseFormat: { type: "json_object" }
+      }
+    );
+    
+    const questionsObj = JSON.parse(response.choices[0].message?.content || "{}");
+    const questions = Array.isArray(questionsObj) ? questionsObj : questionsObj.questions || [];
+    
+    return {
+      testType: params.testType,
+      questions
+    };
+    
+  } catch (error) {
+    console.error("Error generating test questions:", error);
+    throw error;
+  }
 }
