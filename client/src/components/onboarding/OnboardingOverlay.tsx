@@ -12,43 +12,70 @@ interface OnboardingOverlayProps {
 }
 
 const DECA_CAREER_CLUSTERS = {
+  "Business Administration Core": [
+    { name: "Principles of Business Management and Administration", abbrev: "PBM" },
+    { name: "Principles of Entrepreneurship", abbrev: "PEN" },
+    { name: "Principles of Finance", abbrev: "PFN" },
+    { name: "Principles of Hospitality and Tourism", abbrev: "PHT" },
+    { name: "Principles of Marketing", abbrev: "PMK" }
+  ],
   "Business Management & Administration": [
-    { name: "Human Resources Management", abbrev: "HRM" },
-    { name: "Business Services Marketing", abbrev: "BSM" }
-  ],
-  "Finance": [
-    { name: "Accounting Applications", abbrev: "ACT" },
-    { name: "Business Finance", abbrev: "BFS" },
-    { name: "Financial Consulting", abbrev: "FCN" },
-    { name: "Personal Financial Literacy", abbrev: "PFL" }
-  ],
-  "Hospitality & Tourism": [
-    { name: "Hotel & Lodging Management", abbrev: "HLM" },
-    { name: "Quick Serve Restaurant Management", abbrev: "QSR" },
-    { name: "Restaurant & Food Service Management", abbrev: "RMS" },
-    { name: "Travel & Tourism", abbrev: "TTM" }
-  ],
-  "Marketing": [
-    { name: "Automotive Services Marketing", abbrev: "ASM" },
-    { name: "Fashion Merchandising & Marketing", abbrev: "FMM" },
-    { name: "Marketing", abbrev: "MKT" },
-    { name: "Professional Selling", abbrev: "PSE" },
-    { name: "Retail Merchandising", abbrev: "RMA" },
-    { name: "Sports & Entertainment Marketing", abbrev: "SEM" }
+    { name: "Business Law and Ethics Team Decision Making", abbrev: "BLTDM" },
+    { name: "Human Resources Management Series", abbrev: "HRM" },
+    { name: "Business Services Operations Research", abbrev: "BOR" },
+    { name: "Business Solutions Project", abbrev: "PMBS" },
+    { name: "Career Development Project", abbrev: "PMCD" },
+    { name: "Community Awareness Project", abbrev: "PMCA" },
+    { name: "Community Giving Project", abbrev: "PMCG" }
   ],
   "Entrepreneurship": [
-    { name: "Entrepreneurship Innovation Plan", abbrev: "EIP" },
-    { name: "Entrepreneurship Growth Plan", abbrev: "EGP" },
-    { name: "Independent Business Plan", abbrev: "IBP" }
+    { name: "Entrepreneurship Team Decision Making", abbrev: "ETDM" },
+    { name: "Entrepreneurship Series", abbrev: "ENT" },
+    { name: "Business Growth Plan", abbrev: "EBG" },
+    { name: "Franchise Business Plan", abbrev: "EFB" },
+    { name: "Independent Business Plan", abbrev: "EIB" },
+    { name: "Innovation Plan", abbrev: "EIP" },
+    { name: "International Business Plan", abbrev: "IBP" },
+    { name: "Start-Up Business Plan", abbrev: "ESB" }
+  ],
+  "Finance": [
+    { name: "Financial Services Team Decision Making", abbrev: "FTDM" },
+    { name: "Accounting Applications Series", abbrev: "ACT" },
+    { name: "Business Finance Series", abbrev: "BFS" },
+    { name: "Finance Operations Research", abbrev: "FOR" },
+    { name: "Financial Consulting", abbrev: "FCE" },
+    { name: "Financial Literacy Project", abbrev: "PMFL" }
+  ],
+  "Hospitality & Tourism": [
+    { name: "Hospitality Services Team Decision Making", abbrev: "HTDM" },
+    { name: "Travel and Tourism Team Decision Making", abbrev: "TTDM" },
+    { name: "Hotel and Lodging Management Series", abbrev: "HLM" },
+    { name: "Quick Serve Restaurant Management Series", abbrev: "QSRM" },
+    { name: "Restaurant and Food Service Management Series", abbrev: "RFSM" },
+    { name: "Hospitality and Tourism Operations Research", abbrev: "HTOR" },
+    { name: "Hospitality and Tourism Professional Selling", abbrev: "HTPS" }
+  ],
+  "Marketing": [
+    { name: "Buying and Merchandising Team Decision Making", abbrev: "BTDM" },
+    { name: "Marketing Management Team Decision Making", abbrev: "MTDM" },
+    { name: "Sports and Entertainment Marketing Team Decision Making", abbrev: "STDM" },
+    { name: "Apparel and Accessories Marketing Series", abbrev: "AAM" },
+    { name: "Automotive Services Marketing Series", abbrev: "ASM" },
+    { name: "Business Services Marketing Series", abbrev: "BSM" },
+    { name: "Food Marketing Series", abbrev: "FMS" },
+    { name: "Buying and Merchandising Operations Research", abbrev: "BMOR" },
+    { name: "Sports and Entertainment Marketing Operations Research", abbrev: "SEOR" },
+    { name: "Marketing Communications Series", abbrev: "MCS" },
+    { name: "Retail Merchandising Series", abbrev: "RMS" },
+    { name: "Sports and Entertainment Marketing Series", abbrev: "SEM" },
+    { name: "Integrated Marketing Campaign-Event", abbrev: "IMCE" },
+    { name: "Integrated Marketing Campaign-Product", abbrev: "IMCP" },
+    { name: "Integrated Marketing Campaign-Service", abbrev: "IMCS" },
+    { name: "Sales Project", abbrev: "PMSP" },
+    { name: "Professional Selling", abbrev: "PSE" }
   ],
   "Personal Financial Literacy": [
     { name: "Personal Financial Literacy", abbrev: "PFL" }
-  ],
-  "Business Administration Core": [
-    { name: "Principles of Business Administration", abbrev: "PBA" },
-    { name: "Principles of Finance", abbrev: "PFN" },
-    { name: "Principles of Hospitality & Tourism", abbrev: "PHT" },
-    { name: "Principles of Marketing", abbrev: "PMK" }
   ]
 };
 
@@ -175,30 +202,56 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
   // Create blur overlay effect for tutorial
   useEffect(() => {
     if (currentStep === 'tutorial') {
-      // Add blur to all elements except the highlighted one
       const currentSelector = TUTORIAL_STEPS[tutorialStep].selector;
-      const allElements = document.querySelectorAll('*:not(.onboarding-overlay)');
       const targetElement = document.querySelector(currentSelector);
       
-      allElements.forEach(el => {
-        if (el !== targetElement && !targetElement?.contains(el)) {
-          (el as HTMLElement).style.filter = 'blur(2px)';
-          (el as HTMLElement).style.transition = 'filter 0.3s ease-in-out';
-        }
-      });
+      // Add blur to main content area but not the sidebar or target element
+      const mainContent = document.querySelector('main');
+      const sidebar = document.querySelector('aside');
+      
+      if (mainContent && !targetElement?.closest('main')) {
+        (mainContent as HTMLElement).style.filter = 'blur(3px)';
+        (mainContent as HTMLElement).style.transition = 'filter 0.3s ease-in-out';
+      }
+      
+      if (sidebar && targetElement?.closest('aside')) {
+        // Blur sidebar items except the target
+        const sidebarItems = sidebar.querySelectorAll('a[data-tutorial]');
+        sidebarItems.forEach(item => {
+          if (item !== targetElement) {
+            (item as HTMLElement).style.filter = 'blur(2px)';
+            (item as HTMLElement).style.transition = 'filter 0.3s ease-in-out';
+          }
+        });
+      }
       
       if (targetElement) {
         (targetElement as HTMLElement).style.filter = 'none';
         (targetElement as HTMLElement).style.position = 'relative';
         (targetElement as HTMLElement).style.zIndex = '60';
+        (targetElement as HTMLElement).style.borderRadius = '8px';
+        (targetElement as HTMLElement).style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.5)';
       }
       
       return () => {
-        allElements.forEach(el => {
-          (el as HTMLElement).style.filter = '';
-          (el as HTMLElement).style.transition = '';
-          (el as HTMLElement).style.zIndex = '';
-        });
+        if (mainContent) {
+          (mainContent as HTMLElement).style.filter = '';
+          (mainContent as HTMLElement).style.transition = '';
+        }
+        if (sidebar) {
+          const sidebarItems = sidebar.querySelectorAll('a[data-tutorial]');
+          sidebarItems.forEach(item => {
+            (item as HTMLElement).style.filter = '';
+            (item as HTMLElement).style.transition = '';
+            (item as HTMLElement).style.zIndex = '';
+            (item as HTMLElement).style.boxShadow = '';
+          });
+        }
+        if (targetElement) {
+          (targetElement as HTMLElement).style.filter = '';
+          (targetElement as HTMLElement).style.zIndex = '';
+          (targetElement as HTMLElement).style.boxShadow = '';
+        }
       };
     }
   }, [currentStep, tutorialStep]);
