@@ -27,15 +27,15 @@ export function MainLayout({ children }: MainLayoutProps) {
   const { logout } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(!isMobile);
 
-  // Define navigation items
+  // Define navigation items with tutorial data attributes
   const navigationItems = [
-    { icon: <IconHome className="w-5 h-5" />, label: 'Dashboard', href: '/' },
-    { icon: <IconBarChart className="w-5 h-5" />, label: 'Practice Tests', href: '/tests' },
-    { icon: <IconUsers className="w-5 h-5" />, label: 'Roleplay', href: '/roleplay' },
-    { icon: <IconClipboard className="w-5 h-5" />, label: 'Written Events', href: '/written-events' },
-    { icon: <IconActivity className="w-5 h-5" />, label: 'Performance Indicators', href: '/performance-indicators' },
-    { icon: <IconBook className="w-5 h-5" />, label: 'My Progress', href: '/progress' },
-    { icon: <IconSettings className="w-5 h-5" />, label: 'Settings', href: '/settings' },
+    { icon: <IconHome className="w-5 h-5" />, label: 'Dashboard', href: '/', tutorialId: 'dashboard' },
+    { icon: <IconBarChart className="w-5 h-5" />, label: 'Practice Tests', href: '/tests', tutorialId: 'practice-tests' },
+    { icon: <IconUsers className="w-5 h-5" />, label: 'Roleplay', href: '/roleplay', tutorialId: 'roleplay' },
+    { icon: <IconClipboard className="w-5 h-5" />, label: 'Written Events', href: '/written-events', tutorialId: 'written-events' },
+    { icon: <IconActivity className="w-5 h-5" />, label: 'Performance Indicators', href: '/performance-indicators', tutorialId: 'performance-indicators' },
+    { icon: <IconBook className="w-5 h-5" />, label: 'My Progress', href: '/progress', tutorialId: 'my-progress' },
+    { icon: <IconSettings className="w-5 h-5" />, label: 'Settings', href: '/settings', tutorialId: 'settings' },
   ];
 
   // The Vanta.js background is now initialized in index.html
@@ -258,13 +258,16 @@ export function MainLayout({ children }: MainLayoutProps) {
                       variants={navItemVariants}
                     >
                       <Link href={item.href}>
-                        <a className={cn(
-                          "flex items-center px-3 py-2.5 text-base rounded-lg relative group",
-                          location === item.href 
-                            ? "text-primary font-medium" 
-                            : "text-foreground/70 hover:text-foreground",
-                          "transition-all hover:bg-primary/5"
-                        )}>
+                        <a 
+                          data-tutorial={item.tutorialId}
+                          className={cn(
+                            "flex items-center px-3 py-2.5 text-base rounded-lg relative group",
+                            location === item.href 
+                              ? "text-primary font-medium" 
+                              : "text-foreground/70 hover:text-foreground",
+                            "transition-all hover:bg-primary/5"
+                          )}
+                        >
                           <span className="mr-3 text-current opacity-70 group-hover:opacity-100">
                             {item.icon}
                           </span>
