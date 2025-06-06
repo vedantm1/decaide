@@ -79,70 +79,117 @@ export async function checkAzureOpenAI(): Promise<{
  */
 
 /**
- * Parameters for test‐question generation.
+ * Parameters for test question generation (simple version for API routes).
  */
 export interface GenerateTestParams {
   testType: string;
-  difficulty: 'District' | 'State' | 'ICDC';
-  filteredBlueprint: Record<string, number>;
-  fewShotExamples: string[];
+  categories: string[];
   numQuestions: number;
 }
 
 /**
- * Calls Azure OpenAI to generate scenario‐style practice questions.
- *
- * - Builds a prompt that instructs the model how many questions total,
- *   how to distribute them by instructional area, and includes a few‐shot
- *   example block if provided.
- * - Uses `getOpenAIClient()` to get the client, then calls `getCompletions`.
- * - Splits the response text on lines beginning with "Question X:" and returns them.
+ * Generates DECA test questions using Azure OpenAI.
  */
-export async function generateTestQuestions(params: GenerateTestParams): Promise<string[]> {
-  const { testType, difficulty, filteredBlueprint, fewShotExamples, numQuestions } = params;
+export async function generateTestQuestions(params: GenerateTestParams): Promise<any> {
+  const { testType, categories, numQuestions } = params;
 
-  // 1) Build a bullet‐list of the category‐distribution: "- CategoryA: 5\n- CategoryB: 6\n..."
-  const blueprintLines = Object.entries(filteredBlueprint)
-    .map(([category, count]) => `- ${category}: ${count}`)
-    .join('\n');
-
-  // 2) Build a few‐shot block if any examples are passed
-  let fewShotSection = '';
-  if (fewShotExamples && fewShotExamples.length > 0) {
-    fewShotSection =
-      'Here are some example questions from past tests (same cluster & difficulty):\n' +
-      fewShotExamples.map((q) => `> ${q}`).join('\n') +
-      '\n\n';
-  }
-
-  // 3) Construct the full prompt string
   const prompt = `
-You are a DECA practice‐test generator for the "${testType}" cluster at the ${difficulty} competition level.
-We need exactly ${numQuestions} scenario‐style questions total, distributed by instructional area as follows:
-${blueprintLines}
+You are a DECA test question generator. Create ${numQuestions} multiple-choice questions for the ${testType} event.
 
-${fewShotSection}
-Now generate ${numQuestions} brand‐new scenario questions. Number each one as "Question 1:", "Question 2:", etc.
-Do NOT provide answers—only list the scenario questions themselves. Ensure each question references a realistic business scenario relevant to "${testType}".
+Requirements:
+- Focus on these categories: ${categories.join(', ')}
+- Each question should present a realistic business scenario
+- Provide 4 multiple choice options (A, B, C, D)
+- Include the correct answer
+- Questions should be appropriate for high school DECA competition level
+
+Format your response as a JSON object with this structure:
+{
+  "questions": [
+    {
+      "id": 1,
+      "question": "Question text here...",
+      "options": ["A) Option 1", "B) Option 2", "C) Option 3", "D) Option 4"],
+      "correctAnswer": "A",
+      "category": "Category name",
+      "explanation": "Brief explanation of why this is correct"
+    }
+  ]
+}
 `;
 
-  // 4) Get the client and call getCompletions
   const client = getOpenAIClient();
-  // You can override the deployment via env, or fall back to "gpt-4o-mini" (or your own deployment)
-  const deploymentName = process.env.AZURE_OPENAI_DEPLOYMENT_NAME || 'gpt-4o-mini';
+  const deploymentName = process.env.AZURE_OPENAI_DEPLOYMENT || 'gpt-4o-mini';
 
-  const response = await client.getCompletions(deploymentName, prompt, {
-    maxTokens: 1200,
+  const response = await client.getChatCompletions(deploymentName, [
+    { role: 'system', content: 'You are a DECA competition expert who creates realistic business test questions.' },
+    { role: 'user', content: prompt }
+  ], {
+    maxTokens: 2000,
     temperature: 0.7,
-    topP: 0.9,
+    responseFormat: { type: "json_object" }
   });
 
-  const text = response.choices[0].text || '';
-  // 5) Split on lines beginning with "Question X:"
-  const questions = text
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter((line) => /^Question\s+\d+:/.test(line));
+  const content = response.choices[0].message?.content || '{"questions": []}';
+  const testData = JSON.parse(content);
+  return testData;
+}
 
-  return questions;
+/**
+ * Parameters for roleplay scenario generation.
+ */
+export interface GenerateRoleplayParams {
+  instructionalArea: string;
+  performanceIndicators: string[];
+  difficultyLevel: 'District' | 'State' | 'ICDC';
+  businessType?: string;
+}
+
+/**
+ * Generates a DECA roleplay scenario using Azure OpenAI.
+ */
+export async function generateRoleplay(params: GenerateRoleplayParams): Promise<any> {
+  const { instructionalArea, performanceIndicators, difficultyLevel, businessType } = params;
+
+  const prompt = `
+You are a DECA roleplay scenario generator. Create a realistic business scenario for the ${difficultyLevel} competition level.
+
+Requirements:
+- Instructional Area: ${instructionalArea}
+- Performance Indicators to assess: ${performanceIndicators.join(', ')}
+- Business Type: ${businessType || 'General business'}
+- Difficulty Level: ${difficultyLevel}
+
+Generate a complete roleplay scenario that includes:
+1. A realistic business situation/problem
+2. Background context about the company
+3. Your role in the scenario
+4. Specific tasks or decisions you need to make
+5. Key stakeholders involved
+
+Format your response as a JSON object with these properties:
+- title: Brief title for the scenario
+- situation: The main business situation/problem
+- background: Company background and context
+- yourRole: Description of the participant's role
+- tasks: Array of specific tasks or decisions to make
+- stakeholders: Array of key people involved
+- performanceIndicators: The PIs being assessed
+- difficultyLevel: The competition level
+`;
+
+  const client = getOpenAIClient();
+  const deploymentName = process.env.AZURE_OPENAI_DEPLOYMENT || 'gpt-4o-mini';
+
+  const response = await client.getChatCompletions(deploymentName, [
+    { role: 'system', content: 'You are a DECA competition expert who creates realistic business roleplay scenarios.' },
+    { role: 'user', content: prompt }
+  ], {
+    maxTokens: 1000,
+    temperature: 0.7,
+    responseFormat: { type: "json_object" }
+  });
+
+  const roleplayData = JSON.parse(response.choices[0].message?.content || '{}');
+  return roleplayData;
 }
