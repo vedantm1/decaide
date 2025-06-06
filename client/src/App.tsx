@@ -24,6 +24,7 @@ import { ProtectedRoute } from "./lib/protected-route";
 import { AuthProvider } from "@/hooks/use-auth";
 import { MicroInteractionsProvider } from "@/hooks/use-micro-interactions";
 import { UIStateProvider } from "@/hooks/use-ui-state";
+import { OnboardingProvider } from "@/hooks/use-onboarding";
 import ThemeProvider from "@/lib/theme-provider";
 import { useEffect, useState } from "react";
 import { AnimatePresence } from "framer-motion";
@@ -74,13 +75,15 @@ function App() {
         <UIStateProvider>
           <ThemeProvider>
             <MicroInteractionsProvider>
-              {/* Vanta background effect now handled via index.html */}
-              <div className="app-container fade-in new-design">
-                <AnimatePresence mode="wait">
-                  <Router />
-                </AnimatePresence>
-                <Toaster />
-              </div>
+              <OnboardingProvider>
+                {/* Vanta background effect now handled via index.html */}
+                <div className="app-container fade-in new-design">
+                  <AnimatePresence mode="wait">
+                    <Router />
+                  </AnimatePresence>
+                  <Toaster />
+                </div>
+              </OnboardingProvider>
             </MicroInteractionsProvider>
           </ThemeProvider>
         </UIStateProvider>

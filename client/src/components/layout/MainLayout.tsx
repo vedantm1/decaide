@@ -4,6 +4,8 @@ import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUIState } from '@/hooks/use-ui-state';
 import { useAuth } from '@/hooks/use-auth';
+import { useOnboarding } from '@/hooks/use-onboarding';
+import { OnboardingOverlay } from '@/components/onboarding/OnboardingOverlay';
 import { 
   IconHome, 
   IconBarChart, 
@@ -24,7 +26,8 @@ interface MainLayoutProps {
 export function MainLayout({ children }: MainLayoutProps) {
   const [location] = useLocation();
   const { isDarkMode, isMobile } = useUIState();
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
+  const { isOnboardingOpen, completeOnboarding } = useOnboarding();
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(!isMobile);
 
   // Define navigation items with tutorial data attributes
@@ -170,23 +173,23 @@ export function MainLayout({ children }: MainLayoutProps) {
           
           <div className="flex items-center space-x-4">
             {/* User subscription and stats */}
-            {useAuth().user && (
+            {user && (
               <div className="flex items-center gap-4">
                 {/* Stars/Points */}
                 <div className="hidden md:flex items-center gap-1.5 bg-primary/10 px-2.5 py-1 rounded-full">
                   <span className="text-primary text-lg">★</span>
-                  <span className="font-medium text-sm">{useAuth().user?.points || 0} points</span>
+                  <span className="font-medium text-sm">0 points</span>
                 </div>
                 
                 {/* Subscription Type with Stars */}
                 <div className="hidden md:flex items-center bg-accent/10 px-3 py-1.5 rounded-full">
                   <span className="text-xs font-medium text-accent capitalize mr-1.5">
-                    {useAuth().user?.subscriptionTier || 'Standard'}
+                    {user?.subscriptionTier || 'Standard'}
                   </span>
                   {/* Display stars based on subscription tier */}
                   <div className="flex">
                     {(() => {
-                      const tier = useAuth().user?.subscriptionTier || 'standard';
+                      const tier = user?.subscriptionTier || 'standard';
                       const totalStars = 5;
                       let activeStars = 0;
                       
@@ -217,9 +220,9 @@ export function MainLayout({ children }: MainLayoutProps) {
                 {/* Username */}
                 <div className="flex items-center gap-2">
                   <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                    {useAuth().user?.username?.[0]?.toUpperCase() || 'D'}
+                    {user?.username?.[0]?.toUpperCase() || 'D'}
                   </div>
-                  <span className="hidden md:block text-sm font-medium">{useAuth().user?.username || 'DecAide User'}</span>
+                  <span className="hidden md:block text-sm font-medium">{user?.username || 'DecAide User'}</span>
                 </div>
               </div>
             )}
@@ -341,6 +344,13 @@ export function MainLayout({ children }: MainLayoutProps) {
           </div>
         </motion.main>
       </div>
+      
+      {/* Onboarding Overlay */}
+      <OnboardingOverlay
+        isOpen={isOnboardingOpen}
+        onComplete={completeOnboarding}
+        userName={user?.username}
+      />
     </div>
   );
 }
