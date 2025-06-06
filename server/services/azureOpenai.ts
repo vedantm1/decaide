@@ -1,44 +1,28 @@
+import { OpenAIClient, AzureKeyCredential } from "@azure/openai";
+
+let openaiClient: OpenAIClient | null = null;
+
 /**
- * Make a direct HTTP request to Azure OpenAI
+ * Get or create an Azure OpenAI client instance
  * Uses environment variables for configuration:
  * - AZURE_OPENAI_KEY: API key for Azure OpenAI
  * - AZURE_OPENAI_ENDPOINT: Azure OpenAI service endpoint URL
- * - AZURE_OPENAI_DEPLOYMENT: Deployment name
  */
-async function makeAzureOpenAIRequest(messages: any[], options: any = {}) {
-  if (!process.env.AZURE_OPENAI_KEY) {
-    throw new Error("AZURE_OPENAI_KEY environment variable is required");
+export function getOpenAIClient(): OpenAIClient {
+  if (!openaiClient) {
+    if (!process.env.AZURE_OPENAI_KEY) {
+      throw new Error("AZURE_OPENAI_KEY environment variable is required");
+    }
+    
+    if (!process.env.AZURE_OPENAI_ENDPOINT) {
+      throw new Error("AZURE_OPENAI_ENDPOINT environment variable is required");
+    }
+    
+    const credential = new AzureKeyCredential(process.env.AZURE_OPENAI_KEY);
+    openaiClient = new OpenAIClient(process.env.AZURE_OPENAI_ENDPOINT, credential);
   }
   
-  if (!process.env.AZURE_OPENAI_ENDPOINT) {
-    throw new Error("AZURE_OPENAI_ENDPOINT environment variable is required");
-  }
-  
-  const deployment = process.env.AZURE_OPENAI_DEPLOYMENT || "decaide_test";
-  const endpoint = process.env.AZURE_OPENAI_ENDPOINT;
-  const url = `${endpoint}openai/deployments/${deployment}/chat/completions?api-version=2025-01-01-preview`;
-  
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'api-key': process.env.AZURE_OPENAI_KEY
-    },
-    body: JSON.stringify({
-      messages,
-      max_tokens: options.maxTokens || 1000,
-      temperature: options.temperature || 0.7,
-      response_format: options.responseFormat ? { type: options.responseFormat.type } : undefined,
-      model: deployment
-    })
-  });
-  
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(`Azure OpenAI API error: ${error.error?.message || response.statusText}`);
-  }
-  
-  return response.json();
+  return openaiClient;
 }
 
 /**
@@ -61,15 +45,22 @@ export async function checkAzureOpenAI(): Promise<{
       };
     }
     
-    const deploymentId = process.env.AZURE_OPENAI_DEPLOYMENT || "decaide_test";
+    // Try to create a client
+    const client = getOpenAIClient();
+    
+    // Try to get deployments
+    const deploymentId = process.env.AZURE_OPENAI_DEPLOYMENT || "gpt-4o-mini";
     
     // Try a simple chat completion to check connectivity
-    await makeAzureOpenAIRequest(
+    await client.getChatCompletions(
+      deploymentId,
       [
         { role: "system", content: "You are a helpful assistant." },
         { role: "user", content: "Hello!" }
       ],
-      { maxTokens: 10 }
+      {
+        maxTokens: 10
+      }
     );
     
     return {
@@ -98,6 +89,9 @@ export async function generateRoleplay(params: {
   difficultyLevel: string;
   businessType?: string;
 }) {
+  const client = getOpenAIClient();
+  const deploymentId = process.env.AZURE_OPENAI_DEPLOYMENT || "gpt-4o-mini";
+  
   const difficulty = params.difficultyLevel || "medium";
   const businessType = params.businessType || "retail business";
   
@@ -117,7 +111,8 @@ export async function generateRoleplay(params: {
   `;
   
   try {
-    const response = await makeAzureOpenAIRequest(
+    const response = await client.getChatCompletions(
+      deploymentId,
       [
         { role: "system", content: "You are a DECA roleplay scenario generator. Create realistic, challenging, and educational DECA roleplay scenarios for high school students." },
         { role: "user", content: prompt }
@@ -148,38 +143,35 @@ export async function generateTestQuestions(params: {
   categories: string[];
   numQuestions: number;
 }) {
-  const numQuestions = Math.min(params.numQuestions || 10, 50); // Allow up to 50 questions
+  const client = getOpenAIClient();
+  const deploymentId = process.env.AZURE_OPENAI_DEPLOYMENT || "gpt-4o-mini";
+  
+  const numQuestions = Math.min(params.numQuestions || 10, 20); // Limit to 20 questions max
   
   const prompt = `
-  Create ${numQuestions} high-quality multiple-choice questions for a DECA ${params.testType} test.
+  Create ${numQuestions} multiple-choice questions for a DECA ${params.testType} test.
   The questions should cover the following categories: ${params.categories.join(", ")}.
   Distribute the questions evenly across the categories.
 
-  Each question should:
-  - Be realistic and relevant to actual business scenarios
-  - Test practical knowledge and application of concepts
-  - Include plausible distractors that test common misconceptions
-  - Be at an appropriate difficulty level for high school DECA competitors
-
-  Format your response as a JSON object with a "questions" array, where each question object has:
-  - id: A unique numeric ID (starting from 1)
-  - question: The question text (clear and concise)
-  - options: An array of exactly 4 possible answers as strings
+  Format your response as a JSON array of question objects, where each object has:
+  - id: A unique numeric ID
+  - question: The question text
+  - options: An array of 4 possible answers labeled as strings "A", "B", "C", and "D"
   - correctAnswer: The index of the correct answer (0-3)
-  - explanation: A detailed explanation of why the correct answer is right and why others are wrong
-  - category: The category this question belongs to (from the provided list)
-  - difficulty: Either "easy", "medium", or "hard"
+  - explanation: A brief explanation of why the correct answer is correct
+  - category: The category this question belongs to
   `;
   
   try {
-    const response = await makeAzureOpenAIRequest(
+    const response = await client.getChatCompletions(
+      deploymentId,
       [
         { role: "system", content: "You are a DECA test question generator. Create realistic, challenging, and educational multiple-choice questions for high school DECA students." },
         { role: "user", content: prompt }
       ],
       {
         temperature: 0.7,
-        maxTokens: 3000,
+        maxTokens: 2000,
         responseFormat: { type: "json_object" }
       }
     );
