@@ -18,15 +18,14 @@ export function OnboardingProvider({ children }: OnboardingProviderProps) {
   const [shouldShowOnboarding, setShouldShowOnboarding] = useState(false);
 
   useEffect(() => {
-    // Check if user has completed onboarding
-    const hasCompletedOnboarding = localStorage.getItem('onboardingCompleted');
-    const selectedEvent = localStorage.getItem('selectedDecaEvent');
+    // For testing - always show onboarding
+    localStorage.removeItem('onboardingCompleted');
+    localStorage.removeItem('selectedDecaEvent');
     
-    // Show onboarding if user hasn't completed it or hasn't selected an event
-    if (!hasCompletedOnboarding || !selectedEvent) {
-      setShouldShowOnboarding(true);
-      setIsOnboardingOpen(true);
-    }
+    // Force show onboarding for testing
+    setShouldShowOnboarding(true);
+    setIsOnboardingOpen(true);
+    console.log('Onboarding should be visible now');
   }, []);
 
   const completeOnboarding = () => {

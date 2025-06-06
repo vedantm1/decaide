@@ -203,6 +203,8 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
     }
   }, [currentStep, tutorialStep]);
 
+  console.log('OnboardingOverlay - isOpen:', isOpen, 'currentStep:', currentStep);
+
   if (!isOpen) return null;
 
   return (
