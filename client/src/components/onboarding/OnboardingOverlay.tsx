@@ -205,17 +205,16 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
       const currentSelector = TUTORIAL_STEPS[tutorialStep].selector;
       const targetElement = document.querySelector(currentSelector);
       
-      // Add blur to main content area but not the sidebar or target element
+      // Add blur to main content area
       const mainContent = document.querySelector('main');
-      const sidebar = document.querySelector('aside');
-      
-      if (mainContent && !targetElement?.closest('main')) {
+      if (mainContent) {
         (mainContent as HTMLElement).style.filter = 'blur(3px)';
         (mainContent as HTMLElement).style.transition = 'filter 0.3s ease-in-out';
       }
       
-      if (sidebar && targetElement?.closest('aside')) {
-        // Blur sidebar items except the target
+      // Add blur to sidebar elements except the target
+      const sidebar = document.querySelector('aside');
+      if (sidebar) {
         const sidebarItems = sidebar.querySelectorAll('a[data-tutorial]');
         sidebarItems.forEach(item => {
           if (item !== targetElement) {
@@ -223,14 +222,32 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
             (item as HTMLElement).style.transition = 'filter 0.3s ease-in-out';
           }
         });
+        
+        // Also blur the sidebar header/logo area
+        const sidebarHeader = sidebar.querySelector('div');
+        if (sidebarHeader && !targetElement?.closest('div')) {
+          (sidebarHeader as HTMLElement).style.filter = 'blur(2px)';
+          (sidebarHeader as HTMLElement).style.transition = 'filter 0.3s ease-in-out';
+        }
       }
       
+      // Ensure target element is completely unblurred and highlighted
       if (targetElement) {
-        (targetElement as HTMLElement).style.filter = 'none';
+        (targetElement as HTMLElement).style.filter = 'none !important';
         (targetElement as HTMLElement).style.position = 'relative';
         (targetElement as HTMLElement).style.zIndex = '60';
         (targetElement as HTMLElement).style.borderRadius = '8px';
         (targetElement as HTMLElement).style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.5)';
+        (targetElement as HTMLElement).style.background = 'rgba(59, 130, 246, 0.1)';
+        
+        // Force remove any inherited blur from parent elements
+        let parent = targetElement.parentElement;
+        while (parent && parent !== document.body) {
+          if (parent.style.filter) {
+            (parent as HTMLElement).style.filter = 'none';
+          }
+          parent = parent.parentElement;
+        }
       }
       
       return () => {
@@ -245,12 +262,20 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
             (item as HTMLElement).style.transition = '';
             (item as HTMLElement).style.zIndex = '';
             (item as HTMLElement).style.boxShadow = '';
+            (item as HTMLElement).style.background = '';
           });
+          
+          const sidebarHeader = sidebar.querySelector('div');
+          if (sidebarHeader) {
+            (sidebarHeader as HTMLElement).style.filter = '';
+            (sidebarHeader as HTMLElement).style.transition = '';
+          }
         }
         if (targetElement) {
           (targetElement as HTMLElement).style.filter = '';
           (targetElement as HTMLElement).style.zIndex = '';
           (targetElement as HTMLElement).style.boxShadow = '';
+          (targetElement as HTMLElement).style.background = '';
         }
       };
     }
