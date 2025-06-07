@@ -321,34 +321,21 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
   // Clean up all effects when overlay closes
   useEffect(() => {
     if (!isOpen) {
-      // Remove all tutorial effects and blur from entire document
+      // Remove all tutorial effects when overlay is closed
       document.querySelectorAll('*').forEach(el => {
         const element = el as HTMLElement;
-        // Clear all styles that might have been applied during tutorial
-        element.style.filter = '';
-        element.style.transition = '';
-        element.style.zIndex = '';
-        element.style.boxShadow = '';
-        element.style.background = '';
-        element.style.position = '';
-        element.style.borderRadius = '';
-        delete element.dataset.tutorialHighlighted;
-        delete element.dataset.tutorialBlurred;
+        if (element.dataset.tutorialHighlighted || element.dataset.tutorialBlurred) {
+          element.style.filter = '';
+          element.style.transition = '';
+          element.style.zIndex = '';
+          element.style.boxShadow = '';
+          element.style.background = '';
+          element.style.position = '';
+          element.style.borderRadius = '';
+          delete element.dataset.tutorialHighlighted;
+          delete element.dataset.tutorialBlurred;
+        }
       });
-      
-      // Specifically ensure main content and sidebar are clear
-      const mainContent = document.querySelector('main');
-      const sidebar = document.querySelector('aside');
-      
-      if (mainContent) {
-        (mainContent as HTMLElement).style.filter = '';
-        (mainContent as HTMLElement).style.transition = '';
-      }
-      
-      if (sidebar) {
-        (sidebar as HTMLElement).style.filter = '';
-        (sidebar as HTMLElement).style.transition = '';
-      }
     }
   }, [isOpen]);
 
