@@ -350,7 +350,7 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className={`fixed inset-0 z-50 flex items-center justify-center p-4 onboarding-overlay ${
-          currentStep === 'welcome' ? 'bg-black/50 backdrop-blur-sm' : 'bg-black/30'
+          currentStep === 'welcome' || currentStep === 'event-selection' ? 'bg-black/50 backdrop-blur-sm' : 'bg-black/30'
         }`}
       >
         {/* Welcome Screen */}
