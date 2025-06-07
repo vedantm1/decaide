@@ -212,41 +212,58 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
         (mainContent as HTMLElement).style.transition = 'filter 0.3s ease-in-out';
       }
       
-      // Add blur to sidebar elements except the target
+      // Handle sidebar blur based on target element location
       const sidebar = document.querySelector('aside');
       if (sidebar) {
-        const sidebarItems = sidebar.querySelectorAll('a[data-tutorial]');
-        sidebarItems.forEach(item => {
-          if (item !== targetElement) {
-            (item as HTMLElement).style.filter = 'blur(2px)';
-            (item as HTMLElement).style.transition = 'filter 0.3s ease-in-out';
+        if (targetElement?.closest('aside')) {
+          // If target is in sidebar, blur other sidebar items but keep sidebar container clear
+          (sidebar as HTMLElement).style.filter = 'none';
+          const sidebarItems = sidebar.querySelectorAll('a[data-tutorial]');
+          sidebarItems.forEach(item => {
+            if (item !== targetElement) {
+              (item as HTMLElement).style.filter = 'blur(2px)';
+              (item as HTMLElement).style.transition = 'filter 0.3s ease-in-out';
+            }
+          });
+          
+          // Blur the sidebar header/logo area
+          const sidebarHeader = sidebar.querySelector('div');
+          if (sidebarHeader && !sidebarHeader.contains(targetElement as Node)) {
+            (sidebarHeader as HTMLElement).style.filter = 'blur(2px)';
+            (sidebarHeader as HTMLElement).style.transition = 'filter 0.3s ease-in-out';
           }
-        });
-        
-        // Also blur the sidebar header/logo area
-        const sidebarHeader = sidebar.querySelector('div');
-        if (sidebarHeader && !targetElement?.closest('div')) {
-          (sidebarHeader as HTMLElement).style.filter = 'blur(2px)';
-          (sidebarHeader as HTMLElement).style.transition = 'filter 0.3s ease-in-out';
+        } else {
+          // If target is not in sidebar, blur entire sidebar
+          (sidebar as HTMLElement).style.filter = 'blur(2px)';
+          (sidebar as HTMLElement).style.transition = 'filter 0.3s ease-in-out';
         }
       }
       
       // Ensure target element is completely unblurred and highlighted
       if (targetElement) {
-        (targetElement as HTMLElement).style.filter = 'none !important';
-        (targetElement as HTMLElement).style.position = 'relative';
-        (targetElement as HTMLElement).style.zIndex = '60';
-        (targetElement as HTMLElement).style.borderRadius = '8px';
-        (targetElement as HTMLElement).style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.5)';
-        (targetElement as HTMLElement).style.background = 'rgba(59, 130, 246, 0.1)';
+        // Apply styles directly and with high specificity
+        targetElement.setAttribute('style', `
+          filter: none !important;
+          position: relative !important;
+          z-index: 60 !important;
+          border-radius: 8px !important;
+          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5) !important;
+          background: rgba(59, 130, 246, 0.1) !important;
+        `);
         
         // Force remove any inherited blur from parent elements
         let parent = targetElement.parentElement;
         while (parent && parent !== document.body) {
-          if (parent.style.filter) {
-            (parent as HTMLElement).style.filter = 'none';
+          if (parent.style.filter.includes('blur')) {
+            parent.setAttribute('style', parent.getAttribute('style')?.replace(/filter:[^;]*;?/g, '') + ' filter: none !important;');
           }
           parent = parent.parentElement;
+        }
+        
+        // Also ensure the sidebar container isn't blurred
+        const sidebar = targetElement.closest('aside');
+        if (sidebar) {
+          (sidebar as HTMLElement).style.filter = 'none';
         }
       }
       
