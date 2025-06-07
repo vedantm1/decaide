@@ -219,12 +219,11 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
         }
       });
       
-      // Add blur to main content area
+      // Keep main content clear during tutorial
       const mainContent = document.querySelector('main');
       if (mainContent) {
-        (mainContent as HTMLElement).style.filter = 'blur(3px)';
+        (mainContent as HTMLElement).style.filter = 'none';
         (mainContent as HTMLElement).style.transition = 'filter 0.3s ease-in-out';
-        (mainContent as HTMLElement).dataset.tutorialBlurred = 'true';
       }
       
       // Blur every node under <aside> except the target and its ancestors
@@ -248,21 +247,45 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
         // Clear any blur on target element first
         (targetElement as HTMLElement).dataset.tutorialHighlighted = 'true';
         delete (targetElement as HTMLElement).dataset.tutorialBlurred;
-        
+
+        // zero out Tailwind blur vars
+        targetElement.style.setProperty('--tw-blur', 'none', 'important');
+        targetElement.style.setProperty('--tw-backdrop-blur', 'none', 'important');
+
+        // override any backdrop‐filter as well
+        targetElement.style.setProperty('backdrop-filter', 'none', 'important');
+        targetElement.style.setProperty('-webkit-backdrop-filter', 'none', 'important');
+
         // Force clear styling and apply unblur with high priority
         (targetElement as HTMLElement).setAttribute('style', '');
         (targetElement as HTMLElement).style.setProperty('filter', 'none', 'important');
+        (targetElement as HTMLElement).style.setProperty('backdrop-filter', 'none', 'important');
+        (targetElement as HTMLElement).style.setProperty('-webkit-backdrop-filter', 'none', 'important');
         (targetElement as HTMLElement).style.setProperty('position', 'relative', 'important');
         (targetElement as HTMLElement).style.setProperty('z-index', '9999', 'important');
         (targetElement as HTMLElement).style.setProperty('border-radius', '8px', 'important');
         (targetElement as HTMLElement).style.setProperty('box-shadow', '0 0 0 3px rgba(59, 130, 246, 0.5)', 'important');
         (targetElement as HTMLElement).style.setProperty('background', 'rgba(59, 130, 246, 0.1)', 'important');
         (targetElement as HTMLElement).style.setProperty('transition', 'all 0.3s ease-in-out', 'important');
-        
+
+        // inject to kill any blur on ::before/::after if an ID exists
+        if (targetElement.id) {
+          const styleTag = document.createElement('style');
+          styleTag.innerHTML = `
+            #${targetElement.id}::before,
+            #${targetElement.id}::after {
+              filter: none !important;
+              backdrop-filter: none !important;
+              -webkit-backdrop-filter: none !important;
+            }
+          `;
+          document.head.appendChild(styleTag);
+        }
         // Also clear blur from all parent elements up the tree
         let parent = targetElement.parentElement;
         while (parent && parent !== document.body) {
           (parent as HTMLElement).style.setProperty('filter', 'none', 'important');
+          parent.style.setProperty('--tw-blur', 'none', 'important');
           delete (parent as HTMLElement).dataset.tutorialBlurred;
           parent = parent.parentElement;
         }
