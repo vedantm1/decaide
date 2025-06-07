@@ -222,7 +222,7 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
       // Keep main content completely clear
       const mainContent = document.querySelector('main');
       if (mainContent) {
-        (mainContent as HTMLElement).style.filter = 'none';
+        (mainContent as HTMLElement).style.filter = 'blur(3px)';
         (mainContent as HTMLElement).style.transition = 'filter 0.3s ease-in-out';
       }
       
@@ -235,7 +235,7 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
           // skip the exact element we’re highlighting
           if (item === targetElement) return;
 
-          item.style.filter = 'none';
+          item.style.filter = 'blur(2px)';
           item.style.transition = 'filter 0.3s ease-in-out';
         });
       }
