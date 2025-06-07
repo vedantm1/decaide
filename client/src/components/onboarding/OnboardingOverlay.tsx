@@ -205,95 +205,90 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
       const currentSelector = TUTORIAL_STEPS[tutorialStep].selector;
       const targetElement = document.querySelector(currentSelector);
       
+      // Clear all previous tutorial styling first
+      document.querySelectorAll('*').forEach(el => {
+        const element = el as HTMLElement;
+        if (element.dataset.tutorialBlurred) {
+          element.style.filter = '';
+          element.style.transition = '';
+          delete element.dataset.tutorialBlurred;
+        }
+        if (element.dataset.tutorialHighlighted) {
+          element.setAttribute('style', '');
+          delete element.dataset.tutorialHighlighted;
+        }
+      });
+      
       // Add blur to main content area
       const mainContent = document.querySelector('main');
       if (mainContent) {
         (mainContent as HTMLElement).style.filter = 'blur(3px)';
         (mainContent as HTMLElement).style.transition = 'filter 0.3s ease-in-out';
+        (mainContent as HTMLElement).dataset.tutorialBlurred = 'true';
       }
       
-      // Handle sidebar blur based on target element location
+      // Blur ALL sidebar items first
       const sidebar = document.querySelector('aside');
       if (sidebar) {
-        if (targetElement?.closest('aside')) {
-          // If target is in sidebar, blur other sidebar items but keep sidebar container clear
-          (sidebar as HTMLElement).style.filter = 'none';
-          const sidebarItems = sidebar.querySelectorAll('a[data-tutorial]');
-          sidebarItems.forEach(item => {
-            if (item !== targetElement) {
-              (item as HTMLElement).style.filter = 'blur(2px)';
-              (item as HTMLElement).style.transition = 'filter 0.3s ease-in-out';
-            }
-          });
-          
-          // Blur the sidebar header/logo area
-          const sidebarHeader = sidebar.querySelector('div');
-          if (sidebarHeader && !sidebarHeader.contains(targetElement as Node)) {
-            (sidebarHeader as HTMLElement).style.filter = 'blur(2px)';
-            (sidebarHeader as HTMLElement).style.transition = 'filter 0.3s ease-in-out';
-          }
-        } else {
-          // If target is not in sidebar, blur entire sidebar
-          (sidebar as HTMLElement).style.filter = 'blur(2px)';
-          (sidebar as HTMLElement).style.transition = 'filter 0.3s ease-in-out';
-        }
+        (sidebar as HTMLElement).style.filter = 'blur(2px)';
+        (sidebar as HTMLElement).style.transition = 'filter 0.3s ease-in-out';
+        (sidebar as HTMLElement).dataset.tutorialBlurred = 'true';
+        
+        // Blur all navigation items
+        const allNavItems = sidebar.querySelectorAll('a, div');
+        allNavItems.forEach(item => {
+          (item as HTMLElement).style.filter = 'blur(2px)';
+          (item as HTMLElement).style.transition = 'filter 0.3s ease-in-out';
+          (item as HTMLElement).dataset.tutorialBlurred = 'true';
+        });
       }
       
-      // Ensure target element is completely unblurred and highlighted
+      // Now unblur and highlight ONLY the target element
       if (targetElement) {
-        // Apply styles directly and with high specificity
-        targetElement.setAttribute('style', `
+        // Remove blur from target and its parents
+        (targetElement as HTMLElement).style.filter = 'none !important';
+        (targetElement as HTMLElement).style.transition = 'filter 0.3s ease-in-out';
+        (targetElement as HTMLElement).dataset.tutorialHighlighted = 'true';
+        delete (targetElement as HTMLElement).dataset.tutorialBlurred;
+        
+        // Apply highlight styling
+        const originalStyle = targetElement.getAttribute('style') || '';
+        targetElement.setAttribute('style', originalStyle + `
           filter: none !important;
           position: relative !important;
           z-index: 60 !important;
           border-radius: 8px !important;
           box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5) !important;
           background: rgba(59, 130, 246, 0.1) !important;
+          transition: all 0.3s ease-in-out !important;
         `);
         
-        // Force remove any inherited blur from parent elements
+        // Ensure parent elements don't interfere
         let parent = targetElement.parentElement;
         while (parent && parent !== document.body) {
           if (parent.style.filter.includes('blur')) {
-            parent.setAttribute('style', parent.getAttribute('style')?.replace(/filter:[^;]*;?/g, '') + ' filter: none !important;');
+            (parent as HTMLElement).style.filter = 'none !important';
           }
           parent = parent.parentElement;
-        }
-        
-        // Also ensure the sidebar container isn't blurred
-        const sidebar = targetElement.closest('aside');
-        if (sidebar) {
-          (sidebar as HTMLElement).style.filter = 'none';
         }
       }
       
       return () => {
-        if (mainContent) {
-          (mainContent as HTMLElement).style.filter = '';
-          (mainContent as HTMLElement).style.transition = '';
-        }
-        if (sidebar) {
-          const sidebarItems = sidebar.querySelectorAll('a[data-tutorial]');
-          sidebarItems.forEach(item => {
-            (item as HTMLElement).style.filter = '';
-            (item as HTMLElement).style.transition = '';
-            (item as HTMLElement).style.zIndex = '';
-            (item as HTMLElement).style.boxShadow = '';
-            (item as HTMLElement).style.background = '';
-          });
-          
-          const sidebarHeader = sidebar.querySelector('div');
-          if (sidebarHeader) {
-            (sidebarHeader as HTMLElement).style.filter = '';
-            (sidebarHeader as HTMLElement).style.transition = '';
+        // Clean up all tutorial effects
+        document.querySelectorAll('*').forEach(el => {
+          const element = el as HTMLElement;
+          if (element.dataset.tutorialBlurred || element.dataset.tutorialHighlighted) {
+            element.style.filter = '';
+            element.style.transition = '';
+            element.style.zIndex = '';
+            element.style.boxShadow = '';
+            element.style.background = '';
+            element.style.position = '';
+            element.style.borderRadius = '';
+            delete element.dataset.tutorialBlurred;
+            delete element.dataset.tutorialHighlighted;
           }
-        }
-        if (targetElement) {
-          (targetElement as HTMLElement).style.filter = '';
-          (targetElement as HTMLElement).style.zIndex = '';
-          (targetElement as HTMLElement).style.boxShadow = '';
-          (targetElement as HTMLElement).style.background = '';
-        }
+        });
       };
     }
   }, [currentStep, tutorialStep]);
