@@ -188,12 +188,26 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
     const selectedEvent = Object.values(selectedEvents)[0];
     localStorage.setItem('selectedDecaEvent', selectedEvent);
     
-    // Immediately remove background blur before closing overlay
+    // Immediately remove background blur and sidebar blur before closing overlay
     const overlayElement = document.querySelector('.onboarding-overlay');
     if (overlayElement) {
       (overlayElement as HTMLElement).style.backdropFilter = 'none';
       (overlayElement as HTMLElement).style.backgroundColor = 'transparent';
     }
+    
+    // Specifically clean up sidebar elements
+    const sidebarElements = document.querySelectorAll('.translucent-sidebar, [data-tutorial], aside, nav');
+    sidebarElements.forEach(el => {
+      const element = el as HTMLElement;
+      element.style.filter = '';
+      element.style.backdropFilter = '';
+      element.style.transform = '';
+      element.style.opacity = '';
+      if (element.dataset.tutorialHighlighted || element.dataset.tutorialBlurred) {
+        delete element.dataset.tutorialHighlighted;
+        delete element.dataset.tutorialBlurred;
+      }
+    });
     
     onComplete();
   };
@@ -347,10 +361,12 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
       
       // Also clean up any remaining blur effects on body, main elements, and sidebar
       document.body.style.filter = '';
-      const mainElements = document.querySelectorAll('main, .main-content, #root > div, nav, aside, .sidebar, header');
+      const mainElements = document.querySelectorAll('main, .main-content, #root > div, nav, aside, .sidebar, header, .translucent-sidebar, [data-tutorial]');
       mainElements.forEach(el => {
         (el as HTMLElement).style.filter = '';
         (el as HTMLElement).style.backdropFilter = '';
+        (el as HTMLElement).style.transform = '';
+        (el as HTMLElement).style.opacity = '';
       });
     }
   }, [isOpen]);
