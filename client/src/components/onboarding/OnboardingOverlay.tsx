@@ -219,7 +219,7 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
         }
       });
       
-      // Keep main content clear during tutorial
+      // Keep main content completely clear
       const mainContent = document.querySelector('main');
       if (mainContent) {
         (mainContent as HTMLElement).style.filter = 'none';
@@ -285,7 +285,7 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
         let parent = targetElement.parentElement;
         while (parent && parent !== document.body) {
           (parent as HTMLElement).style.setProperty('filter', 'none', 'important');
-          parent.style.setProperty('--tw-blur', 'none', 'important');
+           parent.style.setProperty('--tw-blur', 'none', 'important');
           delete (parent as HTMLElement).dataset.tutorialBlurred;
           parent = parent.parentElement;
         }
@@ -328,7 +328,7 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 onboarding-overlay"
+        className="fixed inset-0 z-50 bg-black/30 flex items-center justify-center p-4 onboarding-overlay"
       >
         {/* Welcome Screen */}
         {currentStep === 'welcome' && (
