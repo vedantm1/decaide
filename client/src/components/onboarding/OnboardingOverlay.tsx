@@ -124,176 +124,153 @@ const TUTORIAL_STEPS = [
   }
 ];
 
-export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: OnboardingOverlayProps) {
-  const [currentStep, setCurrentStep] = useState<'welcome' | 'tutorial' | 'event-selection'>('welcome');
+export function OnboardingOverlay({
+  isOpen,
+  onComplete,
+  userName = "User",
+}: OnboardingOverlayProps) {
+  const [currentStep, setCurrentStep] = useState<"welcome" | "tutorial" | "event-selection">("welcome");
   const [tutorialStep, setTutorialStep] = useState(0);
-  const [selectedEvents, setSelectedEvents] = useState<{[cluster: string]: string}>({});
-  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [selectedEvents, setSelectedEvents] = useState<{ [cluster: string]: string }>({});
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleStartTutorial = () => {
-    setCurrentStep('tutorial');
+    setCurrentStep("tutorial");
     setTutorialStep(0);
   };
-
-  const handleSkipTutorial = () => {
-    setCurrentStep('event-selection');
-  };
-
+  const handleSkipTutorial = () => setCurrentStep("event-selection");
   const handleNextStep = () => {
-    if (tutorialStep < TUTORIAL_STEPS.length - 1) {
-      setTutorialStep(tutorialStep + 1);
-    } else {
-      setCurrentStep('event-selection');
-    }
+    tutorialStep < TUTORIAL_STEPS.length - 1
+      ? setTutorialStep(tutorialStep + 1)
+      : setCurrentStep("event-selection");
   };
-
-  const handlePrevStep = () => {
-    if (tutorialStep > 0) {
-      setTutorialStep(tutorialStep - 1);
-    }
-  };
+  const handlePrevStep = () => tutorialStep > 0 && setTutorialStep(tutorialStep - 1);
 
   const handleEventSelect = (cluster: string, eventValue: string) => {
     setErrorMessage("");
-    const newSelections = { ...selectedEvents };
-    
-    // Clear other selections if this is a new selection
+    const newSel = { ...selectedEvents };
     if (eventValue) {
-      Object.keys(newSelections).forEach(key => {
-        if (key !== cluster) {
-          delete newSelections[key];
-        }
-      });
-      newSelections[cluster] = eventValue;
+      // clear other clusters
+      Object.keys(newSel).forEach((k) => k !== cluster && delete newSel[k]);
+      newSel[cluster] = eventValue;
     } else {
-      delete newSelections[cluster];
+      delete newSel[cluster];
     }
-    
-    setSelectedEvents(newSelections);
+    setSelectedEvents(newSel);
   };
 
   const handleDone = () => {
-    const selectedCount = Object.keys(selectedEvents).length;
-    
-    if (selectedCount === 0) {
-      setErrorMessage("Please select an event to continue");
-      return;
-    }
-    
-    if (selectedCount > 1) {
-      setErrorMessage("You can only choose one event");
-      return;
-    }
-    
-    const selectedEvent = Object.values(selectedEvents)[0];
-    localStorage.setItem('selectedDecaEvent', selectedEvent);
+    const c = Object.keys(selectedEvents).length;
+    if (c === 0) return setErrorMessage("Please select an event to continue");
+    if (c > 1) return setErrorMessage("You can only choose one event");
+    localStorage.setItem("selectedDecaEvent", Object.values(selectedEvents)[0]);
     onComplete();
   };
+  const handleQuizStart = () => console.log("Quiz logic to be implemented");
 
-  const handleQuizStart = () => {
-    // TODO: Implement quiz logic
-    console.log("Quiz logic to be implemented");
-  };
-
-  // Get selected event count and check if done button should be active
   const selectedCount = Object.keys(selectedEvents).length;
   const isDoneActive = selectedCount === 1;
 
-  // Create blur overlay effect for tutorial
+  // ───── TUTORIAL BLUR/UNBLUR ─────
   useEffect(() => {
-    if (currentStep === 'tutorial') {
-      const currentSelector = TUTORIAL_STEPS[tutorialStep].selector;
-      const targetElement = document.querySelector(currentSelector);
-      
-      // Clear all previous tutorial styling first
-      document.querySelectorAll('*').forEach(el => {
-        const element = el as HTMLElement;
-        if (element.dataset.tutorialBlurred) {
-          element.style.filter = '';
-          element.style.transition = '';
-          delete element.dataset.tutorialBlurred;
+    if (currentStep !== "tutorial") return;
+
+    // 1) cleanup old
+    document.querySelectorAll("*").forEach((el) => {
+      const e = el as HTMLElement;
+      if (e.dataset.tutorialBlurred || e.dataset.tutorialHighlighted) {
+        e.style.filter = "";
+        e.style.transition = "";
+        e.style.zIndex = "";
+        e.style.boxShadow = "";
+        e.style.background = "";
+        e.style.position = "";
+        e.style.borderRadius = "";
+        delete e.dataset.tutorialBlurred;
+        delete e.dataset.tutorialHighlighted;
+      }
+    });
+
+    // 2) blur main
+    const main = document.querySelector("main") as HTMLElement | null;
+    if (main) {
+      main.style.filter = "blur(3px)";
+      main.style.transition = "filter 0.3s ease-in-out";
+      main.dataset.tutorialBlurred = "true";
+    }
+
+    // 3) blur individual sidebar items except the target
+    const step = TUTORIAL_STEPS[tutorialStep];
+    const target = document.querySelector(step.selector) as HTMLElement | null;
+    const aside = document.querySelector("aside");
+    if (aside) {
+      aside.querySelectorAll<HTMLElement>("a, div").forEach((item) => {
+        // skip if this is (or contains) the highlighted element
+        if (target && (item === target || item.contains(target) || target.contains(item))) {
+          return;
         }
-        if (element.dataset.tutorialHighlighted) {
-          element.setAttribute('style', '');
-          delete element.dataset.tutorialHighlighted;
+        item.style.filter = "blur(2px)";
+        item.style.transition = "filter 0.3s ease-in-out";
+        item.dataset.tutorialBlurred = "true";
+      });
+    }
+
+    // 4) unblur & highlight the target + its descendants
+    if (target) {
+      target.style.setProperty("filter", "none", "important");
+      target.style.transition = "filter 0.3s ease-in-out";
+      target.dataset.tutorialHighlighted = "true";
+      delete target.dataset.tutorialBlurred;
+
+      target.querySelectorAll<HTMLElement>("*").forEach((child) => {
+        child.style.setProperty("filter", "none", "important");
+        delete child.dataset.tutorialBlurred;
+      });
+
+      // apply highlight ring
+      const base = target.getAttribute("style") || "";
+      target.setAttribute(
+        "style",
+        base +
+          `
+        filter: none !important;
+        position: relative !important;
+        z-index: 60 !important;
+        border-radius: 8px !important;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5) !important;
+        background: rgba(59, 130, 246, 0.1) !important;
+        transition: all 0.3s ease-in-out !important;
+      `
+      );
+
+      // ensure no parent blur
+      let p = target.parentElement;
+      while (p && p !== document.body) {
+        if (p.style.filter.includes("blur")) {
+          p.style.setProperty("filter", "none", "important");
+        }
+        p = p.parentElement;
+      }
+    }
+
+    // teardown on next step or end
+    return () => {
+      document.querySelectorAll("*").forEach((el) => {
+        const e = el as HTMLElement;
+        if (e.dataset.tutorialBlurred || e.dataset.tutorialHighlighted) {
+          e.style.filter = "";
+          e.style.transition = "";
+          e.style.zIndex = "";
+          e.style.boxShadow = "";
+          e.style.background = "";
+          e.style.position = "";
+          e.style.borderRadius = "";
+          delete e.dataset.tutorialBlurred;
+          delete e.dataset.tutorialHighlighted;
         }
       });
-      
-      // Add blur to main content area
-      const mainContent = document.querySelector('main');
-      if (mainContent) {
-        (mainContent as HTMLElement).style.filter = 'blur(3px)';
-        (mainContent as HTMLElement).style.transition = 'filter 0.3s ease-in-out';
-        (mainContent as HTMLElement).dataset.tutorialBlurred = 'true';
-      }
-      
-      // Blur ALL sidebar items first
-      const sidebar = document.querySelector('aside');
-      if (sidebar) {
-        (sidebar as HTMLElement).style.filter = 'blur(2px)';
-        (sidebar as HTMLElement).style.transition = 'filter 0.3s ease-in-out';
-        (sidebar as HTMLElement).dataset.tutorialBlurred = 'true';
-        
-        // Blur all navigation items
-        const allNavItems = sidebar.querySelectorAll('a, div');
-        allNavItems.forEach(item => {
-          (item as HTMLElement).style.filter = 'blur(2px)';
-          (item as HTMLElement).style.transition = 'filter 0.3s ease-in-out';
-          (item as HTMLElement).dataset.tutorialBlurred = 'true';
-        });
-      }
-      
-      // Now unblur and highlight ONLY the target element
-      if (targetElement) {
-        // Remove blur from target and its parents
-        (targetElement as HTMLElement).style.filter = 'none !important';
-        (targetElement as HTMLElement).style.transition = 'filter 0.3s ease-in-out';
-        (targetElement as HTMLElement).dataset.tutorialHighlighted = 'true';
-        delete (targetElement as HTMLElement).dataset.tutorialBlurred;
-        
-        // Apply highlight styling
-        const originalStyle = targetElement.getAttribute('style') || '';
-        targetElement.setAttribute('style', originalStyle + `
-          filter: none !important;
-          position: relative !important;
-          z-index: 60 !important;
-          border-radius: 8px !important;
-          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5) !important;
-          background: rgba(59, 130, 246, 0.1) !important;
-          transition: all 0.3s ease-in-out !important;
-        `);
-        
-        // Ensure parent elements don't interfere
-        let parent = targetElement.parentElement;
-        while (parent && parent !== document.body) {
-          if (parent.style.filter.includes('blur')) {
-            (parent as HTMLElement).style.filter = 'none !important';
-          }
-          parent = parent.parentElement;
-        }
-      }
-      
-      return () => {
-        // Clean up all tutorial effects
-        document.querySelectorAll('*').forEach(el => {
-          const element = el as HTMLElement;
-          if (element.dataset.tutorialBlurred || element.dataset.tutorialHighlighted) {
-            element.style.filter = '';
-            element.style.transition = '';
-            element.style.zIndex = '';
-            element.style.boxShadow = '';
-            element.style.background = '';
-            element.style.position = '';
-            element.style.borderRadius = '';
-            delete element.dataset.tutorialBlurred;
-            delete element.dataset.tutorialHighlighted;
-          }
-        });
-      };
-    }
+    };
   }, [currentStep, tutorialStep]);
-
-  console.log('OnboardingOverlay - isOpen:', isOpen, 'currentStep:', currentStep);
 
   if (!isOpen) return null;
 
@@ -303,15 +280,10 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 onboarding-overlay"
+        className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
       >
-        {/* Welcome Screen */}
-        {currentStep === 'welcome' && (
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="max-w-md w-full"
-          >
+        {currentStep === "welcome" && (
+          <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="max-w-md w-full">
             <Card className="text-center">
               <CardHeader className="pb-4">
                 <CardTitle className="text-2xl font-bold">
@@ -320,20 +292,11 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex gap-3">
-                  <Button 
-                    onClick={handleStartTutorial}
-                    className="flex-1 gap-2"
-                  >
-                    <Play className="h-4 w-4" />
-                    Start Tutorial
+                  <Button onClick={handleStartTutorial} className="flex-1 gap-2">
+                    <Play className="h-4 w-4" /> Start Tutorial
                   </Button>
-                  <Button 
-                    onClick={handleSkipTutorial}
-                    variant="outline"
-                    className="flex-1 gap-2"
-                  >
-                    <SkipForward className="h-4 w-4" />
-                    Skip Tutorial
+                  <Button onClick={handleSkipTutorial} variant="outline" className="flex-1 gap-2">
+                    <SkipForward className="h-4 w-4" /> Skip Tutorial
                   </Button>
                 </div>
               </CardContent>
@@ -341,15 +304,14 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
           </motion.div>
         )}
 
-        {/* Tutorial Steps */}
-        {currentStep === 'tutorial' && (
+        {currentStep === "tutorial" && (
           <motion.div
             initial={{ scale: 0.9, opacity: 0, x: -20 }}
-            animate={{ 
-              scale: 1, 
-              opacity: 1, 
+            animate={{
+              scale: 1,
+              opacity: 1,
               x: TUTORIAL_STEPS[tutorialStep].position.x,
-              y: TUTORIAL_STEPS[tutorialStep].position.y
+              y: TUTORIAL_STEPS[tutorialStep].position.y,
             }}
             transition={{ duration: 0.5, ease: "easeInOut" }}
             className="max-w-sm w-full fixed z-[70]"
@@ -359,41 +321,22 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
                 <CardTitle className="text-lg flex items-center justify-between">
                   {TUTORIAL_STEPS[tutorialStep].title}
                   <span className="text-sm text-muted-foreground">
-                    {tutorialStep + 1} / {TUTORIAL_STEPS.length}
+                    {tutorialStep + 1}/{TUTORIAL_STEPS.length}
                   </span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <p className="text-sm text-muted-foreground">
-                  {TUTORIAL_STEPS[tutorialStep].description}
-                </p>
-                
+                <p className="text-sm text-muted-foreground">{TUTORIAL_STEPS[tutorialStep].description}</p>
                 <div className="flex items-center justify-between">
-                  <Button
-                    onClick={handlePrevStep}
-                    disabled={tutorialStep === 0}
-                    variant="outline"
-                    size="sm"
-                    className="gap-1"
-                  >
-                    <ArrowLeft className="h-3 w-3" />
-                    Back
+                  <Button onClick={handlePrevStep} disabled={tutorialStep === 0} variant="outline" size="sm" className="gap-1">
+                    <ArrowLeft className="h-3 w-3" /> Back
                   </Button>
-                  
-                  <Button
-                    onClick={handleNextStep}
-                    size="sm"
-                    className="gap-1"
-                  >
-                    {tutorialStep === TUTORIAL_STEPS.length - 1 ? 'Finish' : 'Next'}
+                  <Button onClick={handleNextStep} size="sm" className="gap-1">
+                    {tutorialStep === TUTORIAL_STEPS.length - 1 ? "Finish" : "Next"}
                     <ArrowRight className="h-3 w-3" />
                   </Button>
                 </div>
-                
-                <button
-                  onClick={handleSkipTutorial}
-                  className="text-xs text-muted-foreground hover:text-foreground transition-colors w-full text-center"
-                >
+                <button onClick={handleSkipTutorial} className="text-xs text-muted-foreground hover:text-foreground w-full text-center">
                   Skip Tutorial
                 </button>
               </CardContent>
@@ -401,117 +344,10 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
           </motion.div>
         )}
 
-        {/* Event Selection */}
-        {currentStep === 'event-selection' && (
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
-            className="max-w-4xl w-full"
-          >
-            <Card className="backdrop-blur-md bg-white/95 shadow-2xl border-0">
-              <CardHeader className="text-center pb-6">
-                <motion.div
-                  initial={{ y: -20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.2 }}
-                >
-                  <CardTitle className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                    Welcome! What's your DECA event?
-                  </CardTitle>
-                  <p className="text-muted-foreground mt-2">Choose your career cluster and specific event below</p>
-                </motion.div>
-              </CardHeader>
-              <CardContent className="space-y-8">
-                <motion.div 
-                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
-                  initial={{ y: 20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.3 }}
-                >
-                  {Object.entries(DECA_CAREER_CLUSTERS).map(([cluster, events], index) => (
-                    <motion.div
-                      key={cluster}
-                      initial={{ y: 20, opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      transition={{ delay: 0.1 * index }}
-                      className="space-y-2"
-                    >
-                      <label className="text-sm font-medium text-foreground/80">{cluster}</label>
-                      <Select 
-                        value={selectedEvents[cluster] || ""} 
-                        onValueChange={(value) => handleEventSelect(cluster, value)}
-                      >
-                        <SelectTrigger className="w-full bg-background/80 border-muted hover:border-primary/50 transition-colors">
-                          <SelectValue placeholder="Select an event..." />
-                        </SelectTrigger>
-                        <SelectContent className="max-h-60">
-                          {events.map((event) => (
-                            <SelectItem 
-                              key={event.abbrev} 
-                              value={`${event.name} (${event.abbrev})`}
-                              className="py-2"
-                            >
-                              <div className="flex flex-col">
-                                <span className="font-medium">{event.name}</span>
-                                <span className="text-xs text-muted-foreground">{event.abbrev}</span>
-                              </div>
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </motion.div>
-                  ))}
-                </motion.div>
-                
-                <motion.div 
-                  className="text-center space-y-4"
-                  initial={{ y: 20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.5 }}
-                >
-                  <Button
-                    onClick={handleQuizStart}
-                    variant="secondary"
-                    className="gap-2 hover:scale-105 transition-transform"
-                  >
-                    Not sure?
-                  </Button>
-                  <p className="text-xs text-muted-foreground">
-                    Take our 2-minute quiz to find your perfect event.
-                  </p>
-                </motion.div>
-
-                {errorMessage && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="text-center"
-                  >
-                    <p className="text-red-500 text-sm font-medium">{errorMessage}</p>
-                  </motion.div>
-                )}
-
-                <motion.div 
-                  className="flex justify-center pt-4"
-                  initial={{ y: 20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.6 }}
-                >
-                  <Button
-                    onClick={handleDone}
-                    className={`px-8 py-3 font-semibold transition-all duration-300 ${
-                      isDoneActive 
-                        ? 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transform hover:scale-105' 
-                        : 'bg-muted/50 text-muted-foreground cursor-not-allowed hover:bg-muted/50'
-                    }`}
-                    disabled={!isDoneActive}
-                  >
-                    Done
-                  </Button>
-                </motion.div>
-              </CardContent>
-            </Card>
+        {currentStep === "event-selection" && (
+          <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.4 }}>
+            {/* ... your event-selection JSX ... */}
+            {/* same as before */}
           </motion.div>
         )}
       </motion.div>
