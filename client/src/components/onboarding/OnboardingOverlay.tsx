@@ -318,6 +318,27 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
     }
   }, [currentStep, tutorialStep]);
 
+  // Clean up all effects when overlay closes
+  useEffect(() => {
+    if (!isOpen) {
+      // Remove all tutorial effects when overlay is closed
+      document.querySelectorAll('*').forEach(el => {
+        const element = el as HTMLElement;
+        if (element.dataset.tutorialHighlighted || element.dataset.tutorialBlurred) {
+          element.style.filter = '';
+          element.style.transition = '';
+          element.style.zIndex = '';
+          element.style.boxShadow = '';
+          element.style.background = '';
+          element.style.position = '';
+          element.style.borderRadius = '';
+          delete element.dataset.tutorialHighlighted;
+          delete element.dataset.tutorialBlurred;
+        }
+      });
+    }
+  }, [isOpen]);
+
   console.log('OnboardingOverlay - isOpen:', isOpen, 'currentStep:', currentStep);
 
   if (!isOpen) return null;
@@ -328,7 +349,9 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 bg-black/30 flex items-center justify-center p-4 onboarding-overlay"
+        className={`fixed inset-0 z-50 flex items-center justify-center p-4 onboarding-overlay ${
+          currentStep === 'welcome' ? 'bg-black/50 backdrop-blur-sm' : 'bg-black/30'
+        }`}
       >
         {/* Welcome Screen */}
         {currentStep === 'welcome' && (
@@ -340,7 +363,7 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
             <Card className="text-center">
               <CardHeader className="pb-4">
                 <CardTitle className="text-2xl font-bold">
-                  🎉 Congrats, {userName}! Welcome to Decaide!
+                  Welcome to Decaide!
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
