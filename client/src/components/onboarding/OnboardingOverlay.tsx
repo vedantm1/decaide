@@ -185,6 +185,20 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
       return;
     }
     
+    // Immediately clear all blur effects before closing overlay
+    document.querySelectorAll('*').forEach(el => {
+      const element = el as HTMLElement;
+      element.style.filter = '';
+      element.style.transition = '';
+      element.style.zIndex = '';
+      element.style.boxShadow = '';
+      element.style.background = '';
+      element.style.position = '';
+      element.style.borderRadius = '';
+      delete element.dataset.tutorialHighlighted;
+      delete element.dataset.tutorialBlurred;
+    });
+    
     const selectedEvent = Object.values(selectedEvents)[0];
     localStorage.setItem('selectedDecaEvent', selectedEvent);
     onComplete();
