@@ -236,9 +236,8 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
           // skip the exact element we’re highlighting
           if (item === targetElement) return;
 
-          item.style.filter = 'blur(2px)';
+          item.style.filter = 'none';
           item.style.transition = 'filter 0.3s ease-in-out';
-          item.dataset.tutorialBlurred = 'true';
         });
       }
 
@@ -251,19 +250,19 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
         delete (targetElement as HTMLElement).dataset.tutorialBlurred;
         
         // Force clear styling and apply unblur with high priority
-        targetElement.setAttribute('style', '');
-        targetElement.style.setProperty('filter', 'none', 'important');
-        targetElement.style.setProperty('position', 'relative', 'important');
-        targetElement.style.setProperty('z-index', '9999', 'important');
-        targetElement.style.setProperty('border-radius', '8px', 'important');
-        targetElement.style.setProperty('box-shadow', '0 0 0 3px rgba(59, 130, 246, 0.5)', 'important');
-        targetElement.style.setProperty('background', 'rgba(59, 130, 246, 0.1)', 'important');
-        targetElement.style.setProperty('transition', 'all 0.3s ease-in-out', 'important');
+        (targetElement as HTMLElement).setAttribute('style', '');
+        (targetElement as HTMLElement).style.setProperty('filter', 'none', 'important');
+        (targetElement as HTMLElement).style.setProperty('position', 'relative', 'important');
+        (targetElement as HTMLElement).style.setProperty('z-index', '9999', 'important');
+        (targetElement as HTMLElement).style.setProperty('border-radius', '8px', 'important');
+        (targetElement as HTMLElement).style.setProperty('box-shadow', '0 0 0 3px rgba(59, 130, 246, 0.5)', 'important');
+        (targetElement as HTMLElement).style.setProperty('background', 'rgba(59, 130, 246, 0.1)', 'important');
+        (targetElement as HTMLElement).style.setProperty('transition', 'all 0.3s ease-in-out', 'important');
         
         // Also clear blur from all parent elements up the tree
         let parent = targetElement.parentElement;
         while (parent && parent !== document.body) {
-          parent.style.setProperty('filter', 'none', 'important');
+          (parent as HTMLElement).style.setProperty('filter', 'none', 'important');
           delete (parent as HTMLElement).dataset.tutorialBlurred;
           parent = parent.parentElement;
         }
@@ -271,7 +270,7 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
         // Specifically handle sidebar container if target is inside it
         const sidebar = targetElement.closest('aside');
         if (sidebar) {
-          sidebar.style.setProperty('filter', 'none', 'important');
+          (sidebar as HTMLElement).style.setProperty('filter', 'none', 'important');
           delete (sidebar as HTMLElement).dataset.tutorialBlurred;
         }
       }
