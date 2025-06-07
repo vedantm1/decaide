@@ -227,49 +227,52 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
         (mainContent as HTMLElement).dataset.tutorialBlurred = 'true';
       }
       
-      // Blur ALL sidebar items first
-      const sidebar = document.querySelector('aside');
-      if (sidebar) {
-        (sidebar as HTMLElement).style.filter = 'blur(2px)';
-        (sidebar as HTMLElement).style.transition = 'filter 0.3s ease-in-out';
-        (sidebar as HTMLElement).dataset.tutorialBlurred = 'true';
-        
-        // Blur all navigation items
-        const allNavItems = sidebar.querySelectorAll('a, div');
-        allNavItems.forEach(item => {
-          (item as HTMLElement).style.filter = 'blur(2px)';
-          (item as HTMLElement).style.transition = 'filter 0.3s ease-in-out';
-          (item as HTMLElement).dataset.tutorialBlurred = 'true';
+      // Blur every node under <aside> except the target and its ancestors
+      const aside = document.querySelector('aside');
+      if (aside) {
+        // only grab the actual sidebar entries marked for tutorial
+        const navItems = aside.querySelectorAll<HTMLElement>('[data-tutorial]');
+        navItems.forEach(item => {
+          // skip the exact element we’re highlighting
+          if (item === targetElement) return;
+
+          item.style.filter = 'blur(2px)';
+          item.style.transition = 'filter 0.3s ease-in-out';
+          item.dataset.tutorialBlurred = 'true';
         });
       }
+
+
       
       // Now unblur and highlight ONLY the target element
       if (targetElement) {
-        // Remove blur from target and its parents
-        (targetElement as HTMLElement).style.filter = 'none !important';
-        (targetElement as HTMLElement).style.transition = 'filter 0.3s ease-in-out';
+        // Clear any blur on target element first
         (targetElement as HTMLElement).dataset.tutorialHighlighted = 'true';
         delete (targetElement as HTMLElement).dataset.tutorialBlurred;
         
-        // Apply highlight styling
-        const originalStyle = targetElement.getAttribute('style') || '';
-        targetElement.setAttribute('style', originalStyle + `
-          filter: none !important;
-          position: relative !important;
-          z-index: 60 !important;
-          border-radius: 8px !important;
-          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5) !important;
-          background: rgba(59, 130, 246, 0.1) !important;
-          transition: all 0.3s ease-in-out !important;
-        `);
+        // Force clear styling and apply unblur with high priority
+        targetElement.setAttribute('style', '');
+        targetElement.style.setProperty('filter', 'none', 'important');
+        targetElement.style.setProperty('position', 'relative', 'important');
+        targetElement.style.setProperty('z-index', '9999', 'important');
+        targetElement.style.setProperty('border-radius', '8px', 'important');
+        targetElement.style.setProperty('box-shadow', '0 0 0 3px rgba(59, 130, 246, 0.5)', 'important');
+        targetElement.style.setProperty('background', 'rgba(59, 130, 246, 0.1)', 'important');
+        targetElement.style.setProperty('transition', 'all 0.3s ease-in-out', 'important');
         
-        // Ensure parent elements don't interfere
+        // Also clear blur from all parent elements up the tree
         let parent = targetElement.parentElement;
         while (parent && parent !== document.body) {
-          if (parent.style.filter.includes('blur')) {
-            (parent as HTMLElement).style.filter = 'none !important';
-          }
+          parent.style.setProperty('filter', 'none', 'important');
+          delete (parent as HTMLElement).dataset.tutorialBlurred;
           parent = parent.parentElement;
+        }
+        
+        // Specifically handle sidebar container if target is inside it
+        const sidebar = targetElement.closest('aside');
+        if (sidebar) {
+          sidebar.style.setProperty('filter', 'none', 'important');
+          delete (sidebar as HTMLElement).dataset.tutorialBlurred;
         }
       }
       
