@@ -187,6 +187,14 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
     
     const selectedEvent = Object.values(selectedEvents)[0];
     localStorage.setItem('selectedDecaEvent', selectedEvent);
+    
+    // Immediately remove background blur before closing overlay
+    const overlayElement = document.querySelector('.onboarding-overlay');
+    if (overlayElement) {
+      (overlayElement as HTMLElement).style.backdropFilter = 'none';
+      (overlayElement as HTMLElement).style.backgroundColor = 'transparent';
+    }
+    
     onComplete();
   };
 
@@ -335,6 +343,14 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
           delete element.dataset.tutorialHighlighted;
           delete element.dataset.tutorialBlurred;
         }
+      });
+      
+      // Also clean up any remaining blur effects on body and main elements
+      document.body.style.filter = '';
+      const mainElements = document.querySelectorAll('main, .main-content, #root > div');
+      mainElements.forEach(el => {
+        (el as HTMLElement).style.filter = '';
+        (el as HTMLElement).style.backdropFilter = '';
       });
     }
   }, [isOpen]);
