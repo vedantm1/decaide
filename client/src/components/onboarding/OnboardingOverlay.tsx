@@ -187,6 +187,21 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
     
     const selectedEvent = Object.values(selectedEvents)[0];
     localStorage.setItem('selectedDecaEvent', selectedEvent);
+    
+    // Clean up all blur effects immediately
+    document.querySelectorAll('*').forEach(el => {
+      const element = el as HTMLElement;
+      element.style.filter = '';
+      element.style.transition = '';
+      element.style.zIndex = '';
+      element.style.boxShadow = '';
+      element.style.background = '';
+      element.style.position = '';
+      element.style.borderRadius = '';
+      delete element.dataset.tutorialHighlighted;
+      delete element.dataset.tutorialBlurred;
+    });
+    
     onComplete();
   };
 
