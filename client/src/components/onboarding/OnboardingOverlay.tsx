@@ -84,43 +84,43 @@ const TUTORIAL_STEPS = [
     title: "Dashboard",
     description: "Your Dashboard displays your practice stats—role-plays completed, practice tests taken, PIs mastered, and current streak.",
     selector: "[data-tutorial='dashboard']",
-    position: { x: 300, y: 100 }
+    position: { x: 350, y: 100 }
   },
   {
     title: "Practice Tests", 
     description: "Tap 'Practice Tests' to jump into written exam simulations and track your scores.",
     selector: "[data-tutorial='practice-tests']",
-    position: { x: 300, y: 150 }
+    position: { x: 350, y: 150 }
   },
   {
     title: "Roleplay",
     description: "Select 'Roleplay' to practice scenario conversations with AI and review transcripts.",
     selector: "[data-tutorial='roleplay']", 
-    position: { x: 300, y: 200 }
+    position: { x: 350, y: 200 }
   },
   {
     title: "Written Events",
     description: "Under 'Written Events,' find prompts for written performance events.",
     selector: "[data-tutorial='written-events']",
-    position: { x: 300, y: 250 }
+    position: { x: 350, y: 250 }
   },
   {
     title: "Performance Indicators",
     description: "Browse all PIs here—tap any to see definitions, examples, and practice questions.",
     selector: "[data-tutorial='performance-indicators']",
-    position: { x: 300, y: 300 }
+    position: { x: 350, y: 300 }
   },
   {
     title: "My Progress", 
     description: "Check your mastery timeline, badges, and goals on 'My Progress.'",
     selector: "[data-tutorial='my-progress']",
-    position: { x: 300, y: 350 }
+    position: { x: 350, y: 350 }
   },
   {
     title: "Settings",
     description: "Open 'Settings' to customize your experience, adjust notifications, or log out.",
     selector: "[data-tutorial='settings']",
-    position: { x: 300, y: 400 }
+    position: { x: 350, y: 400 }
   }
 ];
 
@@ -350,11 +350,15 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
             animate={{ 
               scale: 1, 
               opacity: 1, 
-              x: TUTORIAL_STEPS[tutorialStep].position.x,
-              y: TUTORIAL_STEPS[tutorialStep].position.y
+              x: 0,
+              y: 0
             }}
             transition={{ duration: 0.5, ease: "easeInOut" }}
-            className="max-w-sm w-full fixed z-[70]"
+            className="max-w-sm w-full fixed z-[70] left-64 top-20"
+            style={{
+              left: `${TUTORIAL_STEPS[tutorialStep].position.x}px`,
+              top: `${TUTORIAL_STEPS[tutorialStep].position.y}px`
+            }}
           >
             <Card>
               <CardHeader className="pb-2">
