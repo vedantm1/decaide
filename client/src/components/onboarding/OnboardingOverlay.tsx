@@ -345,9 +345,9 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
         }
       });
       
-      // Also clean up any remaining blur effects on body and main elements
+      // Also clean up any remaining blur effects on body, main elements, and sidebar
       document.body.style.filter = '';
-      const mainElements = document.querySelectorAll('main, .main-content, #root > div');
+      const mainElements = document.querySelectorAll('main, .main-content, #root > div, nav, aside, .sidebar, header');
       mainElements.forEach(el => {
         (el as HTMLElement).style.filter = '';
         (el as HTMLElement).style.backdropFilter = '';
