@@ -2,12 +2,12 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth } from "./auth";
-import { 
+import {
   DECA_CATEGORIES,
   DECA_EVENTS,
   EVENT_TYPE_GROUPS,
-  PI_CATEGORIES, 
-  SUBSCRIPTION_LIMITS 
+  PI_CATEGORIES,
+  SUBSCRIPTION_LIMITS,
 } from "@shared/schema";
 import aiRoutes from "./routes/aiRoutes";
 import chatRoutes from "./routes/chatRoutes";
@@ -15,22 +15,23 @@ import { getOpenAIClient } from "./services/azureOpenai";
 import Stripe from "stripe";
 import mappingRoutes from "./mappingRoutes";
 
-
 if (!process.env.STRIPE_SECRET_KEY) {
-  console.warn('Missing Stripe secret key. Stripe features will not work properly.');
+  console.warn(
+    "Missing Stripe secret key. Stripe features will not work properly.",
+  );
 }
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2023-10-16' as any, // Using as any to fix type mismatch with newer versions
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
+  apiVersion: "2023-10-16" as any, // Using as any to fix type mismatch with newer versions
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Set up authentication routes
   setupAuth(app);
-  
+
   // Register AI routes
   app.use("/api/ai", aiRoutes);
-  
+
   // Register Chat routes
   app.use("/api/chat", chatRoutes);
 
@@ -47,7 +48,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({
       categories: DECA_CATEGORIES,
       events: DECA_EVENTS,
-      eventTypeGroups: EVENT_TYPE_GROUPS
+      eventTypeGroups: EVENT_TYPE_GROUPS,
     });
   });
 
@@ -55,33 +56,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/pi-categories", (req, res) => {
     res.json(PI_CATEGORIES);
   });
-  
+
   // Test Azure OpenAI integration
   app.get("/api/test-azure-openai", async (req, res) => {
     try {
       const client = getOpenAIClient();
       const deployment = "gpt-4o-mini";
-      
+
       const response = await client.getChatCompletions(
         deployment,
         [
           { role: "system", content: "You are a helpful DECA assistant." },
-          { role: "user", content: "What is DECA and why is it important for high school students?" }
+          {
+            role: "user",
+            content:
+              "What is DECA and why is it important for high school students?",
+          },
         ],
         {
           temperature: 0.7,
-          maxTokens: 300
-        }
+          maxTokens: 300,
+        },
       );
-      
-      const content = response.choices[0]?.message?.content || "No response generated";
+
+      const content =
+        response.choices[0]?.message?.content || "No response generated";
       res.json({ success: true, content });
     } catch (error: any) {
       console.error("Error testing Azure OpenAI:", error);
-      res.status(500).json({ 
-        success: false, 
+      res.status(500).json({
+        success: false,
         error: error.message,
-        details: error.toString()
+        details: error.toString(),
       });
     }
   });
@@ -89,7 +95,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get user stats
   app.get("/api/user/stats", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
-    
+
     try {
       const userId = req.user!.id;
       const stats = await storage.getUserStats(userId);
@@ -102,7 +108,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get recent activities
   app.get("/api/user/activities", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
-    
+
     try {
       const userId = req.user!.id;
       const activities = await storage.getUserActivities(userId);
@@ -115,7 +121,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get learning items (in-progress activities)
   app.get("/api/user/learning", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
-    
+
     try {
       const userId = req.user!.id;
       const learningItems = await storage.getLearningItems(userId);
@@ -128,31 +134,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get performance indicators
   app.get("/api/user/performance-indicators", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
-    
+
     try {
       const userId = req.user!.id;
       const category = req.query.category as string;
       const pis = await storage.getUserPIs(userId, category);
       res.json(pis);
     } catch (error) {
-      res.status(500).json({ error: "Failed to retrieve performance indicators" });
+      res
+        .status(500)
+        .json({ error: "Failed to retrieve performance indicators" });
     }
   });
 
   // Update performance indicator status
   app.post("/api/user/performance-indicators/:id", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
-    
+
     try {
       const userId = req.user!.id;
       const piId = parseInt(req.params.id);
       const { status } = req.body;
-      
+
       const updated = await storage.updatePIStatus(userId, piId, status);
       if (!updated) {
-        return res.status(404).json({ error: "Performance indicator not found" });
+        return res
+          .status(404)
+          .json({ error: "Performance indicator not found" });
       }
-      
+
       res.json({ success: true, status });
     } catch (error) {
       res.status(500).json({ error: "Failed to update performance indicator" });
@@ -162,17 +172,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get roleplay scenarios
   app.post("/api/roleplay/generate", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
-    
+
     try {
       const userId = req.user!.id;
-      const { instructionalArea, performanceIndicators, difficultyLevel, businessType } = req.body;
-      
+      const {
+        instructionalArea,
+        performanceIndicators,
+        difficultyLevel,
+        businessType,
+      } = req.body;
+
       // Check if user has available roleplay generations based on subscription
       const canGenerate = await storage.checkRoleplayAllowance(userId);
       if (!canGenerate) {
-        return res.status(403).json({ error: "Roleplay generation limit reached for your subscription tier" });
+        return res.status(403).json({
+          error: "Roleplay generation limit reached for your subscription tier",
+        });
       }
-      
+
       // Generate roleplay (mock for now)
       const roleplay = {
         id: Date.now(),
@@ -181,12 +198,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         performanceIndicators,
         difficulty: difficultyLevel,
         businessType,
-        meetWith: "The business owner"
+        meetWith: "The business owner",
       };
-      
+
       // Record the usage
       await storage.recordRoleplayGeneration(userId);
-      
+
       res.json(roleplay);
     } catch (error) {
       res.status(500).json({ error: "Failed to generate roleplay scenario" });
@@ -195,10 +212,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Generate AI-powered practice test (demo version - no auth required)
   app.post("/api/generate-test", async (req, res) => {
-    
     try {
       const { cluster, level, questionCount } = req.body;
-      
+
       // Skip user authentication checks for demo purposes
       // In production, you would check user subscription limits here
       let userId = null;
@@ -206,25 +222,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
         userId = req.user.id;
         const canGenerate = await storage.checkTestAllowance(userId);
         if (!canGenerate) {
-          return res.status(403).json({ error: "Test generation limit reached for your subscription tier" });
+          return res.status(403).json({
+            error: "Test generation limit reached for your subscription tier",
+          });
         }
       }
-      
+
       // Get Azure OpenAI and Search credentials from environment
       const azureKey = process.env.AZURE_OPENAI_KEY;
       const azureEndpoint = process.env.AZURE_OPENAI_ENDPOINT;
       const searchEndpoint = process.env.SEARCH_ENDPOINT;
       const searchKey = process.env.SEARCH_KEY;
       const searchIndex = process.env.SEARCH_INDEX_NAME;
-      
+
       if (!azureKey || !azureEndpoint) {
-        return res.status(500).json({ error: "Azure OpenAI configuration missing" });
+        return res
+          .status(500)
+          .json({ error: "Azure OpenAI configuration missing" });
       }
-      
-      console.log('Search endpoint:', searchEndpoint);
-      console.log('Search index:', searchIndex);
-      console.log('Search key available:', !!searchKey);
-      
+
+      console.log("Search endpoint:", searchEndpoint);
+      console.log("Search index:", searchIndex);
+      console.log("Search key available:", !!searchKey);
+
       // Master prompt (system message) - exact text from requirements
       const systemPrompt = `You are a world-class psychometrician, item-writer, and certified DECA Advisor.  
 You have memorized:
@@ -264,7 +284,7 @@ schemaJSON = {
 
 ####################  RULES  ######################
 0 ▸ If both \`cluster\` & \`level\` are supplied in the user request, generate the exam.  
-1 ▸ Use blueprintData exactly—IA counts must sum to 100.  
+1 ▸ Use blueprintData exactly—IA counts must sum to the given amount asked for or 100.  
 2 ▸ Apply difficultyMix quotas.  
 3 ▸ Tag each item with accurate \`pi_codes\`.  
 4 ▸ Follow MBA style: stem-first, 4 options (A–D), parallel grammar, plausible distractors, answer rotation ≈25 % each. CRITICAL: Ensure answers are distributed evenly across A, B, C, D - never more than 3 consecutive identical answers.  
@@ -273,7 +293,59 @@ schemaJSON = {
 7 ▸ Optional "rationales on" appends a one-sentence rationale per item.  
 8 ▸ Self-validate counts, quotas, duplication, JSON syntax.  
 9 ▸ Output *only* the requested exam—no extra commentary or markdown.
-###################################################`;
+
+Additional Rules: 
+
+1▸ **Nuance Factor**  
+ Every item is written so **exactly two choices feel correct** until the test-taker notices **one precise, defining nuance**.  
+ • Craft the “near-miss” distractor to match ~90 % of the same concept.  
+ • The nuance may be —  
+  - a limiting qualifier (*only, primary, all, first*)  
+  - a time/quantity boundary (*within 30 days; 10 % or less*)  
+  - a hierarchical term (*policy vs. procedure; strategic vs. tactical*)  
+  - a legal or ethical fine point (*letter vs. spirit; civil vs. criminal*)  
+  - a scope difference (*domestic vs. international; implicit vs. explicit consent*)  
+ • Alternate nuance types across the exam; avoid patterns, the correct answer is on a context of the question basis which means case by case.  
+ 
+
+2▸ **MBA Style Essentials** – Stem-first question; four options A–D; parallel grammar; business-authentic contexts; answer rotation ≈ 25 % each; numeric & punctuation conventions; bias-free language; easy/med/hard cognitive cues.
+
+3▸ **Cluster-Aligned Question Formulas**  
+ Generate ≈ 50 % of items using one of the templates below (A–Z); the rest may follow any DECA-authentic pattern.  
+ Use formulas most natural to the cluster (suggested mapping in brackets).  
+ A Definition-Pick [Core, BM+A]  
+ B Most/Best Practice [All]  
+ C Except/Not [Core, PFL]  
+ D Scenario→Principle [BM+A, Entrepreneurship]  
+ E Cause-Effect [Economics in all clusters]  
+ F Legal Test [Finance, BM+A]  
+ G Math-Solve [Finance, PFL]  
+ H Sequence/Process [Operations heavy clusters]  
+ I Benefit-Goal [Marketing, Hospitality]  
+ J Risk-Control [Finance, Entrepreneurship]  
+ K Ethics vs Law [Core, BM+A]  
+ L Tech-Impact [Marketing, BM+A]  
+ M Touchpoint ID [Hospitality, Marketing]  
+ N PI-Match [All]  
+ O Behavior-Interpret [HR items across clusters]  
+ P Globalization [Marketing, Core]  
+ Q Economics Curve [Core, Finance]  
+ R Budget/Variance [BM+A, Finance]  
+ S Customer-Service Empathy [Hospitality, Marketing]  
+ T Channel Conflict [Marketing]  
+ U Data-Analytics Use [Marketing, Finance]  
+ V Insurance-Risk Transfer [Finance, PFL]  
+ W Motivation Theory [BM+A, Core]  
+ X Career-Stage (Orientation/Onboarding) [BM+A]  
+ Y Compliance-AI Role [Finance, Core]  
+ Z Governance Action [BM+A]
+
+ • Distribute A–Z variants evenly within that 50 % subset.  
+ • Any formula may be adapted to fit the IA and PI but must preserve its core structure.
+4. Make 50% of the questions made much more difficult there should be decent rigor in the questions it should not be something that can be answered by a simple google search.
+
+###################################################
+`;
 
       // Dynamic user message based on client's request
       const userMessage = `Generate a ${questionCount}-question exam.
@@ -282,32 +354,33 @@ level   = ${level}
 format  = json
 rationales = off
 
-CRITICAL: Distribute correct answers evenly across A, B, C, D options. For ${questionCount} questions, aim for roughly ${Math.ceil(questionCount/4)} answers each for A, B, C, and D. Never have more than 2 consecutive identical answers.`;
+CRITICAL: Distribute correct answers evenly across A, B, C, D options. For ${questionCount} questions, aim for roughly ${Math.ceil(questionCount / 4)} answers each for A, B, C, and D. Never have more than 2 consecutive identical answers.`;
 
-      console.log('Generating test with Azure OpenAI...');
-      console.log('Cluster:', cluster);
-      console.log('Level:', level);
-      console.log('Question Count:', questionCount);
+      console.log("Generating test with Azure OpenAI...");
+      console.log("Cluster:", cluster);
+      console.log("Level:", level);
+      console.log("Question Count:", questionCount);
 
       // Construct correct Azure OpenAI endpoint
-      const baseEndpoint = azureEndpoint.replace(/\/$/, ''); // Remove trailing slash
-      const deploymentName = process.env.AZURE_OPENAI_DEPLOYMENT_NAME || 'gpt-4o-mini';
+      const baseEndpoint = azureEndpoint.replace(/\/$/, ""); // Remove trailing slash
+      const deploymentName =
+        process.env.AZURE_OPENAI_DEPLOYMENT_NAME || "gpt-4o-mini";
       const fullEndpoint = `${baseEndpoint}/openai/deployments/${deploymentName}/chat/completions?api-version=2024-02-15-preview`;
-      
-      console.log('Using Azure endpoint:', fullEndpoint);
-      console.log('Deployment name:', deploymentName);
-      
+
+      console.log("Using Azure endpoint:", fullEndpoint);
+      console.log("Deployment name:", deploymentName);
+
       // Make request to Azure OpenAI
       const response = await fetch(fullEndpoint, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'api-key': azureKey
+          "Content-Type": "application/json",
+          "api-key": azureKey,
         },
         body: JSON.stringify({
           messages: [
             { role: "system", content: systemPrompt },
-            { role: "user", content: userMessage }
+            { role: "user", content: userMessage },
           ],
           max_tokens: 16384,
           temperature: 0.7,
@@ -317,38 +390,43 @@ CRITICAL: Distribute correct answers evenly across A, B, C, D options. For ${que
           stop: null,
           stream: false,
 
-          response_format: { "type": "json_object" }
-        })
+          response_format: { type: "json_object" },
+        }),
       });
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('Azure OpenAI API error:', response.status, errorText);
-        throw new Error(`Azure OpenAI API error: ${response.status} ${errorText}`);
+        console.error("Azure OpenAI API error:", response.status, errorText);
+        throw new Error(
+          `Azure OpenAI API error: ${response.status} ${errorText}`,
+        );
       }
 
       const azureResponse = await response.json();
-      console.log('Azure OpenAI response received');
+      console.log("Azure OpenAI response received");
 
       // Parse the JSON response from Azure
       const quizContent = azureResponse.choices[0].message.content;
       const quizData = JSON.parse(quizContent);
-      
+
       // Record the usage (only if user is authenticated)
       if (userId) {
         await storage.recordTestGeneration(userId);
       }
-      
-      console.log('Generated quiz with', quizData.questions?.length || 0, 'questions');
-      
+
+      console.log(
+        "Generated quiz with",
+        quizData.questions?.length || 0,
+        "questions",
+      );
+
       // Send the parsed quiz JSON back to client
       res.status(200).json(quizData);
-      
     } catch (error: any) {
       console.error("Error generating AI test:", error);
-      res.status(500).json({ 
-        error: "Failed to generate AI-powered test", 
-        details: error.message 
+      res.status(500).json({
+        error: "Failed to generate AI-powered test",
+        details: error.message,
       });
     }
   });
@@ -356,33 +434,30 @@ CRITICAL: Distribute correct answers evenly across A, B, C, D options. For ${que
   // Generate test questions (legacy endpoint)
   app.post("/api/test/generate", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
-    
+
     try {
       const userId = req.user!.id;
       const { testType, categories, numQuestions } = req.body;
-      
+
       // Check if user has available test generations based on subscription
       const canGenerate = await storage.checkTestAllowance(userId);
       if (!canGenerate) {
-        return res.status(403).json({ error: "Test generation limit reached for your subscription tier" });
+        return res.status(403).json({
+          error: "Test generation limit reached for your subscription tier",
+        });
       }
-      
+
       // Generate test questions (mock for now)
       const questions = Array.from({ length: numQuestions }).map((_, i) => ({
         id: i + 1,
         question: `Question about ${categories[i % categories.length]}`,
-        options: [
-          "Option A",
-          "Option B",
-          "Option C",
-          "Option D"
-        ],
-        correctAnswer: Math.floor(Math.random() * 4)
+        options: ["Option A", "Option B", "Option C", "Option D"],
+        correctAnswer: Math.floor(Math.random() * 4),
       }));
-      
+
       // Record the usage
       await storage.recordTestGeneration(userId);
-      
+
       res.json({ testType, questions });
     } catch (error) {
       res.status(500).json({ error: "Failed to generate test questions" });
@@ -392,19 +467,19 @@ CRITICAL: Distribute correct answers evenly across A, B, C, D options. For ${que
   // Submit test results
   app.post("/api/test/submit", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
-    
+
     try {
       const userId = req.user!.id;
       const { testType, score, details } = req.body;
-      
+
       const session = await storage.recordPracticeSession({
         userId,
         type: "test",
         score,
         completedAt: new Date(),
-        details: JSON.stringify({ testType, ...details })
+        details: JSON.stringify({ testType, ...details }),
       });
-      
+
       res.json(session);
     } catch (error) {
       res.status(500).json({ error: "Failed to save test results" });
@@ -414,19 +489,19 @@ CRITICAL: Distribute correct answers evenly across A, B, C, D options. For ${que
   // Submit roleplay results
   app.post("/api/roleplay/submit", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
-    
+
     try {
       const userId = req.user!.id;
       const { roleplayId, score, details } = req.body;
-      
+
       const session = await storage.recordPracticeSession({
         userId,
         type: "roleplay",
         score,
         completedAt: new Date(),
-        details: JSON.stringify({ roleplayId, ...details })
+        details: JSON.stringify({ roleplayId, ...details }),
       });
-      
+
       res.json(session);
     } catch (error) {
       res.status(500).json({ error: "Failed to save roleplay results" });
@@ -436,7 +511,7 @@ CRITICAL: Distribute correct answers evenly across A, B, C, D options. For ${que
   // Get daily challenge
   app.get("/api/daily-challenge", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
-    
+
     try {
       const userId = req.user!.id;
       const challenge = await storage.getDailyChallenge(userId);
@@ -449,7 +524,7 @@ CRITICAL: Distribute correct answers evenly across A, B, C, D options. For ${que
   // Complete daily challenge
   app.post("/api/daily-challenge/complete", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
-    
+
     try {
       const userId = req.user!.id;
       const result = await storage.completeDailyChallenge(userId);
@@ -462,33 +537,36 @@ CRITICAL: Distribute correct answers evenly across A, B, C, D options. For ${que
   // Update user settings
   app.post("/api/user/settings", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
-    
+
     try {
       const userId = req.user!.id;
       const { eventFormat, eventCode } = req.body;
-      
-      const updated = await storage.updateUserSettings(userId, { eventFormat, eventCode });
+
+      const updated = await storage.updateUserSettings(userId, {
+        eventFormat,
+        eventCode,
+      });
       res.json(updated);
     } catch (error) {
       res.status(500).json({ error: "Failed to update user settings" });
     }
   });
-  
+
   // Update appearance settings
   app.post("/api/user/appearance", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
-    
+
     try {
       const userId = req.user!.id;
       const { uiTheme, colorScheme, theme, visualStyle } = req.body;
-      
+
       // Create an object with the settings to update
       const updateData: any = {};
       if (uiTheme) updateData.uiTheme = uiTheme;
-      if (colorScheme) updateData.colorScheme = colorScheme; 
+      if (colorScheme) updateData.colorScheme = colorScheme;
       if (theme) updateData.theme = theme;
       if (visualStyle && !colorScheme) updateData.colorScheme = visualStyle; // For backward compatibility
-      
+
       const updated = await storage.updateUserSettings(userId, updateData);
       res.json(updated);
     } catch (error) {
@@ -499,202 +577,211 @@ CRITICAL: Distribute correct answers evenly across A, B, C, D options. For ${que
   // Update subscription (manual for testing)
   app.post("/api/user/subscription", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
-    
+
     try {
       const userId = req.user!.id;
       const { tier } = req.body;
-      
+
       // In a real app, this would connect to a payment processor
       if (!SUBSCRIPTION_LIMITS[tier as keyof typeof SUBSCRIPTION_LIMITS]) {
         return res.status(400).json({ error: "Invalid subscription tier" });
       }
-      
+
       const updated = await storage.updateSubscription(userId, tier);
       res.json(updated);
     } catch (error) {
       res.status(500).json({ error: "Failed to update subscription" });
     }
   });
-  
+
   // Stripe API endpoints
   // Create a payment intent for one-time payment
-  app.post('/api/create-payment-intent', async (req, res) => {
+  app.post("/api/create-payment-intent", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
-    
+
     try {
       const { amount } = req.body;
-      
+
       // Create a PaymentIntent with the order amount and currency
       const paymentIntent = await stripe.paymentIntents.create({
         amount: Math.round(amount * 100), // convert to cents
-        currency: 'usd',
+        currency: "usd",
         // Verify your integration by passing this to stripe.confirmCardPayment
         // on the client side
         metadata: {
-          userId: req.user!.id.toString()
-        }
+          userId: req.user!.id.toString(),
+        },
       });
 
       res.send({
         clientSecret: paymentIntent.client_secret,
       });
     } catch (error: any) {
-      res.status(500).json({ 
-        error: `Payment intent creation failed: ${error.message}` 
+      res.status(500).json({
+        error: `Payment intent creation failed: ${error.message}`,
       });
     }
   });
-  
+
   // Create or get subscription
-  app.post('/api/get-or-create-subscription', async (req, res) => {
+  app.post("/api/get-or-create-subscription", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
-    
+
     const user = req.user!;
     const { priceId } = req.body;
-    
+
     if (!priceId) {
-      return res.status(400).json({ error: 'Price ID is required' });
+      return res.status(400).json({ error: "Price ID is required" });
     }
-    
+
     try {
       // If user already has a subscription, return it
       if (user.stripeSubscriptionId) {
-        const subscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
-        
+        const subscription = await stripe.subscriptions.retrieve(
+          user.stripeSubscriptionId,
+        );
+
         res.send({
           subscriptionId: subscription.id,
-          clientSecret: (subscription.latest_invoice as any)?.payment_intent?.client_secret,
+          clientSecret: (subscription.latest_invoice as any)?.payment_intent
+            ?.client_secret,
         });
-        
+
         return;
       }
-      
+
       // Create new customer if needed
       if (!user.stripeCustomerId) {
         if (!user.email) {
-          return res.status(400).json({ error: 'User email is required for subscription' });
+          return res
+            .status(400)
+            .json({ error: "User email is required for subscription" });
         }
-        
+
         const customer = await stripe.customers.create({
           email: user.email,
           name: user.username,
         });
-        
+
         await storage.updateStripeCustomerId(user.id, customer.id);
         user.stripeCustomerId = customer.id;
       }
-      
+
       // Create the subscription
       const subscription = await stripe.subscriptions.create({
         customer: user.stripeCustomerId,
         items: [{ price: priceId }],
-        payment_behavior: 'default_incomplete',
-        expand: ['latest_invoice.payment_intent'],
+        payment_behavior: "default_incomplete",
+        expand: ["latest_invoice.payment_intent"],
       });
-      
+
       await storage.updateStripeSubscriptionId(user.id, subscription.id);
-      
+
       // Get the tier from the subscription data
       // This would need to map your Stripe product/price to your subscription tiers
       const tierMap: Record<string, string> = {
-        'price_standard': 'standard',
-        'price_plus': 'plus',
-        'price_pro': 'pro',
+        price_standard: "standard",
+        price_plus: "plus",
+        price_pro: "pro",
       };
-      
+
       // Update the user's subscription tier
       if (tierMap[priceId]) {
         await storage.updateSubscription(user.id, tierMap[priceId]);
       }
-      
+
       res.send({
         subscriptionId: subscription.id,
-        clientSecret: (subscription.latest_invoice as any)?.payment_intent?.client_secret,
+        clientSecret: (subscription.latest_invoice as any)?.payment_intent
+          ?.client_secret,
       });
     } catch (error: any) {
-      res.status(500).json({ 
-        error: `Subscription creation failed: ${error.message}` 
+      res.status(500).json({
+        error: `Subscription creation failed: ${error.message}`,
       });
     }
   });
-  
+
   // Webhook endpoint to handle Stripe events
-  app.post('/api/webhook', async (req, res) => {
-    const sig = req.headers['stripe-signature'] as string;
-    
+  app.post("/api/webhook", async (req, res) => {
+    const sig = req.headers["stripe-signature"] as string;
+
     if (!process.env.STRIPE_WEBHOOK_SECRET) {
-      return res.status(400).send('Webhook secret is not configured');
+      return res.status(400).send("Webhook secret is not configured");
     }
-    
+
     let event;
-    
+
     try {
       // Verify the event came from Stripe
       event = stripe.webhooks.constructEvent(
-        (req as any).rawBody || req.body, 
-        sig, 
-        process.env.STRIPE_WEBHOOK_SECRET
+        (req as any).rawBody || req.body,
+        sig,
+        process.env.STRIPE_WEBHOOK_SECRET,
       );
     } catch (err: any) {
       console.error(`Webhook signature verification failed: ${err.message}`);
       return res.status(400).send(`Webhook Error: ${err.message}`);
     }
-    
+
     // Handle the event
     switch (event.type) {
-      case 'payment_intent.succeeded':
+      case "payment_intent.succeeded":
         const paymentIntent = event.data.object;
-        console.log(`PaymentIntent for ${paymentIntent.amount} was successful!`);
+        console.log(
+          `PaymentIntent for ${paymentIntent.amount} was successful!`,
+        );
         // Update user subscription based on payment
         if (paymentIntent.metadata?.userId) {
           const userId = parseInt(paymentIntent.metadata.userId);
           // Logic to update user subscription based on payment amount
         }
         break;
-        
-      case 'customer.subscription.created':
-      case 'customer.subscription.updated':
+
+      case "customer.subscription.created":
+      case "customer.subscription.updated":
         const subscription = event.data.object;
         const customerId = subscription.customer as string;
-        
+
         // Find user by Stripe customer ID
         const user = await storage.getUserByStripeCustomerId(customerId);
-        
+
         if (user) {
           const status = subscription.status;
-          if (status === 'active' || status === 'trialing') {
+          if (status === "active" || status === "trialing") {
             // Map price to tier and update user subscription
             const priceId = subscription.items.data[0].price.id;
             const tierMap: Record<string, string> = {
-              'price_standard': 'standard',
-              'price_plus': 'plus',
-              'price_pro': 'pro',
+              price_standard: "standard",
+              price_plus: "plus",
+              price_pro: "pro",
             };
-            
+
             if (tierMap[priceId]) {
               await storage.updateSubscription(user.id, tierMap[priceId]);
             }
           }
         }
         break;
-        
-      case 'customer.subscription.deleted':
+
+      case "customer.subscription.deleted":
         const canceledSubscription = event.data.object;
         const canceledCustomerId = canceledSubscription.customer as string;
-        
+
         // Find user by Stripe customer ID
-        const canceledUser = await storage.getUserByStripeCustomerId(canceledCustomerId);
-        
+        const canceledUser =
+          await storage.getUserByStripeCustomerId(canceledCustomerId);
+
         if (canceledUser) {
           // Downgrade to standard tier
-          await storage.updateSubscription(canceledUser.id, 'standard');
+          await storage.updateSubscription(canceledUser.id, "standard");
         }
         break;
-        
+
       default:
         console.log(`Unhandled event type ${event.type}`);
     }
-    
+
     // Return a response to acknowledge receipt of the event
     res.json({ received: true });
   });

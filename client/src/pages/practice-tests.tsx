@@ -43,7 +43,7 @@ const COMPETITION_LEVELS = [
 ];
 
 // Quiz states for managing the interface
-type QuizState = 'configuring' | 'loading' | 'active' | 'results';
+type QuizState = 'configuring' | 'loading' | 'active' | 'results' | 'review';
 
 export default function PracticeTestsPage() {
   const { toast } = useToast();
@@ -409,9 +409,119 @@ export default function PracticeTestsPage() {
                 <Button onClick={restartQuiz} className="flex-1">
                   Take Another Test
                 </Button>
-                <Button variant="outline" onClick={() => setQuizState('active')} className="flex-1">
+                <Button variant="outline" onClick={() => setQuizState('review')} className="flex-1">
                   Review Answers
                 </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Review State */}
+      {quizState === 'review' && quizData && (
+        <div className="space-y-6">
+          <Card className="bg-background/60 backdrop-blur-sm border-muted">
+            <CardHeader>
+              <CardTitle>Answer Review</CardTitle>
+              <p className="text-muted-foreground">
+                Review your answers with correct solutions and explanations
+              </p>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                {quizData.questions.map((question: any, index: number) => {
+                  const userAnswer = userAnswers[question.id];
+                  const correctAnswer = question.answer;
+                  const isCorrect = userAnswer === correctAnswer;
+                  
+                  return (
+                    <div key={question.id} className="border rounded-lg p-4 space-y-4">
+                      <div className="flex items-start gap-3">
+                        <div className={`rounded-full p-2 mt-1 ${isCorrect ? 'bg-green-500/10' : 'bg-red-500/10'}`}>
+                          <span className={`font-semibold text-sm ${isCorrect ? 'text-green-600' : 'text-red-600'}`}>
+                            {index + 1}
+                          </span>
+                        </div>
+                        <div className="flex-1 space-y-3">
+                          <div>
+                            <h3 className="text-lg font-medium leading-relaxed">
+                              {question.stem}
+                            </h3>
+                            <div className="flex items-center gap-2 mt-2">
+                              <Badge variant="outline">{question.instructional_area}</Badge>
+                              <Badge variant="secondary">{question.difficulty}</Badge>
+                              {isCorrect ? (
+                                <Badge className="bg-green-500/10 text-green-600 border-green-500/20">
+                                  Correct
+                                </Badge>
+                              ) : (
+                                <Badge className="bg-red-500/10 text-red-600 border-red-500/20">
+                                  Incorrect
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                          
+                          <div className="space-y-2">
+                            {Object.entries(question.options).map(([key, option]) => {
+                              const isUserChoice = userAnswer === key;
+                              const isCorrectChoice = correctAnswer === key;
+                              
+                              return (
+                                <div 
+                                  key={key} 
+                                  className={`p-3 rounded-lg border ${
+                                    isCorrectChoice 
+                                      ? 'bg-green-500/10 border-green-500/20' 
+                                      : isUserChoice 
+                                        ? 'bg-red-500/10 border-red-500/20' 
+                                        : 'bg-muted/30 border-muted'
+                                  }`}
+                                >
+                                  <div className="flex items-center gap-3">
+                                    <span className={`font-medium ${
+                                      isCorrectChoice 
+                                        ? 'text-green-600' 
+                                        : isUserChoice 
+                                          ? 'text-red-600' 
+                                          : 'text-muted-foreground'
+                                    }`}>
+                                      {key}.
+                                    </span>
+                                    <span className="flex-1">{option as string}</span>
+                                    {isCorrectChoice && (
+                                      <span className="text-green-600 text-sm font-medium">✓ Correct Answer</span>
+                                    )}
+                                    {isUserChoice && !isCorrectChoice && (
+                                      <span className="text-red-600 text-sm font-medium">Your Answer</span>
+                                    )}
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                          
+                          <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
+                            <h4 className="font-medium text-blue-600 mb-2">Explanation:</h4>
+                            <p className="text-sm text-muted-foreground leading-relaxed">
+                              {question.rationale || `The correct answer is ${correctAnswer}. This question tests knowledge of ${question.instructional_area} at the ${question.difficulty} level. Understanding this concept is essential for DECA competition success.`}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+                
+                <div className="flex gap-3 pt-4 border-t">
+                  <Button onClick={() => setQuizState('results')} variant="outline" className="flex-1">
+                    Back to Results
+                  </Button>
+                  <Button onClick={restartQuiz} className="flex-1">
+                    Take Another Test
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
