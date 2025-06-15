@@ -280,8 +280,16 @@ rationales = off`;
       console.log('Level:', level);
       console.log('Question Count:', questionCount);
 
+      // Construct correct Azure OpenAI endpoint
+      const baseEndpoint = azureEndpoint.replace(/\/$/, ''); // Remove trailing slash
+      const deploymentName = process.env.AZURE_OPENAI_DEPLOYMENT_NAME || 'gpt-4o-mini';
+      const fullEndpoint = `${baseEndpoint}/openai/deployments/${deploymentName}/chat/completions?api-version=2024-02-15-preview`;
+      
+      console.log('Using Azure endpoint:', fullEndpoint);
+      console.log('Deployment name:', deploymentName);
+      
       // Make request to Azure OpenAI
-      const response = await fetch(azureEndpoint, {
+      const response = await fetch(fullEndpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
