@@ -193,18 +193,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Generate AI-powered practice test
+  // Generate AI-powered practice test (demo version - no auth required)
   app.post("/api/generate-test", async (req, res) => {
-    if (!req.isAuthenticated()) return res.sendStatus(401);
     
     try {
-      const userId = req.user!.id;
       const { cluster, level, questionCount } = req.body;
       
-      // Check if user has available test generations based on subscription
-      const canGenerate = await storage.checkTestAllowance(userId);
-      if (!canGenerate) {
-        return res.status(403).json({ error: "Test generation limit reached for your subscription tier" });
+      // Skip user authentication checks for demo purposes
+      // In production, you would check user subscription limits here
+      let userId = null;
+      if (req.user) {
+        userId = req.user.id;
+        const canGenerate = await storage.checkTestAllowance(userId);
+        if (!canGenerate) {
+          return res.status(403).json({ error: "Test generation limit reached for your subscription tier" });
+        }
       }
       
       // Get Azure OpenAI credentials from environment
@@ -308,8 +311,10 @@ rationales = off`;
       const quizContent = azureResponse.choices[0].message.content;
       const quizData = JSON.parse(quizContent);
       
-      // Record the usage
-      await storage.recordTestGeneration(userId);
+      // Record the usage (only if user is authenticated)
+      if (userId) {
+        await storage.recordTestGeneration(userId);
+      }
       
       console.log('Generated quiz with', quizData.questions?.length || 0, 'questions');
       
