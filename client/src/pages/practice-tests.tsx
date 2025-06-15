@@ -1,9 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useMutation } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -12,12 +10,10 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, XCircle, ArrowLeft, ArrowRight, RotateCcw } from "lucide-react";
-
+import { CheckCircle, ArrowLeft, ArrowRight, RotateCcw } from "lucide-react";
 
 // Form schema for AI test generation
 const testSchema = z.object({
@@ -176,209 +172,246 @@ export default function PracticeTestsPage() {
   return (
     <MainLayout>
       <PageHeader
-        title="Practice Tests"
-        subtitle="Practice with exam-style questions to prepare for your DECA test"
+        title="AI-Powered Practice Tests"
+        subtitle="Generate unlimited practice tests with authentic DECA questions powered by AI"
       />
       
-      {!generatedTest ? (
+      {/* Configuration State */}
+      {quizState === 'configuring' && (
         <Card className="bg-background/60 backdrop-blur-sm border-muted">
           <CardHeader>
-            <CardTitle>Configure Your Practice Test</CardTitle>
+            <CardTitle>Configure Your AI Practice Test</CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               <div>
-                <Label htmlFor="testType" className="text-foreground/80">Test Type</Label>
+                <Label htmlFor="cluster" className="text-foreground/80">DECA Cluster</Label>
                 <Select 
-                  defaultValue={watch("testType")}
-                  onValueChange={(value) => setValue("testType", value)}
+                  defaultValue={selectedCluster}
+                  onValueChange={(value) => setValue("cluster", value)}
                 >
                   <SelectTrigger className="w-full bg-background/80 mt-2">
-                    <SelectValue placeholder="Select test type" />
+                    <SelectValue placeholder="Select DECA cluster" />
                   </SelectTrigger>
                   <SelectContent>
-                    {TEST_TYPES.map((type) => (
-                      <SelectItem key={type} value={type}>{type}</SelectItem>
+                    {DECA_CLUSTERS.map((cluster) => (
+                      <SelectItem key={cluster} value={cluster}>{cluster}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-                {errors.testType && (
-                  <p className="text-destructive text-sm mt-1">{errors.testType.message}</p>
+                {errors.cluster && (
+                  <p className="text-destructive text-sm mt-1">{errors.cluster.message}</p>
                 )}
               </div>
 
               <div>
-                <Label htmlFor="difficultyType" className="text-foreground/80">Difficulty Type</Label>
+                <Label htmlFor="level" className="text-foreground/80">Competition Level</Label>
                 <Select 
-                  defaultValue={watch("difficultyType")}
-                  onValueChange={(value) => setValue("difficultyType", value)}
+                  defaultValue={selectedLevel}
+                  onValueChange={(value) => setValue("level", value)}
                 >
                   <SelectTrigger className="w-full bg-background/80 mt-2">
-                    <SelectValue placeholder="Select difficulty type" />
+                    <SelectValue placeholder="Select competition level" />
                   </SelectTrigger>
                   <SelectContent>
-                    {DIFFICULTY_TYPES.map((type) => (
-                      <SelectItem key={type} value={type}>{type}</SelectItem>
+                    {COMPETITION_LEVELS.map((level) => (
+                      <SelectItem key={level} value={level}>{level}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-                {errors.difficultyType && (
-                  <p className="text-destructive text-sm mt-1">{errors.difficultyType.message}</p>
+                {errors.level && (
+                  <p className="text-destructive text-sm mt-1">{errors.level.message}</p>
                 )}
               </div>
-              
+
               <div>
-                <Label className="text-foreground/80">Question Categories</Label>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3">
-                  {currentCategories.map((category) => (
-                    <div key={category.name} className="flex items-center space-x-2">
-                      <Checkbox 
-                        id={`category-${category.name}`}
-                        defaultChecked
-                        value={category.name}
-                        onCheckedChange={(checked) => {
-                          const current = watch("categories");
-                          if (checked) {
-                            setValue("categories", [...current, category.name]);
-                          } else {
-                            setValue(
-                              "categories", 
-                              current.filter((item) => item !== category.name)
-                            );
-                          }
-                        }}
-                      />
-                      <label 
-                        htmlFor={`category-${category.name}`} 
-                        className="text-sm text-foreground/80"
-                      >
-                        {category.name} ({category.count})
-                      </label>
-                    </div>
-                  ))}
-                </div>
-                {errors.categories && (
-                  <p className="text-destructive text-sm mt-1">{errors.categories.message}</p>
-                )}
-              </div>
-              
-              <div>
-                <Label className="text-foreground/80">Number of Questions</Label>
-                <div className="flex items-center mt-3">
-                  <Slider
-                    min={10}
-                    max={100}
-                    step={5}
-                    value={[numQuestions]}
-                    onValueChange={(value) => setValue("numQuestions", value[0])}
-                    className="w-full"
-                  />
-                  <span className="ml-4 text-sm text-foreground/80 min-w-[40px] font-medium">{numQuestions}</span>
+                <Label className="text-foreground/80">
+                  Number of Questions: {questionCount}
+                </Label>
+                <Slider
+                  value={[questionCount as number]}
+                  onValueChange={(value) => setValue("questionCount", value[0])}
+                  min={10}
+                  max={100}
+                  step={5}
+                  className="mt-2"
+                />
+                <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                  <span>10</span>
+                  <span>100</span>
                 </div>
               </div>
-              
-              <div>
-                <Label htmlFor="timeLimit" className="text-foreground/80">Time Limit</Label>
-                <Select 
-                  defaultValue={watch("timeLimit")}
-                  onValueChange={(value) => setValue("timeLimit", value)}
-                >
-                  <SelectTrigger className="w-full bg-background/80 mt-2">
-                    <SelectValue placeholder="Select time limit" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {TIME_LIMITS.map((limit) => (
-                      <SelectItem key={limit} value={limit}>{limit}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              
+
+              {error && (
+                <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-md">
+                  <p className="text-destructive text-sm">{error}</p>
+                </div>
+              )}
+
               <Button 
                 type="submit" 
-                className="w-full py-6 mt-4"
-                disabled={generateTest.isPending}
+                className="w-full" 
+                disabled={isLoading}
               >
-                {generateTest.isPending ? (
-                  <div className="flex items-center">
-                    <div className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
-                    Generating...
-                  </div>
-                ) : (
-                  "Start Practice Test"
-                )}
+                {isLoading ? "Generating AI Test..." : "Start Practice Test"}
               </Button>
             </form>
           </CardContent>
         </Card>
-      ) : (
-        <div className="space-y-8">
+      )}
+
+      {/* Loading State */}
+      {quizState === 'loading' && (
+        <Card className="bg-background/60 backdrop-blur-sm border-muted">
+          <CardContent className="text-center py-12">
+            <div className="space-y-4">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+              <h3 className="text-xl font-semibold">Generating Your AI Practice Test</h3>
+              <p className="text-muted-foreground">
+                Creating {questionCount} authentic DECA questions for {selectedCluster} at {selectedLevel} level...
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Active Quiz State */}
+      {quizState === 'active' && quizData && (
+        <div className="space-y-6">
           <Card className="bg-background/60 backdrop-blur-sm border-muted">
             <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle>Practice Test: {generatedTest.testType}</CardTitle>
-              <span className="text-sm text-foreground/70 bg-background/50 px-3 py-1 rounded-full">
-                Question {currentQuestion + 1} of {generatedTest.questions.length}
-              </span>
-            </CardHeader>
-            <CardContent>
-              <div className="bg-background/40 p-6 rounded-lg">
-                <p className="text-foreground font-medium">
-                  {generatedTest.questions[currentQuestion].question}
-                </p>
-                
-                <div className="mt-6 space-y-4">
-                  <RadioGroup 
-                    value={selectedAnswers[currentQuestion]?.toString()} 
-                    onValueChange={(value) => selectAnswer(currentQuestion, parseInt(value))}
-                    className="space-y-3"
-                  >
-                    {generatedTest.questions[currentQuestion].options.map((option: string, index: number) => (
-                      <div key={index} className="flex items-center space-x-3 p-3 rounded-md bg-background/30 hover:bg-background/50 transition-colors">
-                        <RadioGroupItem value={index.toString()} id={`option-${index}`} />
-                        <Label htmlFor={`option-${index}`} className="text-foreground/90 cursor-pointer">
-                          <span className="font-semibold">{String.fromCharCode(65 + index)}.</span> {option}
-                        </Label>
-                      </div>
-                    ))}
-                  </RadioGroup>
+              <div>
+                <CardTitle>Question {currentQuestionIndex + 1} of {quizData.questions.length}</CardTitle>
+                <div className="flex items-center gap-2 mt-1">
+                  <Badge variant="secondary">{quizData.metadata?.cluster || selectedCluster}</Badge>
+                  <Badge variant="outline">{quizData.metadata?.level || selectedLevel}</Badge>
                 </div>
               </div>
-              
-              <div className="mt-8 flex justify-between">
+              <Button 
+                variant="outline" 
+                onClick={restartQuiz}
+                className="shrink-0"
+              >
+                <RotateCcw className="h-4 w-4 mr-2" />
+                Restart
+              </Button>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <Progress 
+                value={((currentQuestionIndex + 1) / quizData.questions.length) * 100} 
+                className="w-full"
+              />
+
+              <div className="space-y-4">
+                <div className="flex items-start gap-3">
+                  <div className="bg-primary/10 rounded-full p-2 mt-1">
+                    <span className="text-primary font-semibold text-sm">
+                      {currentQuestionIndex + 1}
+                    </span>
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-lg font-medium leading-relaxed">
+                      {quizData.questions[currentQuestionIndex].stem}
+                    </h3>
+                    {quizData.questions[currentQuestionIndex].instructional_area && (
+                      <Badge variant="outline" className="mt-2">
+                        {quizData.questions[currentQuestionIndex].instructional_area}
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+                
+                <RadioGroup 
+                  value={userAnswers[quizData.questions[currentQuestionIndex].id] || ""}
+                  onValueChange={(value) => handleOptionSelect(quizData.questions[currentQuestionIndex].id, value)}
+                  className="space-y-3 ml-12"
+                >
+                  {Object.entries(quizData.questions[currentQuestionIndex].options).map(([key, option]) => (
+                    <div key={key} className="flex items-center space-x-3 p-3 rounded-lg hover:bg-muted/50 transition-colors">
+                      <RadioGroupItem value={key} id={`option-${key}`} />
+                      <Label htmlFor={`option-${key}`} className="flex-1 cursor-pointer text-base leading-relaxed">
+                        <span className="font-medium text-primary mr-2">{key}.</span>
+                        {option as string}
+                      </Label>
+                    </div>
+                  ))}
+                </RadioGroup>
+              </div>
+
+              <div className="flex justify-between items-center pt-4 border-t">
                 <Button 
                   variant="outline" 
                   onClick={goToPreviousQuestion}
-                  disabled={currentQuestion === 0}
-                  className="px-6"
+                  disabled={currentQuestionIndex === 0}
+                  className="flex items-center gap-2"
                 >
+                  <ArrowLeft className="h-4 w-4" />
                   Previous
                 </Button>
-                {currentQuestion < generatedTest.questions.length - 1 ? (
-                  <Button onClick={goToNextQuestion} className="px-6">
-                    Next Question
+                
+                {currentQuestionIndex === quizData.questions.length - 1 ? (
+                  <Button onClick={showResults} className="flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4" />
+                    Finish Test
                   </Button>
                 ) : (
-                  <Button className="px-6">
-                    Finish Test
+                  <Button 
+                    onClick={goToNextQuestion}
+                    disabled={!userAnswers[quizData.questions[currentQuestionIndex].id]}
+                    className="flex items-center gap-2"
+                  >
+                    Next
+                    <ArrowRight className="h-4 w-4" />
                   </Button>
                 )}
               </div>
-              
-              {/* Question navigation */}
-              <div className="mt-8 p-4 bg-background/30 rounded-lg">
-                <h3 className="text-sm font-medium text-foreground/80 mb-3">Question Navigator</h3>
-                <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-2">
-                  {generatedTest.questions.map((_: any, index: number) => (
-                    <Button
-                      key={index}
-                      variant={currentQuestion === index ? "default" : selectedAnswers[index] !== undefined ? "secondary" : "outline"}
-                      className="h-10 w-10 p-0"
-                      onClick={() => setCurrentQuestion(index)}
-                    >
-                      {index + 1}
-                    </Button>
-                  ))}
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Results State */}
+      {quizState === 'results' && quizData && (
+        <div className="space-y-6">
+          <Card className="bg-background/60 backdrop-blur-sm border-muted">
+            <CardHeader className="text-center">
+              <CardTitle className="text-2xl">Test Results</CardTitle>
+              <p className="text-muted-foreground">
+                {quizData.metadata?.cluster || selectedCluster} • {quizData.metadata?.level || selectedLevel}
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="text-center">
+                <div className="text-6xl font-bold text-primary mb-2">
+                  {calculateScore().percentage}%
                 </div>
+                <p className="text-xl text-muted-foreground">
+                  {calculateScore().correct} out of {calculateScore().total} correct
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="text-center p-4 bg-green-500/10 border border-green-500/20 rounded-lg">
+                  <div className="text-2xl font-bold text-green-600 mb-1">
+                    {calculateScore().correct}
+                  </div>
+                  <p className="text-sm text-green-600">Correct</p>
+                </div>
+                <div className="text-center p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
+                  <div className="text-2xl font-bold text-red-600 mb-1">
+                    {calculateScore().total - calculateScore().correct}
+                  </div>
+                  <p className="text-sm text-red-600">Incorrect</p>
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <Button onClick={restartQuiz} className="flex-1">
+                  Take Another Test
+                </Button>
+                <Button variant="outline" onClick={() => setQuizState('active')} className="flex-1">
+                  Review Answers
+                </Button>
               </div>
             </CardContent>
           </Card>
