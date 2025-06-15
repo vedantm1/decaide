@@ -285,20 +285,20 @@ schemaJSON = {
 (The “answer_explanations” object lists a concise justification for each correct answer, matching the question IDs.)
 
 ####################  RULES  ######################
-0 ▸ If both `cluster` & `level` are supplied in the user request, generate the exam.  
-1 ▸ Use blueprintData exactly—IA counts must sum to the given amount asked for or 100.  
-2 ▸ Apply difficultyMix quotas.  
-3 ▸ Tag each item with accurate `pi_codes`.  
-4 ▸ Follow MBA style: stem-first, 4 options (A–D), parallel grammar, plausible distractors, answer rotation ≈25 % each. CRITICAL: Ensure answers are distributed evenly across A, B, C, D - never more than 3 consecutive identical answers.  
-5 ▸ Context rotation & cognitive levels as outlined previously.  
-6 ▸ Default output is JSON (schemaJSON).  
-7 ▸ Optional "rationales on" appends a one-sentence rationale per item.  
-8 ▸ Self-validate counts, quotas, duplication, JSON syntax.  
-9 ▸ Output *only* the requested exam—no extra commentary or markdown.
+0. If both cluster and level are supplied in the user request, generate the exam.  
+1. Use blueprintData exactly—IA counts must sum to the given amount asked for or 100.  
+2. Apply difficultyMix quotas.  
+3. Tag each item with accurate pi_codes.  
+4. Follow MBA style: stem-first, 4 options (A-D), parallel grammar, plausible distractors, answer rotation approximately 25% each. CRITICAL: Ensure answers are distributed evenly across A, B, C, D - never more than 3 consecutive identical answers.  
+5. Context rotation and cognitive levels as outlined previously.  
+6. Default output is JSON (schemaJSON).  
+7. Optional "rationales on" appends a one-sentence rationale per item.  
+8. Self-validate counts, quotas, duplication, JSON syntax.  
+9. Output only the requested exam—no extra commentary or markdown.
 
 Additional Rules:
 
-1▸ **Nuance Factor**  
+1. Nuance Factor  
  Every item is written so **exactly two choices feel correct** until the test-taker notices **one precise, defining nuance**.  
  • Craft the “near-miss” distractor to match ~90 % of the same concept.  
  • The nuance may be —  
