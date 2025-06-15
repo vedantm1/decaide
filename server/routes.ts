@@ -210,12 +210,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      // Get Azure OpenAI credentials from environment
+      // Get Azure OpenAI and Search credentials from environment
       const azureKey = process.env.AZURE_OPENAI_KEY;
       const azureEndpoint = process.env.AZURE_OPENAI_ENDPOINT;
+      const searchEndpoint = process.env.SEARCH_ENDPOINT || "https://decaideaisearch.search.windows.net";
+      const searchKey = process.env.SEARCH_KEY;
+      const searchIndex = process.env.SEARCH_INDEX_NAME || "decaide-rag";
       
       if (!azureKey || !azureEndpoint) {
         return res.status(500).json({ error: "Azure OpenAI configuration missing" });
+      }
+      
+      if (!searchKey) {
+        return res.status(500).json({ error: "Azure AI Search configuration missing" });
       }
       
       // Master prompt (system message) - exact text from requirements
@@ -285,7 +292,7 @@ CRITICAL: Distribute correct answers evenly across A, B, C, D options. For ${que
       // Construct correct Azure OpenAI endpoint
       const baseEndpoint = azureEndpoint.replace(/\/$/, ''); // Remove trailing slash
       const deploymentName = process.env.AZURE_OPENAI_DEPLOYMENT_NAME || 'gpt-4o-mini';
-      const fullEndpoint = `${baseEndpoint}/openai/deployments/${deploymentName}/chat/completions?api-version=2024-02-15-preview`;
+      const fullEndpoint = `${baseEndpoint}/openai/deployments/${deploymentName}/chat/completions?api-version=2025-01-01-preview`;
       
       console.log('Using Azure endpoint:', fullEndpoint);
       console.log('Deployment name:', deploymentName);
@@ -307,7 +314,34 @@ CRITICAL: Distribute correct answers evenly across A, B, C, D options. For ${que
           top_p: 0.95,
           frequency_penalty: 0,
           presence_penalty: 0,
-          stop: [],
+          stop: null,
+          stream: false,
+          data_sources: [{
+            type: "azure_search",
+            parameters: {
+              endpoint: searchEndpoint,
+              index_name: searchIndex,
+              semantic_configuration: "decaide-rag-semantic-configuration",
+              query_type: "vector_semantic_hybrid",
+              fields_mapping: {},
+              in_scope: true,
+              filter: null,
+              strictness: 3,
+              top_n_documents: 5,
+              authentication: {
+                type: "api_key",
+                key: searchKey
+              },
+              embedding_dependency: {
+                type: "endpoint",
+                endpoint: searchEndpoint,
+                authentication: {
+                  type: "api_key",
+                  key: searchKey
+                }
+              }
+            }
+          }],
           response_format: { "type": "json_object" }
         })
       });
