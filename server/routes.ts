@@ -273,7 +273,9 @@ schemaJSON = {
 cluster = ${cluster}
 level   = ${level}
 format  = json
-rationales = off`;
+rationales = off
+
+CRITICAL: Distribute correct answers evenly across A, B, C, D options. For ${questionCount} questions, aim for roughly ${Math.ceil(questionCount/4)} answers each for A, B, C, and D. Never have more than 2 consecutive identical answers.`;
 
       console.log('Generating test with Azure OpenAI...');
       console.log('Cluster:', cluster);
