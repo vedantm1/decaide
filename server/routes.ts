@@ -260,7 +260,7 @@ schemaJSON = {
 1 ▸ Use blueprintData exactly—IA counts must sum to 100.  
 2 ▸ Apply difficultyMix quotas.  
 3 ▸ Tag each item with accurate \`pi_codes\`.  
-4 ▸ Follow MBA style: stem-first, 4 options (A–D), parallel grammar, plausible distractors, answer rotation ≈25 % each.  
+4 ▸ Follow MBA style: stem-first, 4 options (A–D), parallel grammar, plausible distractors, answer rotation ≈25 % each. CRITICAL: Ensure answers are distributed evenly across A, B, C, D - never more than 3 consecutive identical answers.  
 5 ▸ Context rotation & cognitive levels as outlined previously.  
 6 ▸ Default output is JSON (schemaJSON).  
 7 ▸ Optional "rationales on" appends a one-sentence rationale per item.  
@@ -300,8 +300,11 @@ rationales = off`;
             { role: "system", content: systemPrompt },
             { role: "user", content: userMessage }
           ],
-          max_tokens: 8192,
+          max_tokens: 16384,
           temperature: 0.7,
+          top_p: 0.95,
+          frequency_penalty: 0,
+          presence_penalty: 0,
           response_format: { "type": "json_object" }
         })
       });
