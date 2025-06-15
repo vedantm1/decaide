@@ -13,6 +13,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Import DecAIde font global styles */
+@import './styles/decaide-font-global.css';
+
 /* Vanta.js translucency system
    These variables control the translucency of UI elements
    so the Vanta wave background shows through consistently */
