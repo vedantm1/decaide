@@ -430,27 +430,37 @@ CRITICAL REQUIREMENTS:
         
         console.log("Answer distribution:", answerDistribution);
         
-        // Check for poor distribution (more than 60% of answers are the same)
+        // Check for poor distribution (more than 50% of answers are the same)
         const totalQuestions = quizData.questions.length;
         const maxSameAnswer = Math.max(...Object.values(answerDistribution));
         
-        if (maxSameAnswer > Math.ceil(totalQuestions * 0.6)) {
+        if (maxSameAnswer > Math.ceil(totalQuestions * 0.5)) {
           console.warn(`Poor answer distribution detected: ${maxSameAnswer}/${totalQuestions} answers are the same`);
           
           // Redistribute answers more evenly
-          const targetPerOption = Math.floor(totalQuestions / 4);
           const options = ['A', 'B', 'C', 'D'];
           let optionIndex = 0;
           
+          // Shuffle questions to avoid pattern
+          const shuffledQuestions = [...quizData.questions].sort(() => Math.random() - 0.5);
+          
           // Reassign answers to achieve better distribution
-          quizData.questions.forEach((question: any, index: number) => {
+          shuffledQuestions.forEach((question: any, index: number) => {
             const newAnswer = options[optionIndex % 4];
             quizData.answer_key[question.id] = newAnswer;
             question.answer = newAnswer;
             optionIndex++;
           });
           
-          console.log("Redistributed answers for better balance");
+          // Recalculate distribution after redistribution
+          const newDistribution = { A: 0, B: 0, C: 0, D: 0 };
+          Object.values(quizData.answer_key).forEach((answer: any) => {
+            if (newDistribution[answer as keyof typeof newDistribution] !== undefined) {
+              newDistribution[answer as keyof typeof newDistribution]++;
+            }
+          });
+          
+          console.log("Redistributed answers for better balance:", newDistribution);
         }
       }
 
