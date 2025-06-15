@@ -307,6 +307,7 @@ CRITICAL: Distribute correct answers evenly across A, B, C, D options. For ${que
           top_p: 0.95,
           frequency_penalty: 0,
           presence_penalty: 0,
+          stop: [],
           response_format: { "type": "json_object" }
         })
       });
