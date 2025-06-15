@@ -1,7 +1,7 @@
 import { Express } from "express";
 import { createServer, Server } from "http";
 import { IStorage } from "./storage";
-import { OpenAIClient, AzureKeyCredential } from "@azure/openai";
+import { AzureOpenAI } from "@azure/openai";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   const storage = app.get("storage") as IStorage;
@@ -36,7 +36,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('Question count:', questionCount);
       
       // Create Azure OpenAI client
-      const client = new OpenAIClient(azureEndpoint, new AzureKeyCredential(azureKey));
+      const client = new AzureOpenAI({
+        apiKey: azureKey,
+        endpoint: azureEndpoint,
+        apiVersion: "2024-02-15-preview"
+      });
 
       // System prompt for DECA test generation
       const systemPrompt = `You are a world-class psychometrician and certified DECA Advisor specializing in creating authentic DECA competition exam questions.
@@ -139,7 +143,7 @@ Format the response as valid JSON with this structure:
     }
   });
 
-  // Health check endpoint
+  // Other existing routes...
   app.get("/api/health", (req, res) => {
     res.json({ status: "ok", timestamp: new Date().toISOString() });
   });
