@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, ArrowLeft, ArrowRight, RotateCcw } from "lucide-react";
+import { CheckCircle, ArrowLeft, ArrowRight, RotateCcw, Eye, EyeOff, Check, X } from "lucide-react";
 
 // Form schema for AI test generation
 const testSchema = z.object({
@@ -53,6 +53,7 @@ export default function PracticeTestsPage() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [userAnswers, setUserAnswers] = useState<Record<number, string>>({});
   const [quizState, setQuizState] = useState<QuizState>('configuring');
+  const [showDetailedAnswers, setShowDetailedAnswers] = useState(false);
   
   // Form setup
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<TestFormValues>({
@@ -409,12 +410,122 @@ export default function PracticeTestsPage() {
                 <Button onClick={restartQuiz} className="flex-1">
                   Take Another Test
                 </Button>
-                <Button variant="outline" onClick={() => setQuizState('active')} className="flex-1">
-                  Review Answers
+                <Button 
+                  variant="outline" 
+                  onClick={() => setShowDetailedAnswers(!showDetailedAnswers)}
+                  className="flex-1 flex items-center gap-2"
+                >
+                  {showDetailedAnswers ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  {showDetailedAnswers ? "Hide" : "Show"} Detailed Answers
                 </Button>
               </div>
             </CardContent>
           </Card>
+
+          {/* Detailed Answer Review */}
+          {showDetailedAnswers && (
+            <Card className="bg-background/60 backdrop-blur-sm border-muted">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Eye className="h-5 w-5" />
+                  Detailed Answer Review
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {quizData.questions.map((question: any, index: number) => {
+                  const userAnswer = userAnswers[question.id];
+                  const correctAnswer = question.answer;
+                  const isCorrect = userAnswer === correctAnswer;
+                  
+                  return (
+                    <div key={question.id} className="border rounded-lg p-4 space-y-4">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Badge variant="outline">Question {index + 1}</Badge>
+                            <Badge variant="secondary">{question.instructional_area}</Badge>
+                            <Badge variant={question.difficulty === 'easy' ? 'default' : question.difficulty === 'medium' ? 'secondary' : 'destructive'}>
+                              {question.difficulty}
+                            </Badge>
+                          </div>
+                          <h4 className="font-medium text-base leading-relaxed mb-3">
+                            {question.stem}
+                          </h4>
+                        </div>
+                        <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-sm font-medium ${
+                          isCorrect 
+                            ? 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400' 
+                            : 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400'
+                        }`}>
+                          {isCorrect ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
+                          {isCorrect ? 'Correct' : 'Incorrect'}
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        {Object.entries(question.options).map(([key, option]) => {
+                          const isUserChoice = userAnswer === key;
+                          const isCorrectChoice = correctAnswer === key;
+                          
+                          let optionStyle = "p-3 rounded-lg border text-sm";
+                          if (isCorrectChoice) {
+                            optionStyle += " bg-green-50 border-green-200 text-green-800 dark:bg-green-900/20 dark:border-green-800 dark:text-green-300";
+                          } else if (isUserChoice && !isCorrectChoice) {
+                            optionStyle += " bg-red-50 border-red-200 text-red-800 dark:bg-red-900/20 dark:border-red-800 dark:text-red-300";
+                          } else {
+                            optionStyle += " bg-muted/50 border-muted";
+                          }
+                          
+                          return (
+                            <div key={key} className={optionStyle}>
+                              <div className="flex items-center justify-between">
+                                <span className="flex-1">
+                                  <span className="font-medium mr-2">{key}.</span>
+                                  {option as string}
+                                </span>
+                                <div className="flex items-center gap-2">
+                                  {isUserChoice && (
+                                    <Badge variant="outline" className="text-xs">
+                                      Your Answer
+                                    </Badge>
+                                  )}
+                                  {isCorrectChoice && (
+                                    <Badge variant="default" className="text-xs bg-green-600">
+                                      Correct Answer
+                                    </Badge>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+
+                      {question.rationale && (
+                        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+                          <h5 className="font-medium text-blue-800 dark:text-blue-300 mb-1 text-sm">Explanation:</h5>
+                          <p className="text-blue-700 dark:text-blue-400 text-sm">
+                            {question.rationale}
+                          </p>
+                        </div>
+                      )}
+
+                      {question.pi_codes && question.pi_codes.length > 0 && (
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                          <span>PI Codes:</span>
+                          {question.pi_codes.map((code: string) => (
+                            <Badge key={code} variant="outline" className="text-xs">
+                              {code}
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </CardContent>
+            </Card>
+          )}
         </div>
       )}
     </MainLayout>
