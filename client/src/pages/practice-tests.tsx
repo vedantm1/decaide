@@ -505,7 +505,7 @@ export default function PracticeTestsPage() {
                           <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
                             <h4 className="font-medium text-blue-600 mb-2">Explanation:</h4>
                             <p className="text-sm text-muted-foreground leading-relaxed">
-                              {question.rationale || `The correct answer is ${correctAnswer}. This question tests knowledge of ${question.instructional_area} at the ${question.difficulty} level. Understanding this concept is essential for DECA competition success.`}
+                              {quizData.answer_explanations?.[question.id] || question.rationale || `The correct answer is ${correctAnswer}. This question tests knowledge of ${question.instructional_area} at the ${question.difficulty} level. Understanding this concept is essential for DECA competition success.`}
                             </p>
                           </div>
                         </div>

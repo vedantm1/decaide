@@ -251,8 +251,8 @@ You have memorized:
 
 • DECA's National Curriculum Standards and every Performance Indicator (PI) code  
 • The exact 2024-25 blueprint counts (see ↓ blueprintData)  
-• MBA Research's style manual for multiple-choice items (stem tone, option balance, cognitive-level targets)   
-• All seven clusters' publicly-released sample exams (Business Admin Core, BM+A, Finance, Marketing, Hospitality + Tourism, Personal Financial Literacy, Entrepreneurship) with their embedded "look-and-feel," wording conventions, and answer-key formats 
+• MBA Research's style manual for multiple-choice items (stem tone, option balance, cognitive-level targets)  
+• All seven clusters' publicly-released sample exams (Business Admin Core, BM+A, Finance, Marketing, Hospitality + Tourism, Personal Financial Literacy, Entrepreneurship) with their embedded "look-and-feel," wording conventions, and answer-key formats
 
 ############# 2024-25 OFFICIAL BLUEPRINT COUNTS #############
 blueprintData = {
@@ -277,16 +277,18 @@ difficultyMix = {
 ######### OUTPUT SCHEMA (JSON mode) ###########
 schemaJSON = {
   "metadata":{"cluster":"<Marketing>","level":"<District>","generated_on":"YYYY-MM-DD","total_questions":100,"difficulty_breakdown":{"easy":50,"medium":35,"hard":15}},
-  "questions":[{"id":1,"instructional_area":"Channel Management","pi_codes":["CM:001"],"difficulty":"easy","stem":"In a dual distribution system, which channel conflict is MOST likely when a manufacturer opens an online store that undercuts authorized retailers?","options":{"A":"Vertical—goal incompatibility","B":"Horizontal—territorial overlap","C":"Vertical—price competition","D":"Horizontal—dual sourcing"},"answer":"C"}],
-  "answer_key":{"1":"C"}
+  "questions":[{"id":1,"instructional_area":"Channel Management","pi_codes":["CM:001"],"difficulty":"easy","stem":"In a dual distribution system, which channel conflict is MOST likely when a manufacturer opens an online store that undercuts authorized retailers?","options":{"A":"Vertical—goal incompatibility","B":"Horizontal—territorial overlap","C":"Vertical—price competition","D":"Horizontal—dual sourcing"},"answer":"C","rationale":"Vertical price competition occurs when a manufacturer sells directly online at a lower price, undercutting its existing retailers; the other conflicts do not involve pricing pressure across channel levels."}],
+  "answer_key":{"1":"C"},
+  "answer_explanations":{"1":"Vertical price competition occurs when a manufacturer sells directly online at a lower price, undercutting its existing retailers; the other conflicts do not involve pricing pressure across channel levels."}
 }
 ###############################################
+(The “answer_explanations” object lists a concise justification for each correct answer, matching the question IDs.)
 
 ####################  RULES  ######################
-0 ▸ If both \`cluster\` & \`level\` are supplied in the user request, generate the exam.  
+0 ▸ If both `cluster` & `level` are supplied in the user request, generate the exam.  
 1 ▸ Use blueprintData exactly—IA counts must sum to the given amount asked for or 100.  
 2 ▸ Apply difficultyMix quotas.  
-3 ▸ Tag each item with accurate \`pi_codes\`.  
+3 ▸ Tag each item with accurate `pi_codes`.  
 4 ▸ Follow MBA style: stem-first, 4 options (A–D), parallel grammar, plausible distractors, answer rotation ≈25 % each. CRITICAL: Ensure answers are distributed evenly across A, B, C, D - never more than 3 consecutive identical answers.  
 5 ▸ Context rotation & cognitive levels as outlined previously.  
 6 ▸ Default output is JSON (schemaJSON).  
@@ -294,7 +296,7 @@ schemaJSON = {
 8 ▸ Self-validate counts, quotas, duplication, JSON syntax.  
 9 ▸ Output *only* the requested exam—no extra commentary or markdown.
 
-Additional Rules: 
+Additional Rules:
 
 1▸ **Nuance Factor**  
  Every item is written so **exactly two choices feel correct** until the test-taker notices **one precise, defining nuance**.  
@@ -306,7 +308,6 @@ Additional Rules:
   - a legal or ethical fine point (*letter vs. spirit; civil vs. criminal*)  
   - a scope difference (*domestic vs. international; implicit vs. explicit consent*)  
  • Alternate nuance types across the exam; avoid patterns, the correct answer is on a context of the question basis which means case by case.  
- 
 
 2▸ **MBA Style Essentials** – Stem-first question; four options A–D; parallel grammar; business-authentic contexts; answer rotation ≈ 25 % each; numeric & punctuation conventions; bias-free language; easy/med/hard cognitive cues.
 
@@ -352,9 +353,12 @@ Additional Rules:
 cluster = ${cluster}
 level   = ${level}
 format  = json
-rationales = off
+rationales = on
 
-CRITICAL: Distribute correct answers evenly across A, B, C, D options. For ${questionCount} questions, aim for roughly ${Math.ceil(questionCount / 4)} answers each for A, B, C, and D. Never have more than 2 consecutive identical answers.`;
+CRITICAL: 
+1. Distribute correct answers evenly across A, B, C, D options. For ${questionCount} questions, aim for roughly ${Math.ceil(questionCount / 4)} answers each for A, B, C, and D. Never have more than 2 consecutive identical answers.
+2. MUST include "answer_explanations" object with detailed explanations for each question ID.
+3. Follow the exact JSON schema format including metadata, questions, answer_key, and answer_explanations.`;
 
       console.log("Generating test with Azure OpenAI...");
       console.log("Cluster:", cluster);
