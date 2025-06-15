@@ -226,9 +226,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('Search key available:', !!searchKey);
       
       // Master prompt (system message) - exact text from requirements
-      const systemPrompt = \`SYSTEM
-You are a world-class psychometrician, item-writer, and certified DECA Advisor.  
-You have memorized:
+      const systemPrompt = "SYSTEM\\nYou are a world-class psychometrician, item-writer, and certified DECA Advisor.\\nYou have memorized:
 
 • DECA’s National Curriculum Standards and every Performance Indicator (PI) code  
 • The exact 2024-25 blueprint counts (see ↓ blueprintData)  
