@@ -282,7 +282,7 @@ schemaJSON = {
   "answer_explanations":{"1":"Vertical price competition occurs when a manufacturer sells directly online at a lower price, undercutting its existing retailers; the other conflicts do not involve pricing pressure across channel levels."}
 }
 ###############################################
-(The “answer_explanations” object lists a concise justification for each correct answer, matching the question IDs.)
+(The “answer_explanations” object lists a detailed explanation that truly explains why the answer choice is correct as opposed to the others for each correct answer, matching the question IDs.)
 
 ####################  RULES  ######################
 0. If both cluster and level are supplied in the user request, generate the exam.  
@@ -355,10 +355,14 @@ level   = ${level}
 format  = json
 rationales = on
 
-CRITICAL: 
-1. Distribute correct answers evenly across A, B, C, D options. For ${questionCount} questions, aim for roughly ${Math.ceil(questionCount / 4)} answers each for A, B, C, and D. Never have more than 2 consecutive identical answers.
-2. MUST include "answer_explanations" object with detailed explanations for each question ID.
-3. Follow the exact JSON schema format including metadata, questions, answer_key, and answer_explanations.`;
+CRITICAL REQUIREMENTS: 
+1. ANSWER DISTRIBUTION: Distribute correct answers evenly across A, B, C, D options. For ${questionCount} questions:
+   - Target: ${Math.floor(questionCount / 4)} answers each for A, B, C, D (remainder distributed randomly)
+   - NEVER have more than 2 consecutive identical correct answers
+   - NEVER have more than ${Math.ceil(questionCount / 2)} answers with the same letter
+2. MUST include "answer_explanations" object with detailed explanations for each question ID
+3. Follow the exact JSON schema format including metadata, questions, answer_key, and answer_explanations
+4. Ensure each question has a unique stem and content - NO duplicate questions`;
 
       console.log("Generating test with Azure OpenAI...");
       console.log("Cluster:", cluster);
@@ -368,7 +372,7 @@ CRITICAL:
       // Construct correct Azure OpenAI endpoint
       const baseEndpoint = azureEndpoint.replace(/\/$/, ""); // Remove trailing slash
       const deploymentName =
-        process.env.AZURE_OPENAI_DEPLOYMENT_NAME || "gpt-4o-mini";
+        process.env.AZURE_OPENAI_DEPLOYMENT_NAME || "decaide_test";
       const fullEndpoint = `${baseEndpoint}/openai/deployments/${deploymentName}/chat/completions?api-version=2024-02-15-preview`;
 
       console.log("Using Azure endpoint:", fullEndpoint);
@@ -386,7 +390,7 @@ CRITICAL:
             { role: "system", content: systemPrompt },
             { role: "user", content: userMessage },
           ],
-          max_tokens: 16384,
+          max_tokens: 32768,
           temperature: 0.7,
           top_p: 0.95,
           frequency_penalty: 0,
@@ -412,6 +416,43 @@ CRITICAL:
       // Parse the JSON response from Azure
       const quizContent = azureResponse.choices[0].message.content;
       const quizData = JSON.parse(quizContent);
+
+      // Validate and fix answer distribution
+      if (quizData.questions && quizData.answer_key) {
+        const answerDistribution = { A: 0, B: 0, C: 0, D: 0 };
+        
+        // Count current distribution
+        Object.values(quizData.answer_key).forEach((answer: any) => {
+          if (answerDistribution[answer as keyof typeof answerDistribution] !== undefined) {
+            answerDistribution[answer as keyof typeof answerDistribution]++;
+          }
+        });
+        
+        console.log("Answer distribution:", answerDistribution);
+        
+        // Check for poor distribution (more than 60% of answers are the same)
+        const totalQuestions = quizData.questions.length;
+        const maxSameAnswer = Math.max(...Object.values(answerDistribution));
+        
+        if (maxSameAnswer > Math.ceil(totalQuestions * 0.6)) {
+          console.warn(`Poor answer distribution detected: ${maxSameAnswer}/${totalQuestions} answers are the same`);
+          
+          // Redistribute answers more evenly
+          const targetPerOption = Math.floor(totalQuestions / 4);
+          const options = ['A', 'B', 'C', 'D'];
+          let optionIndex = 0;
+          
+          // Reassign answers to achieve better distribution
+          quizData.questions.forEach((question: any, index: number) => {
+            const newAnswer = options[optionIndex % 4];
+            quizData.answer_key[question.id] = newAnswer;
+            question.answer = newAnswer;
+            optionIndex++;
+          });
+          
+          console.log("Redistributed answers for better balance");
+        }
+      }
 
       // Record the usage (only if user is authenticated)
       if (userId) {

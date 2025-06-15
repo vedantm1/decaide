@@ -155,16 +155,38 @@ export default function PracticeTestsPage() {
     if (!quizData?.questions) return { correct: 0, total: 0, percentage: 0 };
     
     let correct = 0;
+    let debugInfo: any[] = [];
+    
     quizData.questions.forEach((question: any) => {
       const userAnswer = userAnswers[question.id];
       const correctAnswer = question.answer;
-      if (userAnswer === correctAnswer) {
+      const isCorrect = userAnswer === correctAnswer;
+      
+      debugInfo.push({
+        questionId: question.id,
+        userAnswer,
+        correctAnswer,
+        isCorrect,
+        stem: question.stem.substring(0, 50) + "..."
+      });
+      
+      if (isCorrect) {
         correct++;
       }
     });
     
     const total = quizData.questions.length;
     const percentage = Math.round((correct / total) * 100);
+    
+    // Debug logging
+    console.log("Scoring Debug Info:", {
+      correct,
+      total,
+      percentage,
+      userAnswers,
+      answerKey: quizData.answer_key,
+      detailedScoring: debugInfo
+    });
     
     return { correct, total, percentage };
   };
