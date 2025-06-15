@@ -14,542 +14,163 @@ import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
+import { CheckCircle, XCircle, ArrowLeft, ArrowRight, RotateCcw } from "lucide-react";
 
 
-// Form schema for test generation
+// Form schema for AI test generation
 const testSchema = z.object({
-  testType: z.string().min(1, "Please select a test type"),
-  difficultyType: z.string().min(1, "Please select a difficulty type"),
-  categories: z.array(z.string()).min(1, "Select at least one category"),
-  numQuestions: z.number().min(10).max(100),
-  timeLimit: z.string(),
+  cluster: z.string().min(1, "Please select a cluster"),
+  level: z.string().min(1, "Please select a level"),
+  questionCount: z.number().min(10).max(100),
 });
 
 type TestFormValues = z.infer<typeof testSchema>;
 
-// Updated test types as requested
-const TEST_TYPES = [
-  "Business Management & Administration",
+// DECA Clusters (exact names from your requirements)
+const DECA_CLUSTERS = [
   "Business Administration Core",
+  "Business Management + Administration",
   "Entrepreneurship", 
   "Finance",
-  "Hospitality & Tourism",
+  "Hospitality + Tourism",
   "Marketing",
   "Personal Financial Literacy"
 ];
 
-// Difficulty types
-const DIFFICULTY_TYPES = [
+// Competition levels
+const COMPETITION_LEVELS = [
   "District",
-  "State", 
+  "Association", 
   "ICDC"
 ];
 
-// Test categories with authentic DECA exam blueprint data
-const EXAM_BLUEPRINTS = {
-  "Business Administration Core": {
-    "District": {
-      "Business Law": 1,
-      "Communications": 15,
-      "Customer Relations": 5,
-      "Economics": 7,
-      "Emotional Intelligence": 22,
-      "Entrepreneurship": 0,
-      "Financial Analysis": 16,
-      "Human Resources Management": 1,
-      "Information Management": 10,
-      "Marketing": 1,
-      "Operations": 11,
-      "Professional Development": 11,
-      "Strategic Management": 0
-    },
-    "Association": {
-      "Business Law": 1,
-      "Communications": 15,
-      "Customer Relations": 5,
-      "Economics": 7,
-      "Emotional Intelligence": 22,
-      "Entrepreneurship": 0,
-      "Financial Analysis": 16,
-      "Human Resources Management": 1,
-      "Information Management": 10,
-      "Marketing": 1,
-      "Operations": 11,
-      "Professional Development": 11,
-      "Strategic Management": 0
-    },
-    "ICDC": {
-      "Business Law": 4,
-      "Communications": 11,
-      "Customer Relations": 4,
-      "Economics": 12,
-      "Emotional Intelligence": 19,
-      "Entrepreneurship": 1,
-      "Financial Analysis": 13,
-      "Human Resources Management": 1,
-      "Information Management": 11,
-      "Marketing": 1,
-      "Operations": 13,
-      "Professional Development": 9,
-      "Strategic Management": 1
-    }
-  },
-  "Business Management & Administration": {
-    "District": {
-      "Business Law": 5,
-      "Communications": 7,
-      "Customer Relations": 2,
-      "Economics": 6,
-      "Emotional Intelligence": 9,
-      "Entrepreneurship": 1,
-      "Financial Analysis": 7,
-      "Human Resources Management": 1,
-      "Information Management": 7,
-      "Knowledge Management": 6,
-      "Marketing": 1,
-      "Operations": 21,
-      "Professional Development": 6,
-      "Project Management": 6,
-      "Quality Management": 3,
-      "Risk Management": 4,
-      "Strategic Management": 8
-    },
-    "Association": {
-      "Business Law": 5,
-      "Communications": 6,
-      "Customer Relations": 2,
-      "Economics": 5,
-      "Emotional Intelligence": 8,
-      "Entrepreneurship": 0,
-      "Financial Analysis": 6,
-      "Human Resources Management": 0,
-      "Information Management": 6,
-      "Knowledge Management": 7,
-      "Marketing": 1,
-      "Operations": 24,
-      "Professional Development": 5,
-      "Project Management": 7,
-      "Quality Management": 4,
-      "Risk Management": 5,
-      "Strategic Management": 9
-    },
-    "ICDC": {
-      "Business Law": 5,
-      "Communications": 6,
-      "Customer Relations": 1,
-      "Economics": 4,
-      "Emotional Intelligence": 6,
-      "Entrepreneurship": 0,
-      "Financial Analysis": 5,
-      "Human Resources Management": 0,
-      "Information Management": 6,
-      "Knowledge Management": 9,
-      "Marketing": 1,
-      "Operations": 26,
-      "Professional Development": 4,
-      "Project Management": 8,
-      "Quality Management": 5,
-      "Risk Management": 5,
-      "Strategic Management": 10
-    }
-  },
-  "Entrepreneurship": {
-    "District": {
-      "Business Law": 4,
-      "Channel Management": 3,
-      "Communications": 1,
-      "Customer Relations": 1,
-      "Economics": 3,
-      "Emotional Intelligence": 6,
-      "Entrepreneurship": 14,
-      "Financial Analysis": 10,
-      "Human Resources Management": 5,
-      "Information Management": 4,
-      "Market Planning": 5,
-      "Marketing": 1,
-      "Marketing-Information Management": 2,
-      "Operations": 13,
-      "Pricing": 2,
-      "Product/Service Management": 4,
-      "Professional Development": 5,
-      "Promotion": 6,
-      "Quality Management": 1,
-      "Risk Management": 2,
-      "Selling": 1,
-      "Strategic Management": 7
-    },
-    "Association": {
-      "Business Law": 4,
-      "Channel Management": 3,
-      "Communications": 0,
-      "Customer Relations": 1,
-      "Economics": 3,
-      "Emotional Intelligence": 6,
-      "Entrepreneurship": 13,
-      "Financial Analysis": 9,
-      "Human Resources Management": 4,
-      "Information Management": 3,
-      "Market Planning": 6,
-      "Marketing": 1,
-      "Marketing-Information Management": 3,
-      "Operations": 13,
-      "Pricing": 3,
-      "Product/Service Management": 4,
-      "Professional Development": 5,
-      "Promotion": 7,
-      "Quality Management": 1,
-      "Risk Management": 3,
-      "Selling": 1,
-      "Strategic Management": 7
-    },
-    "ICDC": {
-      "Business Law": 3,
-      "Channel Management": 3,
-      "Communications": 1,
-      "Customer Relations": 1,
-      "Economics": 2,
-      "Emotional Intelligence": 4,
-      "Entrepreneurship": 14,
-      "Financial Analysis": 11,
-      "Human Resources Management": 4,
-      "Information Management": 2,
-      "Market Planning": 6,
-      "Marketing": 1,
-      "Marketing-Information Management": 2,
-      "Operations": 14,
-      "Pricing": 2,
-      "Product/Service Management": 4,
-      "Professional Development": 4,
-      "Promotion": 8,
-      "Quality Management": 1,
-      "Risk Management": 4,
-      "Selling": 1,
-      "Strategic Management": 8
-    }
-  },
-  "Finance": {
-    "District": {
-      "Business Law": 7,
-      "Communications": 5,
-      "Customer Relations": 5,
-      "Economics": 6,
-      "Emotional Intelligence": 9,
-      "Entrepreneurship": 1,
-      "Financial Analysis": 24,
-      "Financial-Information Management": 9,
-      "Human Resources Management": 1,
-      "Information Management": 6,
-      "Marketing": 1,
-      "Operations": 6,
-      "Professional Development": 13,
-      "Risk Management": 6,
-      "Strategic Management": 1
-    },
-    "Association": {
-      "Business Law": 8,
-      "Communications": 4,
-      "Customer Relations": 5,
-      "Economics": 5,
-      "Emotional Intelligence": 8,
-      "Entrepreneurship": 0,
-      "Financial Analysis": 28,
-      "Financial-Information Management": 10,
-      "Human Resources Management": 0,
-      "Information Management": 5,
-      "Marketing": 1,
-      "Operations": 5,
-      "Professional Development": 14,
-      "Risk Management": 7,
-      "Strategic Management": 0
-    },
-    "ICDC": {
-      "Business Law": 7,
-      "Communications": 3,
-      "Customer Relations": 4,
-      "Economics": 4,
-      "Emotional Intelligence": 6,
-      "Entrepreneurship": 0,
-      "Financial Analysis": 30,
-      "Financial-Information Management": 12,
-      "Human Resources Management": 0,
-      "Information Management": 5,
-      "Marketing": 1,
-      "Operations": 4,
-      "Professional Development": 15,
-      "Risk Management": 9,
-      "Strategic Management": 0
-    }
-  },
-  "Hospitality & Tourism": {
-    "District": {
-      "Business Law": 3,
-      "Communications": 5,
-      "Customer Relations": 8,
-      "Economics": 6,
-      "Emotional Intelligence": 9,
-      "Entrepreneurship": 1,
-      "Financial Analysis": 8,
-      "Human Resources Management": 2,
-      "Information Management": 14,
-      "Knowledge Management": 0,
-      "Market Planning": 1,
-      "Marketing": 1,
-      "Operations": 13,
-      "Pricing": 1,
-      "Product/Service Management": 6,
-      "Professional Development": 8,
-      "Promotion": 2,
-      "Quality Management": 1,
-      "Risk Management": 1,
-      "Selling": 7,
-      "Strategic Management": 3
-    },
-    "Association": {
-      "Business Law": 3,
-      "Communications": 4,
-      "Customer Relations": 9,
-      "Economics": 6,
-      "Emotional Intelligence": 9,
-      "Entrepreneurship": 0,
-      "Financial Analysis": 7,
-      "Human Resources Management": 1,
-      "Information Management": 15,
-      "Knowledge Management": 1,
-      "Market Planning": 1,
-      "Marketing": 1,
-      "Operations": 13,
-      "Pricing": 1,
-      "Product/Service Management": 7,
-      "Professional Development": 7,
-      "Promotion": 3,
-      "Quality Management": 1,
-      "Risk Management": 1,
-      "Selling": 8,
-      "Strategic Management": 2
-    },
-    "ICDC": {
-      "Business Law": 2,
-      "Communications": 3,
-      "Customer Relations": 9,
-      "Economics": 5,
-      "Emotional Intelligence": 7,
-      "Entrepreneurship": 0,
-      "Financial Analysis": 7,
-      "Human Resources Management": 1,
-      "Information Management": 15,
-      "Knowledge Management": 1,
-      "Market Planning": 2,
-      "Marketing": 2,
-      "Operations": 13,
-      "Pricing": 1,
-      "Product/Service Management": 9,
-      "Professional Development": 6,
-      "Promotion": 3,
-      "Quality Management": 1,
-      "Risk Management": 2,
-      "Selling": 9,
-      "Strategic Management": 2
-    }
-  },
-  "Marketing": {
-    "District": {
-      "Business Law": 2,
-      "Channel Management": 5,
-      "Communications": 5,
-      "Customer Relations": 2,
-      "Economics": 6,
-      "Emotional Intelligence": 9,
-      "Entrepreneurship": 1,
-      "Financial Analysis": 6,
-      "Human Resources Management": 1,
-      "Information Management": 5,
-      "Market Planning": 4,
-      "Marketing": 1,
-      "Marketing-Information Management": 11,
-      "Operations": 6,
-      "Pricing": 3,
-      "Product/Service Management": 11,
-      "Professional Development": 6,
-      "Promotion": 9,
-      "Selling": 6,
-      "Strategic Management": 1
-    },
-    "Association": {
-      "Business Law": 2,
-      "Channel Management": 6,
-      "Communications": 4,
-      "Customer Relations": 2,
-      "Economics": 5,
-      "Emotional Intelligence": 8,
-      "Entrepreneurship": 0,
-      "Financial Analysis": 5,
-      "Human Resources Management": 0,
-      "Information Management": 4,
-      "Market Planning": 4,
-      "Marketing": 1,
-      "Marketing-Information Management": 14,
-      "Operations": 5,
-      "Pricing": 4,
-      "Product/Service Management": 13,
-      "Professional Development": 5,
-      "Promotion": 11,
-      "Selling": 7,
-      "Strategic Management": 0
-    },
-    "ICDC": {
-      "Business Law": 1,
-      "Channel Management": 7,
-      "Communications": 3,
-      "Customer Relations": 1,
-      "Economics": 4,
-      "Emotional Intelligence": 6,
-      "Entrepreneurship": 0,
-      "Financial Analysis": 4,
-      "Human Resources Management": 0,
-      "Information Management": 3,
-      "Market Planning": 5,
-      "Marketing": 1,
-      "Marketing-Information Management": 16,
-      "Operations": 4,
-      "Pricing": 4,
-      "Product/Service Management": 15,
-      "Professional Development": 5,
-      "Promotion": 13,
-      "Selling": 8,
-      "Strategic Management": 0
-    }
-  },
-  "Personal Financial Literacy": {
-    "District": {
-      "Earning Income": 25,
-      "Spending": 14,
-      "Saving": 15,
-      "Investing": 15,
-      "Managing Credit": 16,
-      "Managing Risk": 15
-    },
-    "Association": {
-      "Earning Income": 20,
-      "Spending": 14,
-      "Saving": 14,
-      "Investing": 19,
-      "Managing Credit": 19,
-      "Managing Risk": 14
-    },
-    "ICDC": {
-      "Earning Income": 16,
-      "Spending": 14,
-      "Saving": 13,
-      "Investing": 21,
-      "Managing Credit": 21,
-      "Managing Risk": 15
-    }
-  }
-};
-
-// Function to get categories for selected test type and difficulty
-const getTestCategories = (testType: string, difficultyType: string) => {
-  const blueprint = EXAM_BLUEPRINTS[testType as keyof typeof EXAM_BLUEPRINTS];
-  if (!blueprint) return [];
-  
-  // Map "State" to "District" since they have the same question counts
-  const mappedDifficulty = difficultyType === "State" ? "District" : difficultyType;
-  
-  const categories = blueprint[mappedDifficulty as keyof typeof blueprint];
-  if (!categories) return [];
-  
-  return Object.entries(categories).map(([name, count]) => ({ name, count }));
-};
-
-// Time limit options
-const TIME_LIMITS = [
-  "No Time Limit",
-  "30 Minutes",
-  "60 Minutes",
-  "90 Minutes (Standard)",
-  "120 Minutes",
-];
+// Quiz states for managing the interface
+type QuizState = 'configuring' | 'loading' | 'active' | 'results';
 
 export default function PracticeTestsPage() {
   const { toast } = useToast();
-  const [generatedTest, setGeneratedTest] = useState<any>(null);
-  const [currentQuestion, setCurrentQuestion] = useState<number>(0);
-  const [selectedAnswers, setSelectedAnswers] = useState<Record<number, number>>({});
+  const [quizData, setQuizData] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [userAnswers, setUserAnswers] = useState<Record<number, string>>({});
+  const [quizState, setQuizState] = useState<QuizState>('configuring');
   
   // Form setup
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<TestFormValues>({
     resolver: zodResolver(testSchema),
     defaultValues: {
-      testType: "Business Management & Administration",
-      difficultyType: "District",
-      categories: getTestCategories("Business Management & Administration", "District").map(cat => cat.name),
-      numQuestions: 50,
-      timeLimit: "120 Minutes (Standard)",
+      cluster: "Marketing",
+      level: "District",
+      questionCount: 25,
     },
   });
   
   // Watch for form values
-  const numQuestions = watch("numQuestions");
-  const selectedTestType = watch("testType");
-  const selectedDifficultyType = watch("difficultyType");
+  const selectedCluster = watch("cluster");
+  const selectedLevel = watch("level");
+  const questionCount = watch("questionCount");
   
-  // Get current test categories based on selections
-  const currentCategories = getTestCategories(selectedTestType, selectedDifficultyType);
-  
-  // Update categories when test type or difficulty changes
-  useEffect(() => {
-    const newCategories = getTestCategories(selectedTestType, selectedDifficultyType);
-    setValue("categories", newCategories.map(cat => cat.name));
-  }, [selectedTestType, selectedDifficultyType, setValue]);
-  
-  // Generate test mutation
-  const generateTest = useMutation({
-    mutationFn: async (data: TestFormValues) => {
-      const res = await apiRequest("POST", "/api/test/generate", data);
-      return await res.json();
-    },
-    onSuccess: (data) => {
-      setGeneratedTest(data);
-      setCurrentQuestion(0);
-      setSelectedAnswers({});
-      toast({
-        title: "Test Generated",
-        description: `Your ${data.testType} practice test is ready!`,
+  // AI Test Generation Function
+  const handleStartTest = async (data: TestFormValues) => {
+    setQuizState('loading');
+    setError('');
+    
+    try {
+      const response = await fetch('/api/generate-test', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          cluster: data.cluster,
+          level: data.level,
+          questionCount: data.questionCount,
+        }),
       });
-    },
-    onError: (error: Error) => {
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to generate test');
+      }
+
+      const quizData = await response.json();
+      setQuizData(quizData);
+      setCurrentQuestionIndex(0);
+      setUserAnswers({});
+      setQuizState('active');
+      
+      toast({
+        title: "Test Generated Successfully",
+        description: `Your ${data.cluster} practice test with ${data.questionCount} questions is ready!`,
+      });
+    } catch (error: any) {
+      console.error('Test generation error:', error);
+      setError(error.message);
+      setQuizState('configuring');
       toast({
         title: "Generation Failed",
         description: error.message,
         variant: "destructive",
       });
-    },
-  });
+    }
+  };
   
   // Form submission handler
   const onSubmit = (data: TestFormValues) => {
-    generateTest.mutate(data);
+    handleStartTest(data);
   };
   
-  // Handle moving to next/previous question
+  // Quiz navigation and interaction functions
+  const handleOptionSelect = (questionId: number, selectedOption: string) => {
+    setUserAnswers({
+      ...userAnswers,
+      [questionId]: selectedOption
+    });
+  };
+
   const goToNextQuestion = () => {
-    if (currentQuestion < generatedTest.questions.length - 1) {
-      setCurrentQuestion(currentQuestion + 1);
+    if (currentQuestionIndex < quizData.questions.length - 1) {
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
     }
   };
   
   const goToPreviousQuestion = () => {
-    if (currentQuestion > 0) {
-      setCurrentQuestion(currentQuestion - 1);
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex(currentQuestionIndex - 1);
     }
   };
-  
-  // Handle answer selection
-  const selectAnswer = (questionIndex: number, answerIndex: number) => {
-    setSelectedAnswers({
-      ...selectedAnswers,
-      [questionIndex]: answerIndex
+
+  const showResults = () => {
+    setQuizState('results');
+  };
+
+  const restartQuiz = () => {
+    setQuizData(null);
+    setUserAnswers({});
+    setCurrentQuestionIndex(0);
+    setQuizState('configuring');
+  };
+
+  // Calculate score for results
+  const calculateScore = () => {
+    if (!quizData?.questions) return { correct: 0, total: 0, percentage: 0 };
+    
+    let correct = 0;
+    quizData.questions.forEach((question: any) => {
+      const userAnswer = userAnswers[question.id];
+      const correctAnswer = question.answer;
+      if (userAnswer === correctAnswer) {
+        correct++;
+      }
     });
+    
+    const total = quizData.questions.length;
+    const percentage = Math.round((correct / total) * 100);
+    
+    return { correct, total, percentage };
   };
   
   return (

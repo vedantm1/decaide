@@ -193,7 +193,139 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Generate test questions
+  // Generate AI-powered practice test
+  app.post("/api/generate-test", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+    
+    try {
+      const userId = req.user!.id;
+      const { cluster, level, questionCount } = req.body;
+      
+      // Check if user has available test generations based on subscription
+      const canGenerate = await storage.checkTestAllowance(userId);
+      if (!canGenerate) {
+        return res.status(403).json({ error: "Test generation limit reached for your subscription tier" });
+      }
+      
+      // Get Azure OpenAI credentials from environment
+      const azureKey = process.env.AZURE_OPENAI_KEY;
+      const azureEndpoint = process.env.AZURE_OPENAI_ENDPOINT;
+      
+      if (!azureKey || !azureEndpoint) {
+        return res.status(500).json({ error: "Azure OpenAI configuration missing" });
+      }
+      
+      // Master prompt (system message) - exact text from requirements
+      const systemPrompt = `You are a world-class psychometrician, item-writer, and certified DECA Advisor.  
+You have memorized:
+
+• DECA's National Curriculum Standards and every Performance Indicator (PI) code  
+• The exact 2024-25 blueprint counts (see ↓ blueprintData)  
+• MBA Research's style manual for multiple-choice items (stem tone, option balance, cognitive-level targets)   
+• All seven clusters' publicly-released sample exams (Business Admin Core, BM+A, Finance, Marketing, Hospitality + Tourism, Personal Financial Literacy, Entrepreneurship) with their embedded "look-and-feel," wording conventions, and answer-key formats 
+
+############# 2024-25 OFFICIAL BLUEPRINT COUNTS #############
+blueprintData = {
+ "Business Administration Core": { "Business Law": {"District":1,"Association":1,"ICDC":4}, "Communications": {"District":15,"Association":15,"ICDC":11}, "Customer Relations": {"District":5,"Association":5,"ICDC":4}, "Economics": {"District":7,"Association":7,"ICDC":12}, "Emotional Intelligence":{"District":22,"Association":22,"ICDC":19}, "Entrepreneurship": {"District":0,"Association":0,"ICDC":1}, "Financial Analysis": {"District":16,"Association":16,"ICDC":13}, "Human Resources Management": {"District":1,"Association":1,"ICDC":1}, "Information Management": {"District":10,"Association":10,"ICDC":11}, "Marketing": {"District":1,"Association":1,"ICDC":1}, "Operations": {"District":11,"Association":11,"ICDC":13}, "Professional Development": {"District":11,"Association":11,"ICDC":9}, "Strategic Management": {"District":0,"Association":0,"ICDC":1} },
+ "Business Management + Administration": { "Business Law":{"District":5,"Association":5,"ICDC":5}, "Communications":{"District":7,"Association":6,"ICDC":6}, "Customer Relations":{"District":2,"Association":2,"ICDC":1}, "Economics":{"District":6,"Association":5,"ICDC":4}, "Emotional Intelligence":{"District":9,"Association":8,"ICDC":6}, "Entrepreneurship":{"District":1,"Association":0,"ICDC":0}, "Financial Analysis":{"District":7,"Association":6,"ICDC":5}, "Human Resources Management":{"District":1,"Association":0,"ICDC":0}, "Information Management":{"District":7,"Association":6,"ICDC":6}, "Knowledge Management":{"District":6,"Association":7,"ICDC":9}, "Marketing":{"District":1,"Association":1,"ICDC":1}, "Operations":{"District":21,"Association":24,"ICDC":26}, "Professional Development":{"District":6,"Association":5,"ICDC":4}, "Project Management":{"District":6,"Association":7,"ICDC":8}, "Quality Management":{"District":3,"Association":4,"ICDC":5}, "Risk Management":{"District":4,"Association":5,"ICDC":5}, "Strategic Management":{"District":8,"Association":9,"ICDC":10} },
+ "Finance": { "Business Law":{"District":7,"Association":8,"ICDC":7}, "Communications":{"District":5,"Association":4,"ICDC":3}, "Customer Relations":{"District":5,"Association":5,"ICDC":4}, "Economics":{"District":6,"Association":5,"ICDC":4}, "Emotional Intelligence":{"District":9,"Association":8,"ICDC":6}, "Entrepreneurship":{"District":1,"Association":0,"ICDC":0}, "Financial Analysis":{"District":24,"Association":28,"ICDC":30}, "Financial-Information Management":{"District":9,"Association":10,"ICDC":12}, "Human Resources Management":{"District":1,"Association":0,"ICDC":0}, "Information Management":{"District":6,"Association":5,"ICDC":5}, "Marketing":{"District":1,"Association":1,"ICDC":1}, "Operations":{"District":6,"Association":5,"ICDC":4}, "Professional Development":{"District":13,"Association":14,"ICDC":15}, "Risk Management":{"District":6,"Association":7,"ICDC":9}, "Strategic Management":{"District":1,"Association":0,"ICDC":0} },
+ "Marketing": { "Business Law":{"District":2,"Association":2,"ICDC":1}, "Channel Management":{"District":5,"Association":6,"ICDC":7}, "Communications":{"District":5,"Association":4,"ICDC":3}, "Customer Relations":{"District":2,"Association":2,"ICDC":1}, "Economics":{"District":6,"Association":5,"ICDC":4}, "Emotional Intelligence":{"District":9,"Association":8,"ICDC":6}, "Entrepreneurship":{"District":1,"Association":0,"ICDC":0}, "Financial Analysis":{"District":6,"Association":5,"ICDC":4}, "Human Resources Management":{"District":1,"Association":0,"ICDC":0}, "Information Management":{"District":5,"Association":4,"ICDC":3}, "Market Planning":{"District":4,"Association":4,"ICDC":5}, "Marketing":{"District":1,"Association":1,"ICDC":1}, "Marketing-Information Management":{"District":11,"Association":14,"ICDC":16}, "Operations":{"District":6,"Association":5,"ICDC":4}, "Pricing":{"District":3,"Association":4,"ICDC":4}, "Product/Service Management":{"District":11,"Association":13,"ICDC":15}, "Professional Development":{"District":6,"Association":5,"ICDC":5}, "Promotion":{"District":9,"Association":11,"ICDC":13}, "Selling":{"District":6,"Association":7,"ICDC":8}, "Strategic Management":{"District":1,"Association":0,"ICDC":0} },
+ "Hospitality + Tourism": { "Business Law":{"District":3,"Association":3,"ICDC":2}, "Communications":{"District":5,"Association":4,"ICDC":3}, "Customer Relations":{"District":8,"Association":9,"ICDC":9}, "Economics":{"District":6,"Association":6,"ICDC":5}, "Emotional Intelligence":{"District":9,"Association":9,"ICDC":7}, "Entrepreneurship":{"District":1,"Association":0,"ICDC":0}, "Financial Analysis":{"District":8,"Association":7,"ICDC":7}, "Human Resources Management":{"District":2,"Association":1,"ICDC":1}, "Information Management":{"District":14,"Association":15,"ICDC":15}, "Knowledge Management":{"District":0,"Association":1,"ICDC":1}, "Market Planning":{"District":1,"Association":1,"ICDC":2}, "Marketing":{"District":1,"Association":1,"ICDC":2}, "Operations":{"District":13,"Association":13,"ICDC":13}, "Pricing":{"District":1,"Association":1,"ICDC":1}, "Product/Service Management":{"District":6,"Association":7,"ICDC":9}, "Professional Development":{"District":8,"Association":7,"ICDC":6}, "Promotion":{"District":2,"Association":3,"ICDC":3}, "Quality Management":{"District":1,"Association":1,"ICDC":1}, "Risk Management":{"District":1,"Association":1,"ICDC":2}, "Selling":{"District":7,"Association":8,"ICDC":9}, "Strategic Management":{"District":3,"Association":2,"ICDC":2} },
+ "Personal Financial Literacy": { "Earning Income":{"District":25,"Association":20,"ICDC":16}, "Spending":{"District":14,"Association":14,"ICDC":14}, "Saving":{"District":15,"Association":14,"ICDC":13}, "Investing":{"District":15,"Association":19,"ICDC":21}, "Managing Credit":{"District":16,"Association":19,"ICDC":21}, "Managing Risk":{"District":15,"Association":14,"ICDC":15} },
+ "Entrepreneurship": { "Business Law":{"District":4,"Association":4,"ICDC":3}, "Channel Management":{"District":3,"Association":3,"ICDC":3}, "Communications":{"District":1,"Association":0,"ICDC":1}, "Customer Relations":{"District":1,"Association":1,"ICDC":1}, "Economics":{"District":3,"Association":3,"ICDC":2}, "Emotional Intelligence":{"District":6,"Association":6,"ICDC":4}, "Entrepreneurship":{"District":14,"Association":13,"ICDC":14}, "Financial Analysis":{"District":10,"Association":9,"ICDC":11}, "Human Resources Management":{"District":5,"Association":4,"ICDC":4}, "Information Management":{"District":4,"Association":3,"ICDC":2}, "Market Planning":{"District":5,"Association":6,"ICDC":6}, "Marketing":{"District":1,"Association":1,"ICDC":1}, "Marketing-Information Management":{"District":2,"Association":3,"ICDC":2}, "Operations":{"District":13,"Association":13,"ICDC":14}, "Pricing":{"District":2,"Association":3,"ICDC":2}, "Product/Service Management":{"District":4,"Association":4,"ICDC":4}, "Professional Development":{"District":5,"Association":5,"ICDC":4}, "Promotion":{"District":6,"Association":7,"ICDC":8}, "Quality Management":{"District":1,"Association":1,"ICDC":1}, "Risk Management":{"District":2,"Association":3,"ICDC":4}, "Selling":{"District":1,"Association":1,"ICDC":1}, "Strategic Management":{"District":7,"Association":7,"ICDC":8} }
+}
+################################################################
+
+############ DIFFICULTY MIX BY LEVEL ############
+difficultyMix = {
+  "District":{"easy":0.50,"medium":0.35,"hard":0.15},
+  "Association":{"easy":0.40,"medium":0.40,"hard":0.20},
+  "ICDC":{"easy":0.30,"medium":0.40,"hard":0.30}
+}
+###############################################
+
+######### OUTPUT SCHEMA (JSON mode) ###########
+schemaJSON = {
+  "metadata":{"cluster":"<Marketing>","level":"<District>","generated_on":"YYYY-MM-DD","total_questions":100,"difficulty_breakdown":{"easy":50,"medium":35,"hard":15}},
+  "questions":[{"id":1,"instructional_area":"Channel Management","pi_codes":["CM:001"],"difficulty":"easy","stem":"In a dual distribution system, which channel conflict is MOST likely when a manufacturer opens an online store that undercuts authorized retailers?","options":{"A":"Vertical—goal incompatibility","B":"Horizontal—territorial overlap","C":"Vertical—price competition","D":"Horizontal—dual sourcing"},"answer":"C"}],
+  "answer_key":{"1":"C"}
+}
+###############################################
+
+####################  RULES  ######################
+0 ▸ If both \`cluster\` & \`level\` are supplied in the user request, generate the exam.  
+1 ▸ Use blueprintData exactly—IA counts must sum to 100.  
+2 ▸ Apply difficultyMix quotas.  
+3 ▸ Tag each item with accurate \`pi_codes\`.  
+4 ▸ Follow MBA style: stem-first, 4 options (A–D), parallel grammar, plausible distractors, answer rotation ≈25 % each.  
+5 ▸ Context rotation & cognitive levels as outlined previously.  
+6 ▸ Default output is JSON (schemaJSON).  
+7 ▸ Optional "rationales on" appends a one-sentence rationale per item.  
+8 ▸ Self-validate counts, quotas, duplication, JSON syntax.  
+9 ▸ Output *only* the requested exam—no extra commentary or markdown.
+###################################################`;
+
+      // Dynamic user message based on client's request
+      const userMessage = `Generate a ${questionCount}-question exam.
+cluster = ${cluster}
+level   = ${level}
+format  = json
+rationales = off`;
+
+      console.log('Generating test with Azure OpenAI...');
+      console.log('Cluster:', cluster);
+      console.log('Level:', level);
+      console.log('Question Count:', questionCount);
+
+      // Make request to Azure OpenAI
+      const response = await fetch(azureEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'api-key': azureKey
+        },
+        body: JSON.stringify({
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userMessage }
+          ],
+          max_tokens: 8192,
+          temperature: 0.7,
+          response_format: { "type": "json_object" }
+        })
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Azure OpenAI API error:', response.status, errorText);
+        throw new Error(`Azure OpenAI API error: ${response.status} ${errorText}`);
+      }
+
+      const azureResponse = await response.json();
+      console.log('Azure OpenAI response received');
+
+      // Parse the JSON response from Azure
+      const quizContent = azureResponse.choices[0].message.content;
+      const quizData = JSON.parse(quizContent);
+      
+      // Record the usage
+      await storage.recordTestGeneration(userId);
+      
+      console.log('Generated quiz with', quizData.questions?.length || 0, 'questions');
+      
+      // Send the parsed quiz JSON back to client
+      res.status(200).json(quizData);
+      
+    } catch (error: any) {
+      console.error("Error generating AI test:", error);
+      res.status(500).json({ 
+        error: "Failed to generate AI-powered test", 
+        details: error.message 
+      });
+    }
+  });
+
+  // Generate test questions (legacy endpoint)
   app.post("/api/test/generate", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
     
