@@ -395,7 +395,7 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
             <Card className="text-center">
               <CardHeader className="pb-4">
                 <CardTitle className="text-2xl font-bold">
-                  Welcome to Decaide!
+                  Welcome to DecA(I)de!
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
