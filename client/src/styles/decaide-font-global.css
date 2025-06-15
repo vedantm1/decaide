@@ -1,6 +1,6 @@
 /* DecAIde Font Global Application with Stylistic Alternates */
 
-/* Apply DecAIde font to all elements with stylistic alternates */
+/* Apply DecAIde font to all elements with stylistic alternates and proper spacing */
 *,
 *::before,
 *::after,
@@ -87,6 +87,8 @@ option,
 button {
   font-family: 'DecAIde', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif !important;
   font-feature-settings: "ss01" on, "ss02" on, "ss03" on, "ss04" on, "ss05" on, "ss06" on, "ss07" on, "ss08" on, "ss09" on, "ss10" on !important;
+  letter-spacing: 0.025em !important;
+  word-spacing: 0.1em !important;
 }
 
 /* Specific targeting for common UI components */
@@ -128,6 +130,8 @@ button {
 .modal-footer {
   font-family: 'DecAIde', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif !important;
   font-feature-settings: "ss01" on, "ss02" on, "ss03" on, "ss04" on, "ss05" on, "ss06" on, "ss07" on, "ss08" on, "ss09" on, "ss10" on !important;
+  letter-spacing: 0.025em !important;
+  word-spacing: 0.1em !important;
 }
 
 /* Shadcn/UI components */
@@ -148,6 +152,8 @@ button {
 [data-radix-collapsible-content] {
   font-family: 'DecAIde', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif !important;
   font-feature-settings: "ss01" on, "ss02" on, "ss03" on, "ss04" on, "ss05" on, "ss06" on, "ss07" on, "ss08" on, "ss09" on, "ss10" on !important;
+  letter-spacing: 0.025em !important;
+  word-spacing: 0.1em !important;
 }
 
 /* React components and custom classes */
@@ -165,6 +171,8 @@ button {
 .column {
   font-family: 'DecAIde', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif !important;
   font-feature-settings: "ss01" on, "ss02" on, "ss03" on, "ss04" on, "ss05" on, "ss06" on, "ss07" on, "ss08" on, "ss09" on, "ss10" on !important;
+  letter-spacing: 0.025em !important;
+  word-spacing: 0.1em !important;
 }
 
 /* Tailwind utility classes override */
@@ -173,6 +181,8 @@ button {
 .font-mono {
   font-family: 'DecAIde', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif !important;
   font-feature-settings: "ss01" on, "ss02" on, "ss03" on, "ss04" on, "ss05" on, "ss06" on, "ss07" on, "ss08" on, "ss09" on, "ss10" on !important;
+  letter-spacing: 0.025em !important;
+  word-spacing: 0.1em !important;
 }
 
 /* Ensure all text content uses DecAIde font */
@@ -185,6 +195,8 @@ button {
 .markdown * {
   font-family: 'DecAIde', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif !important;
   font-feature-settings: "ss01" on, "ss02" on, "ss03" on, "ss04" on, "ss05" on, "ss06" on, "ss07" on, "ss08" on, "ss09" on, "ss10" on !important;
+  letter-spacing: 0.025em !important;
+  word-spacing: 0.1em !important;
 }
 
 /* Override any external library fonts */
@@ -208,6 +220,8 @@ button {
 .bp3-input {
   font-family: 'DecAIde', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif !important;
   font-feature-settings: "ss01" on, "ss02" on, "ss03" on, "ss04" on, "ss05" on, "ss06" on, "ss07" on, "ss08" on, "ss09" on, "ss10" on !important;
+  letter-spacing: 0.025em !important;
+  word-spacing: 0.1em !important;
 }
 
 /* Specific targeting for DecAIde application components */
