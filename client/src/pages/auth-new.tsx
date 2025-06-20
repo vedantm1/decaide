@@ -78,6 +78,8 @@ export default function AuthNew() {
     
     if (response.ok) {
       const userData = await response.json();
+      // Mark as new user to trigger onboarding
+      localStorage.setItem('isNewUser', 'true');
       // Force refresh of auth context
       window.location.href = '/';
     } else {

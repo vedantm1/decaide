@@ -130,6 +130,11 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
   const [selectedEvents, setSelectedEvents] = useState<{[cluster: string]: string}>({});
   const [errorMessage, setErrorMessage] = useState<string>("");
 
+  console.log('OnboardingOverlay - isOpen:', isOpen, 'currentStep:', currentStep);
+
+  // Only render if onboarding is open
+  if (!isOpen) return null;
+
   const handleStartTutorial = () => {
     setCurrentStep('tutorial');
     setTutorialStep(0);
@@ -172,7 +177,7 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
     setSelectedEvents(newSelections);
   };
 
-  const handleDone = () => {
+  const handleDone = async () => {
     const selectedCount = Object.keys(selectedEvents).length;
     
     if (selectedCount === 0) {
@@ -186,16 +191,44 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
     }
     
     const selectedEvent = Object.values(selectedEvents)[0];
+    
+    // Parse event data to extract format, code, type, and instructional area
+    const eventParts = selectedEvent.split(' - ');
+    const eventAbbrev = eventParts[1]?.replace(/[()]/g, '');
+    
+    // Determine event format and type based on the event
+    let eventFormat = 'roleplay';
+    let eventType = 'Individual Series';
+    let instructionalArea = Object.keys(selectedEvents)[0];
+    
+    // Save event selection to backend
+    try {
+      await fetch('/api/user/event-selection', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          eventFormat,
+          eventCode: eventAbbrev,
+          eventType,
+          instructionalArea
+        }),
+      });
+    } catch (error) {
+      console.error('Failed to save event selection:', error);
+    }
+    
     localStorage.setItem('selectedDecaEvent', selectedEvent);
     
-    // Immediately remove background blur and sidebar blur before closing overlay
+    // Clean up styling
     const overlayElement = document.querySelector('.onboarding-overlay');
     if (overlayElement) {
       (overlayElement as HTMLElement).style.backdropFilter = 'none';
       (overlayElement as HTMLElement).style.backgroundColor = 'transparent';
     }
     
-    // Specifically clean up sidebar elements
     const sidebarElements = document.querySelectorAll('.translucent-sidebar, [data-tutorial], aside, nav');
     sidebarElements.forEach(el => {
       const element = el as HTMLElement;

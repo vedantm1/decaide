@@ -92,6 +92,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Save user event selection from onboarding
+  app.post("/api/user/event-selection", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+
+    try {
+      const userId = req.user!.id;
+      const { eventFormat, eventCode, eventType, instructionalArea } = req.body;
+
+      const updatedUser = await storage.updateUserSettings(userId, {
+        eventFormat,
+        eventCode,
+        eventType,
+        instructionalArea
+      });
+
+      res.json(updatedUser);
+    } catch (error) {
+      console.error("Error saving event selection:", error);
+      res.status(500).json({ error: "Failed to save event selection" });
+    }
+  });
+
   // Get user stats
   app.get("/api/user/stats", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);

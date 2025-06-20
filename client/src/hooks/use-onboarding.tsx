@@ -18,12 +18,17 @@ export function OnboardingProvider({ children }: OnboardingProviderProps) {
   const [shouldShowOnboarding, setShouldShowOnboarding] = useState(false);
 
   useEffect(() => {
-    // Disable onboarding to prevent runtime errors
     const hasCompleted = localStorage.getItem('onboardingCompleted');
-    if (!hasCompleted) {
-      // Don't show onboarding automatically - let user trigger it
-      setShouldShowOnboarding(false);
-      setIsOnboardingOpen(false);
+    const isNewUser = localStorage.getItem('isNewUser');
+    
+    console.log('Onboarding check:', { hasCompleted, isNewUser });
+    
+    if (!hasCompleted && isNewUser === 'true') {
+      console.log('Triggering onboarding for new user');
+      setShouldShowOnboarding(true);
+      setIsOnboardingOpen(true);
+      // Clear the new user flag
+      localStorage.removeItem('isNewUser');
     }
   }, []);
 
