@@ -29,8 +29,8 @@ import { AppearanceSettings } from "@/lib/theme-controller";
 const profileSchema = z.object({
   username: z.string().min(3, { message: "Username must be at least 3 characters" }),
   email: z.string().email({ message: "Please enter a valid email address" }).optional(),
-  eventType: z.string().min(1, { message: "Please select an event type" }),
-  instructionalArea: z.string().min(1, { message: "Please select an instructional area" }),
+  eventType: z.string().min(1, { message: "Please select an event type" }).optional(),
+  instructionalArea: z.string().min(1, { message: "Please select an instructional area" }).optional(),
 });
 
 // Notification form schema
@@ -149,8 +149,8 @@ export default function SettingsPage() {
     defaultValues: {
       username: user?.username || "",
       email: "",
-      eventType: user?.eventType || "",
-      instructionalArea: user?.instructionalArea || "",
+      eventType: user?.eventType || undefined,
+      instructionalArea: user?.instructionalArea || undefined,
     },
   });
 
@@ -280,7 +280,7 @@ export default function SettingsPage() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="text-foreground/80">DECA Event Type</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select value={field.value || ""} onValueChange={field.onChange}>
                           <FormControl>
                             <SelectTrigger className="bg-background/80">
                               <SelectValue placeholder="Select your event type" />
