@@ -1,16 +1,12 @@
 /* Import DecAIde font global styles first */
 @import './styles/decaide-font-global.css';
 
-@import './styles/professional-theme.css';
 @import './styles/typography.css';
 @import './styles/micro-interactions.css';
 @import './styles/theme-variables.css';
 @import './styles/visual-styles.css';
 @import './lib/theme-colors.css';
 @import './lib/color-variables.css';
-@import './styles/force-dark-mode.css';
-@import './styles/dark-mode-fixes.css';
-@import './styles/dark-mode-gradients.css';
 @import './styles/premium-scrollbar.css';
 
 @tailwind base;
