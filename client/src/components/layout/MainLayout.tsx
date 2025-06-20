@@ -252,7 +252,7 @@ export function MainLayout({ children }: MainLayoutProps) {
               exit="closed"
               variants={sidebarVariants}
             >
-              <div className="h-full overflow-y-auto py-4 px-3 flex flex-col">
+              <div className="h-full overflow-y-auto py-4 px-3 flex flex-col premium-scroll">
                 <nav className="space-y-1 flex-1">
                   {navigationItems.map((item, index) => (
                     <motion.div 
@@ -320,12 +320,12 @@ export function MainLayout({ children }: MainLayoutProps) {
         
         {/* Main content */}
         <motion.main
-          className="flex-1 min-w-0 relative"
+          className="flex-1 min-w-0 relative main-content"
           initial="collapsed"
           animate={isSidebarOpen && !isMobile ? "expanded" : "collapsed"}
           variants={contentVariants}
         >
-          <div className="max-w-[1600px] mx-auto p-4 md:p-6 lg:p-8">
+          <div className="max-w-[1600px] mx-auto p-4 md:p-6 lg:p-8 dashboard-content">
             <AnimatePresence mode="wait">
               <motion.div
                 key={location}
@@ -336,7 +336,7 @@ export function MainLayout({ children }: MainLayoutProps) {
                 className="pb-12"
               >
                 {/* Content card with glass effect for vanta waves */}
-                <div className="translucent-card rounded-xl shadow-lg p-6 border">
+                <div className="translucent-card rounded-xl shadow-lg p-6 border content-container">
                   {children}
                 </div>
               </motion.div>
