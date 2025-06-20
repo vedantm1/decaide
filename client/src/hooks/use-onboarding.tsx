@@ -18,14 +18,13 @@ export function OnboardingProvider({ children }: OnboardingProviderProps) {
   const [shouldShowOnboarding, setShouldShowOnboarding] = useState(false);
 
   useEffect(() => {
-    // For testing - always show onboarding
-    localStorage.removeItem('onboardingCompleted');
-    localStorage.removeItem('selectedDecaEvent');
-    
-    // Force show onboarding for testing
-    setShouldShowOnboarding(true);
-    setIsOnboardingOpen(true);
-    console.log('Onboarding should be visible now');
+    // Disable onboarding to prevent runtime errors
+    const hasCompleted = localStorage.getItem('onboardingCompleted');
+    if (!hasCompleted) {
+      // Don't show onboarding automatically - let user trigger it
+      setShouldShowOnboarding(false);
+      setIsOnboardingOpen(false);
+    }
   }, []);
 
   const completeOnboarding = () => {

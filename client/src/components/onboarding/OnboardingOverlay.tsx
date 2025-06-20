@@ -228,18 +228,22 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
       const targetElement = document.querySelector(currentSelector);
       
       // Clear all previous tutorial styling first
-      document.querySelectorAll('*').forEach(el => {
-        const element = el as HTMLElement;
-        if (element.dataset.tutorialBlurred) {
-          element.style.filter = '';
-          element.style.transition = '';
-          delete element.dataset.tutorialBlurred;
-        }
-        if (element.dataset.tutorialHighlighted) {
-          element.setAttribute('style', '');
-          delete element.dataset.tutorialHighlighted;
-        }
-      });
+      try {
+        document.querySelectorAll('*').forEach(el => {
+          const element = el as HTMLElement;
+          if (element.dataset.tutorialBlurred) {
+            element.style.filter = '';
+            element.style.transition = '';
+            delete element.dataset.tutorialBlurred;
+          }
+          if (element.dataset.tutorialHighlighted) {
+            element.setAttribute('style', '');
+            delete element.dataset.tutorialHighlighted;
+          }
+        });
+      } catch (error) {
+        console.warn('Error clearing tutorial styling:', error);
+      }
       
       // Keep main content completely clear
       const mainContent = document.querySelector('main');
@@ -308,10 +312,15 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
         // Also clear blur from all parent elements up the tree
         let parent = targetElement.parentElement;
         while (parent && parent !== document.body) {
-          (parent as HTMLElement).style.setProperty('filter', 'none', 'important');
-           parent.style.setProperty('--tw-blur', 'none', 'important');
-          delete (parent as HTMLElement).dataset.tutorialBlurred;
-          parent = parent.parentElement;
+          try {
+            (parent as HTMLElement).style.setProperty('filter', 'none', 'important');
+            (parent as HTMLElement).style.setProperty('--tw-blur', 'none', 'important');
+            delete (parent as HTMLElement).dataset.tutorialBlurred;
+            parent = parent.parentElement;
+          } catch (error) {
+            console.warn('Error clearing parent blur:', error);
+            break;
+          }
         }
         
         // Specifically handle sidebar container if target is inside it
