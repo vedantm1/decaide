@@ -14,7 +14,7 @@ import MyProgressPage from "@/pages/my-progress";
 import SettingsPage from "@/pages/settings";
 import PricingPage from "@/pages/pricing";
 import WhyDecadePage from "@/pages/why-decade";
-import InteractionShowcasePage from "@/pages/interaction-showcase";
+
 
 import Checkout from "@/pages/checkout";
 import Subscribe from "@/pages/subscribe";
@@ -42,7 +42,7 @@ function Router() {
       <ProtectedRoute path="/pricing" component={PricingPage} />
       <ProtectedRoute path="/checkout" component={Checkout} />
       <ProtectedRoute path="/subscribe" component={Subscribe} />
-      <ProtectedRoute path="/interactions" component={InteractionShowcasePage} />
+
       <Route path="/why-decade" component={WhyDecadePage} />
       <Route path="/auth" component={AuthNew} />
       <Route component={NotFound} />

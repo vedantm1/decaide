@@ -5,10 +5,6 @@ import "./styles/typography.css";
 import "./styles/enhanced-components.css";
 import "./styles/layout-system.css";
 import "./styles/micro-interactions.css";
-import "./styles/dark-input-fields.css";
-import "./styles/cluster-badges.css";
-import "./styles/dark-selection-boxes.css";
-import "./styles/animations.css";
 
 // Set the theme.json colors in CSS
 document.documentElement.style.setProperty("--background", "248 100% 96%");
