@@ -1,0 +1,57 @@
+/* Dark Mode Input Styling */
+.dark input[type="text"],
+.dark input[type="password"],
+.dark input[type="email"],
+.dark input[type="number"],
+.dark input[type="search"],
+.dark input[type="tel"],
+.dark input[type="url"],
+.dark input[type="date"],
+.dark input[type="datetime-local"],
+.dark input[type="month"],
+.dark input[type="time"],
+.dark input[type="week"],
+.dark textarea,
+.dark select {
+  background-color: #1a1a1a !important;
+  color: white !important;
+  border-color: #333 !important;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #888 !important;
+}
+
+/* Override default input styling in dark mode for form controls */
+.dark .form-control,
+.dark .select-box,
+.dark .input-field,
+.dark [role="combobox"],
+.dark [role="textbox"] {
+  background-color: #1a1a1a !important;
+  color: white !important;
+  border-color: #333 !important;
+}
+
+/* Specific overrides for the settings page input fields */
+.dark [id^="event-"],
+.dark [id^="instructional-"] {
+  background-color: #1a1a1a !important;
+  color: white !important;
+}
+
+/* Override for any shadcn and Radix components in dark mode */
+.dark [data-radix-select-viewport],
+.dark [data-radix-dropdown-menu-content],
+.dark [data-radix-popper-content],
+.dark [data-highlighted] {
+  background-color: #1a1a1a !important;
+  color: white !important;
+}
+
+/* DECA cluster theme badges fix */
+.dark .badge {
+  background-color: #1a1a1a !important;
+  color: white !important;
+}

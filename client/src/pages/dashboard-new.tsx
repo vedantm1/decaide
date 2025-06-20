@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { StatCard } from '@/components/ui/stat-card';
-import { Card } from '@/components/ui/card';
+import { EnhancedCard, AnimatedHeading, MotionButton, StaggerContainer, FloatingIcon } from '@/components/animations/enhanced-effects';
 import { 
   IconBarChart, 
   IconUsers, 

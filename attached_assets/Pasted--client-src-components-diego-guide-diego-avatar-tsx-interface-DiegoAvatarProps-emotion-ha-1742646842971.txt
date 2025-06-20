@@ -1,0 +1,117 @@
+// client/src/components/diego-guide/diego-avatar.tsx
+interface DiegoAvatarProps {
+  emotion?: 'happy' | 'excited' | 'thinking' | 'neutral' | 'pointing';
+  size?: 'sm' | 'md' | 'lg' | 'xl';
+  className?: string;
+  pointDirection?: 'left' | 'right' | 'up' | 'down';
+  swimming?: boolean;
+}
+
+export default function DiegoAvatar({
+  emotion = 'neutral',
+  size = 'md',
+  className = '',
+  pointDirection = 'up',
+  swimming = false
+}: DiegoAvatarProps) {
+  // Determine size based on prop
+  const sizeClasses = {
+    sm: 'w-8 h-8',
+    md: 'w-12 h-12',
+    lg: 'w-16 h-16',
+    xl: 'w-24 h-24'
+  };
+
+  // Use enhanced swimming animation
+  const swimmingAnimation = swimming ? 'animate-dolphin-swim' : '';
+
+  // Base classes for all avatars
+  const baseClasses = `${sizeClasses[size]} ${swimmingAnimation} ${className}`;
+
+  // Custom Dolphin SVG with gradients and refined details
+  const DolphinSVG = (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 64 64"
+      className="w-full h-full"
+    >
+      <defs>
+        <linearGradient id="dolphinGradient" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#4FD1C5" />
+          <stop offset="100%" stopColor="#3182CE" />
+        </linearGradient>
+      </defs>
+      {/* Dolphin body */}
+      <path
+        fill="url(#dolphinGradient)"
+        d="M4,32c10,0,14-12,28-12s18,10,18,10s-4,4-6,6c-2,2-6,6-6,6s-2-3-4-3c-2,0-4,3-4,3s-2-1-4-1
+          s-4,0-6,2c-2,2-6,2-6,2s-4-4-4-8S4,32,4,32z"
+      />
+      {/* Dolphin fin */}
+      <path
+        fill="#2C5282"
+        d="M30,10c8,2,14,10,14,10s-2,3-4,4s-6,2-6,2s-4-1-6-1S28,10,30,10z"
+      />
+      {/* Dolphin eye */}
+      <circle cx="22" cy="26" r="1.5" fill="#FFFFFF" />
+    </svg>
+  );
+
+  // Render different avatar based on emotion
+  switch (emotion) {
+    case 'happy':
+      return (
+        <div className={`${baseClasses} relative text-primary-foreground`}>
+          <div className="text-4xl">{DolphinSVG}</div>
+          <div className="absolute -bottom-1 -right-1 text-lg">
+            <span>😊</span>
+          </div>
+        </div>
+      );
+    case 'excited':
+      return (
+        <div className={`${baseClasses} relative text-primary-foreground`}>
+          <div className="text-4xl">{DolphinSVG}</div>
+          <div className="absolute -bottom-1 -right-1 text-lg">
+            <span>🤩</span>
+          </div>
+        </div>
+      );
+    case 'thinking':
+      return (
+        <div className={`${baseClasses} relative text-primary-foreground`}>
+          <div className="text-4xl">{DolphinSVG}</div>
+          <div className="absolute -bottom-1 -right-1 text-lg">
+            <span>🤔</span>
+          </div>
+        </div>
+      );
+    case 'pointing':
+      const pointClasses = {
+        up: 'top-0 left-1/2 transform -translate-x-1/2 -translate-y-full',
+        down: 'bottom-0 left-1/2 transform -translate-x-1/2 translate-y-full',
+        left: 'left-0 top-1/2 transform -translate-x-full -translate-y-1/2',
+        right: 'right-0 top-1/2 transform translate-x-full -translate-y-1/2'
+      };
+      const pointEmojis = {
+        up: '☝️',
+        down: '👇',
+        left: '👈',
+        right: '👉'
+      };
+      return (
+        <div className={`${baseClasses} relative text-primary-foreground`}>
+          <div className="text-4xl">{DolphinSVG}</div>
+          <div className={`absolute ${pointClasses[pointDirection]} text-xl`}>
+            <span>{pointEmojis[pointDirection]}</span>
+          </div>
+        </div>
+      );
+    default:
+      return (
+        <div className={`${baseClasses} text-primary-foreground`}>
+          <div className="text-4xl">{DolphinSVG}</div>
+        </div>
+      );
+  }
+}

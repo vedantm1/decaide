@@ -1,10 +1,16 @@
 import { createRoot } from "react-dom/client";
 import App from "./App";
 import "./index.css";
-import "./styles/typography.css";
-import "./styles/enhanced-components.css";
-import "./styles/layout-system.css";
-import "./styles/micro-interactions.css";
+import "./styles/professional-theme.css"; // New professional theme system
+import "./styles/typography.css"; // Professional typography system
+import "./styles/enhanced-components.css"; // Enhanced UI components with micro-interactions 
+import "./styles/layout-system.css"; // Professional layout system
+import "./styles/micro-interactions.css"; // Interactive animation effects
+import "./styles/dark-input-fields.css"; // Dark mode input field styling
+import "./styles/dark-mode-gradients.css"; // Dark mode gradient backgrounds
+import "./styles/cluster-badges.css"; // DECA cluster badges for dark mode
+import "./styles/dark-selection-boxes.css"; // Dark mode selection boxes 
+import "./styles/animations.css"; // 100+ animation collection
 
 // Set the theme.json colors in CSS
 document.documentElement.style.setProperty("--background", "248 100% 96%");

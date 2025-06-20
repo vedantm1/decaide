@@ -1,0 +1,179 @@
+Accounting Applications Series
+ACT
+
+Apparel and Accessories Marketing Series
+AAM
+
+Automotive Services Marketing Series
+ASM
+
+Business Finance Series
+BFS
+
+Business Growth Plan
+EBG
+
+Business Law and Ethics Team Decision Making
+BLTDM
+
+Business Services Marketing Series
+BSM
+
+Business Services Operations Research
+BOR
+
+Business Solutions Project
+PMBS
+
+Buying and Merchandising Operations Research
+BMOR
+
+Buying and Merchandising Team Decision Making
+BTDM
+
+Career Development Project
+PMCD
+
+Community Awareness Project
+PMCA
+
+Community Giving Project
+PMCG
+
+Entrepreneurship Series
+ENT
+
+Entrepreneurship Team Decision Making
+ETDM
+
+Finance Operations Research
+FOR
+
+Financial Consulting
+FCE
+
+Financial Literacy Project
+PMFL
+
+Financial Services Team Decision Making
+FTDM
+
+Food Marketing Series
+FMS
+
+Franchise Business Plan
+EFB
+
+Hospitality Services Team Decision Making
+HTDM
+
+Hospitality and Tourism Operations Research
+HTOR
+
+Hospitality and Tourism Professional Selling
+HTPS
+
+Hotel and Lodging Management Series
+HLM
+
+Human Resources Management Series
+HRM
+
+Independent Business Plan
+EIB
+
+Innovation Plan
+EIP
+
+Integrated Marketing Campaign-Event
+IMCE
+
+Integrated Marketing Campaign-Product
+IMCP
+
+Integrated Marketing Campaign-Service
+IMCS
+
+International Business Plan
+IBP
+
+Marketing Communications Series
+MCS
+
+Marketing Management Team Decision Making
+MTDM
+
+Personal Financial Literacy
+PFL
+
+Principles of Business Management and Administration
+PBM
+
+Principles of Entrepreneurship
+PEN
+
+Principles of Finance
+PFN
+
+Principles of Hospitality and Tourism
+PHT
+
+Principles of Marketing
+PMK
+
+Professional Selling
+PSE
+
+Quick Serve Restaurant Management Series
+QSRM
+
+Restaurant and Food Service Management Series
+RFSM
+
+Retail Merchandising Series
+RMS
+
+Sales Project
+PMSP
+
+Sports and Entertainment Marketing Operations Research
+SEOR
+
+Sports and Entertainment Marketing Series
+SEM
+
+Sports and Entertainment Marketing Team Decision Making
+STDM
+
+Start-Up Business Plan
+ESB
+
+Stock Market Game
+SMG
+
+Travel and Tourism Team Decision Making
+TTDM
+
+Virtual Business Challenge-Accounting
+VBCAC
+
+Virtual Business Challenge-Entrepreneurship
+VBCEN
+
+Virtual Business Challenge-Fashion
+VBCFA
+
+Virtual Business Challenge-Hotel Management
+VBCHM
+
+Virtual Business Challenge-Personal Finance
+VBCPF
+
+Virtual Business Challenge-Restaurant
+VBCRS
+
+Virtual Business Challenge-Retail
+VBCRT
+
+Virtual Business Challenge-Sports
+VBCSP

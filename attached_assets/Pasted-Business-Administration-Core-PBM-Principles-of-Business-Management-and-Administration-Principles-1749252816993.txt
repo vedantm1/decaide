@@ -1,0 +1,115 @@
+Business Administration Core
+
+PBM: Principles of Business Management and Administration — Principles of Business Administration
+
+PEN: Principles of Entrepreneurship — Principles of Business Administration
+
+PFN: Principles of Finance — Principles of Business Administration
+
+PHT: Principles of Hospitality and Tourism — Principles of Business Administration
+
+PMK: Principles of Marketing — Principles of Business Administration
+
+Business Management & Administration
+
+BLTDM: Business Law and Ethics Team Decision Making — Team Decision Making
+
+HRM: Human Resources Management Series — Individual Series
+
+BOR: Business Services Operations Research — Business Operations Research
+
+PMBS: Business Solutions Project — Project Management
+
+PMCD: Career Development Project — Project Management
+
+PMCA: Community Awareness Project — Project Management
+
+PMCG: Community Giving Project — Project Management
+
+Entrepreneurship
+
+ETDM: Entrepreneurship Team Decision Making — Team Decision Making
+
+ENT: Entrepreneurship Series — Individual Series
+
+EBG: Business Growth Plan — Entrepreneurship
+
+EFB: Franchise Business Plan — Entrepreneurship
+
+EIB: Independent Business Plan — Entrepreneurship
+
+EIP: Innovation Plan — Entrepreneurship
+
+IBP: International Business Plan — Entrepreneurship
+
+ESB: Start-Up Business Plan — Entrepreneurship
+
+Finance
+
+FTDM: Financial Services Team Decision Making — Team Decision Making
+
+ACT: Accounting Applications Series — Individual Series
+
+BFS: Business Finance Series — Individual Series
+
+FOR: Finance Operations Research — Business Operations Research
+
+FCE: Financial Consulting — Professional Selling and Consulting
+
+PMFL: Financial Literacy Project — Project Management
+
+Hospitality & Tourism
+
+HTDM: Hospitality Services Team Decision Making — Team Decision Making
+
+TTDM: Travel and Tourism Team Decision Making — Team Decision Making
+
+HLM: Hotel and Lodging Management Series — Individual Series
+
+QSRM: Quick Serve Restaurant Management Series — Individual Series
+
+RFSM: Restaurant and Food Service Management Series — Individual Series
+
+HTOR: Hospitality and Tourism Operations Research — Business Operations Research
+
+HTPS: Hospitality and Tourism Professional Selling — Professional Selling and Consulting
+
+Marketing
+
+BTDM: Buying and Merchandising Team Decision Making — Team Decision Making
+
+MTDM: Marketing Management Team Decision Making — Team Decision Making
+
+STDM: Sports and Entertainment Marketing Team Decision Making — Team Decision Making
+
+AAM: Apparel and Accessories Marketing Series — Individual Series
+
+ASM: Automotive Services Marketing Series — Individual Series
+
+BSM: Business Services Marketing Series — Individual Series
+
+FMS: Food Marketing Series — Individual Series
+
+BMOR: Buying and Merchandising Operations Research — Business Operations Research
+
+SEOR: Sports and Entertainment Marketing Operations Research — Business Operations Research
+
+MCS: Marketing Communications Series — Individual Series
+
+RMS: Retail Merchandising Series — Individual Series
+
+SEM: Sports and Entertainment Marketing Series — Individual Series
+
+IMCE: Integrated Marketing Campaign-Event — Integrated Marketing Campaign
+
+IMCP: Integrated Marketing Campaign-Product — Integrated Marketing Campaign
+
+IMCS: Integrated Marketing Campaign-Service — Integrated Marketing Campaign
+
+PMSP: Sales Project — Project Management
+
+PSE: Professional Selling — Professional Selling and Consulting
+
+Personal Financial Literacy
+
+PFL: Personal Financial Literacy — Personal Financial Literacy
