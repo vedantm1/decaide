@@ -168,10 +168,8 @@ export function MainLayout({ children }: MainLayoutProps) {
               <IconMenu className="w-5 h-5" />
             </button>
             
-            <Link href="/">
-              <a className="text-xl font-bold text-primary tracking-tight hover:opacity-80 transition-opacity">
-                DecA(I)de
-              </a>
+            <Link href="/" className="text-xl font-bold text-primary tracking-tight hover:opacity-80 transition-opacity">
+              DecA(I)de
             </Link>
           </div>
           
@@ -264,32 +262,31 @@ export function MainLayout({ children }: MainLayoutProps) {
                       custom={index}
                       variants={navItemVariants}
                     >
-                      <Link href={item.href}>
-                        <a 
-                          data-tutorial={item.tutorialId}
-                          className={cn(
-                            "flex items-center px-3 py-2.5 text-base rounded-lg relative group",
-                            location === item.href 
-                              ? "text-primary font-medium" 
-                              : "text-foreground/70 hover:text-foreground",
-                            "transition-all hover:bg-primary/5"
-                          )}
-                        >
-                          <span className="mr-3 text-current opacity-70 group-hover:opacity-100">
-                            {item.icon}
-                          </span>
-                          <span className="font-medium">{item.label}</span>
-                          
-                          {location === item.href && (
-                            <motion.div 
-                              className="absolute bottom-0 left-0 h-full w-1 bg-primary rounded-r"
-                              initial="initial"
-                              animate="animate"
-                              variants={activeIndicatorVariants}
-                              layoutId="activeNavIndicator"
-                            />
-                          )}
-                        </a>
+                      <Link 
+                        href={item.href}
+                        data-tutorial={item.tutorialId}
+                        className={cn(
+                          "flex items-center px-3 py-2.5 text-base rounded-lg relative group",
+                          location === item.href 
+                            ? "text-primary font-medium" 
+                            : "text-foreground/70 hover:text-foreground",
+                          "transition-all hover:bg-primary/5"
+                        )}
+                      >
+                        <span className="mr-3 text-current opacity-70 group-hover:opacity-100">
+                          {item.icon}
+                        </span>
+                        <span className="font-medium">{item.label}</span>
+                        
+                        {location === item.href && (
+                          <motion.div 
+                            className="absolute bottom-0 left-0 h-full w-1 bg-primary rounded-r"
+                            initial="initial"
+                            animate="animate"
+                            variants={activeIndicatorVariants}
+                            layoutId="activeNavIndicator"
+                          />
+                        )}
                       </Link>
                     </motion.div>
                   ))}
