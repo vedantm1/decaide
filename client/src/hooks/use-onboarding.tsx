@@ -5,6 +5,7 @@ interface OnboardingContextType {
   shouldShowOnboarding: boolean;
   completeOnboarding: () => void;
   startOnboarding: () => void;
+  triggerOnboardingForNewUser: () => void;
 }
 
 const OnboardingContext = createContext<OnboardingContextType | undefined>(undefined);
@@ -37,6 +38,14 @@ export function OnboardingProvider({ children }: OnboardingProviderProps) {
     // Initial check
     checkOnboarding();
     
+    // Listen for custom event to trigger onboarding
+    const handleTriggerOnboarding = () => {
+      console.log('Received triggerOnboarding event');
+      triggerOnboardingForNewUser();
+    };
+    
+    window.addEventListener('triggerOnboarding', handleTriggerOnboarding);
+    
     // Also listen for storage changes in case flag is set after component mounts
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'isNewUser' && e.newValue === 'true') {
@@ -50,6 +59,7 @@ export function OnboardingProvider({ children }: OnboardingProviderProps) {
     const timeout = setTimeout(checkOnboarding, 100);
     
     return () => {
+      window.removeEventListener('triggerOnboarding', handleTriggerOnboarding);
       window.removeEventListener('storage', handleStorageChange);
       clearTimeout(timeout);
     };
@@ -62,8 +72,15 @@ export function OnboardingProvider({ children }: OnboardingProviderProps) {
   };
 
   const startOnboarding = () => {
+    console.log('Manually starting onboarding');
     setIsOnboardingOpen(true);
     setShouldShowOnboarding(true);
+  };
+
+  const triggerOnboardingForNewUser = () => {
+    console.log('Triggering onboarding for new user via direct call');
+    setShouldShowOnboarding(true);
+    setIsOnboardingOpen(true);
   };
 
   const value = {
@@ -71,6 +88,7 @@ export function OnboardingProvider({ children }: OnboardingProviderProps) {
     shouldShowOnboarding,
     completeOnboarding,
     startOnboarding,
+    triggerOnboardingForNewUser,
   };
 
   return (

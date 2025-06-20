@@ -43,6 +43,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (response.ok) {
           const userData = await response.json();
           setUser(userData);
+          
+          // Check if this is a new user who needs onboarding
+          const isNewUser = localStorage.getItem('isNewUser');
+          if (isNewUser === 'true') {
+            console.log('New user detected in auth check, triggering onboarding');
+            // Trigger onboarding after a small delay
+            setTimeout(() => {
+              window.dispatchEvent(new CustomEvent('triggerOnboarding'));
+            }, 500);
+          }
         } else {
           setUser(null);
         }
