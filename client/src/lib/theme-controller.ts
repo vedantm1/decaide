@@ -243,6 +243,20 @@ export function applyTheme(appearance: AppearanceSettings): AppearanceSettings {
   // 3. Apply new color scheme class
   document.documentElement.classList.add(`theme-${appearance.colorScheme}`);
   
+  // 3.5. Update CSS custom properties for Tailwind based on theme
+  const themeColorMappings = {
+    aquaBlue: { primary: '188 100% 42%', primaryForeground: '210 40% 98%' },
+    coralPink: { primary: '322 81% 57%', primaryForeground: '210 40% 98%' },
+    mintGreen: { primary: '158 64% 52%', primaryForeground: '210 40% 98%' },
+    royalPurple: { primary: '258 90% 66%', primaryForeground: '210 40% 98%' }
+  };
+  
+  const currentThemeColors = themeColorMappings[appearance.colorScheme as keyof typeof themeColorMappings];
+  if (currentThemeColors) {
+    document.documentElement.style.setProperty('--primary', currentThemeColors.primary);
+    document.documentElement.style.setProperty('--primary-foreground', currentThemeColors.primaryForeground);
+  }
+  
   // Debug to console
   console.log(`Applied theme: ${appearance.colorScheme}, dark mode: ${isDarkMode}`);
   

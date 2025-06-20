@@ -528,7 +528,7 @@ export default function SettingsPage() {
                         className={`cursor-pointer p-4 rounded-lg border-2 flex flex-col items-center gap-2 transition-all
                           ${appearance.colorScheme === scheme ? 'border-primary bg-primary/5' : 'border-border hover:border-border/80'}`}
                         onClick={() => {
-                          const newAppearance = {...appearance, colorScheme: scheme};
+                          const newAppearance = {...appearance, colorScheme: scheme as 'aquaBlue' | 'coralPink' | 'mintGreen' | 'royalPurple'};
                           setAppearance(newAppearance);
                           // Apply theme immediately
                           import('@/lib/theme-controller').then(({ applyTheme }) => {
