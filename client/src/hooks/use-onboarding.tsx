@@ -18,18 +18,41 @@ export function OnboardingProvider({ children }: OnboardingProviderProps) {
   const [shouldShowOnboarding, setShouldShowOnboarding] = useState(false);
 
   useEffect(() => {
-    const hasCompleted = localStorage.getItem('onboardingCompleted');
-    const isNewUser = localStorage.getItem('isNewUser');
+    // Check for new user flag every time auth context changes
+    const checkOnboarding = () => {
+      const hasCompleted = localStorage.getItem('onboardingCompleted');
+      const isNewUser = localStorage.getItem('isNewUser');
+      
+      console.log('Onboarding check:', { hasCompleted, isNewUser });
+      
+      if (!hasCompleted && isNewUser === 'true') {
+        console.log('Triggering onboarding for new user');
+        setShouldShowOnboarding(true);
+        setIsOnboardingOpen(true);
+        // Clear the new user flag
+        localStorage.removeItem('isNewUser');
+      }
+    };
+
+    // Initial check
+    checkOnboarding();
     
-    console.log('Onboarding check:', { hasCompleted, isNewUser });
+    // Also listen for storage changes in case flag is set after component mounts
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'isNewUser' && e.newValue === 'true') {
+        checkOnboarding();
+      }
+    };
     
-    if (!hasCompleted && isNewUser === 'true') {
-      console.log('Triggering onboarding for new user');
-      setShouldShowOnboarding(true);
-      setIsOnboardingOpen(true);
-      // Clear the new user flag
-      localStorage.removeItem('isNewUser');
-    }
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Check again after a brief delay to handle race conditions
+    const timeout = setTimeout(checkOnboarding, 100);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      clearTimeout(timeout);
+    };
   }, []);
 
   const completeOnboarding = () => {

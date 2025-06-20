@@ -222,27 +222,61 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
     
     localStorage.setItem('selectedDecaEvent', selectedEvent);
     
-    // Clean up styling
-    const overlayElement = document.querySelector('.onboarding-overlay');
-    if (overlayElement) {
-      (overlayElement as HTMLElement).style.backdropFilter = 'none';
-      (overlayElement as HTMLElement).style.backgroundColor = 'transparent';
-    }
-    
-    const sidebarElements = document.querySelectorAll('.translucent-sidebar, [data-tutorial], aside, nav');
-    sidebarElements.forEach(el => {
-      const element = el as HTMLElement;
-      element.style.filter = '';
-      element.style.backdropFilter = '';
-      element.style.transform = '';
-      element.style.opacity = '';
-      if (element.dataset.tutorialHighlighted || element.dataset.tutorialBlurred) {
-        delete element.dataset.tutorialHighlighted;
-        delete element.dataset.tutorialBlurred;
-      }
-    });
+    // Comprehensive cleanup of all tutorial effects
+    cleanupAllTutorialEffects();
     
     onComplete();
+  };
+
+  // Enhanced cleanup function
+  const cleanupAllTutorialEffects = () => {
+    try {
+      // Remove all tutorial data attributes and styles
+      document.querySelectorAll('*').forEach(el => {
+        const element = el as HTMLElement;
+        if (element.dataset.tutorialHighlighted || element.dataset.tutorialBlurred) {
+          // Reset all possible CSS properties
+          element.style.filter = '';
+          element.style.backdropFilter = '';
+          (element.style as any).webkitBackdropFilter = '';
+          element.style.transform = '';
+          element.style.opacity = '';
+          element.style.zIndex = '';
+          element.style.boxShadow = '';
+          element.style.background = '';
+          element.style.position = '';
+          element.style.borderRadius = '';
+          element.style.transition = '';
+          
+          // Remove data attributes
+          delete element.dataset.tutorialHighlighted;
+          delete element.dataset.tutorialBlurred;
+          
+          // Remove any CSS custom properties we might have added
+          element.style.removeProperty('--tw-blur');
+          element.style.removeProperty('--tw-backdrop-blur');
+        }
+      });
+
+      // Clean up overlay styling
+      const overlayElement = document.querySelector('.onboarding-overlay');
+      if (overlayElement) {
+        (overlayElement as HTMLElement).style.backdropFilter = 'none';
+        (overlayElement as HTMLElement).style.backgroundColor = 'transparent';
+      }
+
+      // Remove any dynamically added style tags
+      const tutorialStyles = document.querySelectorAll('style[data-tutorial-style]');
+      tutorialStyles.forEach(style => style.remove());
+
+      // Force repaint
+      document.body.style.display = 'none';
+      document.body.offsetHeight;
+      document.body.style.display = '';
+      
+    } catch (error) {
+      console.error('Error during tutorial cleanup:', error);
+    }
   };
 
   const handleQuizStart = () => {
@@ -365,21 +399,7 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
       }
       
       return () => {
-        // Clean up all tutorial effects
-        document.querySelectorAll('*').forEach(el => {
-          const element = el as HTMLElement;
-          if (element.dataset.tutorialBlurred || element.dataset.tutorialHighlighted) {
-            element.style.filter = '';
-            element.style.transition = '';
-            element.style.zIndex = '';
-            element.style.boxShadow = '';
-            element.style.background = '';
-            element.style.position = '';
-            element.style.borderRadius = '';
-            delete element.dataset.tutorialBlurred;
-            delete element.dataset.tutorialHighlighted;
-          }
-        });
+        cleanupAllTutorialEffects();
       };
     }
   }, [currentStep, tutorialStep]);

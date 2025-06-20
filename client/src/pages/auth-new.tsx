@@ -80,8 +80,11 @@ export default function AuthNew() {
       const userData = await response.json();
       // Mark as new user to trigger onboarding
       localStorage.setItem('isNewUser', 'true');
-      // Force refresh of auth context
-      window.location.href = '/';
+      console.log('Registration successful, set isNewUser flag');
+      // Force refresh of auth context to trigger onboarding
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 100);
     } else {
       const errorData = await response.json();
       throw new Error(errorData.message || 'Registration failed');
