@@ -6,6 +6,7 @@ import { useUIState } from '@/hooks/use-ui-state';
 import { useAuth } from '@/hooks/use-auth';
 import { useOnboarding } from '@/hooks/use-onboarding';
 import { OnboardingOverlay } from '@/components/onboarding/OnboardingOverlay';
+import { ScrollProgress } from '@/components/ui/scroll-progress';
 import { 
   IconHome, 
   IconBarChart, 
@@ -152,6 +153,9 @@ export function MainLayout({ children }: MainLayoutProps) {
 
   return (
     <div className="min-h-screen flex flex-col relative overflow-hidden">
+      {/* Scroll Progress Indicator */}
+      <ScrollProgress className="fixed top-0 left-0 w-full h-1 z-[60] bg-muted/20" />
+      
       {/* Header */}
       <header className="h-16 border-b translucent-header shadow-sm z-40 sticky top-0 left-0 right-0">
         <div className="px-4 h-full flex items-center justify-between">
