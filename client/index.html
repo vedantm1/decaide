@@ -158,15 +158,26 @@
         // GSAP ScrollTrigger
         gsap.registerPlugin(ScrollTrigger);
         
-        // Initialize Rellax for parallax effects
-        const rellax = new Rellax('[data-rellax-speed]', {
-          speed: -3,
-          center: false,
-          wrapper: null,
-          round: true,
-          vertical: true,
-          horizontal: false
-        });
+        // Initialize Rellax for parallax effects - with error handling
+        let rellax;
+        try {
+          // Wait for React to render before initializing Rellax
+          setTimeout(() => {
+            const rellaxElements = document.querySelectorAll('[data-rellax-speed]');
+            if (rellaxElements.length > 0) {
+              rellax = new Rellax('[data-rellax-speed]', {
+                speed: -3,
+                center: false,
+                wrapper: null,
+                round: true,
+                vertical: true,
+                horizontal: false
+              });
+            }
+          }, 1000);
+        } catch (error) {
+          console.log('Rellax initialization skipped - no elements found');
+        }
         
         // Initialize Vanilla Tilt for cards and interactive elements
         VanillaTilt.init(document.querySelectorAll(".tilt"), {

@@ -271,12 +271,12 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
         delete (targetElement as HTMLElement).dataset.tutorialBlurred;
 
         // zero out Tailwind blur vars
-        targetElement.style.setProperty('--tw-blur', 'none', 'important');
-        targetElement.style.setProperty('--tw-backdrop-blur', 'none', 'important');
+        (targetElement as HTMLElement).style.setProperty('--tw-blur', 'none', 'important');
+        (targetElement as HTMLElement).style.setProperty('--tw-backdrop-blur', 'none', 'important');
 
         // override any backdrop‐filter as well
-        targetElement.style.setProperty('backdrop-filter', 'none', 'important');
-        targetElement.style.setProperty('-webkit-backdrop-filter', 'none', 'important');
+        (targetElement as HTMLElement).style.setProperty('backdrop-filter', 'none', 'important');
+        (targetElement as HTMLElement).style.setProperty('-webkit-backdrop-filter', 'none', 'important');
 
         // Force clear styling and apply unblur with high priority
         (targetElement as HTMLElement).setAttribute('style', '');

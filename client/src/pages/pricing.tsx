@@ -169,7 +169,7 @@ export default function PricingPage() {
                     </li>
                   </ul>
                   <div className="mt-6">
-                    {user?.subscriptionTier === "plus" ? (
+                    {user?.subscriptionTier === "standard" ? (
                       <button disabled className="w-full py-2 px-4 bg-slate-200 text-slate-600 rounded-lg text-center font-medium">
                         Current Plan
                       </button>
@@ -227,7 +227,7 @@ export default function PricingPage() {
                     </li>
                   </ul>
                   <div className="mt-6">
-                    {user?.subscriptionTier === "pro" ? (
+                    {user?.subscriptionTier === "premium" ? (
                       <button disabled className="w-full py-2 px-4 bg-slate-200 text-slate-600 rounded-lg text-center font-medium">
                         Current Plan
                       </button>
