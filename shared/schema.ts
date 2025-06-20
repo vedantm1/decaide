@@ -35,6 +35,7 @@ export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
   email: true,
+  googleId: true,
   eventFormat: true,
   eventCode: true,
   eventType: true,

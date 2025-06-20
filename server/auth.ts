@@ -240,8 +240,25 @@ export function setupAuth(app: Express) {
     }
   });
 
-  app.post("/api/login", passport.authenticate("local"), (req, res) => {
+  app.post("/api/auth/login", passport.authenticate("local"), (req, res) => {
     res.status(200).json(req.user);
+  });
+
+  app.get("/api/auth/me", (req, res) => {
+    if (req.isAuthenticated()) {
+      res.json(req.user);
+    } else {
+      res.status(401).json({ message: "Not authenticated" });
+    }
+  });
+
+  app.post("/api/auth/logout", (req, res) => {
+    req.logout((err) => {
+      if (err) {
+        return res.status(500).json({ message: "Logout failed" });
+      }
+      res.json({ message: "Logged out successfully" });
+    });
   });
 
   // Google OAuth routes

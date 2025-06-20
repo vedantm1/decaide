@@ -1,19 +1,16 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { User } from '@shared/schema';
 
-// Mock User Interface
-interface User {
-  id: string;
-  username: string;
-  email: string;
-  subscriptionTier: 'free' | 'standard' | 'premium';
+// Extend User interface with optional fields for frontend
+interface AuthUser extends User {
   avatar?: string;
   firstName?: string;
   lastName?: string;
 }
 
 interface AuthContextType {
-  user: User | null;
+  user: AuthUser | null;
   isLoading: boolean;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<void>;
@@ -29,57 +26,35 @@ const AuthContext = createContext<AuthContextType>({
   logout: async () => {},
 });
 
-// Sample mock user for testing UI
-const MOCK_USER: User = {
-  id: '1',
-  username: 'testuser',
-  email: 'test@example.com',
-  subscriptionTier: 'standard',
-  avatar: 'https://ui-avatars.com/api/?name=Test+User&background=0D8ABC&color=fff',
-  firstName: 'Test',
-  lastName: 'User'
-};
-
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
   
-  // Simulate fetching user data on initial load
+  // Check authentication status with backend
   useEffect(() => {
-    const fetchUser = async () => {
+    const checkAuth = async () => {
       setLoading(true);
       
       try {
-        // Simulate network request delay
-        await new Promise(resolve => setTimeout(resolve, 500));
+        const response = await fetch('/api/auth/me', {
+          credentials: 'include' // Include cookies for session
+        });
         
-        // Check if user is logged in via localStorage (in a real app, this would be a proper token check)
-        const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-        
-        if (isLoggedIn) {
-          // Get stored username if available
-          const storedUsername = localStorage.getItem('username');
-          if (storedUsername) {
-            // Use the stored username instead of the mock one
-            setUser({
-              ...MOCK_USER,
-              username: storedUsername
-            });
-          } else {
-            setUser(MOCK_USER);
-          }
+        if (response.ok) {
+          const userData = await response.json();
+          setUser(userData);
         } else {
           setUser(null);
         }
       } catch (error) {
-        console.error('Failed to fetch user:', error);
+        console.error('Failed to check auth status:', error);
         setUser(null);
       } finally {
         setLoading(false);
       }
     };
     
-    fetchUser();
+    checkAuth();
   }, []);
   
   // Login function
@@ -87,24 +62,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setLoading(true);
     
     try {
-      // Simulate network request delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include', // Include cookies for session
+        body: JSON.stringify({ username, password }),
+      });
       
-      // In a real app, validate credentials with a backend service
-      if (username && password) {
-        // Set auth token and username in localStorage
-        localStorage.setItem('isLoggedIn', 'true');
-        localStorage.setItem('username', username);
-        // Create user data with the actual username entered by the user
-        const userData = {
-          ...MOCK_USER,
-          username: username,
-        };
+      if (response.ok) {
+        const userData = await response.json();
         setUser(userData);
-        return;
+      } else {
+        const error = await response.json();
+        throw new Error(error.message || 'Login failed');
       }
-      
-      throw new Error('Invalid credentials');
     } catch (error) {
       console.error('Login failed:', error);
       throw error;
@@ -118,12 +91,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setLoading(true);
     
     try {
-      // Simulate network request delay
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // Clear auth token and username from localStorage
-      localStorage.removeItem('isLoggedIn');
-      localStorage.removeItem('username');
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include'
+      });
       setUser(null);
     } catch (error) {
       console.error('Logout failed:', error);
