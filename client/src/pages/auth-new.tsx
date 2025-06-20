@@ -35,6 +35,7 @@ const registerSchema = z.object({
 export default function AuthNew() {
   const [activeTab, setActiveTab] = useState<string>("login");
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string>("");
   const [_, navigate] = useLocation();
   const { user, isAuthenticated, login } = useAuth();
 
@@ -76,21 +77,24 @@ export default function AuthNew() {
     });
     
     if (response.ok) {
-      navigate('/');
+      const userData = await response.json();
+      // Force refresh of auth context
+      window.location.href = '/';
     } else {
-      const error = await response.json();
-      throw new Error(error.message || 'Registration failed');
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Registration failed');
     }
   };
 
   // Login submit handler
   const onLoginSubmit = async (data: z.infer<typeof loginSchema>) => {
     setIsLoading(true);
+    setError("");
     try {
       await login(data.username, data.password);
       navigate('/');
-    } catch (error) {
-      console.error('Login failed:', error);
+    } catch (error: any) {
+      setError(error.message || 'Login failed. Please check your credentials.');
     } finally {
       setIsLoading(false);
     }
@@ -99,10 +103,11 @@ export default function AuthNew() {
   // Registration submit handler
   const onRegisterSubmit = async (data: z.infer<typeof registerSchema>) => {
     setIsLoading(true);
+    setError("");
     try {
       await register(data);
-    } catch (error) {
-      console.error('Registration failed:', error);
+    } catch (error: any) {
+      setError(error.message || 'Registration failed. Please try again.');
     } finally {
       setIsLoading(false);
     }

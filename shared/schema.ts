@@ -43,6 +43,7 @@ export const insertUserSchema = createInsertSchema(users).pick({
   uiTheme: true,
   colorScheme: true,
   theme: true,
+  subscriptionTier: true,
 });
 
 // Performance Indicators model

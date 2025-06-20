@@ -221,22 +221,73 @@ export function setupAuth(app: Express) {
   // Authentication routes
   app.post("/api/auth/register", async (req, res, next) => {
     try {
-      const existingUser = await storage.getUserByUsername(req.body.username);
-      if (existingUser) {
-        return res.status(400).send("Username already exists");
+      const { username, password, email } = req.body;
+
+      // Validate required fields
+      if (!username || !password) {
+        return res.status(400).json({ 
+          message: "Username and password are required" 
+        });
       }
 
-      const user = await storage.createUser({
-        ...req.body,
-        password: await hashPassword(req.body.password),
+      if (username.length < 3) {
+        return res.status(400).json({ 
+          message: "Username must be at least 3 characters long" 
+        });
+      }
+
+      if (password.length < 6) {
+        return res.status(400).json({ 
+          message: "Password must be at least 6 characters long" 
+        });
+      }
+
+      // Check if username already exists
+      const existingUser = await storage.getUserByUsername(username);
+      if (existingUser) {
+        return res.status(400).json({ 
+          message: "Username already exists" 
+        });
+      }
+
+      // Check if email already exists (if provided)
+      if (email) {
+        const existingEmailUser = await storage.getUserByEmail(email);
+        if (existingEmailUser) {
+          return res.status(400).json({ 
+            message: "Email already registered" 
+          });
+        }
+      }
+
+      // Create new user
+      const hashedPassword = await hashPassword(password);
+      const newUser = await storage.createUser({
+        username,
+        password: hashedPassword,
+        email: email || null,
+        subscriptionTier: "standard",
+        uiTheme: "aquaBlue",
+        theme: "light",
+        colorScheme: "memphis"
       });
 
-      req.login(user, (err) => {
-        if (err) return next(err);
-        res.status(201).json(user);
+      // Log the user in automatically after registration
+      req.login(newUser, (err) => {
+        if (err) {
+          console.error("Login error after registration:", err);
+          return next(err);
+        }
+        
+        // Remove password from response
+        const { password: _, ...userResponse } = newUser;
+        res.status(201).json(userResponse);
       });
     } catch (error) {
-      next(error);
+      console.error("Registration error:", error);
+      res.status(500).json({ 
+        message: "Registration failed. Please try again." 
+      });
     }
   });
 
