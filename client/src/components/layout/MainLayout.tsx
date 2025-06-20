@@ -168,8 +168,10 @@ export function MainLayout({ children }: MainLayoutProps) {
               <IconMenu className="w-5 h-5" />
             </button>
             
-            <Link href="/" className="text-xl font-bold text-primary tracking-tight hover:opacity-80 transition-opacity">
-              DecA(I)de
+            <Link href="/" className="text-xl font-bold tracking-tight hover:opacity-80 transition-opacity">
+              <span className="text-foreground">DecA</span>
+              <span className="text-primary">(I)</span>
+              <span className="text-foreground">de</span>
             </Link>
           </div>
           
