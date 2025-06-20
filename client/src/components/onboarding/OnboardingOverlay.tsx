@@ -290,27 +290,30 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
 
   // Create blur overlay effect for tutorial
   useEffect(() => {
-    if (currentStep === 'tutorial') {
-      const currentSelector = TUTORIAL_STEPS[tutorialStep].selector;
-      const targetElement = document.querySelector(currentSelector);
-      
-      // Clear all previous tutorial styling first
-      try {
-        document.querySelectorAll('*').forEach(el => {
-          const element = el as HTMLElement;
-          if (element.dataset.tutorialBlurred) {
-            element.style.filter = '';
-            element.style.transition = '';
-            delete element.dataset.tutorialBlurred;
-          }
-          if (element.dataset.tutorialHighlighted) {
-            element.setAttribute('style', '');
-            delete element.dataset.tutorialHighlighted;
-          }
-        });
-      } catch (error) {
-        console.warn('Error clearing tutorial styling:', error);
-      }
+    if (currentStep !== 'tutorial') return;
+    
+    const currentSelector = TUTORIAL_STEPS[tutorialStep]?.selector;
+    if (!currentSelector) return;
+    
+    const targetElement = document.querySelector(currentSelector);
+    
+    // Clear all previous tutorial styling first
+    try {
+      document.querySelectorAll('*').forEach(el => {
+        const element = el as HTMLElement;
+        if (element.dataset.tutorialBlurred) {
+          element.style.filter = '';
+          element.style.transition = '';
+          delete element.dataset.tutorialBlurred;
+        }
+        if (element.dataset.tutorialHighlighted) {
+          element.setAttribute('style', '');
+          delete element.dataset.tutorialHighlighted;
+        }
+      });
+    } catch (error) {
+      console.warn('Error clearing tutorial styling:', error);
+    }
       
       // Keep main content completely clear
       const mainContent = document.querySelector('main');
@@ -398,10 +401,9 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
         }
       }
       
-      return () => {
-        cleanupAllTutorialEffects();
-      };
-    }
+    return () => {
+      cleanupAllTutorialEffects();
+    };
   }, [currentStep, tutorialStep]);
 
   // Clean up all effects when overlay closes
