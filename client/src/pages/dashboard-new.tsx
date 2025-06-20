@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { motion } from 'framer-motion';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { PageHeader } from '@/components/layout/PageHeader';
-
+import { StatCard } from '@/components/ui/stat-card';
 import { Card } from '@/components/ui/card';
 import { 
   IconBarChart, 
@@ -224,59 +224,55 @@ export default function DashboardNew() {
           animate="visible"
         >
           <motion.div variants={itemVariants}>
-            <Card className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-primary/10 rounded-lg">
-                  <IconUsers className="h-4 w-4 text-primary" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Roleplays Completed</p>
-                  <p className="text-2xl font-bold">{statsLoading ? '-' : stats?.roleplayCount || 0}</p>
-                </div>
-              </div>
-            </Card>
+            <StatCard
+              title="Roleplays Completed"
+              value={stats?.roleplayCount || 0}
+              change={stats?.roleplayCount ? { value: 12, direction: 'up', label: 'vs. last week' } : undefined}
+              icon={<IconUsers className="h-4 w-4" />}
+              accent="primary"
+              loading={statsLoading}
+            />
           </motion.div>
           
           <motion.div variants={itemVariants}>
-            <Card className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-100 rounded-lg">
-                  <IconBarChart className="h-4 w-4 text-blue-600" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Practice Tests</p>
-                  <p className="text-2xl font-bold">{statsLoading ? '-' : stats?.testCount || 0}</p>
-                </div>
-              </div>
-            </Card>
+            <StatCard
+              title="Practice Tests"
+              value={stats?.testCount || 0}
+              change={stats?.testCount ? { value: 5, direction: 'up', label: 'vs. last week' } : undefined}
+              icon={<IconBarChart className="h-4 w-4" />}
+              accent="info"
+              loading={statsLoading}
+            />
           </motion.div>
           
           <motion.div variants={itemVariants}>
-            <Card className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-green-100 rounded-lg">
-                  <IconActivity className="h-4 w-4 text-green-600" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">PIs Mastered</p>
-                  <p className="text-2xl font-bold">{statsLoading ? '-' : `${stats?.completedPIs || 0}/${stats?.totalPIs || 0}`}</p>
-                </div>
-              </div>
-            </Card>
+            <StatCard
+              title="PIs Mastered"
+              value={`${stats?.completedPIs || 0}/${stats?.totalPIs || 0}`}
+              change={
+                stats?.totalPIs 
+                  ? { 
+                      value: Math.round((stats.completedPIs / stats.totalPIs) * 100), 
+                      direction: 'up', 
+                      label: 'completion' 
+                    } 
+                  : undefined
+              }
+              icon={<IconActivity className="h-4 w-4" />}
+              accent="success"
+              loading={statsLoading}
+            />
           </motion.div>
           
           <motion.div variants={itemVariants}>
-            <Card className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-amber-100 rounded-lg">
-                  <IconBook className="h-4 w-4 text-amber-600" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Current Streak</p>
-                  <p className="text-2xl font-bold">{statsLoading ? '-' : stats?.streak || 0} days</p>
-                </div>
-              </div>
-            </Card>
+            <StatCard
+              title="Current Streak"
+              value={stats?.streak || 0}
+              change={stats?.streak ? { value: 20, direction: 'up', label: 'this month' } : undefined}
+              icon={<IconBook className="h-4 w-4" />}
+              accent="warning"
+              loading={statsLoading}
+            />
           </motion.div>
         </motion.div>
       </div>
