@@ -293,9 +293,11 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
         // inject to kill any blur on ::before/::after if an ID exists
         if (targetElement.id) {
           const styleTag = document.createElement('style');
-          styleTag.innerHTML = `
-            #${targetElement.id}::before,
-            #${targetElement.id}::after {
+          // Safely escape the CSS selector to prevent XSS
+          const escapedId = CSS.escape(targetElement.id);
+          styleTag.textContent = `
+            #${escapedId}::before,
+            #${escapedId}::after {
               filter: none !important;
               backdrop-filter: none !important;
               -webkit-backdrop-filter: none !important;
