@@ -302,7 +302,7 @@ export default function DashboardNew() {
                 ))}
               </div>
             ) : learningItems && learningItems.length > 0 ? (
-              <div className="space-y-4 card-scroll max-h-96 overflow-y-auto pr-2">
+              <div className="space-y-4">
                 {learningItems.slice(0, 3).map((item) => (
                   <div key={item.id} className="border rounded-lg p-4 bg-card hover:shadow-md transition-shadow">
                     <div className="flex items-start justify-between">
@@ -378,7 +378,7 @@ export default function DashboardNew() {
                 ))}
               </div>
             ) : activities && activities.length > 0 ? (
-              <div className="space-y-3 card-scroll max-h-80 overflow-y-auto pr-2">
+              <div className="space-y-3">
                 {activities.map((activity) => (
                   <div key={activity.id} className="border rounded-lg p-3 bg-card hover:shadow-sm transition-shadow">
                     <div className="flex items-center">

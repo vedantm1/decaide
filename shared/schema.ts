@@ -35,7 +35,6 @@ export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
   email: true,
-  googleId: true,
   eventFormat: true,
   eventCode: true,
   eventType: true,
@@ -43,7 +42,6 @@ export const insertUserSchema = createInsertSchema(users).pick({
   uiTheme: true,
   colorScheme: true,
   theme: true,
-  subscriptionTier: true,
 });
 
 // Performance Indicators model

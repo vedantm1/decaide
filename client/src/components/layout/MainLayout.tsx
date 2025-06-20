@@ -6,7 +6,6 @@ import { useUIState } from '@/hooks/use-ui-state';
 import { useAuth } from '@/hooks/use-auth';
 import { useOnboarding } from '@/hooks/use-onboarding';
 import { OnboardingOverlay } from '@/components/onboarding/OnboardingOverlay';
-import { ScrollProgress } from '@/components/ui/scroll-progress';
 import { 
   IconHome, 
   IconBarChart, 
@@ -153,9 +152,6 @@ export function MainLayout({ children }: MainLayoutProps) {
 
   return (
     <div className="min-h-screen flex flex-col relative overflow-hidden">
-      {/* Scroll Progress Indicator */}
-      <ScrollProgress className="fixed top-0 left-0 w-full h-1 z-[60] bg-muted/20" />
-      
       {/* Header */}
       <header className="h-16 border-b translucent-header shadow-sm z-40 sticky top-0 left-0 right-0">
         <div className="px-4 h-full flex items-center justify-between">
@@ -168,10 +164,10 @@ export function MainLayout({ children }: MainLayoutProps) {
               <IconMenu className="w-5 h-5" />
             </button>
             
-            <Link href="/" className="text-xl font-bold tracking-tight hover:opacity-80 transition-opacity">
-              <span className="text-foreground">DecA</span>
-              <span className="text-primary">(I)</span>
-              <span className="text-foreground">de</span>
+            <Link href="/">
+              <a className="text-xl font-bold text-primary tracking-tight hover:opacity-80 transition-opacity">
+                DecA(I)de
+              </a>
             </Link>
           </div>
           
@@ -256,7 +252,7 @@ export function MainLayout({ children }: MainLayoutProps) {
               exit="closed"
               variants={sidebarVariants}
             >
-              <div className="h-full overflow-y-auto py-4 px-3 flex flex-col premium-scroll">
+              <div className="h-full overflow-y-auto py-4 px-3 flex flex-col">
                 <nav className="space-y-1 flex-1">
                   {navigationItems.map((item, index) => (
                     <motion.div 
@@ -264,31 +260,32 @@ export function MainLayout({ children }: MainLayoutProps) {
                       custom={index}
                       variants={navItemVariants}
                     >
-                      <Link 
-                        href={item.href}
-                        data-tutorial={item.tutorialId}
-                        className={cn(
-                          "flex items-center px-3 py-2.5 text-base rounded-lg relative group",
-                          location === item.href 
-                            ? "text-primary font-medium" 
-                            : "text-foreground/70 hover:text-foreground",
-                          "transition-all hover:bg-primary/5"
-                        )}
-                      >
-                        <span className="mr-3 text-current opacity-70 group-hover:opacity-100">
-                          {item.icon}
-                        </span>
-                        <span className="font-medium">{item.label}</span>
-                        
-                        {location === item.href && (
-                          <motion.div 
-                            className="absolute bottom-0 left-0 h-full w-1 bg-primary rounded-r"
-                            initial="initial"
-                            animate="animate"
-                            variants={activeIndicatorVariants}
-                            layoutId="activeNavIndicator"
-                          />
-                        )}
+                      <Link href={item.href}>
+                        <a 
+                          data-tutorial={item.tutorialId}
+                          className={cn(
+                            "flex items-center px-3 py-2.5 text-base rounded-lg relative group",
+                            location === item.href 
+                              ? "text-primary font-medium" 
+                              : "text-foreground/70 hover:text-foreground",
+                            "transition-all hover:bg-primary/5"
+                          )}
+                        >
+                          <span className="mr-3 text-current opacity-70 group-hover:opacity-100">
+                            {item.icon}
+                          </span>
+                          <span className="font-medium">{item.label}</span>
+                          
+                          {location === item.href && (
+                            <motion.div 
+                              className="absolute bottom-0 left-0 h-full w-1 bg-primary rounded-r"
+                              initial="initial"
+                              animate="animate"
+                              variants={activeIndicatorVariants}
+                              layoutId="activeNavIndicator"
+                            />
+                          )}
+                        </a>
                       </Link>
                     </motion.div>
                   ))}
@@ -323,12 +320,12 @@ export function MainLayout({ children }: MainLayoutProps) {
         
         {/* Main content */}
         <motion.main
-          className="flex-1 min-w-0 relative main-content"
+          className="flex-1 min-w-0 relative"
           initial="collapsed"
           animate={isSidebarOpen && !isMobile ? "expanded" : "collapsed"}
           variants={contentVariants}
         >
-          <div className="max-w-[1600px] mx-auto p-4 md:p-6 lg:p-8 dashboard-content">
+          <div className="max-w-[1600px] mx-auto p-4 md:p-6 lg:p-8">
             <AnimatePresence mode="wait">
               <motion.div
                 key={location}
@@ -339,7 +336,7 @@ export function MainLayout({ children }: MainLayoutProps) {
                 className="pb-12"
               >
                 {/* Content card with glass effect for vanta waves */}
-                <div className="translucent-card rounded-xl shadow-lg p-6 border content-container">
+                <div className="translucent-card rounded-xl shadow-lg p-6 border">
                   {children}
                 </div>
               </motion.div>

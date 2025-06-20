@@ -219,97 +219,29 @@ export function setupAuth(app: Express) {
   app.use(validateSession);
   
   // Authentication routes
-  app.post("/api/auth/register", async (req, res, next) => {
+  app.post("/api/register", async (req, res, next) => {
     try {
-      const { username, password, email } = req.body;
-
-      // Validate required fields
-      if (!username || !password) {
-        return res.status(400).json({ 
-          message: "Username and password are required" 
-        });
-      }
-
-      if (username.length < 3) {
-        return res.status(400).json({ 
-          message: "Username must be at least 3 characters long" 
-        });
-      }
-
-      if (password.length < 6) {
-        return res.status(400).json({ 
-          message: "Password must be at least 6 characters long" 
-        });
-      }
-
-      // Check if username already exists
-      const existingUser = await storage.getUserByUsername(username);
+      const existingUser = await storage.getUserByUsername(req.body.username);
       if (existingUser) {
-        return res.status(400).json({ 
-          message: "Username already exists" 
-        });
+        return res.status(400).send("Username already exists");
       }
 
-      // Check if email already exists (if provided)
-      if (email) {
-        const existingEmailUser = await storage.getUserByEmail(email);
-        if (existingEmailUser) {
-          return res.status(400).json({ 
-            message: "Email already registered" 
-          });
-        }
-      }
-
-      // Create new user
-      const hashedPassword = await hashPassword(password);
-      const newUser = await storage.createUser({
-        username,
-        password: hashedPassword,
-        email: email || null,
-        subscriptionTier: "standard",
-        uiTheme: "aquaBlue",
-        theme: "light",
-        colorScheme: "memphis"
+      const user = await storage.createUser({
+        ...req.body,
+        password: await hashPassword(req.body.password),
       });
 
-      // Log the user in automatically after registration
-      req.login(newUser, (err) => {
-        if (err) {
-          console.error("Login error after registration:", err);
-          return next(err);
-        }
-        
-        // Remove password from response
-        const { password: _, ...userResponse } = newUser;
-        res.status(201).json(userResponse);
+      req.login(user, (err) => {
+        if (err) return next(err);
+        res.status(201).json(user);
       });
     } catch (error) {
-      console.error("Registration error:", error);
-      res.status(500).json({ 
-        message: "Registration failed. Please try again." 
-      });
+      next(error);
     }
   });
 
-  app.post("/api/auth/login", passport.authenticate("local"), (req, res) => {
+  app.post("/api/login", passport.authenticate("local"), (req, res) => {
     res.status(200).json(req.user);
-  });
-
-  app.get("/api/auth/me", (req, res) => {
-    if (req.isAuthenticated()) {
-      res.json(req.user);
-    } else {
-      res.status(401).json({ message: "Not authenticated" });
-    }
-  });
-
-  app.post("/api/auth/logout", (req, res) => {
-    req.logout((err) => {
-      if (err) {
-        return res.status(500).json({ message: "Logout failed" });
-      }
-      res.json({ message: "Logged out successfully" });
-    });
   });
 
   // Google OAuth routes

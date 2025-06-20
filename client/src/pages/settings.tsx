@@ -29,8 +29,8 @@ import { AppearanceSettings } from "@/lib/theme-controller";
 const profileSchema = z.object({
   username: z.string().min(3, { message: "Username must be at least 3 characters" }),
   email: z.string().email({ message: "Please enter a valid email address" }).optional(),
-  eventType: z.string().min(1, { message: "Please select an event type" }).optional(),
-  instructionalArea: z.string().min(1, { message: "Please select an instructional area" }).optional(),
+  eventType: z.string().min(1, { message: "Please select an event type" }),
+  instructionalArea: z.string().min(1, { message: "Please select an instructional area" }),
 });
 
 // Notification form schema
@@ -50,7 +50,7 @@ export default function SettingsPage() {
   // Appearance settings state
   const [appearance, setAppearance] = useState<AppearanceSettings>({
     theme: "light",
-    colorScheme: "aquaBlue" as const, // Default to aquaBlue
+    colorScheme: user?.uiTheme || "aquaBlue", // Default to aquaBlue if no user preference is set
     fontSize: "medium",
     visualStyle: "memphis"
   });
@@ -149,8 +149,8 @@ export default function SettingsPage() {
     defaultValues: {
       username: user?.username || "",
       email: "",
-      eventType: user?.eventType || undefined,
-      instructionalArea: user?.instructionalArea || undefined,
+      eventType: user?.eventType || "",
+      instructionalArea: user?.instructionalArea || "",
     },
   });
 
@@ -280,7 +280,7 @@ export default function SettingsPage() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="text-foreground/80">DECA Event Type</FormLabel>
-                        <Select value={field.value || ""} onValueChange={field.onChange}>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger className="bg-background/80">
                               <SelectValue placeholder="Select your event type" />
@@ -472,13 +472,7 @@ export default function SettingsPage() {
                     <div 
                       className={`cursor-pointer rounded-lg border-2 p-4 flex items-center gap-2 transition-all
                         ${appearance.theme === 'light' ? 'border-primary bg-primary/5' : 'border-border hover:border-border/80'}`}
-                      onClick={() => {
-                        const newAppearance = {...appearance, theme: 'light' as const};
-                        setAppearance(newAppearance);
-                        import('@/lib/theme-controller').then(({ applyTheme }) => {
-                          applyTheme(newAppearance);
-                        });
-                      }}
+                      onClick={() => setAppearance({...appearance, theme: 'light'})}
                     >
                       <div className="p-1.5 rounded-full bg-background flex items-center justify-center">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-amber-500" viewBox="0 0 20 20" fill="currentColor">
@@ -494,13 +488,7 @@ export default function SettingsPage() {
                     <div 
                       className={`cursor-pointer rounded-lg border-2 p-4 flex items-center gap-2 transition-all
                         ${appearance.theme === 'dark' ? 'border-primary bg-primary/5' : 'border-border hover:border-border/80'}`}
-                      onClick={() => {
-                        const newAppearance = {...appearance, theme: 'dark' as const};
-                        setAppearance(newAppearance);
-                        import('@/lib/theme-controller').then(({ applyTheme }) => {
-                          applyTheme(newAppearance);
-                        });
-                      }}
+                      onClick={() => setAppearance({...appearance, theme: 'dark'})}
                     >
                       <div className="p-1.5 rounded-full bg-background flex items-center justify-center">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-indigo-400" viewBox="0 0 20 20" fill="currentColor">
@@ -527,14 +515,7 @@ export default function SettingsPage() {
                         key={scheme}
                         className={`cursor-pointer p-4 rounded-lg border-2 flex flex-col items-center gap-2 transition-all
                           ${appearance.colorScheme === scheme ? 'border-primary bg-primary/5' : 'border-border hover:border-border/80'}`}
-                        onClick={() => {
-                          const newAppearance = {...appearance, colorScheme: scheme as 'aquaBlue' | 'coralPink' | 'mintGreen' | 'royalPurple'};
-                          setAppearance(newAppearance);
-                          // Apply theme immediately
-                          import('@/lib/theme-controller').then(({ applyTheme }) => {
-                            applyTheme(newAppearance);
-                          });
-                        }}
+                        onClick={() => setAppearance({...appearance, colorScheme: scheme})}
                       >
                         <div 
                           className="w-6 h-6 rounded-full mb-1"
