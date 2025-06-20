@@ -37,6 +37,31 @@ export default function AuthNew() {
   const [isLoading, setIsLoading] = useState(false);
   const [_, navigate] = useLocation();
   const { user, isAuthenticated, login } = useAuth();
+  
+  // Add registration function
+  const register = async (data: z.infer<typeof registerSchema>) => {
+    try {
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(data),
+      });
+      
+      if (response.ok) {
+        // Registration successful, navigate to dashboard
+        navigate('/');
+      } else {
+        const error = await response.json();
+        throw new Error(error.message || 'Registration failed');
+      }
+    } catch (error) {
+      console.error('Registration failed:', error);
+      throw error;
+    }
+  };
 
   // Form setup for login
   const loginForm = useForm<z.infer<typeof loginSchema>>({

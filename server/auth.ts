@@ -219,7 +219,7 @@ export function setupAuth(app: Express) {
   app.use(validateSession);
   
   // Authentication routes
-  app.post("/api/register", async (req, res, next) => {
+  app.post("/api/auth/register", async (req, res, next) => {
     try {
       const existingUser = await storage.getUserByUsername(req.body.username);
       if (existingUser) {
