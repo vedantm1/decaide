@@ -50,7 +50,7 @@ export default function SettingsPage() {
   // Appearance settings state
   const [appearance, setAppearance] = useState<AppearanceSettings>({
     theme: "light",
-    colorScheme: user?.uiTheme || "aquaBlue", // Default to aquaBlue if no user preference is set
+    colorScheme: "aquaBlue" as const, // Default to aquaBlue
     fontSize: "medium",
     visualStyle: "memphis"
   });

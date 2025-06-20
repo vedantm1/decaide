@@ -37,31 +37,6 @@ export default function AuthNew() {
   const [isLoading, setIsLoading] = useState(false);
   const [_, navigate] = useLocation();
   const { user, isAuthenticated, login } = useAuth();
-  
-  // Add registration function
-  const register = async (data: z.infer<typeof registerSchema>) => {
-    try {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify(data),
-      });
-      
-      if (response.ok) {
-        // Registration successful, navigate to dashboard
-        navigate('/');
-      } else {
-        const error = await response.json();
-        throw new Error(error.message || 'Registration failed');
-      }
-    } catch (error) {
-      console.error('Registration failed:', error);
-      throw error;
-    }
-  };
 
   // Form setup for login
   const loginForm = useForm<z.infer<typeof loginSchema>>({
@@ -82,39 +57,52 @@ export default function AuthNew() {
     },
   });
 
-  // If user is already logged in, redirect to dashboard
+  // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
-      navigate("/");
+      navigate('/');
     }
   }, [isAuthenticated, navigate]);
 
-  // Handle login form submission
-  const onLoginSubmit = async (values: z.infer<typeof loginSchema>) => {
+  // Registration function
+  const register = async (data: z.infer<typeof registerSchema>) => {
+    const response = await fetch('/api/auth/register', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify(data),
+    });
+    
+    if (response.ok) {
+      navigate('/');
+    } else {
+      const error = await response.json();
+      throw new Error(error.message || 'Registration failed');
+    }
+  };
+
+  // Login submit handler
+  const onLoginSubmit = async (data: z.infer<typeof loginSchema>) => {
     setIsLoading(true);
     try {
-      await login(values.username, values.password);
-      navigate("/");
+      await login(data.username, data.password);
+      navigate('/');
     } catch (error) {
-      console.error("Login failed:", error);
-      // Handle login error here
+      console.error('Login failed:', error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Handle registration form submission
-  const onRegisterSubmit = async (values: z.infer<typeof registerSchema>) => {
+  // Registration submit handler
+  const onRegisterSubmit = async (data: z.infer<typeof registerSchema>) => {
     setIsLoading(true);
     try {
-      // Registration is stubbed for now
-      console.log("Registration values:", values);
-      // Simulate successful registration and login
-      await login(values.username, values.password);
-      navigate("/");
+      await register(data);
     } catch (error) {
-      console.error("Registration failed:", error);
-      // Handle registration error here
+      console.error('Registration failed:', error);
     } finally {
       setIsLoading(false);
     }
