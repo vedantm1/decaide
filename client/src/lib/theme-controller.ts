@@ -5,7 +5,7 @@
 
 export interface AppearanceSettings {
   theme: 'light' | 'dark' | 'system';
-  colorScheme: string;
+  colorScheme: 'aquaBlue' | 'coralPink' | 'mintGreen' | 'royalPurple';
   fontSize: 'small' | 'medium' | 'large';
   visualStyle: 'memphis' | 'minimalist';
 }

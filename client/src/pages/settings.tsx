@@ -472,7 +472,13 @@ export default function SettingsPage() {
                     <div 
                       className={`cursor-pointer rounded-lg border-2 p-4 flex items-center gap-2 transition-all
                         ${appearance.theme === 'light' ? 'border-primary bg-primary/5' : 'border-border hover:border-border/80'}`}
-                      onClick={() => setAppearance({...appearance, theme: 'light'})}
+                      onClick={() => {
+                        const newAppearance = {...appearance, theme: 'light' as const};
+                        setAppearance(newAppearance);
+                        import('@/lib/theme-controller').then(({ applyTheme }) => {
+                          applyTheme(newAppearance);
+                        });
+                      }}
                     >
                       <div className="p-1.5 rounded-full bg-background flex items-center justify-center">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-amber-500" viewBox="0 0 20 20" fill="currentColor">
@@ -488,7 +494,13 @@ export default function SettingsPage() {
                     <div 
                       className={`cursor-pointer rounded-lg border-2 p-4 flex items-center gap-2 transition-all
                         ${appearance.theme === 'dark' ? 'border-primary bg-primary/5' : 'border-border hover:border-border/80'}`}
-                      onClick={() => setAppearance({...appearance, theme: 'dark'})}
+                      onClick={() => {
+                        const newAppearance = {...appearance, theme: 'dark' as const};
+                        setAppearance(newAppearance);
+                        import('@/lib/theme-controller').then(({ applyTheme }) => {
+                          applyTheme(newAppearance);
+                        });
+                      }}
                     >
                       <div className="p-1.5 rounded-full bg-background flex items-center justify-center">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-indigo-400" viewBox="0 0 20 20" fill="currentColor">
@@ -515,7 +527,14 @@ export default function SettingsPage() {
                         key={scheme}
                         className={`cursor-pointer p-4 rounded-lg border-2 flex flex-col items-center gap-2 transition-all
                           ${appearance.colorScheme === scheme ? 'border-primary bg-primary/5' : 'border-border hover:border-border/80'}`}
-                        onClick={() => setAppearance({...appearance, colorScheme: scheme})}
+                        onClick={() => {
+                          const newAppearance = {...appearance, colorScheme: scheme};
+                          setAppearance(newAppearance);
+                          // Apply theme immediately
+                          import('@/lib/theme-controller').then(({ applyTheme }) => {
+                            applyTheme(newAppearance);
+                          });
+                        }}
                       >
                         <div 
                           className="w-6 h-6 rounded-full mb-1"
