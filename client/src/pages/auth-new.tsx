@@ -172,6 +172,17 @@ export default function AuthNew() {
                 <TabsTrigger value="register">Register</TabsTrigger>
               </TabsList>
               
+              {/* Error message display */}
+              {error && (
+                <motion.div 
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mb-4 p-3 bg-destructive/10 border border-destructive/20 rounded-md"
+                >
+                  <p className="text-sm text-destructive font-medium">{error}</p>
+                </motion.div>
+              )}
+              
               <AnimatePresence mode="wait">
                 <motion.div
                   key={activeTab}
