@@ -10,7 +10,6 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -20,7 +19,7 @@ import { PI_CATEGORIES } from "@shared/schema";
 const roleplaySchema = z.object({
   instructionalArea: z.string().min(1, "Please select an instructional area"),
   performanceIndicators: z.array(z.string()).min(1, "Select at least one performance indicator"),
-  difficultyLevel: z.number().min(1).max(5),
+  competitionLevel: z.string().min(1, "Please select a competition level"),
   businessType: z.string().optional(),
 });
 
@@ -51,14 +50,14 @@ export default function RoleplayPage() {
     defaultValues: {
       instructionalArea: selectedCategory,
       performanceIndicators: [],
-      difficultyLevel: 3,
+      competitionLevel: "District",
       businessType: "",
     },
   });
   
-  // Watch difficulty level for display
-  const difficultyLevel = watch("difficultyLevel");
-  const difficultyLabels = ["Very Easy", "Easy", "Medium", "Hard", "Very Hard"];
+  // Watch competition level for display
+  const competitionLevel = watch("competitionLevel");
+  const competitionLevels = ["District", "Association", "ICDC"];
   
   // Generate roleplay mutation
   const generateRoleplay = useMutation({
@@ -191,20 +190,23 @@ export default function RoleplayPage() {
               </div>
               
               <div>
-                <Label>Difficulty Level</Label>
-                <div className="flex items-center mt-2">
-                  <Slider
-                    min={1}
-                    max={5}
-                    step={1}
-                    value={[difficultyLevel]}
-                    onValueChange={(value) => setValue("difficultyLevel", value[0])}
-                    className="w-full"
-                  />
-                  <span className="ml-3 text-sm text-foreground/70 min-w-[80px]">
-                    {difficultyLabels[difficultyLevel - 1]}
-                  </span>
-                </div>
+                <Label>Competition Level</Label>
+                <Select 
+                  value={competitionLevel} 
+                  onValueChange={(value) => setValue("competitionLevel", value)}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select competition level" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {competitionLevels.map((level) => (
+                      <SelectItem key={level} value={level}>{level}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {errors.competitionLevel && (
+                  <p className="text-destructive text-sm mt-1">{errors.competitionLevel.message}</p>
+                )}
               </div>
               
               <div>

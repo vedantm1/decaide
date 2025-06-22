@@ -48,13 +48,13 @@ router.post('/generate-roleplay', async (req: Request, res: Response) => {
     const { 
       instructionalArea, 
       performanceIndicators, 
-      difficultyLevel, 
+      competitionLevel, 
       businessType 
     } = req.body;
     
-    if (!instructionalArea || !performanceIndicators || !difficultyLevel) {
+    if (!instructionalArea || !performanceIndicators || !competitionLevel) {
       return res.status(400).json({ 
-        error: "Missing required parameters: instructionalArea, performanceIndicators, and difficultyLevel are required" 
+        error: "Missing required parameters: instructionalArea, performanceIndicators, and competitionLevel are required" 
       });
     }
     
@@ -70,7 +70,7 @@ router.post('/generate-roleplay', async (req: Request, res: Response) => {
     const roleplay = await generateRoleplay({
       instructionalArea,
       performanceIndicators: Array.isArray(performanceIndicators) ? performanceIndicators : [performanceIndicators],
-      difficultyLevel,
+      competitionLevel,
       businessType
     });
     

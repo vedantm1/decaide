@@ -86,17 +86,26 @@ export async function checkAzureOpenAI(): Promise<{
 export async function generateRoleplay(params: {
   instructionalArea: string;
   performanceIndicators: string[];
-  difficultyLevel: string;
+  competitionLevel: string;
   businessType?: string;
 }) {
   const client = getOpenAIClient();
   const deploymentId = process.env.AZURE_OPENAI_DEPLOYMENT || "gpt-4o-mini";
   
-  const difficulty = params.difficultyLevel || "medium";
+  const competitionLevel = params.competitionLevel || "District";
   const businessType = params.businessType || "retail business";
   
+  // Map competition levels to complexity descriptions
+  const complexityMap = {
+    "District": "entry-level with straightforward business scenarios suitable for beginners",
+    "Association": "intermediate-level with moderate complexity requiring solid business fundamentals",
+    "ICDC": "advanced competition-level with complex, multi-layered business challenges requiring comprehensive analysis"
+  };
+  
+  const complexity = complexityMap[competitionLevel as keyof typeof complexityMap] || complexityMap["District"];
+  
   const prompt = `
-  Create a realistic DECA roleplay scenario for a ${difficulty} difficulty level. 
+  Create a realistic DECA roleplay scenario for ${competitionLevel} competition level (${complexity}). 
   The scenario should focus on the instructional area of "${params.instructionalArea}" 
   and include the following performance indicators: ${params.performanceIndicators.join(", ")}.
   The scenario should involve a ${businessType}.
@@ -105,7 +114,7 @@ export async function generateRoleplay(params: {
   - title: A catchy title for the roleplay
   - scenario: A 2-3 paragraph description of the business situation
   - performanceIndicators: An array of the provided performance indicators
-  - difficulty: The difficulty level provided
+  - competitionLevel: The competition level provided
   - businessType: The type of business involved
   - meetWith: The title/role of the person the student will be meeting with in the roleplay
   `;
