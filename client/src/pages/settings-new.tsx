@@ -1,63 +1,95 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/use-auth";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Separator } from "@/components/ui/separator";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AlertTriangle, Lock, Unlock, RotateCcw } from "lucide-react";
 import { DECA_EVENTS } from "@shared/schema";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { AlertTriangle, Settings, CheckIcon } from "lucide-react";
+import { AppearanceSettings } from "@/lib/theme-controller";
 
-// Form schemas
+// Profile form schema
 const profileSchema = z.object({
-  username: z.string().min(1, "Username is required"),
-  email: z.string().email("Invalid email address").optional(),
+  username: z.string().min(3, { message: "Username must be at least 3 characters" }),
+  email: z.string().email({ message: "Please enter a valid email address" }).optional(),
 });
 
+// Event change form schema
 const eventChangeSchema = z.object({
-  selectedEvent: z.string().min(1, "Please select an event"),
+  selectedEvent: z.string().min(1, { message: "Please select an event" }),
 });
 
-type ProfileFormValues = z.infer<typeof profileSchema>;
+// Notification form schema
+const notificationSchema = z.object({
+  emailNotifications: z.boolean(),
+  dailyReminders: z.boolean(),
+  weeklyProgressReports: z.boolean(),
+  streakAlerts: z.boolean(),
+});
+
 type EventChangeFormValues = z.infer<typeof eventChangeSchema>;
 
 export default function SettingsNewPage() {
+  const { user } = useAuth();
   const { toast } = useToast();
-  const [showEventChangeDialog, setShowEventChangeDialog] = useState(false);
+  const [activeTab, setActiveTab] = useState("profile");
 
-  // Get current user data
-  const { data: user, isLoading: userLoading } = useQuery({
-    queryKey: ["/api/user"],
-    queryFn: async () => {
-      const res = await fetch("/api/user", { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to load user data");
-      return res.json();
-    },
+  // Appearance settings state
+  const [appearance, setAppearance] = useState<AppearanceSettings>({
+    theme: "light",
+    colorScheme: user?.uiTheme || "aquaBlue",
+    fontSize: "medium",
+    visualStyle: "memphis"
   });
 
+  // Load appearance settings from local storage
+  useEffect(() => {
+    const savedAppearance = localStorage.getItem('diegoAppearance');
+    if (savedAppearance) {
+      try {
+        setAppearance(JSON.parse(savedAppearance));
+      } catch (e) {
+        console.error('Error parsing saved appearance settings:', e);
+      }
+    }
+  }, []);
+
+  // Save appearance settings to localStorage when they change
+  useEffect(() => {
+    localStorage.setItem('diegoAppearance', JSON.stringify(appearance));
+  }, [appearance]);
+
+  // Helper function to get color based on scheme
+  const getColorForScheme = (scheme: string): string => {
+    switch (scheme) {
+      case 'aquaBlue': return '#3b82f6';
+      case 'coralPink': return '#ec4899';
+      case 'mintGreen': return '#22c55e';
+      case 'royalPurple': return '#8b5cf6';
+      default: return '#3b82f6';
+    }
+  };
+
   // Find user's current event
-  const userEvent = user?.selectedEvent ? DECA_EVENTS.find(event => event.code === user.selectedEvent) : null;
+  const selectedEvent = localStorage.getItem('selectedDecaEvent') || user?.eventCode;
+  const userEvent = selectedEvent ? DECA_EVENTS.find(event => event.code === selectedEvent) : null;
   const canChangeEvent = !user?.hasChangedEvent;
 
-  // Profile form setup
-  const profileForm = useForm<ProfileFormValues>({
+  // Profile form
+  const profileForm = useForm<z.infer<typeof profileSchema>>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
       username: user?.username || "",
@@ -65,17 +97,78 @@ export default function SettingsNewPage() {
     },
   });
 
-  // Event change form setup
+  // Event change form
   const eventForm = useForm<EventChangeFormValues>({
     resolver: zodResolver(eventChangeSchema),
     defaultValues: {
-      selectedEvent: user?.selectedEvent || "",
+      selectedEvent: "",
+    },
+  });
+
+  // Notification form
+  const notificationForm = useForm<z.infer<typeof notificationSchema>>({
+    resolver: zodResolver(notificationSchema),
+    defaultValues: {
+      emailNotifications: true,
+      dailyReminders: true,
+      weeklyProgressReports: false,
+      streakAlerts: true,
+    },
+  });
+
+  // Update appearance settings mutation
+  const updateAppearance = useMutation({
+    mutationFn: async (data: AppearanceSettings) => {
+      try {
+        // Import applyTheme from theme-controller
+        const { applyTheme } = await import('@/lib/theme-controller');
+        // Apply theme immediately
+        applyTheme(data);
+        return data;
+      } catch (error) {
+        console.error('Failed to apply theme:', error);
+        throw new Error('Failed to apply appearance settings');
+      }
+    },
+    onSuccess: () => {
+      toast({
+        title: "Appearance Updated",
+        description: "Your appearance settings have been applied.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Update Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Update notification settings mutation
+  const updateNotifications = useMutation({
+    mutationFn: async (data: z.infer<typeof notificationSchema>) => {
+      // Would connect to a real endpoint in production
+      return data;
+    },
+    onSuccess: () => {
+      toast({
+        title: "Notification Settings Updated",
+        description: "Your notification preferences have been saved.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Update Failed",
+        description: error.message,
+        variant: "destructive",
+      });
     },
   });
 
   // Update profile mutation
   const updateProfile = useMutation({
-    mutationFn: async (data: ProfileFormValues) => {
+    mutationFn: async (data: z.infer<typeof profileSchema>) => {
       return apiRequest(`/api/user/profile`, {
         method: "PUT",
         body: data,
@@ -86,7 +179,6 @@ export default function SettingsNewPage() {
         title: "Profile Updated",
         description: "Your profile has been successfully updated.",
       });
-      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
     },
     onError: (error: any) => {
       toast({
