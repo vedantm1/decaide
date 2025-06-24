@@ -43,7 +43,7 @@ export default function RoleplayNewPage() {
   });
 
   // Find user's event and cluster
-  const userEvent = user?.eventCode ? DECA_EVENTS.find(event => event.code === user.eventCode) : null;
+  const userEvent = user?.selectedEvent ? DECA_EVENTS.find(event => event.code === user.selectedEvent) : null;
   const userCluster = userEvent?.cluster;
   const availableInstructionalAreas = userCluster ? CLUSTER_INSTRUCTIONAL_AREAS[userCluster as keyof typeof CLUSTER_INSTRUCTIONAL_AREAS] : [];
 

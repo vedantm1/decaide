@@ -164,10 +164,9 @@ export const users = pgTable("users", {
   password: text("password").notNull(),
   email: text("email"),
   googleId: text("google_id").unique(),
-  eventFormat: text("event_format"), // roleplay or written
-  eventCode: text("event_code"),     // event code like PBM, ACT, etc.
-  eventType: text("event_type"),     // Principles, Individual Series, etc.
-  instructionalArea: text("instructional_area"), // Business Management, Marketing, etc.
+  selectedEvent: text("selected_event"), // DECA event code (PBM, ACT, etc.)
+  hasChangedEvent: boolean("has_changed_event").default(false), // One-time event change flag
+  onboardingCompleted: boolean("onboarding_completed").default(false), // Track onboarding completion
   sessionId: text("session_id"),     // Current session ID for multi-device control
   uiTheme: text("ui_theme").default("aquaBlue"), // UI theme preference
   colorScheme: text("color_scheme").default("memphis"), // UI color scheme (memphis, modern, classic)
@@ -190,10 +189,8 @@ export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
   email: true,
-  eventFormat: true,
-  eventCode: true,
-  eventType: true,
-  instructionalArea: true,
+  selectedEvent: true,
+  onboardingCompleted: true,
   uiTheme: true,
   colorScheme: true,
   theme: true,
