@@ -42,6 +42,7 @@ export interface IStorage {
   getUserByEmail(email: string): Promise<User | undefined>;
   getUserByGoogleId(googleId: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  updateUser(id: number, updates: Partial<User>): Promise<User | undefined>;
   linkGoogleAccount(userId: number, googleId: string): Promise<User | undefined>;
   updateLastLogin(id: number, date: Date): Promise<User | undefined>;
   updateUserSettings(id: number, settings: { 
@@ -259,6 +260,19 @@ export class MemStorage implements IStorage {
   private async createDefaultPIs(userId: number) {
     // Not showing implementation details as they would be long...
     // This would create default performance indicators for a new user
+  }
+
+  async updateUser(id: number, updates: Partial<User>): Promise<User | undefined> {
+    const user = this.users.get(id);
+    if (!user) return undefined;
+    
+    const updatedUser = {
+      ...user,
+      ...updates
+    };
+    
+    this.users.set(id, updatedUser);
+    return updatedUser;
   }
 
   async updateLastLogin(id: number, date: Date): Promise<User | undefined> {

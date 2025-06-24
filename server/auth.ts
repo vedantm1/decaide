@@ -234,7 +234,8 @@ export function setupAuth(app: Express) {
 
       req.login(user, (err) => {
         if (err) return next(err);
-        res.status(201).json({ ...user, isNewUser: true });
+        // Mark as new user who needs onboarding
+        res.status(201).json({ ...user, needsOnboarding: true });
       });
     } catch (error) {
       next(error);

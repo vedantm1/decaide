@@ -46,6 +46,8 @@ export function OnboardingProvider({ children }: OnboardingProviderProps) {
     localStorage.setItem('onboardingCompleted', 'true');
     setIsOnboardingOpen(false);
     setShouldShowOnboarding(false);
+    // Trigger a page reload to refresh user data
+    window.location.reload();
   };
 
   const startOnboarding = () => {
