@@ -87,13 +87,11 @@ export async function generateRoleplay(params: {
   instructionalArea: string;
   performanceIndicators: string[];
   competitionLevel: string;
-  businessType?: string;
 }) {
   const client = getOpenAIClient();
   const deploymentId = process.env.AZURE_OPENAI_DEPLOYMENT || "gpt-4o-mini";
   
   const competitionLevel = params.competitionLevel || "District";
-  const businessType = params.businessType || "retail business";
   
   // Map competition levels to complexity descriptions
   const complexityMap = {
@@ -108,14 +106,12 @@ export async function generateRoleplay(params: {
   Create a realistic DECA roleplay scenario for ${competitionLevel} competition level (${complexity}). 
   The scenario should focus on the instructional area of "${params.instructionalArea}" 
   and include the following performance indicators: ${params.performanceIndicators.join(", ")}.
-  The scenario should involve a ${businessType}.
 
   Format your response as a JSON object with the following properties:
   - title: A catchy title for the roleplay
   - scenario: A 2-3 paragraph description of the business situation
   - performanceIndicators: An array of the provided performance indicators
   - competitionLevel: The competition level provided
-  - businessType: The type of business involved
   - meetWith: The title/role of the person the student will be meeting with in the roleplay
   `;
   
