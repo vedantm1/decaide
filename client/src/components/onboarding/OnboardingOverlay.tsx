@@ -172,7 +172,7 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
     setSelectedEvents(newSelections);
   };
 
-  const handleDone = async () => {
+  const handleDone = () => {
     const selectedCount = Object.keys(selectedEvents).length;
     
     if (selectedCount === 0) {
@@ -187,26 +187,6 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
     
     const selectedEvent = Object.values(selectedEvents)[0];
     localStorage.setItem('selectedDecaEvent', selectedEvent);
-    
-    // Update user profile with selected event via API
-    try {
-      const response = await fetch('/api/user/profile', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          selectedEvent: selectedEvent,
-          onboardingCompleted: true 
-        }),
-      });
-      
-      if (!response.ok) {
-        console.error('Failed to update user profile with selected event');
-      }
-    } catch (error) {
-      console.error('Error updating user profile:', error);
-    }
     
     // Immediately remove background blur and sidebar blur before closing overlay
     const overlayElement = document.querySelector('.onboarding-overlay');

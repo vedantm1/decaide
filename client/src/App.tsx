@@ -11,7 +11,7 @@ import PerformanceIndicatorsPage from "@/pages/performance-indicators";
 import PracticeTestsPage from "@/pages/practice-tests";
 import WrittenEventsPage from "@/pages/written-events";
 import MyProgressPage from "@/pages/my-progress";
-import SettingsPage from "@/pages/settings-new";
+import SettingsPage from "@/pages/settings";
 import PricingPage from "@/pages/pricing";
 import WhyDecadePage from "@/pages/why-decade";
 import InteractionShowcasePage from "@/pages/interaction-showcase";
