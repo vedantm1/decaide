@@ -25,8 +25,8 @@ export function OnboardingProvider({ children }: OnboardingProviderProps) {
         if (response.ok) {
           const user = await response.json();
           
-          // Show onboarding if user doesn't have an event selected
-          const needsOnboarding = !user.eventCode;
+          // Show onboarding if user doesn't have an event selected (using event_code field name)
+          const needsOnboarding = !user.event_code;
           
           if (needsOnboarding) {
             setShouldShowOnboarding(true);

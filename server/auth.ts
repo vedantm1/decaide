@@ -229,11 +229,12 @@ export function setupAuth(app: Express) {
       const user = await storage.createUser({
         ...req.body,
         password: await hashPassword(req.body.password),
+        eventCode: null, // New users start without an event selected
       });
 
       req.login(user, (err) => {
         if (err) return next(err);
-        res.status(201).json(user);
+        res.status(201).json({ ...user, isNewUser: true });
       });
     } catch (error) {
       next(error);
