@@ -6,7 +6,7 @@ import NotFound from "@/pages/not-found";
 import Dashboard from "@/pages/dashboard";
 import DashboardNew from "@/pages/dashboard-new";
 import AuthNew from "@/pages/auth-new";
-import RoleplayPage from "@/pages/roleplay";
+import RoleplayPage from "@/pages/roleplay-new";
 import PerformanceIndicatorsPage from "@/pages/performance-indicators";
 import PracticeTestsPage from "@/pages/practice-tests";
 import WrittenEventsPage from "@/pages/written-events";

@@ -2,6 +2,88 @@ import { pgTable, text, serial, integer, boolean, timestamp, pgEnum } from "driz
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
+// DECA Events with their assigned clusters
+export const DECA_EVENTS = [
+  // Principles of Business Administration
+  { code: "PBM", name: "Principles of Business Management and Administration", cluster: "Business Management & Administration", type: "Principles of Business Administration" },
+  { code: "PEN", name: "Principles of Entrepreneurship", cluster: "Entrepreneurship", type: "Principles of Business Administration" },
+  { code: "PFN", name: "Principles of Finance", cluster: "Finance", type: "Principles of Business Administration" },
+  { code: "PHT", name: "Principles of Hospitality and Tourism", cluster: "Hospitality & Tourism", type: "Principles of Business Administration" },
+  { code: "PMK", name: "Principles of Marketing", cluster: "Marketing", type: "Principles of Business Administration" },
+  
+  // Team Decision Making
+  { code: "BLTDM", name: "Business Law and Ethics Team Decision Making", cluster: "Business Management & Administration", type: "Team Decision Making" },
+  { code: "BTDM", name: "Buying and Merchandising Team Decision Making", cluster: "Marketing", type: "Team Decision Making" },
+  { code: "ETDM", name: "Entrepreneurship Team Decision Making", cluster: "Entrepreneurship", type: "Team Decision Making" },
+  { code: "FTDM", name: "Financial Services Team Decision Making", cluster: "Finance", type: "Team Decision Making" },
+  { code: "HTDM", name: "Hospitality Services Team Decision Making", cluster: "Hospitality & Tourism", type: "Team Decision Making" },
+  { code: "MTDM", name: "Marketing Management Team Decision Making", cluster: "Marketing", type: "Team Decision Making" },
+  { code: "STDM", name: "Sports and Entertainment Marketing Team Decision Making", cluster: "Marketing", type: "Team Decision Making" },
+  { code: "TTDM", name: "Travel and Tourism Team Decision Making", cluster: "Hospitality & Tourism", type: "Team Decision Making" },
+  
+  // Individual Series
+  { code: "ACT", name: "Accounting Applications Series", cluster: "Finance", type: "Individual Series" },
+  { code: "AAM", name: "Apparel and Accessories Marketing Series", cluster: "Marketing", type: "Individual Series" },
+  { code: "ASM", name: "Automotive Services Marketing Series", cluster: "Marketing", type: "Individual Series" },
+  { code: "BFS", name: "Business Finance Series", cluster: "Finance", type: "Individual Series" },
+  { code: "BSM", name: "Business Services Marketing Series", cluster: "Marketing", type: "Individual Series" },
+  { code: "ENT", name: "Entrepreneurship Series", cluster: "Entrepreneurship", type: "Individual Series" },
+  { code: "FMS", name: "Food Marketing Series", cluster: "Marketing", type: "Individual Series" },
+  { code: "HLM", name: "Hotel and Lodging Management Series", cluster: "Hospitality & Tourism", type: "Individual Series" },
+  { code: "HRM", name: "Human Resources Management Series", cluster: "Business Management & Administration", type: "Individual Series" },
+  { code: "MCS", name: "Marketing Communications Series", cluster: "Marketing", type: "Individual Series" },
+  { code: "QSRM", name: "Quick Serve Restaurant Management Series", cluster: "Hospitality & Tourism", type: "Individual Series" },
+  { code: "RFSM", name: "Restaurant and Food Service Management Series", cluster: "Hospitality & Tourism", type: "Individual Series" },
+  { code: "RMS", name: "Retail Merchandising Series", cluster: "Marketing", type: "Individual Series" },
+  { code: "SEM", name: "Sports and Entertainment Marketing Series", cluster: "Marketing", type: "Individual Series" },
+  
+  // Business Operations Research
+  { code: "BOR", name: "Business Services Operations Research", cluster: "Business Management & Administration", type: "Business Operations Research" },
+  { code: "BMOR", name: "Buying and Merchandising Operations Research", cluster: "Marketing", type: "Business Operations Research" },
+  { code: "FOR", name: "Finance Operations Research", cluster: "Finance", type: "Business Operations Research" },
+  { code: "HTOR", name: "Hospitality and Tourism Operations Research", cluster: "Hospitality & Tourism", type: "Business Operations Research" },
+  { code: "SEOR", name: "Sports and Entertainment Marketing Operations Research", cluster: "Marketing", type: "Business Operations Research" },
+  
+  // Project Management
+  { code: "PMBS", name: "Business Solutions Project", cluster: "Business Management & Administration", type: "Project Management" },
+  { code: "PMCD", name: "Career Development Project", cluster: "Business Management & Administration", type: "Project Management" },
+  { code: "PMCA", name: "Community Awareness Project", cluster: "Business Management & Administration", type: "Project Management" },
+  { code: "PMCG", name: "Community Giving Project", cluster: "Business Management & Administration", type: "Project Management" },
+  { code: "PMFL", name: "Financial Literacy Project", cluster: "Finance", type: "Project Management" },
+  { code: "PMSP", name: "Sales Project", cluster: "Marketing", type: "Project Management" },
+  
+  // Entrepreneurship
+  { code: "EBG", name: "Business Growth Plan", cluster: "Entrepreneurship", type: "Entrepreneurship" },
+  { code: "EFB", name: "Franchise Business Plan", cluster: "Entrepreneurship", type: "Entrepreneurship" },
+  { code: "EIB", name: "Independent Business Plan", cluster: "Entrepreneurship", type: "Entrepreneurship" },
+  { code: "EIP", name: "Innovation Plan", cluster: "Entrepreneurship", type: "Entrepreneurship" },
+  { code: "IBP", name: "International Business Plan", cluster: "Entrepreneurship", type: "Entrepreneurship" },
+  { code: "ESB", name: "Start-Up Business Plan", cluster: "Entrepreneurship", type: "Entrepreneurship" },
+  
+  // Integrated Marketing Campaign
+  { code: "IMCE", name: "Integrated Marketing Campaign-Event", cluster: "Marketing", type: "Integrated Marketing Campaign" },
+  { code: "IMCP", name: "Integrated Marketing Campaign-Product", cluster: "Marketing", type: "Integrated Marketing Campaign" },
+  { code: "IMCS", name: "Integrated Marketing Campaign-Service", cluster: "Marketing", type: "Integrated Marketing Campaign" },
+  
+  // Professional Selling and Consulting
+  { code: "FCE", name: "Financial Consulting", cluster: "Finance", type: "Professional Selling and Consulting" },
+  { code: "HTPS", name: "Hospitality and Tourism Professional Selling", cluster: "Hospitality & Tourism", type: "Professional Selling and Consulting" },
+  { code: "PSE", name: "Professional Selling", cluster: "Marketing", type: "Professional Selling and Consulting" },
+  
+  // Personal Financial Literacy
+  { code: "PFL", name: "Personal Financial Literacy", cluster: "Personal Financial Literacy", type: "Personal Financial Literacy" }
+] as const;
+
+// Extract unique clusters from DECA events
+export const DECA_CLUSTERS = [
+  "Business Management & Administration",
+  "Entrepreneurship", 
+  "Finance",
+  "Hospitality & Tourism",
+  "Marketing",
+  "Personal Financial Literacy"
+] as const;
+
 // User model
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
@@ -179,8 +261,8 @@ export const EVENT_TYPE_GROUPS = [
   "Online Events"
 ];
 
-// All DECA events organized by type
-export const DECA_EVENTS = {
+// Legacy DECA events organized by type (keeping for backward compatibility)
+export const LEGACY_DECA_EVENTS = {
   // Role-play events
   roleplay: [
     // Principles Events
