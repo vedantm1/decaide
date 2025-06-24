@@ -172,7 +172,7 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
     setSelectedEvents(newSelections);
   };
 
-  const handleDone = () => {
+  const handleDone = async () => {
     const selectedCount = Object.keys(selectedEvents).length;
     
     if (selectedCount === 0) {
@@ -185,8 +185,26 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
       return;
     }
     
-    const selectedEvent = Object.values(selectedEvents)[0];
-    localStorage.setItem('selectedDecaEvent', selectedEvent);
+    const selectedEventFull = Object.values(selectedEvents)[0];
+    // Extract event code from the selection (format: "Event Name (CODE)")
+    const eventCodeMatch = selectedEventFull.match(/\(([^)]+)\)$/);
+    const eventCode = eventCodeMatch ? eventCodeMatch[1] : selectedEventFull;
+    
+    localStorage.setItem('selectedDecaEvent', eventCode);
+    
+    try {
+      // Save event selection to database
+      await fetch('/api/user/event', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ eventCode }),
+      });
+    } catch (error) {
+      console.error('Failed to save event selection:', error);
+    }
     
     // Immediately remove background blur and sidebar blur before closing overlay
     const overlayElement = document.querySelector('.onboarding-overlay');

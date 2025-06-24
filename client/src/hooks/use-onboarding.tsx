@@ -18,16 +18,28 @@ export function OnboardingProvider({ children }: OnboardingProviderProps) {
   const [shouldShowOnboarding, setShouldShowOnboarding] = useState(false);
 
   useEffect(() => {
-    // Check if user has completed onboarding and has selected an event
-    const onboardingCompleted = localStorage.getItem('onboardingCompleted');
-    const selectedEvent = localStorage.getItem('selectedDecaEvent');
-    const isNewUser = !onboardingCompleted || !selectedEvent;
-    
-    if (isNewUser) {
-      setShouldShowOnboarding(true);
-      setIsOnboardingOpen(true);
-      console.log('Onboarding should be visible now');
-    }
+    // Check authentication status and user data to determine if onboarding is needed
+    const checkOnboardingStatus = async () => {
+      try {
+        const response = await fetch('/api/user', { credentials: 'include' });
+        if (response.ok) {
+          const user = await response.json();
+          
+          // Show onboarding if user doesn't have an event selected
+          const needsOnboarding = !user.eventCode;
+          
+          if (needsOnboarding) {
+            setShouldShowOnboarding(true);
+            setIsOnboardingOpen(true);
+            console.log('Onboarding should be visible now - user needs event selection');
+          }
+        }
+      } catch (error) {
+        console.log('Not authenticated, onboarding not needed');
+      }
+    };
+
+    checkOnboardingStatus();
   }, []);
 
   const completeOnboarding = () => {
