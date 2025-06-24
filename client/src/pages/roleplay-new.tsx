@@ -42,8 +42,19 @@ export default function RoleplayNewPage() {
     },
   });
 
-  // Find user's event and cluster
-  const userEvent = user?.eventCode ? DECA_EVENTS.find(event => event.code === user.eventCode) : null;
+  // Also check localStorage for selected event from onboarding
+  const [localSelectedEvent, setLocalSelectedEvent] = useState<string | null>(null);
+  
+  useEffect(() => {
+    const storedEvent = localStorage.getItem('selectedDecaEvent');
+    if (storedEvent) {
+      setLocalSelectedEvent(storedEvent);
+    }
+  }, []);
+
+  // Find user's event and cluster - prioritize database over localStorage
+  const eventCode = user?.eventCode || localSelectedEvent;
+  const userEvent = eventCode ? DECA_EVENTS.find(event => event.code === eventCode) : null;
   const userCluster = userEvent?.cluster;
   const availableInstructionalAreas = userCluster ? CLUSTER_INSTRUCTIONAL_AREAS[userCluster as keyof typeof CLUSTER_INSTRUCTIONAL_AREAS] : [];
 
