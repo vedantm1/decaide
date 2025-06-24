@@ -131,6 +131,12 @@ DecA(I)de is an AI-powered educational platform designed specifically for DECA b
 
 ## Changelog
 
+- June 24, 2025. Revamped roleplay system to be event-based
+  - Added complete DECA events catalog with cluster assignments
+  - Created event-locked roleplay interface based on user's selected event
+  - Implemented cluster-specific instructional areas
+  - Updated UI to match test generation styling with consistent backgrounds
+  - Removed business type field from roleplay generation for cleaner interface
 - June 24, 2025. Initial setup
 
 ## User Preferences

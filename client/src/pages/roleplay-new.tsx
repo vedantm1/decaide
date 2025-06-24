@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Lock, Unlock, Clock, Play, Pause, RotateCcw } from "lucide-react";
-import { DECA_EVENTS, DECA_CLUSTERS } from "@shared/schema";
+import { DECA_EVENTS, DECA_CLUSTERS, CLUSTER_INSTRUCTIONAL_AREAS } from "@shared/schema";
 
 // Form schema for event-based roleplay generation
 const roleplaySchema = z.object({
@@ -29,6 +29,8 @@ export default function RoleplayNewPage() {
   const [generatedRoleplay, setGeneratedRoleplay] = useState<any>(null);
   const [prepTimerActive, setPrepTimerActive] = useState(false);
   const [prepTimeRemaining, setPrepTimeRemaining] = useState(600); // 10 minutes in seconds
+  const [selectedInstructionalArea, setSelectedInstructionalArea] = useState<string>("");
+  const [selectedPerformanceIndicators, setSelectedPerformanceIndicators] = useState<string[]>([]);
 
   // Get current user data to determine their selected event
   const { data: user, isLoading: userLoading } = useQuery({
@@ -43,6 +45,21 @@ export default function RoleplayNewPage() {
   // Find user's event and cluster
   const userEvent = user?.eventCode ? DECA_EVENTS.find(event => event.code === user.eventCode) : null;
   const userCluster = userEvent?.cluster;
+  const availableInstructionalAreas = userCluster ? CLUSTER_INSTRUCTIONAL_AREAS[userCluster as keyof typeof CLUSTER_INSTRUCTIONAL_AREAS] : [];
+
+  // Get performance indicators for selected instructional area
+  const { data: performanceIndicators, isLoading: pisLoading } = useQuery({
+    queryKey: ["/api/user/performance-indicators", selectedInstructionalArea],
+    queryFn: async () => {
+      if (!selectedInstructionalArea) return [];
+      const res = await fetch(`/api/user/performance-indicators?category=${encodeURIComponent(selectedInstructionalArea)}`, {
+        credentials: "include",
+      });
+      if (!res.ok) throw new Error("Failed to load performance indicators");
+      return res.json();
+    },
+    enabled: !!selectedInstructionalArea,
+  });
 
   // Form setup
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<RoleplayFormValues>({
@@ -203,12 +220,21 @@ export default function RoleplayNewPage() {
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               <div>
                 <Label className="text-foreground/80">Instructional Area</Label>
-                <Select onValueChange={(value) => setValue("instructionalArea", value)}>
+                <Select 
+                  onValueChange={(value) => {
+                    setValue("instructionalArea", value);
+                    setSelectedInstructionalArea(value);
+                    setSelectedPerformanceIndicators([]);
+                    setValue("performanceIndicators", []);
+                  }}
+                >
                   <SelectTrigger className="w-full bg-background/80 mt-2">
-                    <SelectValue placeholder="Select instructional area for your cluster" />
+                    <SelectValue placeholder={`Select instructional area for ${userCluster}`} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="placeholder">Coming Soon - Cluster-specific areas</SelectItem>
+                    {availableInstructionalAreas.map((area) => (
+                      <SelectItem key={area} value={area}>{area}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
                 {errors.instructionalArea && (
@@ -217,12 +243,54 @@ export default function RoleplayNewPage() {
               </div>
 
               <div>
-                <Label className="text-foreground/80">Performance Indicators</Label>
-                <div className="bg-background/80 border rounded-md p-3 mt-2 min-h-[100px] flex items-center justify-center">
-                  <p className="text-muted-foreground text-sm">
-                    Performance indicators will be loaded based on your selected instructional area
-                  </p>
-                </div>
+                <Label className="text-foreground/80">Performance Indicators (Select 3-5)</Label>
+                {!selectedInstructionalArea ? (
+                  <div className="bg-background/80 border rounded-md p-3 mt-2 min-h-[100px] flex items-center justify-center">
+                    <p className="text-muted-foreground text-sm">
+                      Select an instructional area first to see performance indicators
+                    </p>
+                  </div>
+                ) : pisLoading ? (
+                  <div className="bg-background/80 border rounded-md p-3 mt-2 min-h-[100px] flex items-center justify-center">
+                    <div className="animate-spin w-6 h-6 border-2 border-primary border-t-transparent rounded-full"></div>
+                  </div>
+                ) : (
+                  <div className="bg-background/80 border rounded-md p-3 mt-2 max-h-48 overflow-y-auto">
+                    <div className="grid grid-cols-1 gap-2">
+                      {performanceIndicators?.map((pi: any) => (
+                        <div key={pi.id} className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id={`pi-${pi.id}`}
+                            checked={selectedPerformanceIndicators.includes(pi.indicator)}
+                            onChange={(e) => {
+                              const checked = e.target.checked;
+                              let newPIs: string[];
+                              if (checked) {
+                                if (selectedPerformanceIndicators.length < 5) {
+                                  newPIs = [...selectedPerformanceIndicators, pi.indicator];
+                                } else {
+                                  return; // Don't allow more than 5
+                                }
+                              } else {
+                                newPIs = selectedPerformanceIndicators.filter(indicator => indicator !== pi.indicator);
+                              }
+                              setSelectedPerformanceIndicators(newPIs);
+                              setValue("performanceIndicators", newPIs);
+                            }}
+                            className="mr-2"
+                          />
+                          <label 
+                            htmlFor={`pi-${pi.id}`} 
+                            className="text-sm text-foreground/80 cursor-pointer"
+                          >
+                            {pi.indicator}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 {errors.performanceIndicators && (
                   <p className="text-destructive text-sm mt-1">{errors.performanceIndicators.message}</p>
                 )}
@@ -251,7 +319,7 @@ export default function RoleplayNewPage() {
               <Button 
                 type="submit" 
                 className="w-full py-3"
-                disabled={generateRoleplay.isPending}
+                disabled={generateRoleplay.isPending || selectedPerformanceIndicators.length === 0}
               >
                 {generateRoleplay.isPending ? (
                   <div className="flex items-center">

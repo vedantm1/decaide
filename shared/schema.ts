@@ -84,6 +84,79 @@ export const DECA_CLUSTERS = [
   "Personal Financial Literacy"
 ] as const;
 
+// Cluster-specific instructional areas
+export const CLUSTER_INSTRUCTIONAL_AREAS = {
+  "Business Management & Administration": [
+    "Business Law",
+    "Communication and Interpersonal Skills",
+    "Customer Relations",
+    "Economics",
+    "Emotional Intelligence",
+    "Human Resources Management",
+    "Information Management",
+    "Operations",
+    "Professional Development",
+    "Strategic Management"
+  ],
+  "Entrepreneurship": [
+    "Business Law",
+    "Communication and Interpersonal Skills", 
+    "Customer Relations",
+    "Economics",
+    "Emotional Intelligence",
+    "Entrepreneurship",
+    "Financial Analysis",
+    "Information Management",
+    "Marketing",
+    "Operations",
+    "Professional Development",
+    "Strategic Management"
+  ],
+  "Finance": [
+    "Business Law",
+    "Communication and Interpersonal Skills",
+    "Customer Relations", 
+    "Economics",
+    "Emotional Intelligence",
+    "Financial Analysis",
+    "Information Management",
+    "Operations",
+    "Professional Development",
+    "Strategic Management"
+  ],
+  "Hospitality & Tourism": [
+    "Business Law",
+    "Communication and Interpersonal Skills",
+    "Customer Relations",
+    "Economics", 
+    "Emotional Intelligence",
+    "Human Resources Management",
+    "Information Management",
+    "Marketing",
+    "Operations",
+    "Professional Development",
+    "Strategic Management"
+  ],
+  "Marketing": [
+    "Business Law",
+    "Communication and Interpersonal Skills",
+    "Customer Relations",
+    "Economics",
+    "Emotional Intelligence", 
+    "Information Management",
+    "Marketing",
+    "Operations",
+    "Professional Development",
+    "Strategic Management"
+  ],
+  "Personal Financial Literacy": [
+    "Economics",
+    "Financial Analysis",
+    "Information Management",
+    "Professional Development"
+  ]
+} as const;
+
 // User model
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
