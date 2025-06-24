@@ -95,6 +95,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // Set auth token and username in localStorage
         localStorage.setItem('isLoggedIn', 'true');
         localStorage.setItem('username', username);
+        // Don't set isNewUser flag for existing users
         // Create user data with the actual username entered by the user
         const userData = {
           ...MOCK_USER,
