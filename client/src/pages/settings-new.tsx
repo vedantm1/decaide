@@ -327,9 +327,100 @@ export default function SettingsNewPage() {
           <Card className="bg-background/60 backdrop-blur-sm border-muted">
             <CardHeader>
               <CardTitle>Notification Settings</CardTitle>
+              <CardDescription>Manage how you receive notifications</CardDescription>
             </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">Notification settings coming soon...</p>
+            <CardContent className="space-y-6">
+              <Form {...notificationForm}>
+                <form onSubmit={notificationForm.handleSubmit(onNotificationSubmit)} className="space-y-6">
+                  <FormField
+                    control={notificationForm.control}
+                    name="emailNotifications"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                        <div className="space-y-0.5">
+                          <FormLabel className="text-base">Email Notifications</FormLabel>
+                          <FormDescription>
+                            Receive notifications via email
+                          </FormDescription>
+                        </div>
+                        <FormControl>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={notificationForm.control}
+                    name="dailyReminders"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                        <div className="space-y-0.5">
+                          <FormLabel className="text-base">Daily Reminders</FormLabel>
+                          <FormDescription>
+                            Get reminded to practice daily
+                          </FormDescription>
+                        </div>
+                        <FormControl>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={notificationForm.control}
+                    name="weeklyProgressReports"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                        <div className="space-y-0.5">
+                          <FormLabel className="text-base">Weekly Progress Reports</FormLabel>
+                          <FormDescription>
+                            Receive weekly summaries of your progress
+                          </FormDescription>
+                        </div>
+                        <FormControl>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={notificationForm.control}
+                    name="streakAlerts"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                        <div className="space-y-0.5">
+                          <FormLabel className="text-base">Streak Alerts</FormLabel>
+                          <FormDescription>
+                            Get notified about your practice streaks
+                          </FormDescription>
+                        </div>
+                        <FormControl>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <Button type="submit" disabled={updateNotifications.isPending}>
+                    {updateNotifications.isPending ? 'Saving...' : 'Save Notification Settings'}
+                  </Button>
+                </form>
+              </Form>
             </CardContent>
           </Card>
         </TabsContent>
@@ -338,9 +429,136 @@ export default function SettingsNewPage() {
           <Card className="bg-background/60 backdrop-blur-sm border-muted">
             <CardHeader>
               <CardTitle>Appearance Settings</CardTitle>
+              <CardDescription>Customize the look and feel of your experience</CardDescription>
             </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">Appearance settings coming soon...</p>
+            <CardContent className="space-y-6">
+              <div className="space-y-2">
+                <h3 className="text-lg font-medium text-foreground">Theme</h3>
+                <p className="text-sm text-muted-foreground">Choose between light and dark mode</p>
+                
+                <div className="grid grid-cols-2 gap-3 pt-2">
+                  <div 
+                    className={`cursor-pointer p-4 rounded-lg border-2 flex items-center gap-3 transition-all
+                      ${appearance.theme === 'light' ? 'border-primary bg-primary/5' : 'border-border hover:border-border/80'}`}
+                    onClick={() => setAppearance({...appearance, theme: 'light'})}
+                  >
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-b from-gray-50 to-gray-200 border border-gray-300 flex items-center justify-center">
+                      <svg className="w-4 h-4 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <span className="font-medium">Light</span>
+                    {appearance.theme === 'light' && (
+                      <CheckIcon className="h-4 w-4 text-primary ml-auto" />
+                    )}
+                  </div>
+                  
+                  <div 
+                    className={`cursor-pointer p-4 rounded-lg border-2 flex items-center gap-3 transition-all
+                      ${appearance.theme === 'dark' ? 'border-primary bg-primary/5' : 'border-border hover:border-border/80'}`}
+                    onClick={() => setAppearance({...appearance, theme: 'dark'})}
+                  >
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-b from-gray-700 to-gray-900 border border-gray-600 flex items-center justify-center">
+                      <svg className="w-4 h-4 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+                      </svg>
+                    </div>
+                    <span className="font-medium">Dark</span>
+                    {appearance.theme === 'dark' && (
+                      <CheckIcon className="h-4 w-4 text-primary ml-auto" />
+                    )}
+                  </div>
+                </div>
+              </div>
+              
+              <Separator />
+              
+              <div className="space-y-2">
+                <h3 className="text-lg font-medium text-foreground">Color Scheme</h3>
+                <p className="text-sm text-muted-foreground">Select a color scheme for the application</p>
+                
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-2">
+                  {['aquaBlue', 'coralPink', 'mintGreen', 'royalPurple'].map((scheme) => (
+                    <div 
+                      key={scheme}
+                      className={`cursor-pointer p-4 rounded-lg border-2 flex flex-col items-center gap-2 transition-all
+                        ${appearance.colorScheme === scheme ? 'border-primary bg-primary/5' : 'border-border hover:border-border/80'}`}
+                      onClick={() => setAppearance({...appearance, colorScheme: scheme})}
+                    >
+                      <div 
+                        className="w-6 h-6 rounded-full mb-1"
+                        style={{ backgroundColor: getColorForScheme(scheme) }}
+                      />
+                      <span className="text-sm font-medium capitalize">
+                        {scheme === 'aquaBlue' ? 'Aqua Blue' : 
+                         scheme === 'coralPink' ? 'Coral Pink' : 
+                         scheme === 'mintGreen' ? 'Mint Green' : 
+                         'Royal Purple'}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              <Separator />
+              
+              <div className="space-y-2">
+                <h3 className="text-lg font-medium text-foreground">Font Size</h3>
+                <p className="text-sm text-muted-foreground">Adjust the text size throughout the app</p>
+                
+                <div className="grid grid-cols-3 gap-3 pt-2">
+                  {['small', 'medium', 'large'].map((size) => (
+                    <div 
+                      key={size}
+                      className={`cursor-pointer p-4 rounded-lg border-2 flex flex-col items-center gap-2 transition-all
+                        ${appearance.fontSize === size ? 'border-primary bg-primary/5' : 'border-border hover:border-border/80'}`}
+                      onClick={() => setAppearance({...appearance, fontSize: size as 'small' | 'medium' | 'large'})}
+                    >
+                      <span className={`font-medium ${size === 'small' ? 'text-sm' : size === 'large' ? 'text-lg' : 'text-base'}`}>
+                        Aa
+                      </span>
+                      <span className="text-sm capitalize">{size}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              <Separator />
+              
+              <div className="space-y-2">
+                <h3 className="text-lg font-medium text-foreground">Visual Style</h3>
+                <p className="text-sm text-muted-foreground">Choose your preferred visual style</p>
+                
+                <div className="grid grid-cols-2 gap-3 pt-2">
+                  <div 
+                    className={`cursor-pointer p-4 rounded-lg border-2 flex flex-col items-center gap-2 transition-all
+                      ${appearance.visualStyle === 'memphis' ? 'border-primary bg-primary/5' : 'border-border hover:border-border/80'}`}
+                    onClick={() => setAppearance({...appearance, visualStyle: 'memphis'})}
+                  >
+                    <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-purple-500 rounded-lg"></div>
+                    <span className="text-sm font-medium">Memphis</span>
+                    <span className="text-xs text-muted-foreground text-center">Colorful and playful</span>
+                  </div>
+                  
+                  <div 
+                    className={`cursor-pointer p-4 rounded-lg border-2 flex flex-col items-center gap-2 transition-all
+                      ${appearance.visualStyle === 'minimalist' ? 'border-primary bg-primary/5' : 'border-border hover:border-border/80'}`}
+                    onClick={() => setAppearance({...appearance, visualStyle: 'minimalist'})}
+                  >
+                    <div className="w-8 h-8 bg-gray-200 rounded-lg border border-gray-300"></div>
+                    <span className="text-sm font-medium">Minimalist</span>
+                    <span className="text-xs text-muted-foreground text-center">Clean and simple</span>
+                  </div>
+                </div>
+              </div>
+              
+              <Button 
+                onClick={() => updateAppearance.mutate(appearance)}
+                disabled={updateAppearance.isPending}
+                className="w-full"
+              >
+                {updateAppearance.isPending ? 'Applying Changes...' : 'Apply Appearance Settings'}
+              </Button>
             </CardContent>
           </Card>
         </TabsContent>

@@ -11,16 +11,19 @@ router.put('/profile', async (req: Request, res: Response) => {
   }
 
   try {
-    const { username, email } = req.body;
+    const { username, email, selectedEvent, onboardingCompleted } = req.body;
 
-    if (!username) {
-      return res.status(400).json({ error: "Username is required" });
+    if (!username && !selectedEvent && onboardingCompleted === undefined) {
+      return res.status(400).json({ error: "At least one field must be provided" });
     }
 
-    await storage.updateUser(req.user!.id, {
-      username,
-      email: email || null
-    });
+    const updateData: any = {};
+    if (username) updateData.username = username;
+    if (email !== undefined) updateData.email = email || null;
+    if (selectedEvent) updateData.selectedEvent = selectedEvent;
+    if (onboardingCompleted !== undefined) updateData.onboardingCompleted = onboardingCompleted;
+
+    await storage.updateUser(req.user!.id, updateData);
 
     res.json({ success: true, message: "Profile updated successfully" });
   } catch (error: any) {
