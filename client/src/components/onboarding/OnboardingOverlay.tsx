@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { X, ArrowLeft, ArrowRight, Play, SkipForward, ChevronDown } from "lucide-react";
+import Diego from "@/components/diego-guide/diego";
+import { useDiegoGuide } from "@/hooks/use-diego-guide";
 
 interface OnboardingOverlayProps {
   isOpen: boolean;
@@ -129,10 +131,14 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
   const [tutorialStep, setTutorialStep] = useState(0);
   const [selectedEvents, setSelectedEvents] = useState<{[cluster: string]: string}>({});
   const [errorMessage, setErrorMessage] = useState<string>("");
+  const { showDiego, setCurrentStep: setDiegoStep, setIsNewUser } = useDiegoGuide();
 
   const handleStartTutorial = () => {
     setCurrentStep('tutorial');
     setTutorialStep(0);
+    setIsNewUser(true);
+    setDiegoStep('welcome');
+    showDiego('welcome');
   };
 
   const handleSkipTutorial = () => {
@@ -142,14 +148,25 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
   const handleNextStep = () => {
     if (tutorialStep < TUTORIAL_STEPS.length - 1) {
       setTutorialStep(tutorialStep + 1);
+      // Map tutorial steps to Diego steps
+      const diegoSteps = ['dashboard', 'practice_tests', 'roleplay', 'written_events', 'performance_indicators', 'progress', 'settings'];
+      if (diegoSteps[tutorialStep + 1]) {
+        setDiegoStep(diegoSteps[tutorialStep + 1] as any);
+      }
     } else {
       setCurrentStep('event-selection');
+      setDiegoStep('complete');
     }
   };
 
   const handlePrevStep = () => {
     if (tutorialStep > 0) {
       setTutorialStep(tutorialStep - 1);
+      // Map tutorial steps to Diego steps
+      const diegoSteps = ['welcome', 'dashboard', 'practice_tests', 'roleplay', 'written_events', 'performance_indicators', 'progress'];
+      if (diegoSteps[tutorialStep - 1]) {
+        setDiegoStep(diegoSteps[tutorialStep - 1] as any);
+      }
     }
   };
 

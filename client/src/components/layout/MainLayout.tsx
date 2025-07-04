@@ -6,6 +6,8 @@ import { useUIState } from '@/hooks/use-ui-state';
 import { useAuth } from '@/hooks/use-auth';
 import { useOnboarding } from '@/hooks/use-onboarding';
 import { OnboardingOverlay } from '@/components/onboarding/OnboardingOverlay';
+import Diego from '@/components/diego-guide/diego';
+import { useDiegoGuide } from '@/hooks/use-diego-guide';
 import { 
   IconHome, 
   IconBarChart, 
@@ -28,6 +30,7 @@ export function MainLayout({ children }: MainLayoutProps) {
   const { isDarkMode, isMobile } = useUIState();
   const { user, logout } = useAuth();
   const { isOnboardingOpen, completeOnboarding } = useOnboarding();
+  const { isVisible: isDiegoVisible, currentStep: diegoStep } = useDiegoGuide();
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(!isMobile);
 
   // Define navigation items with tutorial data attributes
@@ -351,6 +354,14 @@ export function MainLayout({ children }: MainLayoutProps) {
         onComplete={completeOnboarding}
         userName={user?.username}
       />
+      
+      {/* Diego Tutorial Guide */}
+      {isDiegoVisible && (
+        <Diego
+          isNewUser={true}
+          currentStep={diegoStep}
+        />
+      )}
     </div>
   );
 }
