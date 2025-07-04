@@ -18,20 +18,20 @@ export function OnboardingProvider({ children }: OnboardingProviderProps) {
   const [shouldShowOnboarding, setShouldShowOnboarding] = useState(false);
 
   useEffect(() => {
-    // Check authentication status and user data to determine if onboarding is needed
+    // Check if user just registered and needs onboarding
     const checkOnboardingStatus = async () => {
       try {
         const response = await fetch('/api/user', { credentials: 'include' });
         if (response.ok) {
           const user = await response.json();
           
-          // Show onboarding if user doesn't have an event selected (using event_code field name)
-          const needsOnboarding = !user.event_code;
+          // Only show onboarding if user doesn't have an event selected AND this is a new registration
+          const needsOnboarding = !user.eventCode && !user.event_code && user.needsOnboarding;
           
           if (needsOnboarding) {
             setShouldShowOnboarding(true);
             setIsOnboardingOpen(true);
-            console.log('Onboarding should be visible now - user needs event selection');
+            console.log('Onboarding should be visible now - new user needs event selection');
           }
         }
       } catch (error) {

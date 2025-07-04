@@ -234,8 +234,9 @@ export function setupAuth(app: Express) {
 
       req.login(user, (err) => {
         if (err) return next(err);
-        // Mark as new user who needs onboarding
-        res.status(201).json({ ...user, needsOnboarding: true });
+        // Mark as new user who needs onboarding and clear the flag after first load
+        const userWithOnboarding = { ...user, needsOnboarding: true };
+        res.status(201).json(userWithOnboarding);
       });
     } catch (error) {
       next(error);
