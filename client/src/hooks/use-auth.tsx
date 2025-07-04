@@ -10,6 +10,8 @@ interface User {
   avatar?: string;
   firstName?: string;
   lastName?: string;
+  selectedEvent?: string;
+  selectedCluster?: string;
 }
 
 interface AuthContextType {
