@@ -607,6 +607,24 @@ CRITICAL REQUIREMENTS:
     }
   });
 
+  // Save selected event from onboarding
+  app.post("/api/user/event", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+
+    try {
+      const userId = req.user!.id;
+      const { selectedEvent, selectedCluster } = req.body;
+
+      const updated = await storage.updateUserSettings(userId, {
+        selectedEvent,
+        selectedCluster,
+      });
+      res.json(updated);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to save selected event" });
+    }
+  });
+
   // Update appearance settings
   app.post("/api/user/appearance", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);

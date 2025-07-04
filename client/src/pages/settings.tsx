@@ -45,7 +45,7 @@ export default function SettingsPage() {
   const { user } = useAuth();
   const { toast } = useToast();
   const { triggerAnimation } = useMicroInteractions();
-  const [activeTab, setActiveTab] = useState("profile");
+  const [activeTab, setActiveTab] = useState("account");
 
   // Appearance settings state
   const [appearance, setAppearance] = useState<AppearanceSettings>({
@@ -229,11 +229,95 @@ export default function SettingsPage() {
       />
 
       <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="mb-6">
-        <TabsList className="grid grid-cols-3 max-w-md mb-8 bg-background/40 backdrop-blur">
+        <TabsList className="grid grid-cols-4 max-w-xl mb-8 bg-background/40 backdrop-blur">
+          <TabsTrigger value="account" className="data-[state=active]:bg-primary/20">Account</TabsTrigger>
           <TabsTrigger value="profile" className="data-[state=active]:bg-primary/20">Profile</TabsTrigger>
           <TabsTrigger value="notifications" className="data-[state=active]:bg-primary/20">Notifications</TabsTrigger>
           <TabsTrigger value="appearance" className="data-[state=active]:bg-primary/20">Appearance</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="account">
+          <Card className="bg-background/40 backdrop-blur border-muted/50">
+            <CardHeader>
+              <CardTitle>Account Information</CardTitle>
+              <p className="text-sm text-muted-foreground">
+                View your account details and selected event information.
+              </p>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                {/* Account Overview */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <h3 className="text-lg font-medium text-foreground mb-3">Basic Information</h3>
+                    <div className="space-y-3">
+                      <div className="flex justify-between py-2 border-b border-muted/20">
+                        <span className="text-muted-foreground">Username</span>
+                        <span className="font-medium">{user?.username || 'Not set'}</span>
+                      </div>
+                      <div className="flex justify-between py-2 border-b border-muted/20">
+                        <span className="text-muted-foreground">Email</span>
+                        <span className="font-medium">{user?.email || 'Not set'}</span>
+                      </div>
+                      <div className="flex justify-between py-2 border-b border-muted/20">
+                        <span className="text-muted-foreground">Subscription</span>
+                        <span className="font-medium capitalize">{user?.subscriptionTier || 'Standard'}</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h3 className="text-lg font-medium text-foreground mb-3">DECA Event Selection</h3>
+                    <div className="space-y-3">
+                      <div className="flex justify-between py-2 border-b border-muted/20">
+                        <span className="text-muted-foreground">Selected Event</span>
+                        <span className="font-medium text-right max-w-[200px]">
+                          {user?.selectedEvent || 'No event selected'}
+                        </span>
+                      </div>
+                      <div className="flex justify-between py-2 border-b border-muted/20">
+                        <span className="text-muted-foreground">Career Cluster</span>
+                        <span className="font-medium text-right max-w-[200px]">
+                          {user?.selectedCluster || 'No cluster selected'}
+                        </span>
+                      </div>
+                      {(!user?.selectedEvent || !user?.selectedCluster) && (
+                        <div className="mt-4 p-3 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-700 rounded-md">
+                          <p className="text-sm text-orange-700 dark:text-orange-300">
+                            No DECA event selected. Complete the onboarding process to select your event.
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Account Statistics */}
+                <div className="mt-8">
+                  <h3 className="text-lg font-medium text-foreground mb-3">Activity Summary</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="text-center p-4 bg-primary/5 rounded-lg border border-primary/10">
+                      <div className="text-2xl font-bold text-primary">{user?.streak || 0}</div>
+                      <div className="text-sm text-muted-foreground">Day Streak</div>
+                    </div>
+                    <div className="text-center p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-700">
+                      <div className="text-2xl font-bold text-green-600">{user?.points || 0}</div>
+                      <div className="text-sm text-muted-foreground">Total Points</div>
+                    </div>
+                    <div className="text-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-700">
+                      <div className="text-2xl font-bold text-blue-600">{user?.roleplayCount || 0}</div>
+                      <div className="text-sm text-muted-foreground">Roleplays</div>
+                    </div>
+                    <div className="text-center p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-700">
+                      <div className="text-2xl font-bold text-purple-600">{user?.testCount || 0}</div>
+                      <div className="text-sm text-muted-foreground">Tests</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         <TabsContent value="profile">
           <Card className="bg-background/40 backdrop-blur border-muted/50">

@@ -51,7 +51,9 @@ export interface IStorage {
     instructionalArea?: string,
     uiTheme?: string,
     colorScheme?: string,
-    theme?: string
+    theme?: string,
+    selectedEvent?: string,
+    selectedCluster?: string
   }): Promise<User | undefined>;
   updateSubscription(id: number, tier: string): Promise<User | undefined>;
   
@@ -282,7 +284,9 @@ export class MemStorage implements IStorage {
     instructionalArea?: string,
     uiTheme?: string,
     colorScheme?: string,
-    theme?: string
+    theme?: string,
+    selectedEvent?: string,
+    selectedCluster?: string
   }): Promise<User | undefined> {
     const user = this.users.get(id);
     if (!user) return undefined;

@@ -29,6 +29,8 @@ export const users = pgTable("users", {
   writtenEventResetDate: timestamp("written_event_reset_date"),
   stripeCustomerId: text("stripe_customer_id"),
   stripeSubscriptionId: text("stripe_subscription_id"),
+  selectedEvent: text("selected_event"), // Full event name and abbrev
+  selectedCluster: text("selected_cluster"), // Career cluster name
 });
 
 export const insertUserSchema = createInsertSchema(users).pick({
@@ -42,6 +44,8 @@ export const insertUserSchema = createInsertSchema(users).pick({
   uiTheme: true,
   colorScheme: true,
   theme: true,
+  selectedEvent: true,
+  selectedCluster: true,
 });
 
 // Performance Indicators model
