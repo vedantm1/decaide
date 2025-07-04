@@ -44,67 +44,62 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   
-  // Simulate fetching user data on initial load
+  // Fetch user data from the backend
+  const { data: userData, isLoading: userLoading, refetch } = useQuery({
+    queryKey: ['/api/user'],
+    enabled: true,
+    retry: false,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+
   useEffect(() => {
-    const fetchUser = async () => {
-      setLoading(true);
-      
-      try {
-        // Simulate network request delay
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
-        // Check if user is logged in via localStorage (in a real app, this would be a proper token check)
-        const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-        
-        if (isLoggedIn) {
-          // Get stored username if available
-          const storedUsername = localStorage.getItem('username');
-          if (storedUsername) {
-            // Use the stored username instead of the mock one
-            setUser({
-              ...MOCK_USER,
-              username: storedUsername
-            });
-          } else {
-            setUser(MOCK_USER);
-          }
-        } else {
-          setUser(null);
-        }
-      } catch (error) {
-        console.error('Failed to fetch user:', error);
+    if (!userLoading) {
+      if (userData) {
+        setUser({
+          id: userData.id?.toString(),
+          username: userData.username,
+          email: userData.email || '',
+          subscriptionTier: userData.subscriptionTier || 'standard',
+          firstName: userData.firstName,
+          lastName: userData.lastName,
+        });
+      } else {
         setUser(null);
-      } finally {
-        setLoading(false);
       }
-    };
-    
-    fetchUser();
-  }, []);
+      setLoading(false);
+    }
+  }, [userData, userLoading]);
   
   // Login function
   const login = async (username: string, password: string) => {
     setLoading(true);
     
     try {
-      // Simulate network request delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+        credentials: 'include', // Important for session cookies
+      });
       
-      // In a real app, validate credentials with a backend service
-      if (username && password) {
-        // Set auth token and username in localStorage
-        localStorage.setItem('isLoggedIn', 'true');
-        localStorage.setItem('username', username);
-        // Create user data with the actual username entered by the user
-        const userData = {
-          ...MOCK_USER,
-          username: username,
-        };
-        setUser(userData);
-        return;
+      if (!response.ok) {
+        throw new Error('Invalid credentials');
       }
       
-      throw new Error('Invalid credentials');
+      const userData = await response.json();
+      setUser({
+        id: userData.id?.toString(),
+        username: userData.username,
+        email: userData.email || '',
+        subscriptionTier: userData.subscriptionTier || 'standard',
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+      });
+      
+      // Refetch user data to ensure consistency
+      refetch();
     } catch (error) {
       console.error('Login failed:', error);
       throw error;
@@ -118,13 +113,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setLoading(true);
     
     try {
-      // Simulate network request delay
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await fetch('/api/logout', {
+        method: 'POST',
+        credentials: 'include', // Important for session cookies
+      });
       
-      // Clear auth token and username from localStorage
-      localStorage.removeItem('isLoggedIn');
-      localStorage.removeItem('username');
       setUser(null);
+      refetch();
     } catch (error) {
       console.error('Logout failed:', error);
     } finally {
