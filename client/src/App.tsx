@@ -25,7 +25,6 @@ import { AuthProvider } from "@/hooks/use-auth";
 import { MicroInteractionsProvider } from "@/hooks/use-micro-interactions";
 import { UIStateProvider } from "@/hooks/use-ui-state";
 import { OnboardingProvider } from "@/hooks/use-onboarding";
-import { DiegoGuideProvider } from "@/hooks/use-diego-guide";
 import ThemeProvider from "@/lib/theme-provider";
 import { useEffect, useState } from "react";
 import { AnimatePresence } from "framer-motion";
@@ -76,17 +75,15 @@ function App() {
         <UIStateProvider>
           <ThemeProvider>
             <MicroInteractionsProvider>
-              <DiegoGuideProvider>
-                <OnboardingProvider>
-                  {/* Vanta background effect now handled via index.html */}
-                  <div className="app-container fade-in new-design">
-                    <AnimatePresence mode="wait">
-                      <Router />
-                    </AnimatePresence>
-                    <Toaster />
-                  </div>
-                </OnboardingProvider>
-              </DiegoGuideProvider>
+              <OnboardingProvider>
+                {/* Vanta background effect now handled via index.html */}
+                <div className="app-container fade-in new-design">
+                  <AnimatePresence mode="wait">
+                    <Router />
+                  </AnimatePresence>
+                  <Toaster />
+                </div>
+              </OnboardingProvider>
             </MicroInteractionsProvider>
           </ThemeProvider>
         </UIStateProvider>
