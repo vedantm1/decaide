@@ -245,6 +245,13 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
       const currentSelector = TUTORIAL_STEPS[tutorialStep].selector;
       const targetElement = document.querySelector(currentSelector);
       
+      // Apply blur to entire background
+      const mainContent = document.querySelector('main') || document.querySelector('#root > div');
+      if (mainContent) {
+        (mainContent as HTMLElement).style.filter = 'blur(3px)';
+        (mainContent as HTMLElement).style.transition = 'filter 0.3s ease-in-out';
+      }
+      
       // Clear all previous tutorial styling first
       document.querySelectorAll('*').forEach(el => {
         const element = el as HTMLElement;
@@ -259,12 +266,7 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
         }
       });
       
-      // Keep main content completely clear
-      const mainContent = document.querySelector('main');
-      if (mainContent) {
-        (mainContent as HTMLElement).style.filter = 'blur(3px)';
-        (mainContent as HTMLElement).style.transition = 'filter 0.3s ease-in-out';
-      }
+
       
       // Blur every node under <aside> except the target and its ancestors
       const aside = document.querySelector('aside');
@@ -288,61 +290,41 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
         (targetElement as HTMLElement).dataset.tutorialHighlighted = 'true';
         delete (targetElement as HTMLElement).dataset.tutorialBlurred;
 
-        // zero out Tailwind blur vars
-        targetElement.style.setProperty('--tw-blur', 'none', 'important');
-        targetElement.style.setProperty('--tw-backdrop-blur', 'none', 'important');
+        // Clear any existing styles and apply highlight
+        (targetElement as HTMLElement).style.filter = 'none';
+        (targetElement as HTMLElement).style.position = 'relative';
+        (targetElement as HTMLElement).style.zIndex = '60';
+        (targetElement as HTMLElement).style.transition = 'all 0.3s ease-in-out';
+        (targetElement as HTMLElement).style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.8), 0 0 40px rgba(59, 130, 246, 0.6), 0 0 60px rgba(59, 130, 246, 0.4)';
+        (targetElement as HTMLElement).style.borderRadius = '12px';
+        (targetElement as HTMLElement).style.background = 'rgba(255, 255, 255, 0.1)';
+        (targetElement as HTMLElement).style.backdropFilter = 'blur(0px)';
+        (targetElement as HTMLElement).dataset.tutorialHighlighted = 'true';
 
-        // override any backdrop‐filter as well
-        targetElement.style.setProperty('backdrop-filter', 'none', 'important');
-        targetElement.style.setProperty('-webkit-backdrop-filter', 'none', 'important');
 
-        // Force clear styling and apply unblur with high priority
-        (targetElement as HTMLElement).setAttribute('style', '');
-        (targetElement as HTMLElement).style.setProperty('filter', 'none', 'important');
-        (targetElement as HTMLElement).style.setProperty('backdrop-filter', 'none', 'important');
-        (targetElement as HTMLElement).style.setProperty('-webkit-backdrop-filter', 'none', 'important');
-        (targetElement as HTMLElement).style.setProperty('position', 'relative', 'important');
-        (targetElement as HTMLElement).style.setProperty('z-index', '9999', 'important');
-        (targetElement as HTMLElement).style.setProperty('border-radius', '8px', 'important');
-        (targetElement as HTMLElement).style.setProperty('box-shadow', '0 0 0 3px rgba(59, 130, 246, 0.5)', 'important');
-        (targetElement as HTMLElement).style.setProperty('background', 'rgba(59, 130, 246, 0.1)', 'important');
-        (targetElement as HTMLElement).style.setProperty('transition', 'all 0.3s ease-in-out', 'important');
 
-        // inject to kill any blur on ::before/::after if an ID exists
-        if (targetElement.id) {
-          const styleTag = document.createElement('style');
-          styleTag.innerHTML = `
-            #${targetElement.id}::before,
-            #${targetElement.id}::after {
-              filter: none !important;
-              backdrop-filter: none !important;
-              -webkit-backdrop-filter: none !important;
-            }
-          `;
-          document.head.appendChild(styleTag);
-        }
-        // Also clear blur from all parent elements up the tree
-        let parent = targetElement.parentElement;
-        while (parent && parent !== document.body) {
-          (parent as HTMLElement).style.setProperty('filter', 'none', 'important');
-           parent.style.setProperty('--tw-blur', 'none', 'important');
-          delete (parent as HTMLElement).dataset.tutorialBlurred;
-          parent = parent.parentElement;
-        }
-        
-        // Specifically handle sidebar container if target is inside it
-        const sidebar = targetElement.closest('aside');
-        if (sidebar) {
-          (sidebar as HTMLElement).style.setProperty('filter', 'none', 'important');
-          delete (sidebar as HTMLElement).dataset.tutorialBlurred;
-        }
+        // Make sure highlighted element is visible
+        setTimeout(() => {
+          targetElement.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center',
+            inline: 'center'
+          });
+        }, 100);
       }
       
+      // Clean up function
       return () => {
-        // Clean up all tutorial effects
+        // Remove main blur
+        const mainContent = document.querySelector('main') || document.querySelector('#root > div');
+        if (mainContent) {
+          (mainContent as HTMLElement).style.filter = '';
+          (mainContent as HTMLElement).style.transition = '';
+        }
+        
         document.querySelectorAll('*').forEach(el => {
           const element = el as HTMLElement;
-          if (element.dataset.tutorialBlurred || element.dataset.tutorialHighlighted) {
+          if (element.dataset.tutorialHighlighted || element.dataset.tutorialBlurred) {
             element.style.filter = '';
             element.style.transition = '';
             element.style.zIndex = '';
@@ -350,11 +332,19 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
             element.style.background = '';
             element.style.position = '';
             element.style.borderRadius = '';
+            element.style.backdropFilter = '';
             delete element.dataset.tutorialBlurred;
             delete element.dataset.tutorialHighlighted;
           }
         });
       };
+    } else {
+      // Remove blur when not in tutorial
+      const mainContent = document.querySelector('main') || document.querySelector('#root > div');
+      if (mainContent) {
+        (mainContent as HTMLElement).style.filter = '';
+        (mainContent as HTMLElement).style.transition = '';
+      }
     }
   }, [currentStep, tutorialStep]);
 
