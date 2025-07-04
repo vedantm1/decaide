@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { X, ArrowLeft, ArrowRight, Play, SkipForward, ChevronDown } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
 
 interface OnboardingOverlayProps {
   isOpen: boolean;
@@ -125,6 +126,7 @@ const TUTORIAL_STEPS = [
 ];
 
 export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: OnboardingOverlayProps) {
+  const { refreshUser } = useAuth();
   const [currentStep, setCurrentStep] = useState<'welcome' | 'tutorial' | 'event-selection'>('welcome');
   const [tutorialStep, setTutorialStep] = useState(0);
   const [selectedEvents, setSelectedEvents] = useState<{[cluster: string]: string}>({});
@@ -208,6 +210,9 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
       // Also save to localStorage for immediate use
       localStorage.setItem('selectedDecaEvent', selectedEvent);
       localStorage.setItem('selectedDecaCluster', selectedCluster);
+      
+      // Refresh user data to show updated event selection
+      refreshUser();
       
     } catch (error) {
       console.error("Error saving event:", error);
