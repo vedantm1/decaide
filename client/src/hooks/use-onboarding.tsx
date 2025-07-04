@@ -25,13 +25,13 @@ export function OnboardingProvider({ children }: OnboardingProviderProps) {
         if (response.ok) {
           const user = await response.json();
           
-          // Only show onboarding if user doesn't have an event selected AND this is a new registration
-          const needsOnboarding = !user.eventCode && !user.event_code && user.needsOnboarding;
+          // Show onboarding if user doesn't have an event selected
+          const needsOnboarding = !user.eventCode && !user.event_code;
           
           if (needsOnboarding) {
             setShouldShowOnboarding(true);
             setIsOnboardingOpen(true);
-            console.log('Onboarding should be visible now - new user needs event selection');
+            console.log('Onboarding should be visible now - user needs event selection');
           }
         }
       } catch (error) {
@@ -53,6 +53,13 @@ export function OnboardingProvider({ children }: OnboardingProviderProps) {
   const startOnboarding = () => {
     setIsOnboardingOpen(true);
     setShouldShowOnboarding(true);
+  };
+
+  // Debug function to manually trigger onboarding
+  window.showTutorial = () => {
+    setIsOnboardingOpen(true);
+    setShouldShowOnboarding(true);
+    console.log('Manual tutorial trigger activated');
   };
 
   const value = {
