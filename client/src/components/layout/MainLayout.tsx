@@ -27,7 +27,7 @@ export function MainLayout({ children }: MainLayoutProps) {
   const [location] = useLocation();
   const { isDarkMode, isMobile } = useUIState();
   const { user, logout } = useAuth();
-  const { isOnboardingOpen, completeOnboarding } = useOnboarding();
+  const { isOnboardingOpen, completeOnboarding, startOnboarding } = useOnboarding();
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(!isMobile);
 
   // Define navigation items with tutorial data attributes

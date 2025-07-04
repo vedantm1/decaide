@@ -1,83 +1,16 @@
-import { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { X, ArrowLeft, ArrowRight, Play, SkipForward, ChevronDown } from "lucide-react";
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { ChevronLeft, ChevronRight, Play, SkipForward } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { DECA_EVENTS } from '@shared/schema';
 
 interface OnboardingOverlayProps {
   isOpen: boolean;
   onComplete: () => void;
   userName?: string;
 }
-
-const DECA_CAREER_CLUSTERS = {
-  "Business Administration Core": [
-    { name: "Principles of Business Management and Administration", abbrev: "PBM" },
-    { name: "Principles of Entrepreneurship", abbrev: "PEN" },
-    { name: "Principles of Finance", abbrev: "PFN" },
-    { name: "Principles of Hospitality and Tourism", abbrev: "PHT" },
-    { name: "Principles of Marketing", abbrev: "PMK" }
-  ],
-  "Business Management & Administration": [
-    { name: "Business Law and Ethics Team Decision Making", abbrev: "BLTDM" },
-    { name: "Human Resources Management Series", abbrev: "HRM" },
-    { name: "Business Services Operations Research", abbrev: "BOR" },
-    { name: "Business Solutions Project", abbrev: "PMBS" },
-    { name: "Career Development Project", abbrev: "PMCD" },
-    { name: "Community Awareness Project", abbrev: "PMCA" },
-    { name: "Community Giving Project", abbrev: "PMCG" }
-  ],
-  "Entrepreneurship": [
-    { name: "Entrepreneurship Team Decision Making", abbrev: "ETDM" },
-    { name: "Entrepreneurship Series", abbrev: "ENT" },
-    { name: "Business Growth Plan", abbrev: "EBG" },
-    { name: "Franchise Business Plan", abbrev: "EFB" },
-    { name: "Independent Business Plan", abbrev: "EIB" },
-    { name: "Innovation Plan", abbrev: "EIP" },
-    { name: "International Business Plan", abbrev: "IBP" },
-    { name: "Start-Up Business Plan", abbrev: "ESB" }
-  ],
-  "Finance": [
-    { name: "Financial Services Team Decision Making", abbrev: "FTDM" },
-    { name: "Accounting Applications Series", abbrev: "ACT" },
-    { name: "Business Finance Series", abbrev: "BFS" },
-    { name: "Finance Operations Research", abbrev: "FOR" },
-    { name: "Financial Consulting", abbrev: "FCE" },
-    { name: "Financial Literacy Project", abbrev: "PMFL" }
-  ],
-  "Hospitality & Tourism": [
-    { name: "Hospitality Services Team Decision Making", abbrev: "HTDM" },
-    { name: "Travel and Tourism Team Decision Making", abbrev: "TTDM" },
-    { name: "Hotel and Lodging Management Series", abbrev: "HLM" },
-    { name: "Quick Serve Restaurant Management Series", abbrev: "QSRM" },
-    { name: "Restaurant and Food Service Management Series", abbrev: "RFSM" },
-    { name: "Hospitality and Tourism Operations Research", abbrev: "HTOR" },
-    { name: "Hospitality and Tourism Professional Selling", abbrev: "HTPS" }
-  ],
-  "Marketing": [
-    { name: "Buying and Merchandising Team Decision Making", abbrev: "BTDM" },
-    { name: "Marketing Management Team Decision Making", abbrev: "MTDM" },
-    { name: "Sports and Entertainment Marketing Team Decision Making", abbrev: "STDM" },
-    { name: "Apparel and Accessories Marketing Series", abbrev: "AAM" },
-    { name: "Automotive Services Marketing Series", abbrev: "ASM" },
-    { name: "Business Services Marketing Series", abbrev: "BSM" },
-    { name: "Food Marketing Series", abbrev: "FMS" },
-    { name: "Buying and Merchandising Operations Research", abbrev: "BMOR" },
-    { name: "Sports and Entertainment Marketing Operations Research", abbrev: "SEOR" },
-    { name: "Marketing Communications Series", abbrev: "MCS" },
-    { name: "Retail Merchandising Series", abbrev: "RMS" },
-    { name: "Sports and Entertainment Marketing Series", abbrev: "SEM" },
-    { name: "Integrated Marketing Campaign-Event", abbrev: "IMCE" },
-    { name: "Integrated Marketing Campaign-Product", abbrev: "IMCP" },
-    { name: "Integrated Marketing Campaign-Service", abbrev: "IMCS" },
-    { name: "Sales Project", abbrev: "PMSP" },
-    { name: "Professional Selling", abbrev: "PSE" }
-  ],
-  "Personal Financial Literacy": [
-    { name: "Personal Financial Literacy", abbrev: "PFL" }
-  ]
-};
 
 const TUTORIAL_STEPS = [
   {
@@ -172,72 +105,69 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
     setSelectedEvents(newSelections);
   };
 
-  const handleDone = async () => {
-    const selectedCount = Object.keys(selectedEvents).length;
-    
-    if (selectedCount === 0) {
-      setErrorMessage("Please select an event to continue");
+  const handleFinishOnboarding = async () => {
+    if (Object.keys(selectedEvents).length === 0) {
+      setErrorMessage("Please select at least one event to continue.");
       return;
     }
+
+    const selectedEvent = Object.values(selectedEvents)[0];
+    const eventDetails = DECA_EVENTS.find((event: any) => event.code === selectedEvent);
     
-    if (selectedCount > 1) {
-      setErrorMessage("You can only choose one event");
+    if (!eventDetails) {
+      setErrorMessage("Selected event not found. Please try again.");
       return;
     }
-    
-    const selectedEventFull = Object.values(selectedEvents)[0];
-    // Extract event code from the selection (format: "Event Name (CODE)")
-    const eventCodeMatch = selectedEventFull.match(/\(([^)]+)\)$/);
-    const eventCode = eventCodeMatch ? eventCodeMatch[1] : selectedEventFull;
-    
-    localStorage.setItem('selectedDecaEvent', eventCode);
-    
+
     try {
-      // Save event selection to database
-      await fetch('/api/user/event', {
-        method: 'PATCH',
+      const response = await fetch('/api/user/update-event', {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         credentials: 'include',
-        body: JSON.stringify({ eventCode }),
+        body: JSON.stringify({
+          eventCode: eventDetails.code,
+          eventType: eventDetails.type,
+          eventFormat: 'roleplay',
+          instructionalArea: eventDetails.cluster,
+          cluster: eventDetails.cluster,
+          needsOnboarding: false
+        }),
       });
-    } catch (error) {
-      console.error('Failed to save event selection:', error);
-    }
-    
-    // Immediately remove background blur and sidebar blur before closing overlay
-    const overlayElement = document.querySelector('.onboarding-overlay');
-    if (overlayElement) {
-      (overlayElement as HTMLElement).style.backdropFilter = 'none';
-      (overlayElement as HTMLElement).style.backgroundColor = 'transparent';
-    }
-    
-    // Specifically clean up sidebar elements
-    const sidebarElements = document.querySelectorAll('.translucent-sidebar, [data-tutorial], aside, nav');
-    sidebarElements.forEach(el => {
-      const element = el as HTMLElement;
-      element.style.filter = '';
-      element.style.backdropFilter = '';
-      element.style.transform = '';
-      element.style.opacity = '';
-      if (element.dataset.tutorialHighlighted || element.dataset.tutorialBlurred) {
-        delete element.dataset.tutorialHighlighted;
-        delete element.dataset.tutorialBlurred;
+
+      if (response.ok) {
+        // Clean up all tutorial effects
+        document.querySelectorAll('*').forEach(el => {
+          const element = el as HTMLElement;
+          if (element.dataset.tutorialHighlighted || element.dataset.tutorialBlurred) {
+            element.style.filter = '';
+            element.style.transition = '';
+            element.style.zIndex = '';
+            element.style.boxShadow = '';
+            element.style.background = '';
+            element.style.position = '';
+            element.style.borderRadius = '';
+            delete element.dataset.tutorialHighlighted;
+            delete element.dataset.tutorialBlurred;
+          }
+        });
+
+        // Clean up main content blur
+        const mainContent = document.querySelector('main') || document.querySelector('#root > div');
+        if (mainContent) {
+          (mainContent as HTMLElement).style.filter = '';
+          (mainContent as HTMLElement).style.transition = '';
+        }
+
+        onComplete();
+      } else {
+        setErrorMessage("Failed to save event selection. Please try again.");
       }
-    });
-    
-    onComplete();
+    } catch (error) {
+      setErrorMessage("An error occurred. Please try again.");
+    }
   };
-
-  const handleQuizStart = () => {
-    // TODO: Implement quiz logic
-    console.log("Quiz logic to be implemented");
-  };
-
-  // Get selected event count and check if done button should be active
-  const selectedCount = Object.keys(selectedEvents).length;
-  const isDoneActive = selectedCount === 1;
 
   // Create blur overlay effect for tutorial
   useEffect(() => {
@@ -261,36 +191,31 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
           delete element.dataset.tutorialBlurred;
         }
         if (element.dataset.tutorialHighlighted) {
-          element.setAttribute('style', '');
+          element.style.filter = '';
+          element.style.transition = '';
+          element.style.zIndex = '';
+          element.style.boxShadow = '';
+          element.style.background = '';
+          element.style.position = '';
+          element.style.borderRadius = '';
           delete element.dataset.tutorialHighlighted;
         }
       });
       
-
-      
-      // Blur every node under <aside> except the target and its ancestors
+      // Blur sidebar elements except target
       const aside = document.querySelector('aside');
       if (aside) {
-        // only grab the actual sidebar entries marked for tutorial
         const navItems = aside.querySelectorAll<HTMLElement>('[data-tutorial]');
         navItems.forEach(item => {
-          // skip the exact element we’re highlighting
           if (item === targetElement) return;
-
           item.style.filter = 'blur(2px)';
           item.style.transition = 'filter 0.3s ease-in-out';
+          item.dataset.tutorialBlurred = 'true';
         });
       }
 
-
-      
-      // Now unblur and highlight ONLY the target element
+      // Highlight target element
       if (targetElement) {
-        // Clear any blur on target element first
-        (targetElement as HTMLElement).dataset.tutorialHighlighted = 'true';
-        delete (targetElement as HTMLElement).dataset.tutorialBlurred;
-
-        // Clear any existing styles and apply highlight
         (targetElement as HTMLElement).style.filter = 'none';
         (targetElement as HTMLElement).style.position = 'relative';
         (targetElement as HTMLElement).style.zIndex = '60';
@@ -298,12 +223,9 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
         (targetElement as HTMLElement).style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.8), 0 0 40px rgba(59, 130, 246, 0.6), 0 0 60px rgba(59, 130, 246, 0.4)';
         (targetElement as HTMLElement).style.borderRadius = '12px';
         (targetElement as HTMLElement).style.background = 'rgba(255, 255, 255, 0.1)';
-        (targetElement as HTMLElement).style.backdropFilter = 'blur(0px)';
         (targetElement as HTMLElement).dataset.tutorialHighlighted = 'true';
 
-
-
-        // Make sure highlighted element is visible
+        // Scroll to highlighted element
         setTimeout(() => {
           targetElement.scrollIntoView({ 
             behavior: 'smooth', 
@@ -315,7 +237,6 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
       
       // Clean up function
       return () => {
-        // Remove main blur
         const mainContent = document.querySelector('main') || document.querySelector('#root > div');
         if (mainContent) {
           (mainContent as HTMLElement).style.filter = '';
@@ -332,7 +253,6 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
             element.style.background = '';
             element.style.position = '';
             element.style.borderRadius = '';
-            element.style.backdropFilter = '';
             delete element.dataset.tutorialBlurred;
             delete element.dataset.tutorialHighlighted;
           }
@@ -367,21 +287,30 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
         }
       });
       
-      // Also clean up any remaining blur effects on body, main elements, and sidebar
-      document.body.style.filter = '';
-      const mainElements = document.querySelectorAll('main, .main-content, #root > div, nav, aside, .sidebar, header, .translucent-sidebar, [data-tutorial]');
-      mainElements.forEach(el => {
-        (el as HTMLElement).style.filter = '';
-        (el as HTMLElement).style.backdropFilter = '';
-        (el as HTMLElement).style.transform = '';
-        (el as HTMLElement).style.opacity = '';
-      });
+      // Clean up main content blur
+      const mainContent = document.querySelector('main') || document.querySelector('#root > div');
+      if (mainContent) {
+        (mainContent as HTMLElement).style.filter = '';
+        (mainContent as HTMLElement).style.transition = '';
+      }
     }
   }, [isOpen]);
 
   console.log('OnboardingOverlay - isOpen:', isOpen, 'currentStep:', currentStep);
 
   if (!isOpen) return null;
+
+  // Group events by cluster for better organization
+  const eventsByCluster = DECA_EVENTS.reduce((acc: any, event: any) => {
+    if (!acc[event.cluster]) {
+      acc[event.cluster] = [];
+    }
+    acc[event.cluster].push(event);
+    return acc;
+  }, {} as {[cluster: string]: typeof DECA_EVENTS});
+
+  const selectedCount = Object.keys(selectedEvents).length;
+  const isDoneActive = selectedCount === 1;
 
   return (
     <AnimatePresence>
@@ -403,10 +332,13 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
             <Card className="text-center">
               <CardHeader className="pb-4">
                 <CardTitle className="text-2xl font-bold">
-                  Welcome to DecA(I)de!
+                  Welcome to DecA(I)de, {userName}!
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
+                <p className="text-muted-foreground">
+                  Let's get you started with a quick tour of the platform.
+                </p>
                 <div className="flex gap-3">
                   <Button 
                     onClick={handleStartTutorial}
@@ -468,8 +400,8 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
                     size="sm"
                     className="gap-1"
                   >
-                    <ArrowLeft className="h-3 w-3" />
-                    Back
+                    <ChevronLeft className="h-4 w-4" />
+                    Previous
                   </Button>
                   
                   <Button
@@ -478,16 +410,9 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
                     className="gap-1"
                   >
                     {tutorialStep === TUTORIAL_STEPS.length - 1 ? 'Finish' : 'Next'}
-                    <ArrowRight className="h-3 w-3" />
+                    <ChevronRight className="h-4 w-4" />
                   </Button>
                 </div>
-                
-                <button
-                  onClick={handleSkipTutorial}
-                  className="text-xs text-muted-foreground hover:text-foreground transition-colors w-full text-center"
-                >
-                  Skip Tutorial
-                </button>
               </CardContent>
             </Card>
           </motion.div>
@@ -498,110 +423,64 @@ export function OnboardingOverlay({ isOpen, onComplete, userName = "User" }: Onb
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
-            className="max-w-4xl w-full"
+            className="max-w-4xl w-full max-h-[80vh] overflow-y-auto"
           >
-            <Card className="backdrop-blur-md bg-white/95 shadow-2xl border-0">
-              <CardHeader className="text-center pb-6">
-                <motion.div
-                  initial={{ y: -20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.2 }}
-                >
-                  <CardTitle className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                    Welcome! What's your DECA event?
-                  </CardTitle>
-                  <p className="text-muted-foreground mt-2">Choose your career cluster and specific event below</p>
-                </motion.div>
-              </CardHeader>
-              <CardContent className="space-y-8">
-                <motion.div 
-                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
-                  initial={{ y: 20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.3 }}
-                >
-                  {Object.entries(DECA_CAREER_CLUSTERS).map(([cluster, events], index) => (
-                    <motion.div
-                      key={cluster}
-                      initial={{ y: 20, opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      transition={{ delay: 0.1 * index }}
-                      className="space-y-2"
-                    >
-                      <label className="text-sm font-medium text-foreground/80">{cluster}</label>
-                      <Select 
-                        value={selectedEvents[cluster] || ""} 
-                        onValueChange={(value) => handleEventSelect(cluster, value)}
-                      >
-                        <SelectTrigger className="w-full bg-background/80 border-muted hover:border-primary/50 transition-colors">
-                          <SelectValue placeholder="Select an event..." />
-                        </SelectTrigger>
-                        <SelectContent className="max-h-60">
-                          {events.map((event) => (
-                            <SelectItem 
-                              key={event.abbrev} 
-                              value={`${event.name} (${event.abbrev})`}
-                              className="py-2"
-                            >
-                              <div className="flex flex-col">
-                                <span className="font-medium">{event.name}</span>
-                                <span className="text-xs text-muted-foreground">{event.abbrev}</span>
-                              </div>
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </motion.div>
-                  ))}
-                </motion.div>
-                
-                <motion.div 
-                  className="text-center space-y-4"
-                  initial={{ y: 20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.5 }}
-                >
-                  <Button
-                    onClick={handleQuizStart}
-                    variant="secondary"
-                    className="gap-2 hover:scale-105 transition-transform"
-                  >
-                    Not sure?
-                  </Button>
-                  <p className="text-xs text-muted-foreground">
-                    Take our 2-minute quiz to find your perfect event.
-                  </p>
-                </motion.div>
-
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-xl">Select Your DECA Event</CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Choose the event you want to focus on. You can change this later in settings.
+                </p>
                 {errorMessage && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="text-center"
-                  >
-                    <p className="text-red-500 text-sm font-medium">{errorMessage}</p>
-                  </motion.div>
+                  <p className="text-sm text-red-500">{errorMessage}</p>
                 )}
-
-                <motion.div 
-                  className="flex justify-center pt-4"
-                  initial={{ y: 20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.6 }}
-                >
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {Object.entries(eventsByCluster).map(([cluster, events]) => (
+                  <div key={cluster} className="space-y-3">
+                    <h3 className="text-lg font-semibold text-primary">{cluster}</h3>
+                    <div className="grid gap-2">
+                      {events.map((event: any) => (
+                        <div
+                          key={event.code}
+                          className={`p-3 rounded-lg border cursor-pointer transition-all ${
+                            selectedEvents[cluster] === event.code
+                              ? 'border-primary bg-primary/5 shadow-sm'
+                              : 'border-border hover:border-muted-foreground hover:bg-muted/50'
+                          }`}
+                          onClick={() => handleEventSelect(cluster, event.code)}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2">
+                                <Badge variant="outline" className="text-xs">
+                                  {event.code}
+                                </Badge>
+                                <span className="font-medium">{event.name}</span>
+                              </div>
+                              <p className="text-sm text-muted-foreground mt-1">
+                                {event.type}
+                              </p>
+                            </div>
+                            {selectedEvents[cluster] === event.code && (
+                              <div className="h-4 w-4 rounded-full bg-primary"></div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+                
+                <div className="flex justify-end pt-4">
                   <Button
-                    onClick={handleDone}
-                    className={`px-8 py-3 font-semibold transition-all duration-300 ${
-                      isDoneActive 
-                        ? 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transform hover:scale-105' 
-                        : 'bg-muted/50 text-muted-foreground cursor-not-allowed hover:bg-muted/50'
-                    }`}
+                    onClick={handleFinishOnboarding}
                     disabled={!isDoneActive}
+                    className="px-8"
                   >
-                    Done
+                    Complete Setup
                   </Button>
-                </motion.div>
+                </div>
               </CardContent>
             </Card>
           </motion.div>
