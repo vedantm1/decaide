@@ -20,6 +20,7 @@ const roleplaySchema = z.object({
   instructionalArea: z.string().min(1, "Please select an instructional area"),
   performanceIndicators: z.array(z.string()).min(1, "Select at least one performance indicator"),
   competitionLevel: z.string().min(1, "Please select a competition level"),
+  businessType: z.string().optional(),
 });
 
 type RoleplayFormValues = z.infer<typeof roleplaySchema>;
@@ -50,6 +51,7 @@ export default function RoleplayPage() {
       instructionalArea: selectedCategory,
       performanceIndicators: [],
       competitionLevel: "District",
+      businessType: "",
     },
   });
   
@@ -121,19 +123,19 @@ export default function RoleplayPage() {
       />
       
       {!generatedRoleplay ? (
-        <Card className="bg-background/60 backdrop-blur-sm border-muted">
+        <Card className="bg-card/80 backdrop-blur-sm">
           <CardHeader>
             <CardTitle>Generate a New Roleplay</CardTitle>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div>
-                <Label htmlFor="instructionalArea" className="text-foreground/80">Instructional Area</Label>
+                <Label htmlFor="instructionalArea">Instructional Area</Label>
                 <Select 
                   defaultValue={selectedCategory} 
                   onValueChange={handleCategoryChange}
                 >
-                  <SelectTrigger className="w-full bg-background/80 mt-2">
+                  <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select instructional area" />
                   </SelectTrigger>
                   <SelectContent>
@@ -148,40 +150,38 @@ export default function RoleplayPage() {
               </div>
               
               <div>
-                <Label className="text-foreground/80">Performance Indicators (Select 3-5)</Label>
+                <Label>Performance Indicators (Select 3-5)</Label>
                 {pisLoading ? (
                   <div className="py-4 flex justify-center">
                     <div className="animate-spin w-6 h-6 border-2 border-primary border-t-transparent rounded-full"></div>
                   </div>
                 ) : (
-                  <div className="bg-background/80 border rounded-md p-3 mt-2 max-h-48 overflow-y-auto">
-                    <div className="grid grid-cols-1 gap-2">
-                      {performanceIndicators?.map((pi: any) => (
-                        <div key={pi.id} className="flex items-center">
-                          <Checkbox 
-                            id={`pi-${pi.id}`} 
-                            value={pi.indicator}
-                            onCheckedChange={(checked) => {
-                              const current = watch("performanceIndicators");
-                              if (checked) {
-                                setValue("performanceIndicators", [...current, pi.indicator]);
-                              } else {
-                                setValue(
-                                  "performanceIndicators", 
-                                  current.filter((item) => item !== pi.indicator)
-                                );
-                              }
-                            }}
-                          />
-                          <label 
-                            htmlFor={`pi-${pi.id}`} 
-                            className="ml-2 text-sm text-foreground/80"
-                          >
-                            {pi.indicator}
-                          </label>
-                        </div>
-                      ))}
-                    </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
+                    {performanceIndicators?.map((pi: any) => (
+                      <div key={pi.id} className="flex items-center">
+                        <Checkbox 
+                          id={`pi-${pi.id}`} 
+                          value={pi.indicator}
+                          onCheckedChange={(checked) => {
+                            const current = watch("performanceIndicators");
+                            if (checked) {
+                              setValue("performanceIndicators", [...current, pi.indicator]);
+                            } else {
+                              setValue(
+                                "performanceIndicators", 
+                                current.filter((item) => item !== pi.indicator)
+                              );
+                            }
+                          }}
+                        />
+                        <label 
+                          htmlFor={`pi-${pi.id}`} 
+                          className="ml-2 text-sm text-foreground/80"
+                        >
+                          {pi.indicator}
+                        </label>
+                      </div>
+                    ))}
                   </div>
                 )}
                 {errors.performanceIndicators && (
@@ -190,12 +190,12 @@ export default function RoleplayPage() {
               </div>
               
               <div>
-                <Label className="text-foreground/80">Competition Level</Label>
+                <Label>Competition Level</Label>
                 <Select 
                   value={competitionLevel} 
                   onValueChange={(value) => setValue("competitionLevel", value)}
                 >
-                  <SelectTrigger className="w-full bg-background/80 mt-2">
+                  <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select competition level" />
                   </SelectTrigger>
                   <SelectContent>
@@ -207,6 +207,15 @@ export default function RoleplayPage() {
                 {errors.competitionLevel && (
                   <p className="text-destructive text-sm mt-1">{errors.competitionLevel.message}</p>
                 )}
+              </div>
+              
+              <div>
+                <Label htmlFor="businessType">Business Type (Optional)</Label>
+                <Input 
+                  id="businessType"
+                  placeholder="e.g., Retail store, Hotel, Financial firm"
+                  {...register("businessType")}
+                />
               </div>
               
               <Button 

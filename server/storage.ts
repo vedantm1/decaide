@@ -42,7 +42,6 @@ export interface IStorage {
   getUserByEmail(email: string): Promise<User | undefined>;
   getUserByGoogleId(googleId: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
-  updateUser(id: number, updates: Partial<User>): Promise<User | undefined>;
   linkGoogleAccount(userId: number, googleId: string): Promise<User | undefined>;
   updateLastLogin(id: number, date: Date): Promise<User | undefined>;
   updateUserSettings(id: number, settings: { 
@@ -260,19 +259,6 @@ export class MemStorage implements IStorage {
   private async createDefaultPIs(userId: number) {
     // Not showing implementation details as they would be long...
     // This would create default performance indicators for a new user
-  }
-
-  async updateUser(id: number, updates: Partial<User>): Promise<User | undefined> {
-    const user = this.users.get(id);
-    if (!user) return undefined;
-    
-    const updatedUser = {
-      ...user,
-      ...updates
-    };
-    
-    this.users.set(id, updatedUser);
-    return updatedUser;
   }
 
   async updateLastLogin(id: number, date: Date): Promise<User | undefined> {
@@ -1400,34 +1386,6 @@ export class DatabaseStorage implements IStorage {
       };
       
       return user;
-    }
-  }
-
-  async updateUser(id: number, updates: Partial<User>): Promise<User | undefined> {
-    try {
-      // Convert camelCase to snake_case for database
-      const dbUpdates: any = {};
-      if (updates.eventCode !== undefined) dbUpdates.event_code = updates.eventCode;
-      if (updates.eventFormat !== undefined) dbUpdates.event_format = updates.eventFormat;
-      if (updates.eventType !== undefined) dbUpdates.event_type = updates.eventType;
-      if (updates.instructionalArea !== undefined) dbUpdates.instructional_area = updates.instructionalArea;
-      if (updates.uiTheme !== undefined) dbUpdates.ui_theme = updates.uiTheme;
-      if (updates.colorScheme !== undefined) dbUpdates.color_scheme = updates.colorScheme;
-      if (updates.theme !== undefined) dbUpdates.theme = updates.theme;
-      if (updates.subscriptionTier !== undefined) dbUpdates.subscription_tier = updates.subscriptionTier;
-      if (updates.points !== undefined) dbUpdates.points = updates.points;
-      if (updates.streak !== undefined) dbUpdates.streak = updates.streak;
-
-      const [user] = await db
-        .update(users)
-        .set(dbUpdates)
-        .where(eq(users.id, id))
-        .returning();
-      
-      return user;
-    } catch (error) {
-      console.error("Error in updateUser:", error);
-      return undefined;
     }
   }
 

@@ -48,7 +48,8 @@ router.post('/generate-roleplay', async (req: Request, res: Response) => {
     const { 
       instructionalArea, 
       performanceIndicators, 
-      competitionLevel
+      competitionLevel, 
+      businessType 
     } = req.body;
     
     if (!instructionalArea || !performanceIndicators || !competitionLevel) {
@@ -69,7 +70,8 @@ router.post('/generate-roleplay', async (req: Request, res: Response) => {
     const roleplay = await generateRoleplay({
       instructionalArea,
       performanceIndicators: Array.isArray(performanceIndicators) ? performanceIndicators : [performanceIndicators],
-      competitionLevel
+      competitionLevel,
+      businessType
     });
     
     // Record usage

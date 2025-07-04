@@ -118,48 +118,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get current user data
-  app.get("/api/user", async (req, res) => {
-    if (!req.isAuthenticated()) {
-      return res.status(401).json({ error: "Not authenticated" });
-    }
-    
-    try {
-      const user = await storage.getUser(req.user!.id);
-      if (!user) {
-        return res.status(404).json({ error: "User not found" });
-      }
-      
-      // Don't send password in response
-      const { password, ...userWithoutPassword } = user;
-      res.json(userWithoutPassword);
-    } catch (error) {
-      console.error("Error fetching user:", error);
-      res.status(500).json({ error: "Failed to fetch user data" });
-    }
-  });
-
-  // Update user event selection
-  app.patch("/api/user/event", async (req, res) => {
-    if (!req.isAuthenticated()) {
-      return res.status(401).json({ error: "Authentication required" });
-    }
-    
-    try {
-      const { eventCode } = req.body;
-      
-      if (!eventCode) {
-        return res.status(400).json({ error: "Event code is required" });
-      }
-      
-      await storage.updateUser(req.user!.id, { eventCode });
-      res.json({ success: true });
-    } catch (error: any) {
-      console.error("Error updating user event:", error);
-      res.status(500).json({ error: "Failed to update event selection" });
-    }
-  });
-
   // Get learning items (in-progress activities)
   app.get("/api/user/learning", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);

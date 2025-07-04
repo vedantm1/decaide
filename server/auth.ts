@@ -229,14 +229,11 @@ export function setupAuth(app: Express) {
       const user = await storage.createUser({
         ...req.body,
         password: await hashPassword(req.body.password),
-        eventCode: null, // New users start without an event selected
       });
 
       req.login(user, (err) => {
         if (err) return next(err);
-        // Mark as new user who needs onboarding and clear the flag after first load
-        const userWithOnboarding = { ...user, needsOnboarding: true };
-        res.status(201).json(userWithOnboarding);
+        res.status(201).json(user);
       });
     } catch (error) {
       next(error);
