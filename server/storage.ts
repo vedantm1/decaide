@@ -75,6 +75,7 @@ export interface IStorage {
   
   // Practice sessions methods
   recordPracticeSession(session: InsertSession): Promise<PracticeSession>;
+  getUserPracticeSessions(userId: number, timeRange?: string): Promise<PracticeSession[]>;
   
   // Stats and activities
   getUserStats(userId: number): Promise<any>;
@@ -406,6 +407,41 @@ export class MemStorage implements IStorage {
     
     this.practiceSessions.set(id, session);
     return session;
+  }
+
+  async getUserPracticeSessions(userId: number, timeRange?: string): Promise<PracticeSession[]> {
+    const sessions: PracticeSession[] = [];
+    const now = new Date();
+    
+    // Calculate date range based on timeRange parameter
+    let startDate: Date;
+    switch(timeRange) {
+      case 'day':
+        startDate = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+        break;
+      case 'week':
+        startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        break;
+      case 'month':
+        startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+        break;
+      case 'year':
+        startDate = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+        break;
+      default:
+        startDate = new Date(0); // Get all sessions if no timeRange specified
+    }
+    
+    for (const session of this.practiceSessions.values()) {
+      if (session.userId === userId && session.completedAt >= startDate) {
+        sessions.push(session);
+      }
+    }
+    
+    // Sort by date, most recent first
+    sessions.sort((a, b) => b.completedAt.getTime() - a.completedAt.getTime());
+    
+    return sessions;
   }
 
   async getUserStats(userId: number): Promise<any> {
@@ -1605,6 +1641,41 @@ export class DatabaseStorage implements IStorage {
       .returning();
     
     return session;
+  }
+
+  async getUserPracticeSessions(userId: number, timeRange?: string): Promise<PracticeSession[]> {
+    const now = new Date();
+    let whereConditions = [eq(practiceSessions.userId, userId)];
+    
+    // Add time range filter if specified
+    if (timeRange) {
+      let startDate: Date;
+      switch(timeRange) {
+        case 'day':
+          startDate = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+          break;
+        case 'week':
+          startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+          break;
+        case 'month':
+          startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+          break;
+        case 'year':
+          startDate = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+          break;
+        default:
+          startDate = new Date(0);
+      }
+      whereConditions.push(sql`${practiceSessions.completedAt} >= ${startDate}`);
+    }
+    
+    const sessions = await db
+      .select()
+      .from(practiceSessions)
+      .where(and(...whereConditions))
+      .orderBy(desc(practiceSessions.completedAt));
+    
+    return sessions;
   }
 
   async getUserStats(userId: number): Promise<any> {

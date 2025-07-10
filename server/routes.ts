@@ -149,6 +149,393 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get all achievements
+  app.get("/api/achievements", async (req, res) => {
+    try {
+      const achievements = await storage.getAllAchievements();
+      res.json(achievements);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to retrieve achievements" });
+    }
+  });
+
+  // Get user achievements
+  app.get("/api/user/achievements", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+
+    try {
+      const userId = req.user!.id;
+      const userAchievements = await storage.getUserAchievements(userId);
+      res.json(userAchievements);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to retrieve user achievements" });
+    }
+  });
+
+  // Check and award new achievements
+  app.post("/api/user/achievements/check", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+
+    try {
+      const userId = req.user!.id;
+      const newAchievements = await storage.checkAndAwardAchievements(userId);
+      res.json(newAchievements);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to check achievements" });
+    }
+  });
+
+  // Analytics endpoints
+  app.get("/api/analytics", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+
+    try {
+      const userId = req.user!.id;
+      const { timeRange = 'week', selectedEvent = 'all' } = req.query;
+      
+      // Get user stats
+      const stats = await storage.getUserStats(userId);
+      
+      // Get practice sessions for analytics
+      const sessions = await storage.getUserPracticeSessions(userId, timeRange as string);
+      
+      // Calculate analytics data
+      const totalActivities = sessions.length;
+      const scores = sessions.filter(s => s.score).map(s => s.score!);
+      const averageScore = scores.length > 0 
+        ? scores.reduce((a, b) => a + b, 0) / scores.length 
+        : 0;
+      
+      // Calculate completion rate based on started vs completed activities
+      const completedActivities = sessions.filter(s => s.score && s.score >= 70).length;
+      const completionRate = totalActivities > 0 
+        ? (completedActivities / totalActivities) * 100 
+        : 0;
+      
+      // Mock weekly growth for now (would calculate from historical data)
+      const weeklyGrowth = 12.5;
+      
+      res.json({
+        totalActivities,
+        averageScore: Math.round(averageScore * 10) / 10,
+        completionRate: Math.round(completionRate),
+        weeklyGrowth,
+        sessions,
+        ...stats
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to retrieve analytics data" });
+    }
+  });
+
+  // Enhanced roleplay generation
+  app.post("/api/roleplay/generate", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+
+    try {
+      const userId = req.user!.id;
+      const {
+        difficulty,
+        scenarioType,
+        duration,
+        includeObjections,
+        realTimeMode,
+        focusArea,
+        customInstructions
+      } = req.body;
+      
+      // Check roleplay allowance
+      const allowed = await storage.checkRoleplayAllowance(userId);
+      if (!allowed) {
+        return res.status(403).json({ 
+          error: "Monthly roleplay limit reached. Upgrade to generate more scenarios." 
+        });
+      }
+      
+      // Generate unique ID for scenario
+      const scenarioId = `scenario_${Date.now()}`;
+      
+      // Mock scenario generation (would use Azure OpenAI in production)
+      const scenario = {
+        id: scenarioId,
+        title: `${difficulty.charAt(0).toUpperCase() + difficulty.slice(1)} ${scenarioType.charAt(0).toUpperCase() + scenarioType.slice(1)} Interaction`,
+        description: `A ${duration}-minute roleplay scenario focusing on ${scenarioType} interactions with ${difficulty} difficulty level.`,
+        difficulty,
+        estimatedTime: duration,
+        objectives: [
+          "Build rapport and establish trust",
+          "Identify customer needs and pain points",
+          "Present solutions effectively",
+          includeObjections && "Handle objections professionally",
+          focusArea && `Focus on ${focusArea} skills`
+        ].filter(Boolean),
+        character: {
+          name: "Alex Johnson",
+          role: `${scenarioType.charAt(0).toUpperCase() + scenarioType.slice(1)} Representative`,
+          personality: difficulty === 'easy' ? 'Friendly and cooperative' : difficulty === 'expert' ? 'Skeptical and demanding' : 'Professional and focused',
+          background: "10 years of industry experience, looking for reliable business partners"
+        },
+        context: {
+          company: "TechSolutions Inc.",
+          industry: "Technology Services",
+          situation: "Quarterly vendor review meeting",
+          challenges: [
+            "Budget constraints",
+            "Previous service issues",
+            difficulty === 'hard' || difficulty === 'expert' ? "Competing offers from rivals" : null,
+            difficulty === 'expert' ? "Complex stakeholder requirements" : null
+          ].filter(Boolean)
+        },
+        evaluationCriteria: [
+          "Communication clarity",
+          "Problem-solving approach",
+          "Professional demeanor",
+          "Product knowledge",
+          "Closing effectiveness"
+        ]
+      };
+      
+      // Record the generation
+      await storage.recordRoleplayGeneration(userId);
+      
+      // Create practice session
+      await storage.recordPracticeSession({
+        userId,
+        type: 'roleplay',
+        completedAt: new Date(),
+        details: JSON.stringify({
+          scenarioId,
+          title: scenario.title,
+          difficulty,
+          scenarioType,
+          duration,
+          scenario
+        })
+      });
+      
+      res.json(scenario);
+    } catch (error) {
+      console.error("Error generating roleplay:", error);
+      res.status(500).json({ error: "Failed to generate roleplay scenario" });
+    }
+  });
+
+  // Complete daily challenge task
+  app.post("/api/daily-challenge/complete/:taskId", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+
+    try {
+      const userId = req.user!.id;
+      const { taskId } = req.params;
+      
+      // Get current daily challenge
+      const challenge = await storage.getDailyChallenge(userId);
+      if (!challenge) {
+        return res.status(404).json({ error: "No active daily challenge" });
+      }
+      
+      // Mark task as completed (mock implementation)
+      const pointsEarned = 50; // Mock points
+      const challengeCompleted = false; // Would check if all tasks are done
+      
+      // Update user points (would need a proper method in storage)
+      // For now, just record the session with the points earned
+      
+      // Record completion
+      await storage.recordPracticeSession({
+        userId,
+        type: 'daily-challenge',
+        score: pointsEarned,
+        completedAt: new Date(),
+        details: JSON.stringify({
+          challengeId: challenge.id,
+          taskId,
+          taskType: 'daily-challenge'
+        })
+      });
+      
+      res.json({
+        pointsEarned,
+        challengeCompleted,
+        totalPoints: challenge.totalPoints || 200
+      });
+    } catch (error) {
+      console.error("Error completing daily challenge task:", error);
+      res.status(500).json({ error: "Failed to complete task" });
+    }
+  });
+
+  // Generate written event prompt
+  app.post("/api/written-events/generate", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+
+    try {
+      const userId = req.user!.id;
+      const { eventType, difficulty, focusArea, specificRequirements } = req.body;
+      
+      // Check written event allowance
+      const allowed = await storage.checkWrittenEventAllowance(userId);
+      if (!allowed) {
+        return res.status(403).json({ 
+          error: "Monthly written event limit reached. Upgrade to generate more prompts." 
+        });
+      }
+      
+      // Generate unique ID
+      const promptId = `prompt_${Date.now()}`;
+      
+      // Mock prompt generation
+      const prompt = {
+        id: promptId,
+        title: `${eventType.replace('-', ' ').charAt(0).toUpperCase() + eventType.replace('-', ' ').slice(1)} - ${difficulty}`,
+        scenario: `You are a business consultant tasked with creating a ${eventType.replace('-', ' ')} for a growing technology company.`,
+        requirements: [
+          "Include executive summary",
+          "Provide detailed analysis",
+          "Include recommendations",
+          "Professional formatting",
+          specificRequirements ? `Focus on: ${specificRequirements}` : "Address all key areas"
+        ].filter(Boolean),
+        evaluationCriteria: [
+          "Clarity and organization",
+          "Depth of analysis",
+          "Feasibility of recommendations",
+          "Professional presentation",
+          "Adherence to format"
+        ],
+        tips: [
+          "Start with a strong executive summary",
+          "Use data to support your points",
+          "Be specific in your recommendations"
+        ],
+        estimatedTime: difficulty === 'beginner' ? 30 : difficulty === 'competition' ? 90 : 60,
+        wordCount: {
+          min: eventType === 'executive-summary' ? 300 : 1000,
+          max: eventType === 'executive-summary' ? 500 : 2500
+        }
+      };
+      
+      // Record the generation
+      await storage.recordWrittenEventGeneration(userId);
+      
+      res.json(prompt);
+    } catch (error) {
+      console.error("Error generating written event:", error);
+      res.status(500).json({ error: "Failed to generate prompt" });
+    }
+  });
+
+  // Submit written event for feedback
+  app.post("/api/written-events/feedback", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+
+    try {
+      const userId = req.user!.id;
+      
+      // Mock feedback generation
+      const feedback = {
+        overallScore: Math.floor(Math.random() * 30) + 70, // 70-100
+        strengths: [
+          "Clear and organized structure",
+          "Good use of business terminology",
+          "Strong executive summary"
+        ],
+        improvements: [
+          "Could include more data analysis",
+          "Recommendations need more detail",
+          "Consider adding visual elements"
+        ],
+        detailedFeedback: [
+          {
+            section: "Executive Summary",
+            score: 85,
+            comments: "Well-written and concise. Captures key points effectively."
+          },
+          {
+            section: "Analysis",
+            score: 75,
+            comments: "Good analysis but could benefit from more quantitative data."
+          },
+          {
+            section: "Recommendations",
+            score: 70,
+            comments: "Recommendations are relevant but need more implementation details."
+          }
+        ],
+        suggestions: [
+          "Review sample high-scoring papers",
+          "Practice data analysis techniques",
+          "Work on actionable recommendations"
+        ]
+      };
+      
+      // Record practice session
+      await storage.recordPracticeSession({
+        userId,
+        type: 'written',
+        score: feedback.overallScore,
+        completedAt: new Date(),
+        details: JSON.stringify({
+          eventType: req.body.eventType || 'unknown',
+          feedback
+        })
+      });
+      
+      res.json(feedback);
+    } catch (error) {
+      console.error("Error providing feedback:", error);
+      res.status(500).json({ error: "Failed to generate feedback" });
+    }
+  });
+
+  // Check for new achievements
+  app.post("/api/user/achievements/check", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+
+    try {
+      const userId = req.user!.id;
+      const newAchievements = await storage.checkForNewAchievements(userId);
+      res.json(newAchievements);
+    } catch (error) {
+      console.error("Error checking achievements:", error);
+      res.status(500).json({ error: "Failed to check achievements" });
+    }
+  });
+
+  // Get new achievements (not yet displayed)
+  app.get("/api/user/achievements/new", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+
+    try {
+      const userId = req.user!.id;
+      const newAchievements = await storage.getNewUserAchievements(userId);
+      res.json(newAchievements);
+    } catch (error) {
+      console.error("Error getting new achievements:", error);
+      res.status(500).json({ error: "Failed to get new achievements" });
+    }
+  });
+
+  // Mark achievement as displayed
+  app.post("/api/user/achievements/:achievementId/displayed", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+
+    try {
+      const userId = req.user!.id;
+      const achievementId = parseInt(req.params.achievementId);
+      
+      const success = await storage.markAchievementAsDisplayed(userId, achievementId);
+      if (success) {
+        res.json({ success: true });
+      } else {
+        res.status(404).json({ error: "Achievement not found" });
+      }
+    } catch (error) {
+      console.error("Error marking achievement as displayed:", error);
+      res.status(500).json({ error: "Failed to update achievement" });
+    }
+  });
+
   // Get recent activities
   app.get("/api/user/activities", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);

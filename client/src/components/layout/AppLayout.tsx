@@ -3,7 +3,7 @@ import { Link, useLocation } from 'wouter';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import { useUIState } from '@/hooks/use-ui-state';
-import { IconHome, IconBarChart, IconUsers, IconSettings, IconBook, IconActivity, IconClipboard, IconMenu, IconX, IconSun, IconMoon } from '@/components/ui/icons';
+import { IconHome, IconBarChart, IconUsers, IconSettings, IconBook, IconActivity, IconClipboard, IconMenu, IconX, IconSun, IconMoon, IconTrophy } from '@/components/ui/icons';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -27,6 +27,8 @@ export function AppLayout({ children, className }: AppLayoutProps) {
     { icon: <IconClipboard className="w-5 h-5" />, label: 'Written Events', href: '/written-events' },
     { icon: <IconActivity className="w-5 h-5" />, label: 'Performance Indicators', href: '/performance-indicators' },
     { icon: <IconBook className="w-5 h-5" />, label: 'My Progress', href: '/progress' },
+    { icon: <IconTrophy className="w-5 h-5" />, label: 'Achievements', href: '/achievements' },
+    { icon: <IconBarChart className="w-5 h-5" />, label: 'Analytics', href: '/analytics' },
     { icon: <IconSettings className="w-5 h-5" />, label: 'Settings', href: '/settings' },
   ];
 

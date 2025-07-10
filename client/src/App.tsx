@@ -15,6 +15,8 @@ import SettingsPage from "@/pages/settings";
 import PricingPage from "@/pages/pricing";
 import WhyDecadePage from "@/pages/why-decade";
 import InteractionShowcasePage from "@/pages/interaction-showcase";
+import AchievementsPage from "@/pages/achievements";
+import AnalyticsPage from "@/pages/analytics";
 
 import Checkout from "@/pages/checkout";
 import Subscribe from "@/pages/subscribe";
@@ -26,6 +28,7 @@ import { MicroInteractionsProvider } from "@/hooks/use-micro-interactions";
 import { UIStateProvider } from "@/hooks/use-ui-state";
 import { OnboardingProvider } from "@/hooks/use-onboarding";
 import ThemeProvider from "@/lib/theme-provider";
+import { NotificationProvider } from "@/components/notifications/notification-provider";
 import { useEffect, useState } from "react";
 import { AnimatePresence } from "framer-motion";
 
@@ -38,6 +41,8 @@ function Router() {
       <ProtectedRoute path="/tests" component={PracticeTestsPage} />
       <ProtectedRoute path="/written-events" component={WrittenEventsPage} />
       <ProtectedRoute path="/progress" component={MyProgressPage} />
+      <ProtectedRoute path="/achievements" component={AchievementsPage} />
+      <ProtectedRoute path="/analytics" component={AnalyticsPage} />
       <ProtectedRoute path="/settings" component={SettingsPage} />
       <ProtectedRoute path="/pricing" component={PricingPage} />
       <ProtectedRoute path="/checkout" component={Checkout} />
@@ -75,15 +80,17 @@ function App() {
         <UIStateProvider>
           <ThemeProvider>
             <MicroInteractionsProvider>
-              <OnboardingProvider>
-                {/* Vanta background effect now handled via index.html */}
-                <div className="app-container fade-in new-design">
-                  <AnimatePresence mode="wait">
-                    <Router />
-                  </AnimatePresence>
-                  <Toaster />
-                </div>
-              </OnboardingProvider>
+              <NotificationProvider>
+                <OnboardingProvider>
+                  {/* Vanta background effect now handled via index.html */}
+                  <div className="app-container fade-in new-design">
+                    <AnimatePresence mode="wait">
+                      <Router />
+                    </AnimatePresence>
+                    <Toaster />
+                  </div>
+                </OnboardingProvider>
+              </NotificationProvider>
             </MicroInteractionsProvider>
           </ThemeProvider>
         </UIStateProvider>
