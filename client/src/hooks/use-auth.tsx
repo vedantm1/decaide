@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
-// Mock User Interface
+// User Interface matching backend data structure
 interface User {
   id: string;
   username: string;
@@ -12,6 +12,15 @@ interface User {
   lastName?: string;
   selectedEvent?: string;
   selectedCluster?: string;
+  eventFormat?: string;
+  eventCode?: string;
+  eventType?: string;
+  instructionalArea?: string;
+  uiTheme?: string;
+  colorScheme?: string;
+  theme?: string;
+  points?: number;
+  streak?: number;
 }
 
 interface AuthContextType {
@@ -66,6 +75,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           subscriptionTier: userData.subscriptionTier || 'standard',
           firstName: userData.firstName,
           lastName: userData.lastName,
+          selectedEvent: userData.selectedEvent,
+          selectedCluster: userData.selectedCluster,
+          eventFormat: userData.eventFormat,
+          eventCode: userData.eventCode,
+          eventType: userData.eventType,
+          instructionalArea: userData.instructionalArea,
+          uiTheme: userData.uiTheme,
+          colorScheme: userData.colorScheme,
+          theme: userData.theme,
+          points: userData.points,
+          streak: userData.streak,
         });
       } else {
         setUser(null);
@@ -89,7 +109,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
       
       if (!response.ok) {
-        throw new Error('Invalid credentials');
+        const errorData = await response.json().catch(() => ({ error: 'Invalid credentials' }));
+        throw new Error(errorData.error || 'Invalid credentials');
       }
       
       const userData = await response.json();
@@ -100,6 +121,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         subscriptionTier: userData.subscriptionTier || 'standard',
         firstName: userData.firstName,
         lastName: userData.lastName,
+        selectedEvent: userData.selectedEvent,
+        selectedCluster: userData.selectedCluster,
       });
       
       // Refetch user data to ensure consistency
