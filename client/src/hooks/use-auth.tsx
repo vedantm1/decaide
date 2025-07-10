@@ -147,4 +147,55 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  
+  // Add registration mutation
+  const registerMutation = {
+    mutate: async (userData: any, options?: { onSuccess?: () => void; onError?: () => void }) => {
+      try {
+        const response = await fetch('/api/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(userData),
+          credentials: 'include',
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Registration failed');
+        }
+        
+        const user = await response.json();
+        context.refreshUser();
+        options?.onSuccess?.();
+      } catch (error) {
+        console.error('Registration failed:', error);
+        options?.onError?.();
+        throw error;
+      }
+    },
+    isPending: false,
+  };
+
+  const loginMutation = {
+    mutate: async (credentials: any, options?: { onSuccess?: () => void; onError?: () => void }) => {
+      try {
+        await context.login(credentials.username, credentials.password);
+        options?.onSuccess?.();
+      } catch (error) {
+        options?.onError?.();
+        throw error;
+      }
+    },
+    isPending: false,
+  };
+
+  return {
+    ...context,
+    registerMutation,
+    loginMutation,
+  };
+};

@@ -18,11 +18,6 @@ import mappingRoutes from "./mappingRoutes";
 // Load the system prompt from an external file to keep the routes file cleaner
 import fs from "fs";
 import path from "path";
-import { fileURLToPath } from "url";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
 const systemPrompt = fs.readFileSync(
   path.join(__dirname, "system-prompt.txt"),
   "utf-8",
@@ -45,44 +40,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get current user
   app.get("/api/user", async (req, res) => {
     if (!req.isAuthenticated()) {
-      // For now, create or get a test user if none exists
-      try {
-        let testUser;
-
-        // Try to get existing user first
-        try {
-          testUser = await storage.getUserByUsername("testuser");
-        } catch (error) {
-          // User doesn't exist, create a new one
-          testUser = await storage.createUser({
-            username: "testuser",
-            email: "test@example.com",
-            password: "testpass123",
-            subscriptionTier: "standard",
-            firstName: "Test",
-            lastName: "User",
-          });
-        }
-
-        // Manually authenticate the user
-        req.login(testUser, (err) => {
-          if (err) {
-            console.error("Login error:", err);
-            return res.sendStatus(500);
-          }
-          res.json(testUser);
-        });
-      } catch (error) {
-        console.error("Error with test user:", error);
-        return res.sendStatus(401);
-      }
-    } else {
-      try {
-        const user = req.user;
-        res.json(user);
-      } catch (error) {
-        res.status(500).json({ error: "Failed to get user data" });
-      }
+      return res.sendStatus(401);
+    }
+    
+    try {
+      const user = req.user;
+      res.json(user);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to get user data" });
     }
   });
 
