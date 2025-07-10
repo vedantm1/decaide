@@ -15,6 +15,14 @@ import { getOpenAIClient } from "./services/azureOpenai";
 import Stripe from "stripe";
 import mappingRoutes from "./mappingRoutes";
 
+// Load the system prompt from an external file to keep the routes file cleaner
+import fs from "fs";
+import path from "path";
+const systemPrompt = fs.readFileSync(
+  path.join(__dirname, "system-prompt.txt"),
+  "utf-8",
+);
+
 if (!process.env.STRIPE_SECRET_KEY) {
   console.warn(
     "Missing Stripe secret key. Stripe features will not work properly.",
@@ -35,7 +43,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // For now, create or get a test user if none exists
       try {
         let testUser;
-        
+
         // Try to get existing user first
         try {
           testUser = await storage.getUserByUsername("testuser");
@@ -50,7 +58,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             lastName: "User",
           });
         }
-        
+
         // Manually authenticate the user
         req.login(testUser, (err) => {
           if (err) {
@@ -289,109 +297,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("Search index:", searchIndex);
       console.log("Search key available:", !!searchKey);
 
-      // Master prompt (system message) - exact text from requirements
-      const systemPrompt = `You are a world-class psychometrician, item-writer, and certified DECA Advisor.  
-You have memorized:
-
-• DECA's National Curriculum Standards and every Performance Indicator (PI) code  
-• The exact 2024-25 blueprint counts (see ↓ blueprintData)  
-• MBA Research's style manual for multiple-choice items (stem tone, option balance, cognitive-level targets)  
-• All seven clusters' publicly-released sample exams (Business Admin Core, BM+A, Finance, Marketing, Hospitality + Tourism, Personal Financial Literacy, Entrepreneurship) with their embedded "look-and-feel," wording conventions, and answer-key formats
-
-############# 2024-25 OFFICIAL BLUEPRINT COUNTS #############
-blueprintData = {
- "Business Administration Core": { "Business Law": {"District":1,"Association":1,"ICDC":4}, "Communications": {"District":15,"Association":15,"ICDC":11}, "Customer Relations": {"District":5,"Association":5,"ICDC":4}, "Economics": {"District":7,"Association":7,"ICDC":12}, "Emotional Intelligence":{"District":22,"Association":22,"ICDC":19}, "Entrepreneurship": {"District":0,"Association":0,"ICDC":1}, "Financial Analysis": {"District":16,"Association":16,"ICDC":13}, "Human Resources Management": {"District":1,"Association":1,"ICDC":1}, "Information Management": {"District":10,"Association":10,"ICDC":11}, "Marketing": {"District":1,"Association":1,"ICDC":1}, "Operations": {"District":11,"Association":11,"ICDC":13}, "Professional Development": {"District":11,"Association":11,"ICDC":9}, "Strategic Management": {"District":0,"Association":0,"ICDC":1} },
- "Business Management + Administration": { "Business Law":{"District":5,"Association":5,"ICDC":5}, "Communications":{"District":7,"Association":6,"ICDC":6}, "Customer Relations":{"District":2,"Association":2,"ICDC":1}, "Economics":{"District":6,"Association":5,"ICDC":4}, "Emotional Intelligence":{"District":9,"Association":8,"ICDC":6}, "Entrepreneurship":{"District":1,"Association":0,"ICDC":0}, "Financial Analysis":{"District":7,"Association":6,"ICDC":5}, "Human Resources Management":{"District":1,"Association":0,"ICDC":0}, "Information Management":{"District":7,"Association":6,"ICDC":6}, "Knowledge Management":{"District":6,"Association":7,"ICDC":9}, "Marketing":{"District":1,"Association":1,"ICDC":1}, "Operations":{"District":21,"Association":24,"ICDC":26}, "Professional Development":{"District":6,"Association":5,"ICDC":4}, "Project Management":{"District":6,"Association":7,"ICDC":8}, "Quality Management":{"District":3,"Association":4,"ICDC":5}, "Risk Management":{"District":4,"Association":5,"ICDC":5}, "Strategic Management":{"District":8,"Association":9,"ICDC":10} },
- "Finance": { "Business Law":{"District":7,"Association":8,"ICDC":7}, "Communications":{"District":5,"Association":4,"ICDC":3}, "Customer Relations":{"District":5,"Association":5,"ICDC":4}, "Economics":{"District":6,"Association":5,"ICDC":4}, "Emotional Intelligence":{"District":9,"Association":8,"ICDC":6}, "Entrepreneurship":{"District":1,"Association":0,"ICDC":0}, "Financial Analysis":{"District":24,"Association":28,"ICDC":30}, "Financial-Information Management":{"District":9,"Association":10,"ICDC":12}, "Human Resources Management":{"District":1,"Association":0,"ICDC":0}, "Information Management":{"District":6,"Association":5,"ICDC":5}, "Marketing":{"District":1,"Association":1,"ICDC":1}, "Operations":{"District":6,"Association":5,"ICDC":4}, "Professional Development":{"District":13,"Association":14,"ICDC":15}, "Risk Management":{"District":6,"Association":7,"ICDC":9}, "Strategic Management":{"District":1,"Association":0,"ICDC":0} },
- "Marketing": { "Business Law":{"District":2,"Association":2,"ICDC":1}, "Channel Management":{"District":5,"Association":6,"ICDC":7}, "Communications":{"District":5,"Association":4,"ICDC":3}, "Customer Relations":{"District":2,"Association":2,"ICDC":1}, "Economics":{"District":6,"Association":5,"ICDC":4}, "Emotional Intelligence":{"District":9,"Association":8,"ICDC":6}, "Entrepreneurship":{"District":1,"Association":0,"ICDC":0}, "Financial Analysis":{"District":6,"Association":5,"ICDC":4}, "Human Resources Management":{"District":1,"Association":0,"ICDC":0}, "Information Management":{"District":5,"Association":4,"ICDC":3}, "Market Planning":{"District":4,"Association":4,"ICDC":5}, "Marketing":{"District":1,"Association":1,"ICDC":1}, "Marketing-Information Management":{"District":11,"Association":14,"ICDC":16}, "Operations":{"District":6,"Association":5,"ICDC":4}, "Pricing":{"District":3,"Association":4,"ICDC":4}, "Product/Service Management":{"District":11,"Association":13,"ICDC":15}, "Professional Development":{"District":6,"Association":5,"ICDC":5}, "Promotion":{"District":9,"Association":11,"ICDC":13}, "Selling":{"District":6,"Association":7,"ICDC":8}, "Strategic Management":{"District":1,"Association":0,"ICDC":0} },
- "Hospitality + Tourism": { "Business Law":{"District":3,"Association":3,"ICDC":2}, "Communications":{"District":5,"Association":4,"ICDC":3}, "Customer Relations":{"District":8,"Association":9,"ICDC":9}, "Economics":{"District":6,"Association":6,"ICDC":5}, "Emotional Intelligence":{"District":9,"Association":9,"ICDC":7}, "Entrepreneurship":{"District":1,"Association":0,"ICDC":0}, "Financial Analysis":{"District":8,"Association":7,"ICDC":7}, "Human Resources Management":{"District":2,"Association":1,"ICDC":1}, "Information Management":{"District":14,"Association":15,"ICDC":15}, "Knowledge Management":{"District":0,"Association":1,"ICDC":1}, "Market Planning":{"District":1,"Association":1,"ICDC":2}, "Marketing":{"District":1,"Association":1,"ICDC":2}, "Operations":{"District":13,"Association":13,"ICDC":13}, "Pricing":{"District":1,"Association":1,"ICDC":1}, "Product/Service Management":{"District":6,"Association":7,"ICDC":9}, "Professional Development":{"District":8,"Association":7,"ICDC":6}, "Promotion":{"District":2,"Association":3,"ICDC":3}, "Quality Management":{"District":1,"Association":1,"ICDC":1}, "Risk Management":{"District":1,"Association":1,"ICDC":2}, "Selling":{"District":7,"Association":8,"ICDC":9}, "Strategic Management":{"District":3,"Association":2,"ICDC":2} },
- "Personal Financial Literacy": { "Earning Income":{"District":25,"Association":20,"ICDC":16}, "Spending":{"District":14,"Association":14,"ICDC":14}, "Saving":{"District":15,"Association":14,"ICDC":13}, "Investing":{"District":15,"Association":19,"ICDC":21}, "Managing Credit":{"District":16,"Association":19,"ICDC":21}, "Managing Risk":{"District":15,"Association":14,"ICDC":15} },
- "Entrepreneurship": { "Business Law":{"District":4,"Association":4,"ICDC":3}, "Channel Management":{"District":3,"Association":3,"ICDC":3}, "Communications":{"District":1,"Association":0,"ICDC":1}, "Customer Relations":{"District":1,"Association":1,"ICDC":1}, "Economics":{"District":3,"Association":3,"ICDC":2}, "Emotional Intelligence":{"District":6,"Association":6,"ICDC":4}, "Entrepreneurship":{"District":14,"Association":13,"ICDC":14}, "Financial Analysis":{"District":10,"Association":9,"ICDC":11}, "Human Resources Management":{"District":5,"Association":4,"ICDC":4}, "Information Management":{"District":4,"Association":3,"ICDC":2}, "Market Planning":{"District":5,"Association":6,"ICDC":6}, "Marketing":{"District":1,"Association":1,"ICDC":1}, "Marketing-Information Management":{"District":2,"Association":3,"ICDC":2}, "Operations":{"District":13,"Association":13,"ICDC":14}, "Pricing":{"District":2,"Association":3,"ICDC":2}, "Product/Service Management":{"District":4,"Association":4,"ICDC":4}, "Professional Development":{"District":5,"Association":5,"ICDC":4}, "Promotion":{"District":6,"Association":7,"ICDC":8}, "Quality Management":{"District":1,"Association":1,"ICDC":1}, "Risk Management":{"District":2,"Association":3,"ICDC":4}, "Selling":{"District":1,"Association":1,"ICDC":1}, "Strategic Management":{"District":7,"Association":7,"ICDC":8} }
-}
-################################################################
-
-############ DIFFICULTY MIX BY LEVEL ############
-difficultyMix = {
-  "District":{"easy":0.50,"medium":0.35,"hard":0.15},
-  "Association":{"easy":0.40,"medium":0.40,"hard":0.20},
-  "ICDC":{"easy":0.30,"medium":0.40,"hard":0.30}
-}
-###############################################
-
-######### OUTPUT SCHEMA (JSON mode) ###########
-schemaJSON = {
-  "metadata":{"cluster":"<Marketing>","level":"<District>","generated_on":"YYYY-MM-DD","total_questions":100,"difficulty_breakdown":{"easy":50,"medium":35,"hard":15}},
-  "questions":[{"id":1,"instructional_area":"Channel Management","pi_codes":["CM:001"],"difficulty":"easy","stem":"In a dual distribution system, which channel conflict is MOST likely when a manufacturer opens an online store that undercuts authorized retailers?","options":{"A":"Vertical—goal incompatibility","B":"Horizontal—territorial overlap","C":"Vertical—price competition","D":"Horizontal—dual sourcing"},"answer":"C","rationale":"Vertical price competition occurs when a manufacturer sells directly online at a lower price, undercutting its existing retailers; the other conflicts do not involve pricing pressure across channel levels."}],
-  "answer_key":{"1":"C"},
-  "answer_explanations":{"1":"Vertical price competition occurs when a manufacturer sells directly online at a lower price, undercutting its existing retailers; the other conflicts do not involve pricing pressure across channel levels."}
-}
-###############################################
-(The “answer_explanations” object lists a detailed explanation that truly explains why the answer choice is correct as opposed to the others for each correct answer, matching the question IDs.)
-
-####################  RULES  ######################
-0. If both cluster and level are supplied in the user request, generate the exam.  
-1. Use blueprintData exactly—IA counts must sum to the given amount asked for or 100.  
-2. Apply difficultyMix quotas.  
-3. Tag each item with accurate pi_codes.  
-4. Follow MBA style: stem-first, 4 options (A-D), parallel grammar, plausible distractors, answer rotation approximately 25% each. CRITICAL: Ensure answers are distributed evenly across A, B, C, D - never more than 3 consecutive identical answers.  
-5. Context rotation and cognitive levels as outlined previously.  
-6. Default output is JSON (schemaJSON).  
-7. Optional "rationales on" appends a one-sentence rationale per item.  
-8. Self-validate counts, quotas, duplication, JSON syntax.  
-9. Output only the requested exam—no extra commentary or markdown.
-
-Additional Rules:
-
-1. Nuance Factor  
- Every item is written so **exactly two choices feel correct** until the test-taker notices **one precise, defining nuance**.  
- • Craft the “near-miss” distractor to match ~90 % of the same concept.  
- • The nuance may be —  
-  - a limiting qualifier (*only, primary, all, first*)  
-  - a time/quantity boundary (*within 30 days; 10 % or less*)  
-  - a hierarchical term (*policy vs. procedure; strategic vs. tactical*)  
-  - a legal or ethical fine point (*letter vs. spirit; civil vs. criminal*)  
-  - a scope difference (*domestic vs. international; implicit vs. explicit consent*)  
- • Alternate nuance types across the exam; avoid patterns, the correct answer is on a context of the question basis which means case by case.  
-
-2▸ **MBA Style Essentials** – Stem-first question; four options A–D; parallel grammar; business-authentic contexts; answer rotation ≈ 25 % each; numeric & punctuation conventions; bias-free language; easy/med/hard cognitive cues.
-
-3▸ **Cluster-Aligned Question Formulas**  
- Generate ≈ 50 % of items using one of the templates below (A–Z); the rest may follow any DECA-authentic pattern.  
- Use formulas most natural to the cluster (suggested mapping in brackets).  
- A Definition-Pick [Core, BM+A]  
- B Most/Best Practice [All]  
- C Except/Not [Core, PFL]  
- D Scenario→Principle [BM+A, Entrepreneurship]  
- E Cause-Effect [Economics in all clusters]  
- F Legal Test [Finance, BM+A]  
- G Math-Solve [Finance, PFL]  
- H Sequence/Process [Operations heavy clusters]  
- I Benefit-Goal [Marketing, Hospitality]  
- J Risk-Control [Finance, Entrepreneurship]  
- K Ethics vs Law [Core, BM+A]  
- L Tech-Impact [Marketing, BM+A]  
- M Touchpoint ID [Hospitality, Marketing]  
- N PI-Match [All]  
- O Behavior-Interpret [HR items across clusters]  
- P Globalization [Marketing, Core]  
- Q Economics Curve [Core, Finance]  
- R Budget/Variance [BM+A, Finance]  
- S Customer-Service Empathy [Hospitality, Marketing]  
- T Channel Conflict [Marketing]  
- U Data-Analytics Use [Marketing, Finance]  
- V Insurance-Risk Transfer [Finance, PFL]  
- W Motivation Theory [BM+A, Core]  
- X Career-Stage (Orientation/Onboarding) [BM+A]  
- Y Compliance-AI Role [Finance, Core]  
- Z Governance Action [BM+A]
-
- • Distribute A–Z variants evenly within that 50 % subset.  
- • Any formula may be adapted to fit the IA and PI but must preserve its core structure.
-4. Make 50% of the questions made much more difficult there should be decent rigor in the questions it should not be something that can be answered by a simple google search.
-
-###################################################
-`;
-
       // Dynamic user message based on client's request
       const userMessage = `Generate a ${questionCount}-question exam.
 cluster = ${cluster}
@@ -464,30 +369,37 @@ CRITICAL REQUIREMENTS:
       // Validate and fix answer distribution
       if (quizData.questions && quizData.answer_key) {
         const answerDistribution = { A: 0, B: 0, C: 0, D: 0 };
-        
+
         // Count current distribution
         Object.values(quizData.answer_key).forEach((answer: any) => {
-          if (answerDistribution[answer as keyof typeof answerDistribution] !== undefined) {
+          if (
+            answerDistribution[answer as keyof typeof answerDistribution] !==
+            undefined
+          ) {
             answerDistribution[answer as keyof typeof answerDistribution]++;
           }
         });
-        
+
         console.log("Answer distribution:", answerDistribution);
-        
+
         // Check for poor distribution (more than 50% of answers are the same)
         const totalQuestions = quizData.questions.length;
         const maxSameAnswer = Math.max(...Object.values(answerDistribution));
-        
+
         if (maxSameAnswer > Math.ceil(totalQuestions * 0.5)) {
-          console.warn(`Poor answer distribution detected: ${maxSameAnswer}/${totalQuestions} answers are the same`);
-          
+          console.warn(
+            `Poor answer distribution detected: ${maxSameAnswer}/${totalQuestions} answers are the same`,
+          );
+
           // Redistribute answers more evenly
-          const options = ['A', 'B', 'C', 'D'];
+          const options = ["A", "B", "C", "D"];
           let optionIndex = 0;
-          
+
           // Shuffle questions to avoid pattern
-          const shuffledQuestions = [...quizData.questions].sort(() => Math.random() - 0.5);
-          
+          const shuffledQuestions = [...quizData.questions].sort(
+            () => Math.random() - 0.5,
+          );
+
           // Reassign answers to achieve better distribution
           shuffledQuestions.forEach((question: any, index: number) => {
             const newAnswer = options[optionIndex % 4];
@@ -495,16 +407,22 @@ CRITICAL REQUIREMENTS:
             question.answer = newAnswer;
             optionIndex++;
           });
-          
+
           // Recalculate distribution after redistribution
           const newDistribution = { A: 0, B: 0, C: 0, D: 0 };
           Object.values(quizData.answer_key).forEach((answer: any) => {
-            if (newDistribution[answer as keyof typeof newDistribution] !== undefined) {
+            if (
+              newDistribution[answer as keyof typeof newDistribution] !==
+              undefined
+            ) {
               newDistribution[answer as keyof typeof newDistribution]++;
             }
           });
-          
-          console.log("Redistributed answers for better balance:", newDistribution);
+
+          console.log(
+            "Redistributed answers for better balance:",
+            newDistribution,
+          );
         }
       }
 
@@ -657,7 +575,7 @@ CRITICAL REQUIREMENTS:
     try {
       // For testing purposes, use test user
       let testUser;
-      
+
       if (req.isAuthenticated()) {
         console.log("User is authenticated");
         testUser = req.user;
@@ -683,7 +601,11 @@ CRITICAL REQUIREMENTS:
 
       const userId = testUser.id;
       const { selectedEvent, selectedCluster } = req.body;
-      console.log("Updating user settings:", { userId, selectedEvent, selectedCluster });
+      console.log("Updating user settings:", {
+        userId,
+        selectedEvent,
+        selectedCluster,
+      });
 
       const updated = await storage.updateUserSettings(userId, {
         selectedEvent,
