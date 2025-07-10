@@ -18,6 +18,11 @@ import mappingRoutes from "./mappingRoutes";
 // Load the system prompt from an external file to keep the routes file cleaner
 import fs from "fs";
 import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const systemPrompt = fs.readFileSync(
   path.join(__dirname, "system-prompt.txt"),
   "utf-8",
