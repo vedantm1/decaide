@@ -1,9 +1,6 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
-import aiRoutes from "./routes/aiRoutes";
-import chatRoutes from "./routes/chatRoutes";
-import aiEnhancedRoutes from "./routes/aiEnhancedRoutes";
 
 const app = express();
 app.use(express.json());
@@ -49,11 +46,6 @@ app.use((req, res, next) => {
     res.status(status).json({ message });
     throw err;
   });
-
-  // Mount routes
-  app.use(aiRoutes);
-  app.use(chatRoutes);
-  app.use(aiEnhancedRoutes);
 
   // importantly only setup vite in development and after
   // setting up all the other routes so the catch-all route

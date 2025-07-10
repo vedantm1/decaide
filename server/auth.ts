@@ -53,17 +53,8 @@ export function setupAuth(app: Express) {
   passport.use(
     new LocalStrategy(async (username, password, done) => {
       try {
-        console.log("LocalStrategy: Attempting login for:", username);
         const user = await storage.getUserByUsername(username);
-        console.log("LocalStrategy: User found:", !!user);
-        if (!user) {
-          console.log("LocalStrategy: User not found");
-          return done(null, false);
-        }
-        const passwordMatch = await comparePasswords(password, user.password);
-        console.log("LocalStrategy: Password match:", passwordMatch);
-        if (!passwordMatch) {
-          console.log("LocalStrategy: Invalid password");
+        if (!user || !(await comparePasswords(password, user.password))) {
           return done(null, false);
         } else {
           // Generate a unique session identifier
@@ -232,13 +223,12 @@ export function setupAuth(app: Express) {
     try {
       const existingUser = await storage.getUserByUsername(req.body.username);
       if (existingUser) {
-        return res.status(400).json({ error: "Username already exists" });
+        return res.status(400).send("Username already exists");
       }
 
-      const hashedPassword = await hashPassword(req.body.password);
       const user = await storage.createUser({
         ...req.body,
-        password: hashedPassword,
+        password: await hashPassword(req.body.password),
       });
 
       req.login(user, (err) => {
@@ -246,31 +236,12 @@ export function setupAuth(app: Express) {
         res.status(201).json(user);
       });
     } catch (error) {
-      console.error("Registration error:", error);
-      res.status(500).json({ error: "Registration failed" });
+      next(error);
     }
   });
 
-  app.post("/api/login", (req, res, next) => {
-    console.log("Login attempt:", req.body);
-    passport.authenticate("local", (err, user, info) => {
-      if (err) {
-        console.error("Authentication error:", err);
-        return next(err);
-      }
-      if (!user) {
-        console.log("Authentication failed:", info);
-        return res.status(401).json({ error: "Invalid credentials" });
-      }
-      req.logIn(user, (err) => {
-        if (err) {
-          console.error("Login error:", err);
-          return next(err);
-        }
-        console.log("Login successful for user:", user.username);
-        return res.status(200).json(user);
-      });
-    })(req, res, next);
+  app.post("/api/login", passport.authenticate("local"), (req, res) => {
+    res.status(200).json(req.user);
   });
 
   // Google OAuth routes
