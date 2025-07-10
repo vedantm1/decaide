@@ -83,6 +83,8 @@ export const insertSessionSchema = createInsertSchema(practiceSessions).pick({
   details: true,
 });
 
+
+
 // Export types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;

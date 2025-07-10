@@ -16,7 +16,9 @@ import {
   IconClipboard, 
   IconMenu, 
   IconX,
-  IconLogOut
+  IconLogOut,
+  IconTrophy,
+  IconTrendingUp
 } from '@/components/ui/icons';
 
 interface MainLayoutProps {
@@ -38,6 +40,8 @@ export function MainLayout({ children }: MainLayoutProps) {
     { icon: <IconClipboard className="w-5 h-5" />, label: 'Written Events', href: '/written-events', tutorialId: 'written-events' },
     { icon: <IconActivity className="w-5 h-5" />, label: 'Performance Indicators', href: '/performance-indicators', tutorialId: 'performance-indicators' },
     { icon: <IconBook className="w-5 h-5" />, label: 'My Progress', href: '/progress', tutorialId: 'my-progress' },
+    { icon: <IconTrendingUp className="w-5 h-5" />, label: 'Analytics', href: '/analytics', tutorialId: 'analytics' },
+    { icon: <IconTrophy className="w-5 h-5" />, label: 'Achievements', href: '/achievements', tutorialId: 'achievements' },
     { icon: <IconSettings className="w-5 h-5" />, label: 'Settings', href: '/settings', tutorialId: 'settings' },
   ];
 

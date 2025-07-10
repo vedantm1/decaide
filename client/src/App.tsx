@@ -6,16 +6,16 @@ import NotFound from "@/pages/not-found";
 import Dashboard from "@/pages/dashboard";
 import DashboardNew from "@/pages/dashboard-new";
 import AuthNew from "@/pages/auth-new";
-import RoleplayPage from "@/pages/roleplay";
+import { RoleplayPage } from "@/pages/roleplay";
 import PerformanceIndicatorsPage from "@/pages/performance-indicators";
 import PracticeTestsPage from "@/pages/practice-tests";
-import WrittenEventsPage from "@/pages/written-events";
+import { WrittenEventsPage } from "@/pages/written-events";
 import MyProgressPage from "@/pages/my-progress";
 import SettingsPage from "@/pages/settings";
 import PricingPage from "@/pages/pricing";
 import WhyDecadePage from "@/pages/why-decade";
 import InteractionShowcasePage from "@/pages/interaction-showcase";
-import AchievementsPage from "@/pages/achievements";
+import { AchievementsPage } from "@/pages/achievements";
 import AnalyticsPage from "@/pages/analytics";
 
 import Checkout from "@/pages/checkout";
@@ -29,6 +29,7 @@ import { UIStateProvider } from "@/hooks/use-ui-state";
 import { OnboardingProvider } from "@/hooks/use-onboarding";
 import ThemeProvider from "@/lib/theme-provider";
 import { NotificationProvider } from "@/components/notifications/notification-provider";
+import { AchievementNotificationManager } from "@/components/achievements/achievement-notification";
 import { useEffect, useState } from "react";
 import { AnimatePresence } from "framer-motion";
 
@@ -84,6 +85,7 @@ function App() {
                 <OnboardingProvider>
                   {/* Vanta background effect now handled via index.html */}
                   <div className="app-container fade-in new-design">
+                    <AchievementNotificationManager />
                     <AnimatePresence mode="wait">
                       <Router />
                     </AnimatePresence>

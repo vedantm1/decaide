@@ -1,275 +1,155 @@
-import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { motion } from "framer-motion";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { AchievementCard } from "@/components/achievements/achievement-card";
-import { Trophy, Star, Target, Zap } from "lucide-react";
-import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Skeleton } from "@/components/ui/skeleton";
+import { MainLayout } from '@/components/layout/MainLayout';
+import { motion } from 'framer-motion';
+import { useQuery } from '@tanstack/react-query';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { AchievementCard, AchievementProgress } from '@/components/achievements/achievement-notification';
+import { Trophy, Target, Star, Zap, TrendingUp } from 'lucide-react';
 
-export default function AchievementsPage() {
-  const [selectedCategory, setSelectedCategory] = useState("all");
-
-  // Fetch user achievements
-  const { data: userAchievements, isLoading: loadingUserAchievements } = useQuery({
-    queryKey: ["/api/user/achievements"],
+export function AchievementsPage() {
+  const { data: user } = useQuery({
+    queryKey: ['/api/user'],
   });
 
-  // Fetch all available achievements
-  const { data: allAchievements, isLoading: loadingAllAchievements } = useQuery({
-    queryKey: ["/api/achievements"],
+  const { data: userAchievements } = useQuery({
+    queryKey: [`/api/user/${user?.id}/achievements`],
+    enabled: !!user?.id
   });
 
-  // Fetch user stats for progress
-  const { data: userStats } = useQuery({
-    queryKey: ["/api/user/stats"],
+  const { data: allAchievements } = useQuery({
+    queryKey: ['/api/achievements'],
   });
 
-  const isLoading = loadingUserAchievements || loadingAllAchievements;
+  const earnedAchievements = userAchievements || [];
+  const lockedAchievements = allAchievements?.filter(
+    (achievement: any) => !earnedAchievements.find((earned: any) => earned.achievementId === achievement.id)
+  ) || [];
 
-  // Calculate achievement statistics
-  const stats = {
-    earned: userAchievements?.length || 0,
-    total: allAchievements?.length || 0,
-    points: userAchievements?.reduce((sum: number, ua: any) => 
-      sum + (allAchievements?.find((a: any) => a.id === ua.achievementId)?.points || 0), 0
-    ) || 0,
-    percentage: allAchievements?.length 
-      ? Math.round((userAchievements?.length || 0) / allAchievements.length * 100)
-      : 0
+  const categorizedAchievements = {
+    earned: {
+      Performance: earnedAchievements.filter((a: any) => a.category === 'Performance'),
+      Consistency: earnedAchievements.filter((a: any) => a.category === 'Consistency'),
+      Mastery: earnedAchievements.filter((a: any) => a.category === 'Mastery'),
+      Special: earnedAchievements.filter((a: any) => a.category === 'Special'),
+    },
+    locked: {
+      Performance: lockedAchievements.filter((a: any) => a.category === 'Performance'),
+      Consistency: lockedAchievements.filter((a: any) => a.category === 'Consistency'),
+      Mastery: lockedAchievements.filter((a: any) => a.category === 'Mastery'),
+      Special: lockedAchievements.filter((a: any) => a.category === 'Special'),
+    }
   };
 
-  // Merge achievement data with user progress
-  const mergedAchievements = allAchievements?.map((achievement: any) => {
-    const userAchievement = userAchievements?.find((ua: any) => ua.achievementId === achievement.id);
-    const isEarned = !!userAchievement;
-    
-    // Calculate progress for unearned achievements
-    let progress = 0;
-    if (!isEarned && userStats) {
-      switch (achievement.type) {
-        case 'streak':
-          progress = userStats.currentStreak || 0;
-          break;
-        case 'roleplay_complete':
-          progress = userStats.roleplayCount || 0;
-          break;
-        case 'test_score':
-          if (achievement.threshold <= 50) {
-            progress = userStats.testCount || 0;
-          } else {
-            progress = userStats.highestTestScore || 0;
-          }
-          break;
-        case 'performance_indicator':
-          progress = userStats.completedPIs || 0;
-          break;
-        case 'written_event':
-          progress = userStats.writtenEventCount || 0;
-          break;
-        case 'daily_challenge':
-          progress = userStats.dailyChallengesCompleted || 0;
-          break;
-      }
-    }
-
-    return {
-      ...achievement,
-      earnedAt: userAchievement?.earnedAt,
-      isEarned,
-      progress
-    };
-  });
-
-  // Filter achievements by category
-  const filteredAchievements = selectedCategory === "all" 
-    ? mergedAchievements 
-    : mergedAchievements?.filter((a: any) => 
-        selectedCategory === "earned" ? a.isEarned : a.type === selectedCategory
-      );
-
-  // Achievement categories
-  const categories = [
-    { value: "all", label: "All Achievements", icon: Trophy },
-    { value: "earned", label: "Earned", icon: Star },
-    { value: "streak", label: "Streaks", icon: Zap },
-    { value: "roleplay_complete", label: "Roleplay", icon: Target },
-    { value: "test_score", label: "Tests", icon: Target },
-    { value: "performance_indicator", label: "Performance", icon: Target },
-  ];
+  const categoryIcons = {
+    Performance: <TrendingUp className="h-5 w-5" />,
+    Consistency: <Target className="h-5 w-5" />,
+    Mastery: <Zap className="h-5 w-5" />,
+    Special: <Star className="h-5 w-5" />
+  };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl">
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
+    <MainLayout>
+      <div className="max-w-6xl mx-auto py-8 px-4 space-y-8">
         {/* Header */}
-        <div className="mb-8">
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center"
+        >
           <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
             Achievements
           </h1>
-          <p className="text-muted-foreground text-lg">
-            Track your progress and unlock rewards as you master DECA skills
+          <p className="text-muted-foreground">
+            Track your progress and unlock rewards
           </p>
-        </div>
+        </motion.div>
 
-        {/* Statistics Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Total Earned</p>
-                  <p className="text-2xl font-bold">{stats.earned}</p>
-                </div>
-                <Trophy className="h-8 w-8 text-primary opacity-20" />
-              </div>
-            </CardContent>
-          </Card>
+        {/* Progress Overview */}
+        {user && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+          >
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Trophy className="h-5 w-5 text-yellow-500" />
+                  Your Progress
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <AchievementProgress userId={user.id} />
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
 
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Total Points</p>
-                  <p className="text-2xl font-bold">{stats.points}</p>
-                </div>
-                <Star className="h-8 w-8 text-yellow-500 opacity-20" />
-              </div>
-            </CardContent>
-          </Card>
+        {/* Achievement Tabs */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          <Tabs defaultValue="earned" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="earned">
+                Earned ({earnedAchievements.length})
+              </TabsTrigger>
+              <TabsTrigger value="locked">
+                Locked ({lockedAchievements.length})
+              </TabsTrigger>
+            </TabsList>
 
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Completion</p>
-                  <p className="text-2xl font-bold">{stats.percentage}%</p>
-                </div>
-                <Target className="h-8 w-8 text-green-500 opacity-20" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Progress</span>
-                  <span className="font-medium">{stats.earned}/{stats.total}</span>
-                </div>
-                <Progress value={stats.percentage} className="h-2" />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Achievements Tabs */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Achievement Gallery</CardTitle>
-            <CardDescription>
-              Earn achievements by completing challenges and reaching milestones
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Tabs value={selectedCategory} onValueChange={setSelectedCategory}>
-              <TabsList className="grid grid-cols-3 lg:grid-cols-6 w-full mb-6">
-                {categories.map((category) => (
-                  <TabsTrigger
-                    key={category.value}
-                    value={category.value}
-                    className="flex items-center gap-2"
-                  >
-                    <category.icon className="h-4 w-4" />
-                    <span className="hidden sm:inline">{category.label}</span>
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-
-              <TabsContent value={selectedCategory} className="mt-6">
-                {isLoading ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {[...Array(6)].map((_, i) => (
-                      <Skeleton key={i} className="h-40" />
+            <TabsContent value="earned" className="space-y-6 mt-6">
+              {Object.entries(categorizedAchievements.earned).map(([category, achievements]) => (
+                <div key={category} className="space-y-3">
+                  <h3 className="font-semibold flex items-center gap-2">
+                    {categoryIcons[category as keyof typeof categoryIcons]}
+                    {category} ({achievements.length})
+                  </h3>
+                  <div className="grid gap-3 md:grid-cols-2">
+                    {achievements.map((achievement: any) => (
+                      <AchievementCard key={achievement.id} achievement={achievement} />
                     ))}
                   </div>
-                ) : (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.3 }}
-                    className="grid grid-cols-1 md:grid-cols-2 gap-4"
-                  >
-                    {filteredAchievements?.length === 0 ? (
-                      <div className="col-span-2 text-center py-12">
-                        <Trophy className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                        <p className="text-muted-foreground">
-                          No achievements found in this category
-                        </p>
-                      </div>
-                    ) : (
-                      filteredAchievements?.map((achievement: any, index: number) => (
-                        <motion.div
-                          key={achievement.id}
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: index * 0.05 }}
-                        >
-                          <AchievementCard
-                            achievement={achievement}
-                            isEarned={achievement.isEarned}
-                            showProgress={!achievement.isEarned}
-                          />
-                        </motion.div>
-                      ))
-                    )}
-                  </motion.div>
-                )}
-              </TabsContent>
-            </Tabs>
-          </CardContent>
-        </Card>
+                  {achievements.length === 0 && (
+                    <p className="text-sm text-muted-foreground">
+                      No {category.toLowerCase()} achievements earned yet
+                    </p>
+                  )}
+                </div>
+              ))}
+            </TabsContent>
 
-        {/* Tier Legend */}
-        <Card className="mt-8">
-          <CardHeader>
-            <CardTitle>Achievement Tiers</CardTitle>
-            <CardDescription>
-              Achievements come in different tiers based on difficulty
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-wrap gap-4">
-              <div className="flex items-center gap-2">
-                <Badge variant="outline" className="bg-amber-100 text-amber-700">
-                  Bronze Tier
-                </Badge>
-                <span className="text-sm text-muted-foreground">Entry level achievements</span>
-              </div>
-              <Separator orientation="vertical" className="h-6" />
-              <div className="flex items-center gap-2">
-                <Badge variant="outline" className="bg-gray-100 text-gray-700">
-                  Silver Tier
-                </Badge>
-                <span className="text-sm text-muted-foreground">Intermediate challenges</span>
-              </div>
-              <Separator orientation="vertical" className="h-6" />
-              <div className="flex items-center gap-2">
-                <Badge variant="outline" className="bg-yellow-100 text-yellow-700">
-                  Gold Tier
-                </Badge>
-                <span className="text-sm text-muted-foreground">Master level accomplishments</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
-    </div>
+            <TabsContent value="locked" className="space-y-6 mt-6">
+              {Object.entries(categorizedAchievements.locked).map(([category, achievements]) => (
+                <div key={category} className="space-y-3">
+                  <h3 className="font-semibold flex items-center gap-2">
+                    {categoryIcons[category as keyof typeof categoryIcons]}
+                    {category} ({achievements.length})
+                  </h3>
+                  <div className="grid gap-3 md:grid-cols-2">
+                    {achievements.map((achievement: any) => (
+                      <div key={achievement.id} className="opacity-60">
+                        <AchievementCard achievement={{
+                          ...achievement,
+                          earnedAt: null
+                        }} />
+                      </div>
+                    ))}
+                  </div>
+                  {achievements.length === 0 && (
+                    <p className="text-sm text-muted-foreground">
+                      All {category.toLowerCase()} achievements earned!
+                    </p>
+                  )}
+                </div>
+              ))}
+            </TabsContent>
+          </Tabs>
+        </motion.div>
+      </div>
+    </MainLayout>
   );
 }
