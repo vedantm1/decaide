@@ -43,7 +43,7 @@ interface GeneratedScenario {
     challenges: string[];
   };
   evaluationCriteria: string[];
-  performanceIndicators?: string[];
+  performanceIndicators?: PIWithArea[];
 }
 
 export function EnhancedRoleplayGenerator() {
@@ -152,6 +152,10 @@ export function EnhancedRoleplayGenerator() {
       }
 
       const scenario = await response.json();
+      // If the scenario has PIs, update the selected PIs state
+      if (scenario.performanceIndicators && scenario.performanceIndicators.length > 0) {
+        setSelectedPIs(scenario.performanceIndicators);
+      }
       setGeneratedScenario(scenario);
       
       // Show success notification
@@ -294,7 +298,10 @@ export function EnhancedRoleplayGenerator() {
                   <Badge variant="outline" className="mt-0.5">
                     {index + 1}
                   </Badge>
-                  <p className="text-sm">{formatPI(pi)}</p>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium">{pi.pi}</p>
+                    <p className="text-xs text-muted-foreground">{pi.instructionalArea}</p>
+                  </div>
                 </div>
               ))}
             </div>
@@ -521,14 +528,14 @@ export function EnhancedRoleplayGenerator() {
                 </div>
 
                 {/* Performance Indicators */}
-                {selectedPIs.length > 0 && (
+                {(generatedScenario.performanceIndicators || selectedPIs).length > 0 && (
                   <div>
                     <h4 className="font-semibold mb-2 flex items-center gap-2">
                       <BookOpen className="h-4 w-4" />
                       Performance Indicators
                     </h4>
                     <div className="bg-primary/5 rounded-lg p-4 space-y-3">
-                      {selectedPIs.map((piData, idx) => (
+                      {(generatedScenario.performanceIndicators || selectedPIs).map((piData, idx) => (
                         <div key={idx} className="space-y-1">
                           <div className="flex items-start gap-2">
                             <Badge variant="outline" className="mt-0.5">
