@@ -145,6 +145,14 @@ export const DECA_EVENTS: DecaEvent[] = [
     instructionalAreas: ['Business Law', 'Communication Skills', 'Customer Relations', 'Economics', 'Emotional Intelligence', 'Financial Analysis', 'Human Resources Management', 'Information Management', 'Marketing', 'Operations', 'Professional Development', 'Strategic Management'],
     description: 'Individual event focusing on restaurant and food service management'
   },
+  {
+    name: 'Quick Serve Restaurant Management Series (QSRM)',
+    code: 'QSRM',
+    cluster: 'Hospitality & Tourism',
+    type: 'individual',
+    instructionalAreas: ['Business Law', 'Communication Skills', 'Customer Relations', 'Economics', 'Emotional Intelligence', 'Financial Analysis', 'Human Resources Management', 'Information Management', 'Marketing', 'Operations', 'Professional Development', 'Strategic Management'],
+    description: 'Individual event focusing on quick serve restaurant management'
+  },
   
   // Marketing Career Cluster
   {

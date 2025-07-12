@@ -279,149 +279,38 @@ export function EnhancedRoleplayGenerator() {
         </Card>
       )}
 
-      {/* Selected PIs Display */}
-      {selectedPIs.length > 0 && (
-        <Card className="border-green-200 bg-green-50">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Target className="h-5 w-5" />
-              Selected Performance Indicators
-            </CardTitle>
-            <CardDescription>
-              These PIs will be used for your roleplay scenario
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {selectedPIs.map((pi, index) => (
-                <div key={index} className="flex items-start gap-2">
-                  <Badge variant="outline" className="mt-0.5">
-                    {index + 1}
-                  </Badge>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">{pi.pi}</p>
-                    <p className="text-xs text-muted-foreground">{pi.instructionalArea}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
+
 
       {/* Settings Panel */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Settings className="h-5 w-5" />
-            Scenario Settings
+            PI Settings
           </CardTitle>
           <CardDescription>
-            Customize your roleplay experience
+            Select Performance Indicators for your DECA event
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="normal" className="space-y-4">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="normal">Normal</TabsTrigger>
-              <TabsTrigger value="custom">Custom</TabsTrigger>
-            </TabsList>
-
-            {/* Normal Settings */}
-            <TabsContent value="normal" className="space-y-6">
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label>Duration (minutes)</Label>
-                  <span className="text-sm font-medium">{settings.duration} min</span>
-                </div>
-                <Slider
-                  value={[settings.duration]}
-                  onValueChange={([value]) => setSettings({...settings, duration: value})}
-                  min={5}
-                  max={30}
-                  step={5}
-                  className="w-full"
-                />
-              </div>
-            </TabsContent>
-
-            {/* Custom Instructions */}
-            <TabsContent value="custom" className="space-y-4">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Include Objections</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Add realistic customer objections and concerns
-                    </p>
-                  </div>
-                  <Switch
-                    checked={settings.includeObjections}
-                    onCheckedChange={(checked) => setSettings({...settings, includeObjections: checked})}
-                  />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Real-Time Mode</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Dynamic responses that adapt to your choices
-                    </p>
-                  </div>
-                  <Switch
-                    checked={settings.realTimeMode}
-                    onCheckedChange={(checked) => setSettings({...settings, realTimeMode: checked})}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Focus Area (Optional)</Label>
-                  <select
-                    className="w-full p-2 border rounded-md"
-                    value={settings.focusArea || ''}
-                    onChange={(e) => setSettings({...settings, focusArea: e.target.value || undefined})}
-                  >
-                    <option value="">No specific focus</option>
-                    <option value="negotiation">Negotiation Skills</option>
-                    <option value="objection-handling">Objection Handling</option>
-                    <option value="closing">Closing Techniques</option>
-                    <option value="relationship-building">Relationship Building</option>
-                    <option value="problem-solving">Problem Solving</option>
-                  </select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Instructional Area (Optional)</Label>
-                  <p className="text-sm text-muted-foreground mb-2">
-                    Choose a specific instructional area, or leave blank for random selection
-                  </p>
-                  <select
-                    className="w-full p-2 border rounded-md"
-                    value={selectedInstructionalArea}
-                    onChange={(e) => setSelectedInstructionalArea(e.target.value)}
-                  >
-                    <option value="">Random selection</option>
-                    {user?.selectedEvent && getInstructionalAreasForCluster(getClusterFromEvent(user.selectedEvent)).map((area) => (
-                      <option key={area} value={area}>{area}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Custom Instructions</Label>
-                  <p className="text-sm text-muted-foreground mb-2">
-                    Add specific requirements or context for your scenario
-                  </p>
-                  <Textarea
-                    placeholder="E.g., 'Focus on B2B sales in the tech industry' or 'Include sustainability concerns'"
-                    value={customInstructions}
-                    onChange={(e) => setCustomInstructions(e.target.value)}
-                    className="min-h-[100px]"
-                  />
-                </div>
-              </div>
-            </TabsContent>
-          </Tabs>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Instructional Area (Optional)</Label>
+              <p className="text-sm text-muted-foreground">
+                Choose a specific instructional area, or leave blank for random selection
+              </p>
+              <select
+                className="w-full p-2 border rounded-md"
+                value={selectedInstructionalArea}
+                onChange={(e) => setSelectedInstructionalArea(e.target.value)}
+              >
+                <option value="">Random selection</option>
+                {user?.selectedEvent && getInstructionalAreasForCluster(getClusterFromEvent(user.selectedEvent)).map((area) => (
+                  <option key={area} value={area}>{area}</option>
+                ))}
+              </select>
+            </div>
+          </div>
 
           {/* Generate Button */}
           <motion.div
@@ -430,20 +319,20 @@ export function EnhancedRoleplayGenerator() {
             className="mt-6"
           >
             <Button
-              onClick={handleGenerateScenario}
-              disabled={isGenerating}
+              onClick={handleGeneratePIs}
+              disabled={isGeneratingPIs}
               size="lg"
               className="w-full"
             >
-              {isGenerating ? (
+              {isGeneratingPIs ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Generating Scenario...
+                  Generating PIs...
                 </>
               ) : (
                 <>
-                  <Sparkles className="mr-2 h-4 w-4" />
-                  Generate Scenario
+                  <BookOpen className="mr-2 h-4 w-4" />
+                  Generate Performance Indicators
                 </>
               )}
             </Button>
@@ -451,9 +340,9 @@ export function EnhancedRoleplayGenerator() {
         </CardContent>
       </Card>
 
-      {/* Generated Scenario */}
+      {/* Performance Indicators */}
       <AnimatePresence>
-        {generatedScenario && (
+        {selectedPIs.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -461,108 +350,34 @@ export function EnhancedRoleplayGenerator() {
           >
             <Card className="border-primary/20">
               <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-xl">{generatedScenario.title}</CardTitle>
-                  {generatedScenario.difficulty && (
-                    <Badge className={difficultyColors[generatedScenario.difficulty as keyof typeof difficultyColors]}>
-                      {generatedScenario.difficulty}
-                    </Badge>
-                  )}
-                </div>
-                <CardDescription className="mt-2">
-                  {generatedScenario.description}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {/* Objectives */}
-                <div>
-                  <h4 className="font-semibold mb-2 flex items-center gap-2">
-                    <Target className="h-4 w-4" />
-                    Objectives
-                  </h4>
-                  <ul className="space-y-1">
-                    {generatedScenario.objectives.map((objective, idx) => (
-                      <li key={idx} className="flex items-start gap-2">
-                        <ChevronRight className="h-4 w-4 mt-0.5 text-primary" />
-                        <span className="text-sm">{objective}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* Character Profile */}
-                <div>
-                  <h4 className="font-semibold mb-2 flex items-center gap-2">
-                    <Brain className="h-4 w-4" />
-                    Character Profile
-                  </h4>
-                  <div className="bg-secondary/20 rounded-lg p-4 space-y-2">
-                    <p><strong>Name:</strong> {generatedScenario.character.name}</p>
-                    <p><strong>Role:</strong> {generatedScenario.character.role}</p>
-                    <p><strong>Personality:</strong> {generatedScenario.character.personality}</p>
-                    <p><strong>Background:</strong> {generatedScenario.character.background}</p>
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                    <BookOpen className="h-5 w-5 text-primary" />
                   </div>
-                </div>
-
-                {/* Context */}
-                <div>
-                  <h4 className="font-semibold mb-2 flex items-center gap-2">
-                    <Zap className="h-4 w-4" />
-                    Scenario Context
-                  </h4>
-                  <div className="space-y-2">
-                    <p><strong>Company:</strong> {generatedScenario.context.company}</p>
-                    <p><strong>Industry:</strong> {generatedScenario.context.industry}</p>
-                    <p><strong>Situation:</strong> {generatedScenario.context.situation}</p>
-                    <div>
-                      <strong>Key Challenges:</strong>
-                      <ul className="mt-1 space-y-1">
-                        {generatedScenario.context.challenges.map((challenge, idx) => (
-                          <li key={idx} className="text-sm text-muted-foreground ml-4">
-                            • {challenge}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Performance Indicators */}
-                {(generatedScenario.performanceIndicators || selectedPIs).length > 0 && (
                   <div>
-                    <h4 className="font-semibold mb-2 flex items-center gap-2">
-                      <BookOpen className="h-4 w-4" />
-                      Performance Indicators
-                    </h4>
-                    <div className="bg-primary/5 rounded-lg p-4 space-y-3">
-                      {(generatedScenario.performanceIndicators || selectedPIs).map((piData, idx) => (
-                        <div key={idx} className="space-y-1">
-                          <div className="flex items-start gap-2">
-                            <Badge variant="outline" className="mt-0.5">
-                              {idx + 1}
-                            </Badge>
-                            <span className="text-sm font-medium">{piData.pi}</span>
-                          </div>
-                          <div className="ml-8">
-                            <Badge variant="secondary" className="text-xs">
-                              {piData.instructionalArea}
-                            </Badge>
-                          </div>
-                        </div>
-                      ))}
+                    <CardTitle className="text-xl">Performance Indicators</CardTitle>
+                    <CardDescription>
+                      {user?.selectedEvent}
+                    </CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {selectedPIs.map((piData, idx) => (
+                  <div key={idx} className="space-y-1">
+                    <div className="flex items-start gap-2">
+                      <Badge variant="outline" className="mt-0.5">
+                        {idx + 1}
+                      </Badge>
+                      <span className="text-sm font-medium">{piData.pi}</span>
+                    </div>
+                    <div className="ml-8">
+                      <Badge variant="secondary" className="text-xs">
+                        {piData.instructionalArea}
+                      </Badge>
                     </div>
                   </div>
-                )}
-
-                {/* Start Button */}
-                <Button 
-                  size="lg" 
-                  className="w-full"
-                  onClick={() => window.location.href = `/roleplay/session/${generatedScenario.id}`}
-                >
-                  Start Roleplay Session
-                  <ChevronRight className="ml-2 h-4 w-4" />
-                </Button>
+                ))}
               </CardContent>
             </Card>
           </motion.div>

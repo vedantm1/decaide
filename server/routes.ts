@@ -321,20 +321,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const scenario = {
         id: scenarioId,
-        title: aiScenario.title,
-        description: aiScenario.description,
+        title: selectedEvent || 'DECA Roleplay Scenario',
+        description: '',
         difficulty: '',
         estimatedTime: duration,
-        objectives: aiScenario.objectives,
-        character: aiScenario.character,
-        context: aiScenario.context,
-        evaluationCriteria: [
-          "Communication clarity",
-          "Problem-solving approach",
-          "Professional demeanor",
-          "Product knowledge",
-          "Closing effectiveness"
-        ],
+        objectives: [],
+        character: null,
+        context: null,
+        evaluationCriteria: [],
         performanceIndicators: generatedPIs.length > 0 ? generatedPIs : []
       };
       
