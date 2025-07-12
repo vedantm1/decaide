@@ -218,7 +218,8 @@ export function getClusterFromEvent(eventName: string): string {
 
 // Check if event is team-based
 export function isTeamEvent(eventName: string): boolean {
-  return TEAM_EVENTS.includes(eventName);
+  const event = getEventByName(eventName);
+  return event ? event.type === 'team' : false;
 }
 
 // Get all PIs for a specific instructional area within a cluster
@@ -265,7 +266,10 @@ export function getRandomPIsForRoleplay(eventName: string, selectedInstructional
   }
   
   const cluster = event.cluster;
-  const numPIs = isTeamEvent(eventName) ? 7 : 5;
+  const isTeam = isTeamEvent(eventName);
+  const numPIs = isTeam ? 7 : 5;
+  
+  console.log(`Event: ${eventName}, Type: ${event.type}, Is Team: ${isTeam}, Target PIs: ${numPIs}`);
   
   // Map cluster names to JSON cluster names
   const clusterMappings: { [key: string]: string } = {
