@@ -307,8 +307,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         details: JSON.stringify({
           scenarioId,
           title: scenario.title,
-          difficulty,
-          scenarioType,
           duration,
           scenario
         })
