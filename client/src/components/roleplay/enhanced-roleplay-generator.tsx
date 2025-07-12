@@ -353,18 +353,11 @@ export function EnhancedRoleplayGenerator() {
               </CardHeader>
               <CardContent className="space-y-3">
                 {selectedPIs.map((piData, idx) => (
-                  <div key={idx} className="space-y-1">
-                    <div className="flex items-start gap-2">
-                      <Badge variant="outline" className="mt-0.5">
-                        {idx + 1}
-                      </Badge>
-                      <span className="text-sm font-medium">{piData.pi}</span>
-                    </div>
-                    <div className="ml-8">
-                      <Badge variant="secondary" className="text-xs">
-                        {piData.instructionalArea}
-                      </Badge>
-                    </div>
+                  <div key={idx} className="flex items-start gap-2">
+                    <Badge variant="outline" className="mt-0.5">
+                      {idx + 1}
+                    </Badge>
+                    <span className="text-sm font-medium">{piData.pi}</span>
                   </div>
                 ))}
               </CardContent>
