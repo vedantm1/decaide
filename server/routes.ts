@@ -294,6 +294,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         "objectives": ["objective1", "objective2", "objective3"]
       }`;
 
+      const openai = getOpenAIClient();
       const response = await openai.chat.completions.create({
         model: "gpt-4o-mini",
         messages: [
