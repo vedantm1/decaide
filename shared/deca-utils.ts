@@ -163,7 +163,7 @@ export function getRandomPIsForRoleplay(eventName: string, selectedInstructional
     'Entrepreneurship': 'Entrepreneurship Career Cluster',
     'Business Administration Core': 'Business Administration Core Career Cluster',
     'Finance': 'Finance Career Cluster',
-    'Hospitality & Tourism': 'Hospitality and Tourism Career Cluster',
+    'Hospitality & Tourism': 'Hospitality Career Cluster',
     'Marketing': 'Marketing Career Cluster',
     'Business Management & Administration': 'Business Management and Administration Career Cluster'
   };
@@ -213,7 +213,7 @@ export function getInstructionalAreasForCluster(cluster: string): string[] {
     'Entrepreneurship': 'Entrepreneurship Career Cluster',
     'Business Administration Core': 'Business Administration Core Career Cluster',
     'Finance': 'Finance Career Cluster',
-    'Hospitality & Tourism': 'Hospitality and Tourism Career Cluster',
+    'Hospitality & Tourism': 'Hospitality Career Cluster',
     'Marketing': 'Marketing Career Cluster',
     'Business Management & Administration': 'Business Management and Administration Career Cluster'
   };

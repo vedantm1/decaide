@@ -9,6 +9,7 @@ import {
   PI_CATEGORIES,
   SUBSCRIPTION_LIMITS,
 } from "@shared/schema";
+import { getRandomPIsForRoleplay } from "@shared/deca-utils";
 import aiRoutes from "./routes/aiRoutes";
 import chatRoutes from "./routes/chatRoutes";
 
@@ -255,6 +256,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Generate unique ID for scenario
       const scenarioId = `scenario_${Date.now()}`;
       
+      // Get user's selected event for PI generation  
+      const user = await storage.getUser(userId);
+      const selectedEvent = user?.selectedEvent || userEvent;
+      
+      // Generate PIs using the actual function from deca-utils
+      const generatedPIs = selectedEvent 
+        ? getRandomPIsForRoleplay(selectedEvent, focusArea)
+        : [];
+      
       // Generate simple randomized scenario
       const companyNames = [
         "TechSolutions Inc", "Global Innovations LLC", "Strategic Partners Corp", 
@@ -292,7 +302,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const selectedPersonality = personalities[Math.floor(Math.random() * personalities.length)];
       
       const aiScenario = {
-        title: `${selectedIndustry} Business Meeting${userEvent ? ` - ${userEvent}` : ''}`,
+        title: `${selectedIndustry} Business Meeting${selectedEvent ? ` - ${selectedEvent}` : ''}`,
         description: `A ${duration}-minute business roleplay scenario with ${selectedCompany}`,
         character: {
           name: selectedName,
@@ -325,7 +335,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           "Product knowledge",
           "Closing effectiveness"
         ],
-        performanceIndicators: performanceIndicators || []
+        performanceIndicators: generatedPIs.length > 0 ? generatedPIs : []
       };
       
       // Record the generation
