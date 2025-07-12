@@ -125,6 +125,13 @@ DecA(I)de is an AI-powered educational platform designed to help high school stu
 
 ## Changelog
 
+- July 12, 2025. Implemented comprehensive PI selection system
+  - Added authentic PI selection from deca-pis.json file
+  - Fixed cluster mapping for all DECA career clusters
+  - Added 17 comprehensive DECA events across all clusters
+  - Implemented proper team vs individual event handling (7 vs 5 PIs)
+  - Removed Azure OpenAI dependency in favor of reliable randomization
+  - System now displays exact PI text with instructional area information
 - July 04, 2025. Initial setup
 
 ## User Preferences
