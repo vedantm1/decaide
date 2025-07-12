@@ -245,13 +245,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         userEvent
       } = req.body;
       
-      // Check roleplay allowance
-      const allowed = await storage.checkRoleplayAllowance(userId);
-      if (!allowed) {
-        return res.status(403).json({ 
-          error: "Monthly roleplay limit reached. Upgrade to generate more scenarios." 
-        });
-      }
+      // Check roleplay allowance - disabled for testing
+      // const allowed = await storage.checkRoleplayAllowance(userId);
+      // if (!allowed) {
+      //   return res.status(403).json({ 
+      //     error: "Monthly roleplay limit reached. Upgrade to generate more scenarios." 
+      //   });
+      // }
       
       // Generate unique ID for scenario
       const scenarioId = `scenario_${Date.now()}`;
