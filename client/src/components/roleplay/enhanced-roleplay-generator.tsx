@@ -14,7 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useNotifications } from '@/components/notifications/notification-provider';
 import { Sparkles, Settings, Target, Brain, Zap, ChevronRight, Loader2, Award, BookOpen, Users } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import { getRandomPIsForRoleplay, isTeamEvent, formatPI } from '@shared/deca-utils';
+import { getRandomPIsForRoleplay, isTeamEvent, PIWithArea } from '@shared/deca-utils';
 
 interface RoleplaySettings {
   duration: number;
@@ -55,7 +55,7 @@ export function EnhancedRoleplayGenerator() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedScenario, setGeneratedScenario] = useState<GeneratedScenario | null>(null);
   const [customInstructions, setCustomInstructions] = useState('');
-  const [selectedPIs, setSelectedPIs] = useState<string[]>([]);
+  const [selectedPIs, setSelectedPIs] = useState<PIWithArea[]>([]);
   const [isGeneratingPIs, setIsGeneratingPIs] = useState(false);
   const { toast } = useToast();
   const { addNotification } = useNotifications();
@@ -141,7 +141,7 @@ export function EnhancedRoleplayGenerator() {
         body: JSON.stringify({
           ...settings,
           customInstructions: customInstructions.trim() || undefined,
-          performanceIndicators: pisToUse,
+          performanceIndicators: pisToUse.map(pi => pi.pi),
           userEvent: user?.selectedEvent
         })
       });
@@ -501,19 +501,26 @@ export function EnhancedRoleplayGenerator() {
                 </div>
 
                 {/* Performance Indicators */}
-                {generatedScenario.performanceIndicators && generatedScenario.performanceIndicators.length > 0 && (
+                {selectedPIs.length > 0 && (
                   <div>
                     <h4 className="font-semibold mb-2 flex items-center gap-2">
                       <BookOpen className="h-4 w-4" />
                       Performance Indicators
                     </h4>
-                    <div className="bg-primary/5 rounded-lg p-4 space-y-2">
-                      {generatedScenario.performanceIndicators.map((pi, idx) => (
-                        <div key={idx} className="flex items-start gap-2">
-                          <Badge variant="outline" className="mt-0.5">
-                            {idx + 1}
-                          </Badge>
-                          <span className="text-sm">{formatPI(pi)}</span>
+                    <div className="bg-primary/5 rounded-lg p-4 space-y-3">
+                      {selectedPIs.map((piData, idx) => (
+                        <div key={idx} className="space-y-1">
+                          <div className="flex items-start gap-2">
+                            <Badge variant="outline" className="mt-0.5">
+                              {idx + 1}
+                            </Badge>
+                            <span className="text-sm font-medium">{piData.pi}</span>
+                          </div>
+                          <div className="ml-8">
+                            <Badge variant="secondary" className="text-xs">
+                              {piData.instructionalArea}
+                            </Badge>
+                          </div>
                         </div>
                       ))}
                     </div>

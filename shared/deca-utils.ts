@@ -141,8 +141,14 @@ export function getPIsForInstructionalArea(cluster: string, instructionalArea: s
   return [];
 }
 
+// Interface for PI with instructional area information
+export interface PIWithArea {
+  pi: string;
+  instructionalArea: string;
+}
+
 // Get random PIs for roleplay based on selected event
-export function getRandomPIsForRoleplay(eventName: string): string[] {
+export function getRandomPIsForRoleplay(eventName: string): PIWithArea[] {
   const event = getEventByName(eventName);
   if (!event) {
     console.warn(`Event "${eventName}" not found`);
@@ -167,12 +173,15 @@ export function getRandomPIsForRoleplay(eventName: string): string[] {
   }
   
   // Randomly select the required number of PIs
-  const selectedPIs: string[] = [];
+  const selectedPIs: PIWithArea[] = [];
   const availablePIs = [...allPIs]; // Create a copy to avoid modifying original
   
   for (let i = 0; i < Math.min(numPIs, availablePIs.length); i++) {
     const randomIndex = Math.floor(Math.random() * availablePIs.length);
-    selectedPIs.push(availablePIs.splice(randomIndex, 1)[0]);
+    selectedPIs.push({
+      pi: availablePIs.splice(randomIndex, 1)[0],
+      instructionalArea: randomArea
+    });
   }
   
   return selectedPIs;
