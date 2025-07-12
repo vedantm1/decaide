@@ -20,20 +20,30 @@ export const TEAM_EVENTS = [
   'International Business Team Decision Making (IBTDM)',
   'Marketing Management Team Decision Making (MTDM)',
   'Sports and Entertainment Marketing Team Decision Making (STDM)',
-  'Travel and Tourism Team Decision Making (TTDM)'
+  'Travel and Tourism Team Decision Making (TTDM)',
+  'Business Management and Administration Team Decision Making (BTDM)'
 ];
 
 // Full DECA event list with clusters and instructional areas
 export const DECA_EVENTS: DecaEvent[] = [
   // Entrepreneurship Career Cluster
   {
-    name: 'Entrepreneurship Career Cluster',
-    code: 'ECC',
+    name: 'Entrepreneurship Team Decision Making (ETDM)',
+    code: 'ETDM',
+    cluster: 'Entrepreneurship',
+    type: 'team',
+    instructionalAreas: ['Business Law', 'Communication Skills', 'Customer Relations', 'Economics', 'Emotional Intelligence', 'Entrepreneurship', 'Financial Analysis', 'Human Resources Management', 'Information Management', 'Marketing', 'Operations', 'Professional Development', 'Strategic Management'],
+    description: 'Team decision making for entrepreneurship ventures'
+  },
+  {
+    name: 'Independent Business Plan (IBP)',
+    code: 'IBP',
     cluster: 'Entrepreneurship',
     type: 'individual',
     instructionalAreas: ['Business Law', 'Communication Skills', 'Customer Relations', 'Economics', 'Emotional Intelligence', 'Entrepreneurship', 'Financial Analysis', 'Human Resources Management', 'Information Management', 'Marketing', 'Operations', 'Professional Development', 'Strategic Management'],
-    description: 'Focuses on entrepreneurship and small business management'
+    description: 'Individual business plan development and presentation'
   },
+  
   // Business Management & Administration
   {
     name: 'Business Solutions Project (PMBS)',
@@ -43,10 +53,27 @@ export const DECA_EVENTS: DecaEvent[] = [
     instructionalAreas: ['Business Law', 'Communication Skills', 'Customer Relations', 'Economics', 'Emotional Intelligence', 'Financial Analysis', 'Human Resources Management', 'Information Management', 'Marketing', 'Operations', 'Professional Development', 'Strategic Management'],
     description: 'Team-based project focusing on business solutions and management'
   },
+  {
+    name: 'Business Management and Administration Team Decision Making (BTDM)',
+    code: 'BTDM',
+    cluster: 'Business Management & Administration',
+    type: 'team',
+    instructionalAreas: ['Business Law', 'Communication Skills', 'Customer Relations', 'Economics', 'Emotional Intelligence', 'Financial Analysis', 'Human Resources Management', 'Information Management', 'Marketing', 'Operations', 'Professional Development', 'Strategic Management'],
+    description: 'Team decision making for business management and administration'
+  },
+  {
+    name: 'Human Resources Management Series (HRM)',
+    code: 'HRM',
+    cluster: 'Business Management & Administration',
+    type: 'individual',
+    instructionalAreas: ['Business Law', 'Communication Skills', 'Customer Relations', 'Economics', 'Emotional Intelligence', 'Financial Analysis', 'Human Resources Management', 'Information Management', 'Marketing', 'Operations', 'Professional Development', 'Strategic Management'],
+    description: 'Individual event focusing on human resources management'
+  },
+  
   // Finance Career Cluster
   {
-    name: 'Accounting Applications (FTDM)',
-    code: 'FTDM',
+    name: 'Accounting Applications Series (ACT)',
+    code: 'ACT',
     cluster: 'Finance',
     type: 'individual',
     instructionalAreas: ['Business Law', 'Communication Skills', 'Customer Relations', 'Economics', 'Emotional Intelligence', 'Financial Analysis', 'Human Resources Management', 'Information Management', 'Marketing', 'Operations', 'Professional Development', 'Strategic Management'],
@@ -60,6 +87,23 @@ export const DECA_EVENTS: DecaEvent[] = [
     instructionalAreas: ['Business Law', 'Communication Skills', 'Customer Relations', 'Economics', 'Emotional Intelligence', 'Financial Analysis', 'Human Resources Management', 'Information Management', 'Marketing', 'Operations', 'Professional Development', 'Strategic Management'],
     description: 'Team decision making event for financial services'
   },
+  {
+    name: 'Personal Financial Literacy Event (PFL)',
+    code: 'PFL',
+    cluster: 'Finance',
+    type: 'individual',
+    instructionalAreas: ['Business Law', 'Communication Skills', 'Customer Relations', 'Economics', 'Emotional Intelligence', 'Financial Analysis', 'Human Resources Management', 'Information Management', 'Marketing', 'Operations', 'Professional Development', 'Strategic Management'],
+    description: 'Individual event focusing on personal financial literacy'
+  },
+  {
+    name: 'Banking and Financial Services Series (BFIN)',
+    code: 'BFIN',
+    cluster: 'Finance',
+    type: 'individual',
+    instructionalAreas: ['Business Law', 'Communication Skills', 'Customer Relations', 'Economics', 'Emotional Intelligence', 'Financial Analysis', 'Human Resources Management', 'Information Management', 'Marketing', 'Operations', 'Professional Development', 'Strategic Management'],
+    description: 'Individual event focusing on banking and financial services'
+  },
+  
   // Hospitality & Tourism
   {
     name: 'Hospitality Services Team Decision Making (HTDM)',
@@ -85,6 +129,15 @@ export const DECA_EVENTS: DecaEvent[] = [
     instructionalAreas: ['Business Law', 'Communication Skills', 'Customer Relations', 'Economics', 'Emotional Intelligence', 'Financial Analysis', 'Human Resources Management', 'Information Management', 'Marketing', 'Operations', 'Professional Development', 'Strategic Management'],
     description: 'Team decision making for travel and tourism industry'
   },
+  {
+    name: 'Restaurant and Food Service Management Series (RFSM)',
+    code: 'RFSM',
+    cluster: 'Hospitality & Tourism',
+    type: 'individual',
+    instructionalAreas: ['Business Law', 'Communication Skills', 'Customer Relations', 'Economics', 'Emotional Intelligence', 'Financial Analysis', 'Human Resources Management', 'Information Management', 'Marketing', 'Operations', 'Professional Development', 'Strategic Management'],
+    description: 'Individual event focusing on restaurant and food service management'
+  },
+  
   // Marketing Career Cluster
   {
     name: 'Marketing Management Team Decision Making (MTDM)',
@@ -101,6 +154,38 @@ export const DECA_EVENTS: DecaEvent[] = [
     type: 'team',
     instructionalAreas: ['Business Law', 'Communication Skills', 'Customer Relations', 'Economics', 'Emotional Intelligence', 'Financial Analysis', 'Human Resources Management', 'Information Management', 'Marketing', 'Operations', 'Professional Development', 'Strategic Management'],
     description: 'Team decision making for sports and entertainment marketing'
+  },
+  {
+    name: 'Marketing Communications Series (MCS)',
+    code: 'MCS',
+    cluster: 'Marketing',
+    type: 'individual',
+    instructionalAreas: ['Business Law', 'Communication Skills', 'Customer Relations', 'Economics', 'Emotional Intelligence', 'Financial Analysis', 'Human Resources Management', 'Information Management', 'Marketing', 'Operations', 'Professional Development', 'Strategic Management'],
+    description: 'Individual event focusing on marketing communications'
+  },
+  {
+    name: 'Professional Selling and Consulting (PSC)',
+    code: 'PSC',
+    cluster: 'Marketing',
+    type: 'individual',
+    instructionalAreas: ['Business Law', 'Communication Skills', 'Customer Relations', 'Economics', 'Emotional Intelligence', 'Financial Analysis', 'Human Resources Management', 'Information Management', 'Marketing', 'Operations', 'Professional Development', 'Strategic Management'],
+    description: 'Individual event focusing on professional selling and consulting'
+  },
+  {
+    name: 'Buying and Merchandising Team Decision Making (BTDM)',
+    code: 'BTDM',
+    cluster: 'Marketing',
+    type: 'team',
+    instructionalAreas: ['Business Law', 'Communication Skills', 'Customer Relations', 'Economics', 'Emotional Intelligence', 'Financial Analysis', 'Human Resources Management', 'Information Management', 'Marketing', 'Operations', 'Professional Development', 'Strategic Management'],
+    description: 'Team decision making for buying and merchandising'
+  },
+  {
+    name: 'Creative Marketing Project (CMP)',
+    code: 'CMP',
+    cluster: 'Marketing',
+    type: 'individual',
+    instructionalAreas: ['Business Law', 'Communication Skills', 'Customer Relations', 'Economics', 'Emotional Intelligence', 'Financial Analysis', 'Human Resources Management', 'Information Management', 'Marketing', 'Operations', 'Professional Development', 'Strategic Management'],
+    description: 'Individual creative marketing project and presentation'
   }
 ];
 
@@ -157,8 +242,6 @@ export interface PIWithArea {
 
 // Get random PIs for roleplay based on selected event and optional instructional area
 export function getRandomPIsForRoleplay(eventName: string, selectedInstructionalArea?: string): PIWithArea[] {
-  console.log(`PI Generation Debug: Event "${eventName}", Selected Area: "${selectedInstructionalArea}"`);
-  
   const event = getEventByName(eventName);
   if (!event) {
     console.warn(`Event "${eventName}" not found`);
@@ -167,7 +250,6 @@ export function getRandomPIsForRoleplay(eventName: string, selectedInstructional
   
   const cluster = event.cluster;
   const numPIs = isTeamEvent(eventName) ? 7 : 5;
-  console.log(`PI Generation Debug: Event found, Cluster: "${cluster}", NumPIs: ${numPIs}, IsTeam: ${isTeamEvent(eventName)}`);
   
   // Map cluster names to JSON cluster names
   const clusterMappings: { [key: string]: string } = {
@@ -176,17 +258,14 @@ export function getRandomPIsForRoleplay(eventName: string, selectedInstructional
     'Finance': 'Finance Career Cluster',
     'Hospitality & Tourism': 'Hospitality Career Cluster',
     'Marketing': 'Marketing Career Cluster',
-    'Business Management & Administration': 'Business Management and Administration Career Cluster'
+    'Business Management & Administration': 'Business Management & Administration Career Cluster'
   };
   
   const jsonClusterName = clusterMappings[cluster] || cluster;
-  console.log(`PI Generation Debug: Mapped cluster "${cluster}" to JSON cluster "${jsonClusterName}"`);
-  
   const clusterData = decaPIs[jsonClusterName as keyof typeof decaPIs];
   
   if (!clusterData) {
     console.warn(`Cluster "${jsonClusterName}" not found in PI data`);
-    console.log(`Available clusters:`, Object.keys(decaPIs));
     return [];
   }
   
@@ -196,10 +275,7 @@ export function getRandomPIsForRoleplay(eventName: string, selectedInstructional
     // Get available instructional areas from the JSON (they include abbreviations)
     const availableAreas = Object.keys(clusterData);
     instructionalAreaToUse = availableAreas[Math.floor(Math.random() * availableAreas.length)];
-    console.log(`PI Generation Debug: No specific area selected, using random area: "${instructionalAreaToUse}"`);
   }
-  
-  console.log(`PI Generation Debug: Available instructional areas:`, Object.keys(clusterData));
   
   // Get all PIs for this instructional area
   const allPIs = clusterData[instructionalAreaToUse as keyof typeof clusterData] as string[];
@@ -208,8 +284,6 @@ export function getRandomPIsForRoleplay(eventName: string, selectedInstructional
     console.warn(`No PIs found for instructional area "${instructionalAreaToUse}" in cluster "${jsonClusterName}"`);
     return [];
   }
-  
-  console.log(`PI Generation Debug: Found ${allPIs.length} PIs for area "${instructionalAreaToUse}"`);
   
   // Randomly select the required number of PIs
   const selectedPIs: PIWithArea[] = [];
@@ -223,7 +297,6 @@ export function getRandomPIsForRoleplay(eventName: string, selectedInstructional
     });
   }
   
-  console.log(`PI Generation Debug: Selected ${selectedPIs.length} PIs:`, selectedPIs);
   return selectedPIs;
 }
 
@@ -235,7 +308,7 @@ export function getInstructionalAreasForCluster(cluster: string): string[] {
     'Finance': 'Finance Career Cluster',
     'Hospitality & Tourism': 'Hospitality Career Cluster',
     'Marketing': 'Marketing Career Cluster',
-    'Business Management & Administration': 'Business Management and Administration Career Cluster'
+    'Business Management & Administration': 'Business Management & Administration Career Cluster'
   };
   
   const jsonClusterName = clusterMappings[cluster] || cluster;
