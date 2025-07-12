@@ -289,33 +289,55 @@ export function getRandomPIsForRoleplay(eventName: string, selectedInstructional
     return [];
   }
   
-  // Get instructional area to use
-  let instructionalAreaToUse = selectedInstructionalArea;
-  if (!instructionalAreaToUse) {
-    // Get available instructional areas from the JSON (they include abbreviations)
-    const availableAreas = Object.keys(clusterData);
-    instructionalAreaToUse = availableAreas[Math.floor(Math.random() * availableAreas.length)];
+  // Collect all PIs from all instructional areas in the cluster
+  const allPIsWithAreas: PIWithArea[] = [];
+  const availableAreas = Object.keys(clusterData);
+  
+  // If a specific instructional area is selected, try to get PIs from that area first
+  if (selectedInstructionalArea) {
+    const specificAreaPIs = clusterData[selectedInstructionalArea as keyof typeof clusterData] as string[];
+    if (specificAreaPIs && specificAreaPIs.length > 0) {
+      specificAreaPIs.forEach(pi => {
+        allPIsWithAreas.push({
+          pi,
+          instructionalArea: selectedInstructionalArea
+        });
+      });
+    }
   }
   
-  // Get all PIs for this instructional area
-  const allPIs = clusterData[instructionalAreaToUse as keyof typeof clusterData] as string[];
+  // If we don't have enough PIs yet, add from other areas
+  if (allPIsWithAreas.length < numPIs) {
+    for (const area of availableAreas) {
+      if (selectedInstructionalArea && area === selectedInstructionalArea) continue; // Skip already added
+      
+      const areaPIs = clusterData[area as keyof typeof clusterData] as string[];
+      if (areaPIs && areaPIs.length > 0) {
+        areaPIs.forEach(pi => {
+          allPIsWithAreas.push({
+            pi,
+            instructionalArea: area
+          });
+        });
+      }
+    }
+  }
   
-  if (!allPIs || allPIs.length === 0) {
-    console.warn(`No PIs found for instructional area "${instructionalAreaToUse}" in cluster "${jsonClusterName}"`);
+  if (allPIsWithAreas.length === 0) {
+    console.warn(`No PIs found in cluster "${jsonClusterName}"`);
     return [];
   }
   
   // Randomly select the required number of PIs
   const selectedPIs: PIWithArea[] = [];
-  const availablePIs = [...allPIs]; // Create a copy to avoid modifying original
+  const availablePIs = [...allPIsWithAreas]; // Create a copy to avoid modifying original
   
   for (let i = 0; i < Math.min(numPIs, availablePIs.length); i++) {
     const randomIndex = Math.floor(Math.random() * availablePIs.length);
-    selectedPIs.push({
-      pi: availablePIs.splice(randomIndex, 1)[0],
-      instructionalArea: instructionalAreaToUse
-    });
+    selectedPIs.push(availablePIs.splice(randomIndex, 1)[0]);
   }
+  
+  console.log(`Selected ${selectedPIs.length} PIs from ${selectedPIs.length > 0 ? selectedPIs.map(p => p.instructionalArea).join(', ') : 'no areas'}`);
   
   return selectedPIs;
 }

@@ -36,7 +36,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // For now, create or get a test user if none exists
       try {
         let testUser;
-        
+
         // Try to get existing user first
         try {
           testUser = await storage.getUserByUsername("testuser");
@@ -51,7 +51,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             lastName: "User",
           });
         }
-        
+
         // Manually authenticate the user
         req.login(testUser, (err) => {
           if (err) {
@@ -192,37 +192,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     try {
       const userId = req.user!.id;
-      const { timeRange = 'week', selectedEvent = 'all' } = req.query;
-      
+      const { timeRange = "week", selectedEvent = "all" } = req.query;
+
       // Get user stats
       const stats = await storage.getUserStats(userId);
-      
+
       // Get practice sessions for analytics
-      const sessions = await storage.getUserPracticeSessions(userId, timeRange as string);
-      
+      const sessions = await storage.getUserPracticeSessions(
+        userId,
+        timeRange as string,
+      );
+
       // Calculate analytics data
       const totalActivities = sessions.length;
-      const scores = sessions.filter(s => s.score).map(s => s.score!);
-      const averageScore = scores.length > 0 
-        ? scores.reduce((a, b) => a + b, 0) / scores.length 
-        : 0;
-      
+      const scores = sessions.filter((s) => s.score).map((s) => s.score!);
+      const averageScore =
+        scores.length > 0
+          ? scores.reduce((a, b) => a + b, 0) / scores.length
+          : 0;
+
       // Calculate completion rate based on started vs completed activities
-      const completedActivities = sessions.filter(s => s.score && s.score >= 70).length;
-      const completionRate = totalActivities > 0 
-        ? (completedActivities / totalActivities) * 100 
-        : 0;
-      
+      const completedActivities = sessions.filter(
+        (s) => s.score && s.score >= 70,
+      ).length;
+      const completionRate =
+        totalActivities > 0 ? (completedActivities / totalActivities) * 100 : 0;
+
       // Mock weekly growth for now (would calculate from historical data)
       const weeklyGrowth = 12.5;
-      
+
       res.json({
         totalActivities,
         averageScore: Math.round(averageScore * 10) / 10,
         completionRate: Math.round(completionRate),
         weeklyGrowth,
         sessions,
-        ...stats
+        ...stats,
       });
     } catch (error) {
       res.status(500).json({ error: "Failed to retrieve analytics data" });
@@ -242,112 +247,147 @@ export async function registerRoutes(app: Express): Promise<Server> {
         focusArea,
         customInstructions,
         performanceIndicators,
-        userEvent
+        userEvent,
       } = req.body;
-      
+
       // Check roleplay allowance - disabled for testing
       // const allowed = await storage.checkRoleplayAllowance(userId);
       // if (!allowed) {
-      //   return res.status(403).json({ 
-      //     error: "Monthly roleplay limit reached. Upgrade to generate more scenarios." 
+      //   return res.status(403).json({
+      //     error: "Monthly roleplay limit reached. Upgrade to generate more scenarios."
       //   });
       // }
-      
+
       // Generate unique ID for scenario
       const scenarioId = `scenario_${Date.now()}`;
-      
-      // Get user's selected event for PI generation  
+
+      // Get user's selected event for PI generation
       const user = await storage.getUser(userId);
       const selectedEvent = user?.selectedEvent || userEvent;
-      
+
       // Generate PIs using the actual function from deca-utils
-      const generatedPIs = selectedEvent 
+      const generatedPIs = selectedEvent
         ? getRandomPIsForRoleplay(selectedEvent, focusArea)
         : [];
-      
+
       // Generate simple randomized scenario
       const companyNames = [
-        "TechSolutions Inc", "Global Innovations LLC", "Strategic Partners Corp", 
-        "MarketLeaders Co", "BusinessPro Solutions", "InnovateNow Ltd",
-        "Premier Business Group", "Excellence Enterprises", "Future Forward Corp"
+        "TechSolutions Inc",
+        "Global Innovations LLC",
+        "Strategic Partners Corp",
+        "MarketLeaders Co",
+        "BusinessPro Solutions",
+        "InnovateNow Ltd",
+        "Premier Business Group",
+        "Excellence Enterprises",
+        "Future Forward Corp",
       ];
-      
+
       const industries = [
-        "Technology Services", "Marketing & Advertising", "Financial Services",
-        "Healthcare Solutions", "Retail & E-commerce", "Consulting Services",
-        "Manufacturing", "Hospitality", "Education & Training"
+        "Technology Services",
+        "Marketing & Advertising",
+        "Financial Services",
+        "Healthcare Solutions",
+        "Retail & E-commerce",
+        "Consulting Services",
+        "Manufacturing",
+        "Hospitality",
+        "Education & Training",
       ];
-      
+
       const characterNames = [
-        "Alex Johnson", "Taylor Smith", "Jordan Martinez", "Casey Wilson",
-        "Morgan Davis", "Riley Thompson", "Avery Garcia", "Quinn Rodriguez"
+        "Alex Johnson",
+        "Taylor Smith",
+        "Jordan Martinez",
+        "Casey Wilson",
+        "Morgan Davis",
+        "Riley Thompson",
+        "Avery Garcia",
+        "Quinn Rodriguez",
       ];
-      
+
       const roles = [
-        "Business Manager", "Department Head", "Regional Director", "Project Manager",
-        "Sales Representative", "Operations Manager", "Account Executive", "Team Lead"
+        "Business Manager",
+        "Department Head",
+        "Regional Director",
+        "Project Manager",
+        "Sales Representative",
+        "Operations Manager",
+        "Account Executive",
+        "Team Lead",
       ];
-      
+
       const personalities = [
-        "Professional and detail-oriented", "Results-driven and analytical", 
-        "Collaborative and strategic", "Innovative and forward-thinking",
-        "Experienced and methodical", "Dynamic and goal-focused"
+        "Professional and detail-oriented",
+        "Results-driven and analytical",
+        "Collaborative and strategic",
+        "Innovative and forward-thinking",
+        "Experienced and methodical",
+        "Dynamic and goal-focused",
       ];
-      
+
       // Random selections
-      const selectedCompany = companyNames[Math.floor(Math.random() * companyNames.length)];
-      const selectedIndustry = industries[Math.floor(Math.random() * industries.length)];
-      const selectedName = characterNames[Math.floor(Math.random() * characterNames.length)];
+      const selectedCompany =
+        companyNames[Math.floor(Math.random() * companyNames.length)];
+      const selectedIndustry =
+        industries[Math.floor(Math.random() * industries.length)];
+      const selectedName =
+        characterNames[Math.floor(Math.random() * characterNames.length)];
       const selectedRole = roles[Math.floor(Math.random() * roles.length)];
-      const selectedPersonality = personalities[Math.floor(Math.random() * personalities.length)];
-      
+      const selectedPersonality =
+        personalities[Math.floor(Math.random() * personalities.length)];
+
       const aiScenario = {
-        title: `${selectedIndustry} Business Meeting${selectedEvent ? ` - ${selectedEvent}` : ''}`,
+        title: `${selectedIndustry} Business Meeting${selectedEvent ? ` - ${selectedEvent}` : ""}`,
         description: `A business roleplay scenario with ${selectedCompany}`,
         character: {
           name: selectedName,
           role: selectedRole,
           personality: selectedPersonality,
-          background: `${Math.floor(Math.random() * 8) + 3}+ years of industry experience`
+          background: `${Math.floor(Math.random() * 8) + 3}+ years of industry experience`,
         },
         context: {
           company: selectedCompany,
           industry: selectedIndustry,
           situation: "Strategic business consultation",
-          challenges: ["Market positioning", "Budget optimization", "Service delivery"]
+          challenges: [
+            "Market positioning",
+            "Budget optimization",
+            "Service delivery",
+          ],
         },
-        objectives: generatedPIs.map(pi => pi.pi)
+        objectives: generatedPIs.map((pi) => pi.pi),
       };
 
       const scenario = {
         id: scenarioId,
-        title: selectedEvent || 'DECA Roleplay Scenario',
-        description: '',
-        difficulty: '',
+        title: selectedEvent || "DECA Roleplay Scenario",
+        description: "",
+        difficulty: "",
         estimatedTime: duration,
         objectives: [],
         character: null,
         context: null,
         evaluationCriteria: [],
-        performanceIndicators: generatedPIs.length > 0 ? generatedPIs : []
+        performanceIndicators: generatedPIs.length > 0 ? generatedPIs : [],
       };
-      
+
       // Record the generation
       await storage.recordRoleplayGeneration(userId);
-      
+
       // Create practice session
       await storage.recordPracticeSession({
         userId,
-        type: 'roleplay',
+        type: "roleplay",
         completedAt: new Date(),
         details: JSON.stringify({
           scenarioId,
           title: scenario.title,
           duration,
-          scenario
-        })
+          scenario,
+        }),
       });
-      
+
       res.json(scenario);
     } catch (error) {
       console.error("Error generating roleplay:", error);
@@ -362,37 +402,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.user!.id;
       const { taskId } = req.params;
-      
+
       // Get current daily challenge
       const challenge = await storage.getDailyChallenge(userId);
       if (!challenge) {
         return res.status(404).json({ error: "No active daily challenge" });
       }
-      
+
       // Mark task as completed (mock implementation)
       const pointsEarned = 50; // Mock points
       const challengeCompleted = false; // Would check if all tasks are done
-      
+
       // Update user points (would need a proper method in storage)
       // For now, just record the session with the points earned
-      
+
       // Record completion
       await storage.recordPracticeSession({
         userId,
-        type: 'daily-challenge',
+        type: "daily-challenge",
         score: pointsEarned,
         completedAt: new Date(),
         details: JSON.stringify({
           challengeId: challenge.id,
           taskId,
-          taskType: 'daily-challenge'
-        })
+          taskType: "daily-challenge",
+        }),
       });
-      
+
       res.json({
         pointsEarned,
         challengeCompleted,
-        totalPoints: challenge.totalPoints || 200
+        totalPoints: challenge.totalPoints || 200,
       });
     } catch (error) {
       console.error("Error completing daily challenge task:", error);
@@ -406,53 +446,62 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     try {
       const userId = req.user!.id;
-      const { eventType, difficulty, focusArea, specificRequirements } = req.body;
-      
+      const { eventType, difficulty, focusArea, specificRequirements } =
+        req.body;
+
       // Check written event allowance
       const allowed = await storage.checkWrittenEventAllowance(userId);
       if (!allowed) {
-        return res.status(403).json({ 
-          error: "Monthly written event limit reached. Upgrade to generate more prompts." 
+        return res.status(403).json({
+          error:
+            "Monthly written event limit reached. Upgrade to generate more prompts.",
         });
       }
-      
+
       // Generate unique ID
       const promptId = `prompt_${Date.now()}`;
-      
+
       // Mock prompt generation
       const prompt = {
         id: promptId,
-        title: `${eventType.replace('-', ' ').charAt(0).toUpperCase() + eventType.replace('-', ' ').slice(1)} - ${difficulty}`,
-        scenario: `You are a business consultant tasked with creating a ${eventType.replace('-', ' ')} for a growing technology company.`,
+        title: `${eventType.replace("-", " ").charAt(0).toUpperCase() + eventType.replace("-", " ").slice(1)} - ${difficulty}`,
+        scenario: `You are a business consultant tasked with creating a ${eventType.replace("-", " ")} for a growing technology company.`,
         requirements: [
           "Include executive summary",
           "Provide detailed analysis",
           "Include recommendations",
           "Professional formatting",
-          specificRequirements ? `Focus on: ${specificRequirements}` : "Address all key areas"
+          specificRequirements
+            ? `Focus on: ${specificRequirements}`
+            : "Address all key areas",
         ].filter(Boolean),
         evaluationCriteria: [
           "Clarity and organization",
           "Depth of analysis",
           "Feasibility of recommendations",
           "Professional presentation",
-          "Adherence to format"
+          "Adherence to format",
         ],
         tips: [
           "Start with a strong executive summary",
           "Use data to support your points",
-          "Be specific in your recommendations"
+          "Be specific in your recommendations",
         ],
-        estimatedTime: difficulty === 'beginner' ? 30 : difficulty === 'competition' ? 90 : 60,
+        estimatedTime:
+          difficulty === "beginner"
+            ? 30
+            : difficulty === "competition"
+              ? 90
+              : 60,
         wordCount: {
-          min: eventType === 'executive-summary' ? 300 : 1000,
-          max: eventType === 'executive-summary' ? 500 : 2500
-        }
+          min: eventType === "executive-summary" ? 300 : 1000,
+          max: eventType === "executive-summary" ? 500 : 2500,
+        },
       };
-      
+
       // Record the generation
       await storage.recordWrittenEventGeneration(userId);
-      
+
       res.json(prompt);
     } catch (error) {
       console.error("Error generating written event:", error);
@@ -466,56 +515,59 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     try {
       const userId = req.user!.id;
-      
+
       // Mock feedback generation
       const feedback = {
         overallScore: Math.floor(Math.random() * 30) + 70, // 70-100
         strengths: [
           "Clear and organized structure",
           "Good use of business terminology",
-          "Strong executive summary"
+          "Strong executive summary",
         ],
         improvements: [
           "Could include more data analysis",
           "Recommendations need more detail",
-          "Consider adding visual elements"
+          "Consider adding visual elements",
         ],
         detailedFeedback: [
           {
             section: "Executive Summary",
             score: 85,
-            comments: "Well-written and concise. Captures key points effectively."
+            comments:
+              "Well-written and concise. Captures key points effectively.",
           },
           {
             section: "Analysis",
             score: 75,
-            comments: "Good analysis but could benefit from more quantitative data."
+            comments:
+              "Good analysis but could benefit from more quantitative data.",
           },
           {
             section: "Recommendations",
             score: 70,
-            comments: "Recommendations are relevant but need more implementation details."
-          }
+            comments:
+              "Recommendations are relevant but need more implementation details.",
+          },
         ],
         suggestions: [
           "Review sample high-scoring papers",
           "Practice data analysis techniques",
-          "Work on actionable recommendations"
-        ]
+          "Work on actionable recommendations",
+        ],
       };
-      
+
       // Record practice session
       await storage.recordPracticeSession({
         userId,
-        type: 'written',
+        type: "written",
         score: feedback.overallScore,
         completedAt: new Date(),
         details: JSON.stringify({
-          eventType: req.body.eventType || 'unknown',
-          feedback
-        })
+          eventType: req.body.eventType || "unknown",
+          feedback,
+        }),
       });
-      
+
       res.json(feedback);
     } catch (error) {
       console.error("Error providing feedback:", error);
@@ -552,24 +604,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Mark achievement as displayed
-  app.post("/api/user/achievements/:achievementId/displayed", async (req, res) => {
-    if (!req.isAuthenticated()) return res.sendStatus(401);
+  app.post(
+    "/api/user/achievements/:achievementId/displayed",
+    async (req, res) => {
+      if (!req.isAuthenticated()) return res.sendStatus(401);
 
-    try {
-      const userId = req.user!.id;
-      const achievementId = parseInt(req.params.achievementId);
-      
-      const success = await storage.markAchievementAsDisplayed(userId, achievementId);
-      if (success) {
-        res.json({ success: true });
-      } else {
-        res.status(404).json({ error: "Achievement not found" });
+      try {
+        const userId = req.user!.id;
+        const achievementId = parseInt(req.params.achievementId);
+
+        const success = await storage.markAchievementAsDisplayed(
+          userId,
+          achievementId,
+        );
+        if (success) {
+          res.json({ success: true });
+        } else {
+          res.status(404).json({ error: "Achievement not found" });
+        }
+      } catch (error) {
+        console.error("Error marking achievement as displayed:", error);
+        res.status(500).json({ error: "Failed to update achievement" });
       }
-    } catch (error) {
-      console.error("Error marking achievement as displayed:", error);
-      res.status(500).json({ error: "Failed to update achievement" });
-    }
-  });
+    },
+  );
 
   // Get recent activities
   app.get("/api/user/activities", async (req, res) => {
@@ -886,30 +944,37 @@ CRITICAL REQUIREMENTS:
       // Validate and fix answer distribution
       if (quizData.questions && quizData.answer_key) {
         const answerDistribution = { A: 0, B: 0, C: 0, D: 0 };
-        
+
         // Count current distribution
         Object.values(quizData.answer_key).forEach((answer: any) => {
-          if (answerDistribution[answer as keyof typeof answerDistribution] !== undefined) {
+          if (
+            answerDistribution[answer as keyof typeof answerDistribution] !==
+            undefined
+          ) {
             answerDistribution[answer as keyof typeof answerDistribution]++;
           }
         });
-        
+
         console.log("Answer distribution:", answerDistribution);
-        
+
         // Check for poor distribution (more than 50% of answers are the same)
         const totalQuestions = quizData.questions.length;
         const maxSameAnswer = Math.max(...Object.values(answerDistribution));
-        
+
         if (maxSameAnswer > Math.ceil(totalQuestions * 0.5)) {
-          console.warn(`Poor answer distribution detected: ${maxSameAnswer}/${totalQuestions} answers are the same`);
-          
+          console.warn(
+            `Poor answer distribution detected: ${maxSameAnswer}/${totalQuestions} answers are the same`,
+          );
+
           // Redistribute answers more evenly
-          const options = ['A', 'B', 'C', 'D'];
+          const options = ["A", "B", "C", "D"];
           let optionIndex = 0;
-          
+
           // Shuffle questions to avoid pattern
-          const shuffledQuestions = [...quizData.questions].sort(() => Math.random() - 0.5);
-          
+          const shuffledQuestions = [...quizData.questions].sort(
+            () => Math.random() - 0.5,
+          );
+
           // Reassign answers to achieve better distribution
           shuffledQuestions.forEach((question: any, index: number) => {
             const newAnswer = options[optionIndex % 4];
@@ -917,16 +982,22 @@ CRITICAL REQUIREMENTS:
             question.answer = newAnswer;
             optionIndex++;
           });
-          
+
           // Recalculate distribution after redistribution
           const newDistribution = { A: 0, B: 0, C: 0, D: 0 };
           Object.values(quizData.answer_key).forEach((answer: any) => {
-            if (newDistribution[answer as keyof typeof newDistribution] !== undefined) {
+            if (
+              newDistribution[answer as keyof typeof newDistribution] !==
+              undefined
+            ) {
               newDistribution[answer as keyof typeof newDistribution]++;
             }
           });
-          
-          console.log("Redistributed answers for better balance:", newDistribution);
+
+          console.log(
+            "Redistributed answers for better balance:",
+            newDistribution,
+          );
         }
       }
 
@@ -1079,7 +1150,7 @@ CRITICAL REQUIREMENTS:
     try {
       // For testing purposes, use test user
       let testUser;
-      
+
       if (req.isAuthenticated()) {
         console.log("User is authenticated");
         testUser = req.user;
@@ -1105,7 +1176,11 @@ CRITICAL REQUIREMENTS:
 
       const userId = testUser.id;
       const { selectedEvent, selectedCluster } = req.body;
-      console.log("Updating user settings:", { userId, selectedEvent, selectedCluster });
+      console.log("Updating user settings:", {
+        userId,
+        selectedEvent,
+        selectedCluster,
+      });
 
       const updated = await storage.updateUserSettings(userId, {
         selectedEvent,
