@@ -43,6 +43,14 @@ export const DECA_EVENTS: DecaEvent[] = [
     instructionalAreas: ['Business Law', 'Communication Skills', 'Customer Relations', 'Economics', 'Emotional Intelligence', 'Entrepreneurship', 'Financial Analysis', 'Human Resources Management', 'Information Management', 'Marketing', 'Operations', 'Professional Development', 'Strategic Management'],
     description: 'Individual business plan development and presentation'
   },
+  {
+    name: 'Entrepreneurship Series (ENT)',
+    code: 'ENT',
+    cluster: 'Entrepreneurship',
+    type: 'individual',
+    instructionalAreas: ['Business Law', 'Communication Skills', 'Customer Relations', 'Economics', 'Emotional Intelligence', 'Entrepreneurship', 'Financial Analysis', 'Human Resources Management', 'Information Management', 'Marketing', 'Operations', 'Professional Development', 'Strategic Management'],
+    description: 'Individual series focusing on entrepreneurship skills and strategies'
+  },
   
   // Business Management & Administration
   {

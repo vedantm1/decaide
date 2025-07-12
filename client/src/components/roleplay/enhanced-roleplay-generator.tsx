@@ -456,9 +456,11 @@ export function EnhancedRoleplayGenerator() {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-xl">{generatedScenario.title}</CardTitle>
-                  <Badge className={difficultyColors[generatedScenario.difficulty as keyof typeof difficultyColors]}>
-                    {generatedScenario.difficulty}
-                  </Badge>
+                  {generatedScenario.difficulty && (
+                    <Badge className={difficultyColors[generatedScenario.difficulty as keyof typeof difficultyColors]}>
+                      {generatedScenario.difficulty}
+                    </Badge>
+                  )}
                 </div>
                 <CardDescription className="mt-2">
                   {generatedScenario.description}

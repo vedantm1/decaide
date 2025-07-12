@@ -303,7 +303,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const aiScenario = {
         title: `${selectedIndustry} Business Meeting${selectedEvent ? ` - ${selectedEvent}` : ''}`,
-        description: `A ${duration}-minute business roleplay scenario with ${selectedCompany}`,
+        description: `A business roleplay scenario with ${selectedCompany}`,
         character: {
           name: selectedName,
           role: selectedRole,
@@ -316,14 +316,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
           situation: "Strategic business consultation",
           challenges: ["Market positioning", "Budget optimization", "Service delivery"]
         },
-        objectives: ["Build professional rapport", "Present effective solutions", "Address key business challenges"]
+        objectives: generatedPIs.map(pi => pi.pi)
       };
 
       const scenario = {
         id: scenarioId,
         title: aiScenario.title,
         description: aiScenario.description,
-        difficulty: 'medium',
+        difficulty: '',
         estimatedTime: duration,
         objectives: aiScenario.objectives,
         character: aiScenario.character,
