@@ -11,7 +11,7 @@ import {
 } from "@shared/schema";
 import aiRoutes from "./routes/aiRoutes";
 import chatRoutes from "./routes/chatRoutes";
-import { getOpenAIClient } from "./services/azureOpenai";
+
 import Stripe from "stripe";
 import mappingRoutes from "./mappingRoutes";
 
@@ -255,80 +255,59 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Generate unique ID for scenario
       const scenarioId = `scenario_${Date.now()}`;
       
-      // Generate unique scenario using Azure OpenAI
-      const piText = performanceIndicators && performanceIndicators.length > 0 
-        ? `Focus on these Performance Indicators: ${performanceIndicators.join(', ')}`
-        : '';
+      // Generate simple randomized scenario
+      const companyNames = [
+        "TechSolutions Inc", "Global Innovations LLC", "Strategic Partners Corp", 
+        "MarketLeaders Co", "BusinessPro Solutions", "InnovateNow Ltd",
+        "Premier Business Group", "Excellence Enterprises", "Future Forward Corp"
+      ];
       
-      const prompt = `Generate a unique business roleplay scenario for DECA training. 
+      const industries = [
+        "Technology Services", "Marketing & Advertising", "Financial Services",
+        "Healthcare Solutions", "Retail & E-commerce", "Consulting Services",
+        "Manufacturing", "Hospitality", "Education & Training"
+      ];
       
-      Event: ${userEvent || 'General Business'}
-      Duration: ${duration} minutes
-      ${piText}
-      ${customInstructions ? `Special Instructions: ${customInstructions}` : ''}
-      ${focusArea ? `Focus Area: ${focusArea}` : ''}
+      const characterNames = [
+        "Alex Johnson", "Taylor Smith", "Jordan Martinez", "Casey Wilson",
+        "Morgan Davis", "Riley Thompson", "Avery Garcia", "Quinn Rodriguez"
+      ];
       
-      Generate a realistic business scenario with:
-      1. Unique company name and industry
-      2. Specific character with name, role, personality, and background
-      3. Clear business context and situation
-      4. Specific challenges or objectives
-      5. Make it realistic and engaging
+      const roles = [
+        "Business Manager", "Department Head", "Regional Director", "Project Manager",
+        "Sales Representative", "Operations Manager", "Account Executive", "Team Lead"
+      ];
       
-      Return only JSON format:
-      {
-        "title": "scenario title",
-        "description": "brief description",
-        "character": {
-          "name": "character name",
-          "role": "their role",
-          "personality": "personality traits",
-          "background": "relevant background"
+      const personalities = [
+        "Professional and detail-oriented", "Results-driven and analytical", 
+        "Collaborative and strategic", "Innovative and forward-thinking",
+        "Experienced and methodical", "Dynamic and goal-focused"
+      ];
+      
+      // Random selections
+      const selectedCompany = companyNames[Math.floor(Math.random() * companyNames.length)];
+      const selectedIndustry = industries[Math.floor(Math.random() * industries.length)];
+      const selectedName = characterNames[Math.floor(Math.random() * characterNames.length)];
+      const selectedRole = roles[Math.floor(Math.random() * roles.length)];
+      const selectedPersonality = personalities[Math.floor(Math.random() * personalities.length)];
+      
+      const aiScenario = {
+        title: `${selectedIndustry} Business Meeting${userEvent ? ` - ${userEvent}` : ''}`,
+        description: `A ${duration}-minute business roleplay scenario with ${selectedCompany}`,
+        character: {
+          name: selectedName,
+          role: selectedRole,
+          personality: selectedPersonality,
+          background: `${Math.floor(Math.random() * 8) + 3}+ years of industry experience`
         },
-        "context": {
-          "company": "company name",
-          "industry": "industry type",
-          "situation": "meeting/scenario context",
-          "challenges": ["challenge1", "challenge2", "challenge3"]
+        context: {
+          company: selectedCompany,
+          industry: selectedIndustry,
+          situation: "Strategic business consultation",
+          challenges: ["Market positioning", "Budget optimization", "Service delivery"]
         },
-        "objectives": ["objective1", "objective2", "objective3"]
-      }`;
-
-      const openai = getOpenAIClient();
-      const response = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [
-          { role: "system", content: "You are a DECA business education expert. Generate unique, realistic business scenarios for student training." },
-          { role: "user", content: prompt }
-        ],
-        temperature: 0.9,
-        max_tokens: 800
-      });
-
-      let aiScenario;
-      try {
-        aiScenario = JSON.parse(response.choices[0].message.content!);
-      } catch (parseError) {
-        console.error("Failed to parse AI response:", parseError);
-        // Fallback to basic scenario
-        aiScenario = {
-          title: `Business Roleplay - ${userEvent || 'General'}`,
-          description: `A ${duration}-minute business roleplay scenario`,
-          character: {
-            name: "Jamie Martinez",
-            role: "Business Manager",
-            personality: "Professional and results-oriented",
-            background: "5+ years in business development"
-          },
-          context: {
-            company: "InnovateNow Solutions",
-            industry: "Business Services",
-            situation: "Strategic business meeting",
-            challenges: ["Market competition", "Resource allocation", "Client retention"]
-          },
-          objectives: ["Build professional relationships", "Present solutions effectively", "Address business challenges"]
-        };
-      }
+        objectives: ["Build professional rapport", "Present effective solutions", "Address key business challenges"]
+      };
 
       const scenario = {
         id: scenarioId,
