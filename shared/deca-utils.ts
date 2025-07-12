@@ -70,6 +70,14 @@ export const DECA_EVENTS: DecaEvent[] = [
     description: 'Team decision making for hospitality and tourism services'
   },
   {
+    name: 'Hotel and Lodging Management Series (HLM)',
+    code: 'HLM',
+    cluster: 'Hospitality & Tourism',
+    type: 'individual',
+    instructionalAreas: ['Business Law', 'Communication Skills', 'Customer Relations', 'Economics', 'Emotional Intelligence', 'Financial Analysis', 'Human Resources Management', 'Information Management', 'Marketing', 'Operations', 'Professional Development', 'Strategic Management'],
+    description: 'Individual event focusing on hotel and lodging management'
+  },
+  {
     name: 'Travel and Tourism Team Decision Making (TTDM)',
     code: 'TTDM',
     cluster: 'Hospitality & Tourism',
@@ -149,6 +157,8 @@ export interface PIWithArea {
 
 // Get random PIs for roleplay based on selected event and optional instructional area
 export function getRandomPIsForRoleplay(eventName: string, selectedInstructionalArea?: string): PIWithArea[] {
+  console.log(`PI Generation Debug: Event "${eventName}", Selected Area: "${selectedInstructionalArea}"`);
+  
   const event = getEventByName(eventName);
   if (!event) {
     console.warn(`Event "${eventName}" not found`);
@@ -157,6 +167,7 @@ export function getRandomPIsForRoleplay(eventName: string, selectedInstructional
   
   const cluster = event.cluster;
   const numPIs = isTeamEvent(eventName) ? 7 : 5;
+  console.log(`PI Generation Debug: Event found, Cluster: "${cluster}", NumPIs: ${numPIs}, IsTeam: ${isTeamEvent(eventName)}`);
   
   // Map cluster names to JSON cluster names
   const clusterMappings: { [key: string]: string } = {
@@ -169,10 +180,13 @@ export function getRandomPIsForRoleplay(eventName: string, selectedInstructional
   };
   
   const jsonClusterName = clusterMappings[cluster] || cluster;
+  console.log(`PI Generation Debug: Mapped cluster "${cluster}" to JSON cluster "${jsonClusterName}"`);
+  
   const clusterData = decaPIs[jsonClusterName as keyof typeof decaPIs];
   
   if (!clusterData) {
     console.warn(`Cluster "${jsonClusterName}" not found in PI data`);
+    console.log(`Available clusters:`, Object.keys(decaPIs));
     return [];
   }
   
@@ -182,7 +196,10 @@ export function getRandomPIsForRoleplay(eventName: string, selectedInstructional
     // Get available instructional areas from the JSON (they include abbreviations)
     const availableAreas = Object.keys(clusterData);
     instructionalAreaToUse = availableAreas[Math.floor(Math.random() * availableAreas.length)];
+    console.log(`PI Generation Debug: No specific area selected, using random area: "${instructionalAreaToUse}"`);
   }
+  
+  console.log(`PI Generation Debug: Available instructional areas:`, Object.keys(clusterData));
   
   // Get all PIs for this instructional area
   const allPIs = clusterData[instructionalAreaToUse as keyof typeof clusterData] as string[];
@@ -191,6 +208,8 @@ export function getRandomPIsForRoleplay(eventName: string, selectedInstructional
     console.warn(`No PIs found for instructional area "${instructionalAreaToUse}" in cluster "${jsonClusterName}"`);
     return [];
   }
+  
+  console.log(`PI Generation Debug: Found ${allPIs.length} PIs for area "${instructionalAreaToUse}"`);
   
   // Randomly select the required number of PIs
   const selectedPIs: PIWithArea[] = [];
@@ -204,6 +223,7 @@ export function getRandomPIsForRoleplay(eventName: string, selectedInstructional
     });
   }
   
+  console.log(`PI Generation Debug: Selected ${selectedPIs.length} PIs:`, selectedPIs);
   return selectedPIs;
 }
 
