@@ -241,7 +241,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         includeObjections,
         realTimeMode,
         focusArea,
-        customInstructions
+        customInstructions,
+        performanceIndicators,
+        userEvent
       } = req.body;
       
       // Check roleplay allowance
@@ -259,7 +261,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const scenario = {
         id: scenarioId,
         title: `${difficulty.charAt(0).toUpperCase() + difficulty.slice(1)} ${scenarioType.charAt(0).toUpperCase() + scenarioType.slice(1)} Interaction`,
-        description: `A ${duration}-minute roleplay scenario focusing on ${scenarioType} interactions with ${difficulty} difficulty level.`,
+        description: `A ${duration}-minute roleplay scenario focusing on ${scenarioType} interactions with ${difficulty} difficulty level.${userEvent ? ` Based on your selected DECA event: ${userEvent}` : ''}`,
         difficulty,
         estimatedTime: duration,
         objectives: [
@@ -267,7 +269,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           "Identify customer needs and pain points",
           "Present solutions effectively",
           includeObjections && "Handle objections professionally",
-          focusArea && `Focus on ${focusArea} skills`
+          focusArea && `Focus on ${focusArea} skills`,
+          performanceIndicators && performanceIndicators.length > 0 && "Demonstrate mastery of selected Performance Indicators"
         ].filter(Boolean),
         character: {
           name: "Alex Johnson",
@@ -292,7 +295,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           "Professional demeanor",
           "Product knowledge",
           "Closing effectiveness"
-        ]
+        ],
+        performanceIndicators: performanceIndicators || []
       };
       
       // Record the generation

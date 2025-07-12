@@ -1,0 +1,228 @@
+import decaPIs from './deca-pis.json';
+
+// DECA Event configurations
+export interface DecaEvent {
+  name: string;
+  code: string;
+  cluster: string;
+  type: 'individual' | 'team';
+  instructionalAreas: string[];
+  description: string;
+}
+
+// Team Decision Making Events (require 7 PIs instead of 5)
+export const TEAM_EVENTS = [
+  'Business Solutions Project (PMBS)',
+  'Buying and Merchandising Team Decision Making (BTDM)',
+  'Entrepreneurship Team Decision Making (ETDM)',
+  'Financial Services Team Decision Making (FTDM)',
+  'Hospitality Services Team Decision Making (HTDM)',
+  'International Business Team Decision Making (IBTDM)',
+  'Marketing Management Team Decision Making (MTDM)',
+  'Sports and Entertainment Marketing Team Decision Making (STDM)',
+  'Travel and Tourism Team Decision Making (TTDM)'
+];
+
+// Full DECA event list with clusters and instructional areas
+export const DECA_EVENTS: DecaEvent[] = [
+  // Entrepreneurship Career Cluster
+  {
+    name: 'Entrepreneurship Career Cluster',
+    code: 'ECC',
+    cluster: 'Entrepreneurship',
+    type: 'individual',
+    instructionalAreas: ['Business Law', 'Communication Skills', 'Customer Relations', 'Economics', 'Emotional Intelligence', 'Entrepreneurship', 'Financial Analysis', 'Human Resources Management', 'Information Management', 'Marketing', 'Operations', 'Professional Development', 'Strategic Management'],
+    description: 'Focuses on entrepreneurship and small business management'
+  },
+  // Business Management & Administration
+  {
+    name: 'Business Solutions Project (PMBS)',
+    code: 'PMBS',
+    cluster: 'Business Management & Administration',
+    type: 'team',
+    instructionalAreas: ['Business Law', 'Communication Skills', 'Customer Relations', 'Economics', 'Emotional Intelligence', 'Financial Analysis', 'Human Resources Management', 'Information Management', 'Marketing', 'Operations', 'Professional Development', 'Strategic Management'],
+    description: 'Team-based project focusing on business solutions and management'
+  },
+  // Finance Career Cluster
+  {
+    name: 'Accounting Applications (FTDM)',
+    code: 'FTDM',
+    cluster: 'Finance',
+    type: 'individual',
+    instructionalAreas: ['Business Law', 'Communication Skills', 'Customer Relations', 'Economics', 'Emotional Intelligence', 'Financial Analysis', 'Human Resources Management', 'Information Management', 'Marketing', 'Operations', 'Professional Development', 'Strategic Management'],
+    description: 'Individual event focusing on accounting applications'
+  },
+  {
+    name: 'Financial Services Team Decision Making (FTDM)',
+    code: 'FTDM',
+    cluster: 'Finance',
+    type: 'team',
+    instructionalAreas: ['Business Law', 'Communication Skills', 'Customer Relations', 'Economics', 'Emotional Intelligence', 'Financial Analysis', 'Human Resources Management', 'Information Management', 'Marketing', 'Operations', 'Professional Development', 'Strategic Management'],
+    description: 'Team decision making event for financial services'
+  },
+  // Hospitality & Tourism
+  {
+    name: 'Hospitality Services Team Decision Making (HTDM)',
+    code: 'HTDM',
+    cluster: 'Hospitality & Tourism',
+    type: 'team',
+    instructionalAreas: ['Business Law', 'Communication Skills', 'Customer Relations', 'Economics', 'Emotional Intelligence', 'Financial Analysis', 'Human Resources Management', 'Information Management', 'Marketing', 'Operations', 'Professional Development', 'Strategic Management'],
+    description: 'Team decision making for hospitality and tourism services'
+  },
+  {
+    name: 'Travel and Tourism Team Decision Making (TTDM)',
+    code: 'TTDM',
+    cluster: 'Hospitality & Tourism',
+    type: 'team',
+    instructionalAreas: ['Business Law', 'Communication Skills', 'Customer Relations', 'Economics', 'Emotional Intelligence', 'Financial Analysis', 'Human Resources Management', 'Information Management', 'Marketing', 'Operations', 'Professional Development', 'Strategic Management'],
+    description: 'Team decision making for travel and tourism industry'
+  },
+  // Marketing Career Cluster
+  {
+    name: 'Marketing Management Team Decision Making (MTDM)',
+    code: 'MTDM',
+    cluster: 'Marketing',
+    type: 'team',
+    instructionalAreas: ['Business Law', 'Communication Skills', 'Customer Relations', 'Economics', 'Emotional Intelligence', 'Financial Analysis', 'Human Resources Management', 'Information Management', 'Marketing', 'Operations', 'Professional Development', 'Strategic Management'],
+    description: 'Team decision making for marketing management'
+  },
+  {
+    name: 'Sports and Entertainment Marketing Team Decision Making (STDM)',
+    code: 'STDM',
+    cluster: 'Marketing',
+    type: 'team',
+    instructionalAreas: ['Business Law', 'Communication Skills', 'Customer Relations', 'Economics', 'Emotional Intelligence', 'Financial Analysis', 'Human Resources Management', 'Information Management', 'Marketing', 'Operations', 'Professional Development', 'Strategic Management'],
+    description: 'Team decision making for sports and entertainment marketing'
+  }
+];
+
+// Get event by name
+export function getEventByName(eventName: string): DecaEvent | undefined {
+  return DECA_EVENTS.find(event => event.name === eventName);
+}
+
+// Get cluster name from event
+export function getClusterFromEvent(eventName: string): string {
+  const event = getEventByName(eventName);
+  return event ? event.cluster : 'Business Management & Administration';
+}
+
+// Check if event is team-based
+export function isTeamEvent(eventName: string): boolean {
+  return TEAM_EVENTS.includes(eventName);
+}
+
+// Get all PIs for a specific instructional area within a cluster
+export function getPIsForInstructionalArea(cluster: string, instructionalArea: string): string[] {
+  const clusterData = decaPIs[cluster as keyof typeof decaPIs];
+  if (!clusterData) {
+    console.warn(`Cluster "${cluster}" not found in DECA PIs`);
+    return [];
+  }
+  
+  // Try to find exact match first
+  const exactMatch = clusterData[instructionalArea as keyof typeof clusterData];
+  if (exactMatch) {
+    return exactMatch as string[];
+  }
+  
+  // Try to find partial match (e.g., "BL" for "Business Law")
+  const shortCode = instructionalArea.split(' ').map(word => word.charAt(0)).join('');
+  const partialMatch = Object.keys(clusterData).find(key => 
+    key.toLowerCase().includes(shortCode.toLowerCase()) || 
+    key.toLowerCase().includes(instructionalArea.toLowerCase())
+  );
+  
+  if (partialMatch) {
+    return clusterData[partialMatch as keyof typeof clusterData] as string[];
+  }
+  
+  console.warn(`Instructional area "${instructionalArea}" not found in cluster "${cluster}"`);
+  return [];
+}
+
+// Get random PIs for roleplay based on selected event
+export function getRandomPIsForRoleplay(eventName: string): string[] {
+  const event = getEventByName(eventName);
+  if (!event) {
+    console.warn(`Event "${eventName}" not found`);
+    return [];
+  }
+  
+  const cluster = event.cluster;
+  const numPIs = isTeamEvent(eventName) ? 7 : 5;
+  
+  // Get all available instructional areas for this cluster
+  const availableAreas = event.instructionalAreas;
+  
+  // Select a random instructional area
+  const randomArea = availableAreas[Math.floor(Math.random() * availableAreas.length)];
+  
+  // Get all PIs for this instructional area
+  const allPIs = getPIsForInstructionalArea(cluster, randomArea);
+  
+  if (allPIs.length === 0) {
+    console.warn(`No PIs found for instructional area "${randomArea}" in cluster "${cluster}"`);
+    return [];
+  }
+  
+  // Randomly select the required number of PIs
+  const selectedPIs: string[] = [];
+  const availablePIs = [...allPIs]; // Create a copy to avoid modifying original
+  
+  for (let i = 0; i < Math.min(numPIs, availablePIs.length); i++) {
+    const randomIndex = Math.floor(Math.random() * availablePIs.length);
+    selectedPIs.push(availablePIs.splice(randomIndex, 1)[0]);
+  }
+  
+  return selectedPIs;
+}
+
+// Get all available clusters
+export function getAvailableClusters(): string[] {
+  return Object.keys(decaPIs);
+}
+
+// Get all instructional areas for a cluster
+export function getInstructionalAreasForCluster(cluster: string): string[] {
+  const clusterData = decaPIs[cluster as keyof typeof decaPIs];
+  return clusterData ? Object.keys(clusterData) : [];
+}
+
+// Helper function to format PI for display
+export function formatPI(pi: string): string {
+  return pi.replace(/^[A-Z]{2}:\d{3}\s*–\s*/, '').trim();
+}
+
+// Get PI code from full PI string
+export function getPICode(pi: string): string {
+  const match = pi.match(/^([A-Z]{2}:\d{3})/);
+  return match ? match[1] : '';
+}
+
+// Search PIs by keyword
+export function searchPIs(keyword: string, cluster?: string): Array<{ pi: string; cluster: string; area: string }> {
+  const results: Array<{ pi: string; cluster: string; area: string }> = [];
+  const searchTerm = keyword.toLowerCase();
+  
+  const clustersToSearch = cluster ? [cluster] : getAvailableClusters();
+  
+  clustersToSearch.forEach(clusterName => {
+    const clusterData = decaPIs[clusterName as keyof typeof decaPIs];
+    if (clusterData) {
+      Object.entries(clusterData).forEach(([areaName, pis]) => {
+        (pis as string[]).forEach(pi => {
+          if (pi.toLowerCase().includes(searchTerm)) {
+            results.push({
+              pi,
+              cluster: clusterName,
+              area: areaName
+            });
+          }
+        });
+      });
+    }
+  });
+  
+  return results;
+}

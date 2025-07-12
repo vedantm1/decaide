@@ -12,7 +12,9 @@ import { Progress } from '@/components/ui/progress';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { useNotifications } from '@/components/notifications/notification-provider';
-import { Sparkles, Settings, Target, Brain, Zap, ChevronRight, Loader2, Award } from 'lucide-react';
+import { Sparkles, Settings, Target, Brain, Zap, ChevronRight, Loader2, Award, BookOpen, Users } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { getRandomPIsForRoleplay, isTeamEvent, formatPI } from '@shared/deca-utils';
 
 interface RoleplaySettings {
   difficulty: 'easy' | 'medium' | 'hard' | 'expert';
@@ -43,6 +45,7 @@ interface GeneratedScenario {
     challenges: string[];
   };
   evaluationCriteria: string[];
+  performanceIndicators?: string[];
 }
 
 export function EnhancedRoleplayGenerator() {
@@ -56,8 +59,16 @@ export function EnhancedRoleplayGenerator() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedScenario, setGeneratedScenario] = useState<GeneratedScenario | null>(null);
   const [customInstructions, setCustomInstructions] = useState('');
+  const [selectedPIs, setSelectedPIs] = useState<string[]>([]);
+  const [isGeneratingPIs, setIsGeneratingPIs] = useState(false);
   const { toast } = useToast();
   const { addNotification } = useNotifications();
+
+  // Fetch user data to get selected event
+  const { data: user } = useQuery({
+    queryKey: ['/api/user'],
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
 
   const difficultyColors = {
     easy: 'bg-green-100 text-green-800',
@@ -73,6 +84,41 @@ export function EnhancedRoleplayGenerator() {
     expert: 'Competition-level difficulty. Multiple stakeholders and high stakes.'
   };
 
+  const handleGeneratePIs = async () => {
+    if (!user?.selectedEvent) {
+      toast({
+        title: 'No Event Selected',
+        description: 'Please complete the tutorial to select your DECA event first.',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    setIsGeneratingPIs(true);
+    
+    try {
+      const pis = getRandomPIsForRoleplay(user.selectedEvent);
+      setSelectedPIs(pis);
+      
+      // Show success notification
+      addNotification({
+        type: 'success',
+        title: 'PIs Generated!',
+        message: `${pis.length} Performance Indicators selected for ${user.selectedEvent}`,
+        duration: 5000
+      });
+      
+    } catch (error) {
+      toast({
+        title: 'Generation Failed',
+        description: 'Unable to generate PIs. Please try again.',
+        variant: 'destructive'
+      });
+    } finally {
+      setIsGeneratingPIs(false);
+    }
+  };
+
   const handleGenerateScenario = async () => {
     setIsGenerating(true);
     
@@ -82,7 +128,9 @@ export function EnhancedRoleplayGenerator() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...settings,
-          customInstructions: customInstructions.trim() || undefined
+          customInstructions: customInstructions.trim() || undefined,
+          performanceIndicators: selectedPIs.length > 0 ? selectedPIs : undefined,
+          userEvent: user?.selectedEvent
         })
       });
 
@@ -157,6 +205,89 @@ export function EnhancedRoleplayGenerator() {
           Create personalized scenarios tailored to your DECA event
         </p>
       </motion.div>
+
+      {/* User Event Info Card */}
+      {user?.selectedEvent && (
+        <Card className="border-primary/20 bg-primary/5">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <BookOpen className="h-5 w-5" />
+              Your Selected Event
+            </CardTitle>
+            <CardDescription>
+              PIs will be generated based on your DECA event selection
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-medium">{user.selectedEvent}</p>
+                <p className="text-sm text-muted-foreground">
+                  {user.selectedCluster} Career Cluster
+                </p>
+                <div className="flex items-center gap-2 mt-2">
+                  {isTeamEvent(user.selectedEvent) && (
+                    <Badge variant="secondary" className="flex items-center gap-1">
+                      <Users className="h-3 w-3" />
+                      Team Event (7 PIs)
+                    </Badge>
+                  )}
+                  {!isTeamEvent(user.selectedEvent) && (
+                    <Badge variant="secondary">
+                      Individual Event (5 PIs)
+                    </Badge>
+                  )}
+                </div>
+              </div>
+              <Button
+                onClick={handleGeneratePIs}
+                disabled={isGeneratingPIs}
+                variant="outline"
+                size="sm"
+              >
+                {isGeneratingPIs ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <Zap className="mr-2 h-4 w-4" />
+                    Generate PIs
+                  </>
+                )}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Selected PIs Display */}
+      {selectedPIs.length > 0 && (
+        <Card className="border-green-200 bg-green-50">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Target className="h-5 w-5" />
+              Selected Performance Indicators
+            </CardTitle>
+            <CardDescription>
+              These PIs will be used for your roleplay scenario
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {selectedPIs.map((pi, index) => (
+                <div key={index} className="flex items-start gap-2">
+                  <Badge variant="outline" className="mt-0.5">
+                    {index + 1}
+                  </Badge>
+                  <p className="text-sm">{formatPI(pi)}</p>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Settings Panel */}
       <Card>
@@ -420,6 +551,26 @@ export function EnhancedRoleplayGenerator() {
                     </div>
                   </div>
                 </div>
+
+                {/* Performance Indicators */}
+                {generatedScenario.performanceIndicators && generatedScenario.performanceIndicators.length > 0 && (
+                  <div>
+                    <h4 className="font-semibold mb-2 flex items-center gap-2">
+                      <BookOpen className="h-4 w-4" />
+                      Performance Indicators
+                    </h4>
+                    <div className="bg-primary/5 rounded-lg p-4 space-y-2">
+                      {generatedScenario.performanceIndicators.map((pi, idx) => (
+                        <div key={idx} className="flex items-start gap-2">
+                          <Badge variant="outline" className="mt-0.5">
+                            {idx + 1}
+                          </Badge>
+                          <span className="text-sm">{formatPI(pi)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {/* Start Button */}
                 <Button 
