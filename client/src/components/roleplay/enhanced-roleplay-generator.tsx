@@ -94,7 +94,12 @@ export function EnhancedRoleplayGenerator() {
     setIsGeneratingPIs(true);
     
     try {
-      const pis = getRandomPIsForRoleplay(user.selectedEvent);
+      console.log('Generating PIs for event:', user.selectedEvent);
+      console.log('Selected instructional area:', selectedInstructionalArea);
+      
+      const pis = getRandomPIsForRoleplay(user.selectedEvent, selectedInstructionalArea || undefined);
+      console.log('Generated PIs:', pis);
+      
       setSelectedPIs(pis);
       
       // Show success notification
@@ -106,6 +111,7 @@ export function EnhancedRoleplayGenerator() {
       });
       
     } catch (error) {
+      console.error('Error generating PIs:', error);
       toast({
         title: 'Generation Failed',
         description: 'Unable to generate PIs. Please try again.',
@@ -256,24 +262,7 @@ export function EnhancedRoleplayGenerator() {
                   )}
                 </div>
               </div>
-              <Button
-                onClick={handleGeneratePIs}
-                disabled={isGeneratingPIs}
-                variant="outline"
-                size="sm"
-              >
-                {isGeneratingPIs ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Generating...
-                  </>
-                ) : (
-                  <>
-                    <Zap className="mr-2 h-4 w-4" />
-                    Generate PIs
-                  </>
-                )}
-              </Button>
+
             </div>
           </CardContent>
         </Card>
