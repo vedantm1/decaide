@@ -17,8 +17,6 @@ import { useQuery } from '@tanstack/react-query';
 import { getRandomPIsForRoleplay, isTeamEvent, formatPI } from '@shared/deca-utils';
 
 interface RoleplaySettings {
-  difficulty: 'easy' | 'medium' | 'hard' | 'expert';
-  scenarioType: 'customer' | 'employee' | 'vendor' | 'partner' | 'random';
   duration: number;
   includeObjections: boolean;
   realTimeMode: boolean;
@@ -50,8 +48,6 @@ interface GeneratedScenario {
 
 export function EnhancedRoleplayGenerator() {
   const [settings, setSettings] = useState<RoleplaySettings>({
-    difficulty: 'medium',
-    scenarioType: 'customer',
     duration: 15,
     includeObjections: true,
     realTimeMode: false,
@@ -120,16 +116,32 @@ export function EnhancedRoleplayGenerator() {
   };
 
   const handleGenerateScenario = async () => {
+    if (!user?.selectedEvent) {
+      toast({
+        title: 'No Event Selected',
+        description: 'Please complete the tutorial to select your DECA event first.',
+        variant: 'destructive'
+      });
+      return;
+    }
+
     setIsGenerating(true);
     
     try {
+      // First generate PIs if none are selected
+      let pisToUse = selectedPIs;
+      if (pisToUse.length === 0) {
+        pisToUse = getRandomPIsForRoleplay(user.selectedEvent);
+        setSelectedPIs(pisToUse);
+      }
+
       const response = await fetch('/api/roleplay/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...settings,
           customInstructions: customInstructions.trim() || undefined,
-          performanceIndicators: selectedPIs.length > 0 ? selectedPIs : undefined,
+          performanceIndicators: pisToUse,
           userEvent: user?.selectedEvent
         })
       });
@@ -145,7 +157,7 @@ export function EnhancedRoleplayGenerator() {
       addNotification({
         type: 'success',
         title: 'Scenario Generated!',
-        message: `${scenario.title} is ready to practice`,
+        message: `${scenario.title} is ready to practice with ${pisToUse.length} Performance Indicators`,
         duration: 5000
       });
       
@@ -301,75 +313,14 @@ export function EnhancedRoleplayGenerator() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="basic" className="space-y-4">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="basic">Basic</TabsTrigger>
-              <TabsTrigger value="advanced">Advanced</TabsTrigger>
+          <Tabs defaultValue="normal" className="space-y-4">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="normal">Normal</TabsTrigger>
               <TabsTrigger value="custom">Custom</TabsTrigger>
             </TabsList>
 
-            {/* Basic Settings */}
-            <TabsContent value="basic" className="space-y-6">
-              <div className="space-y-2">
-                <Label>Difficulty Level</Label>
-                <RadioGroup 
-                  value={settings.difficulty} 
-                  onValueChange={(value) => setSettings({...settings, difficulty: value as any})}
-                >
-                  <div className="grid grid-cols-2 gap-4">
-                    {(['easy', 'medium', 'hard', 'expert'] as const).map((level) => (
-                      <motion.div
-                        key={level}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                      >
-                        <label 
-                          htmlFor={level}
-                          className={`
-                            flex flex-col p-4 rounded-lg border-2 cursor-pointer transition-all
-                            ${settings.difficulty === level ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'}
-                          `}
-                        >
-                          <RadioGroupItem value={level} id={level} className="sr-only" />
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="font-medium capitalize">{level}</span>
-                            <Badge className={difficultyColors[level]} variant="secondary">
-                              {level === 'easy' ? '★' : level === 'medium' ? '★★' : level === 'hard' ? '★★★' : '★★★★'}
-                            </Badge>
-                          </div>
-                          <p className="text-sm text-muted-foreground">
-                            {difficultyDescriptions[level]}
-                          </p>
-                        </label>
-                      </motion.div>
-                    ))}
-                  </div>
-                </RadioGroup>
-              </div>
-
-              <div className="space-y-2">
-                <Label>Scenario Type</Label>
-                <RadioGroup 
-                  value={settings.scenarioType} 
-                  onValueChange={(value) => setSettings({...settings, scenarioType: value as any})}
-                  className="grid grid-cols-3 gap-3"
-                >
-                  {(['customer', 'employee', 'vendor', 'partner', 'random'] as const).map((type) => (
-                    <label
-                      key={type}
-                      htmlFor={type}
-                      className={`
-                        flex items-center justify-center p-3 rounded-md border cursor-pointer transition-all
-                        ${settings.scenarioType === type ? 'border-primary bg-primary/10' : 'border-border hover:border-primary/50'}
-                      `}
-                    >
-                      <RadioGroupItem value={type} id={type} className="sr-only" />
-                      <span className="capitalize">{type}</span>
-                    </label>
-                  ))}
-                </RadioGroup>
-              </div>
-
+            {/* Normal Settings */}
+            <TabsContent value="normal" className="space-y-6">
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label>Duration (minutes)</Label>
@@ -386,8 +337,8 @@ export function EnhancedRoleplayGenerator() {
               </div>
             </TabsContent>
 
-            {/* Advanced Settings */}
-            <TabsContent value="advanced" className="space-y-4">
+            {/* Custom Instructions */}
+            <TabsContent value="custom" className="space-y-4">
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
@@ -430,22 +381,19 @@ export function EnhancedRoleplayGenerator() {
                     <option value="problem-solving">Problem Solving</option>
                   </select>
                 </div>
-              </div>
-            </TabsContent>
 
-            {/* Custom Instructions */}
-            <TabsContent value="custom" className="space-y-4">
-              <div className="space-y-2">
-                <Label>Custom Instructions</Label>
-                <p className="text-sm text-muted-foreground mb-2">
-                  Add specific requirements or context for your scenario
-                </p>
-                <Textarea
-                  placeholder="E.g., 'Focus on B2B sales in the tech industry' or 'Include sustainability concerns'"
-                  value={customInstructions}
-                  onChange={(e) => setCustomInstructions(e.target.value)}
-                  className="min-h-[100px]"
-                />
+                <div className="space-y-2">
+                  <Label>Custom Instructions</Label>
+                  <p className="text-sm text-muted-foreground mb-2">
+                    Add specific requirements or context for your scenario
+                  </p>
+                  <Textarea
+                    placeholder="E.g., 'Focus on B2B sales in the tech industry' or 'Include sustainability concerns'"
+                    value={customInstructions}
+                    onChange={(e) => setCustomInstructions(e.target.value)}
+                    className="min-h-[100px]"
+                  />
+                </div>
               </div>
             </TabsContent>
           </Tabs>

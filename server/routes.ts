@@ -235,8 +235,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.user!.id;
       const {
-        difficulty,
-        scenarioType,
         duration,
         includeObjections,
         realTimeMode,
@@ -260,9 +258,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Mock scenario generation (would use Azure OpenAI in production)
       const scenario = {
         id: scenarioId,
-        title: `${difficulty.charAt(0).toUpperCase() + difficulty.slice(1)} ${scenarioType.charAt(0).toUpperCase() + scenarioType.slice(1)} Interaction`,
-        description: `A ${duration}-minute roleplay scenario focusing on ${scenarioType} interactions with ${difficulty} difficulty level.${userEvent ? ` Based on your selected DECA event: ${userEvent}` : ''}`,
-        difficulty,
+        title: `Business Roleplay Scenario${userEvent ? ` - ${userEvent}` : ''}`,
+        description: `A ${duration}-minute roleplay scenario${userEvent ? ` based on your selected DECA event: ${userEvent}` : ''}.${performanceIndicators && performanceIndicators.length > 0 ? ` Focuses on ${performanceIndicators.length} Performance Indicators.` : ''}`,
+        difficulty: 'medium',
         estimatedTime: duration,
         objectives: [
           "Build rapport and establish trust",
@@ -274,20 +272,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ].filter(Boolean),
         character: {
           name: "Alex Johnson",
-          role: `${scenarioType.charAt(0).toUpperCase() + scenarioType.slice(1)} Representative`,
-          personality: difficulty === 'easy' ? 'Friendly and cooperative' : difficulty === 'expert' ? 'Skeptical and demanding' : 'Professional and focused',
+          role: "Business Representative",
+          personality: "Professional and focused",
           background: "10 years of industry experience, looking for reliable business partners"
         },
         context: {
           company: "TechSolutions Inc.",
           industry: "Technology Services",
-          situation: "Quarterly vendor review meeting",
+          situation: "Business consultation meeting",
           challenges: [
             "Budget constraints",
             "Previous service issues",
-            difficulty === 'hard' || difficulty === 'expert' ? "Competing offers from rivals" : null,
-            difficulty === 'expert' ? "Complex stakeholder requirements" : null
-          ].filter(Boolean)
+            "Competing offers from rivals"
+          ]
         },
         evaluationCriteria: [
           "Communication clarity",
