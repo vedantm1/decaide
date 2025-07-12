@@ -255,37 +255,89 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Generate unique ID for scenario
       const scenarioId = `scenario_${Date.now()}`;
       
-      // Mock scenario generation (would use Azure OpenAI in production)
+      // Generate unique scenario using Azure OpenAI
+      const piText = performanceIndicators && performanceIndicators.length > 0 
+        ? `Focus on these Performance Indicators: ${performanceIndicators.join(', ')}`
+        : '';
+      
+      const prompt = `Generate a unique business roleplay scenario for DECA training. 
+      
+      Event: ${userEvent || 'General Business'}
+      Duration: ${duration} minutes
+      ${piText}
+      ${customInstructions ? `Special Instructions: ${customInstructions}` : ''}
+      ${focusArea ? `Focus Area: ${focusArea}` : ''}
+      
+      Generate a realistic business scenario with:
+      1. Unique company name and industry
+      2. Specific character with name, role, personality, and background
+      3. Clear business context and situation
+      4. Specific challenges or objectives
+      5. Make it realistic and engaging
+      
+      Return only JSON format:
+      {
+        "title": "scenario title",
+        "description": "brief description",
+        "character": {
+          "name": "character name",
+          "role": "their role",
+          "personality": "personality traits",
+          "background": "relevant background"
+        },
+        "context": {
+          "company": "company name",
+          "industry": "industry type",
+          "situation": "meeting/scenario context",
+          "challenges": ["challenge1", "challenge2", "challenge3"]
+        },
+        "objectives": ["objective1", "objective2", "objective3"]
+      }`;
+
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [
+          { role: "system", content: "You are a DECA business education expert. Generate unique, realistic business scenarios for student training." },
+          { role: "user", content: prompt }
+        ],
+        temperature: 0.9,
+        max_tokens: 800
+      });
+
+      let aiScenario;
+      try {
+        aiScenario = JSON.parse(response.choices[0].message.content!);
+      } catch (parseError) {
+        console.error("Failed to parse AI response:", parseError);
+        // Fallback to basic scenario
+        aiScenario = {
+          title: `Business Roleplay - ${userEvent || 'General'}`,
+          description: `A ${duration}-minute business roleplay scenario`,
+          character: {
+            name: "Jamie Martinez",
+            role: "Business Manager",
+            personality: "Professional and results-oriented",
+            background: "5+ years in business development"
+          },
+          context: {
+            company: "InnovateNow Solutions",
+            industry: "Business Services",
+            situation: "Strategic business meeting",
+            challenges: ["Market competition", "Resource allocation", "Client retention"]
+          },
+          objectives: ["Build professional relationships", "Present solutions effectively", "Address business challenges"]
+        };
+      }
+
       const scenario = {
         id: scenarioId,
-        title: `Business Roleplay Scenario${userEvent ? ` - ${userEvent}` : ''}`,
-        description: `A ${duration}-minute roleplay scenario${userEvent ? ` based on your selected DECA event: ${userEvent}` : ''}.${performanceIndicators && performanceIndicators.length > 0 ? ` Focuses on ${performanceIndicators.length} Performance Indicators.` : ''}`,
+        title: aiScenario.title,
+        description: aiScenario.description,
         difficulty: 'medium',
         estimatedTime: duration,
-        objectives: [
-          "Build rapport and establish trust",
-          "Identify customer needs and pain points",
-          "Present solutions effectively",
-          includeObjections && "Handle objections professionally",
-          focusArea && `Focus on ${focusArea} skills`,
-          performanceIndicators && performanceIndicators.length > 0 && "Demonstrate mastery of selected Performance Indicators"
-        ].filter(Boolean),
-        character: {
-          name: "Alex Johnson",
-          role: "Business Representative",
-          personality: "Professional and focused",
-          background: "10 years of industry experience, looking for reliable business partners"
-        },
-        context: {
-          company: "TechSolutions Inc.",
-          industry: "Technology Services",
-          situation: "Business consultation meeting",
-          challenges: [
-            "Budget constraints",
-            "Previous service issues",
-            "Competing offers from rivals"
-          ]
-        },
+        objectives: aiScenario.objectives,
+        character: aiScenario.character,
+        context: aiScenario.context,
         evaluationCriteria: [
           "Communication clarity",
           "Problem-solving approach",

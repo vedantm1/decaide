@@ -147,8 +147,8 @@ export interface PIWithArea {
   instructionalArea: string;
 }
 
-// Get random PIs for roleplay based on selected event
-export function getRandomPIsForRoleplay(eventName: string): PIWithArea[] {
+// Get random PIs for roleplay based on selected event and optional instructional area
+export function getRandomPIsForRoleplay(eventName: string, selectedInstructionalArea?: string): PIWithArea[] {
   const event = getEventByName(eventName);
   if (!event) {
     console.warn(`Event "${eventName}" not found`);
@@ -158,17 +158,37 @@ export function getRandomPIsForRoleplay(eventName: string): PIWithArea[] {
   const cluster = event.cluster;
   const numPIs = isTeamEvent(eventName) ? 7 : 5;
   
-  // Get all available instructional areas for this cluster
-  const availableAreas = event.instructionalAreas;
+  // Map cluster names to JSON cluster names
+  const clusterMappings: { [key: string]: string } = {
+    'Entrepreneurship': 'Entrepreneurship Career Cluster',
+    'Business Administration Core': 'Business Administration Core Career Cluster',
+    'Finance': 'Finance Career Cluster',
+    'Hospitality & Tourism': 'Hospitality and Tourism Career Cluster',
+    'Marketing': 'Marketing Career Cluster',
+    'Business Management & Administration': 'Business Management and Administration Career Cluster'
+  };
   
-  // Select a random instructional area
-  const randomArea = availableAreas[Math.floor(Math.random() * availableAreas.length)];
+  const jsonClusterName = clusterMappings[cluster] || cluster;
+  const clusterData = decaPIs[jsonClusterName as keyof typeof decaPIs];
+  
+  if (!clusterData) {
+    console.warn(`Cluster "${jsonClusterName}" not found in PI data`);
+    return [];
+  }
+  
+  // Get instructional area to use
+  let instructionalAreaToUse = selectedInstructionalArea;
+  if (!instructionalAreaToUse) {
+    // Get available instructional areas from the JSON (they include abbreviations)
+    const availableAreas = Object.keys(clusterData);
+    instructionalAreaToUse = availableAreas[Math.floor(Math.random() * availableAreas.length)];
+  }
   
   // Get all PIs for this instructional area
-  const allPIs = getPIsForInstructionalArea(cluster, randomArea);
+  const allPIs = clusterData[instructionalAreaToUse as keyof typeof clusterData] as string[];
   
-  if (allPIs.length === 0) {
-    console.warn(`No PIs found for instructional area "${randomArea}" in cluster "${cluster}"`);
+  if (!allPIs || allPIs.length === 0) {
+    console.warn(`No PIs found for instructional area "${instructionalAreaToUse}" in cluster "${jsonClusterName}"`);
     return [];
   }
   
@@ -180,11 +200,27 @@ export function getRandomPIsForRoleplay(eventName: string): PIWithArea[] {
     const randomIndex = Math.floor(Math.random() * availablePIs.length);
     selectedPIs.push({
       pi: availablePIs.splice(randomIndex, 1)[0],
-      instructionalArea: randomArea
+      instructionalArea: instructionalAreaToUse
     });
   }
   
   return selectedPIs;
+}
+
+// Get available instructional areas for a cluster (from JSON)
+export function getInstructionalAreasForCluster(cluster: string): string[] {
+  const clusterMappings: { [key: string]: string } = {
+    'Entrepreneurship': 'Entrepreneurship Career Cluster',
+    'Business Administration Core': 'Business Administration Core Career Cluster',
+    'Finance': 'Finance Career Cluster',
+    'Hospitality & Tourism': 'Hospitality and Tourism Career Cluster',
+    'Marketing': 'Marketing Career Cluster',
+    'Business Management & Administration': 'Business Management and Administration Career Cluster'
+  };
+  
+  const jsonClusterName = clusterMappings[cluster] || cluster;
+  const clusterData = decaPIs[jsonClusterName as keyof typeof decaPIs];
+  return clusterData ? Object.keys(clusterData) : [];
 }
 
 // Get all available clusters
@@ -192,11 +228,7 @@ export function getAvailableClusters(): string[] {
   return Object.keys(decaPIs);
 }
 
-// Get all instructional areas for a cluster
-export function getInstructionalAreasForCluster(cluster: string): string[] {
-  const clusterData = decaPIs[cluster as keyof typeof decaPIs];
-  return clusterData ? Object.keys(clusterData) : [];
-}
+
 
 // Helper function to format PI for display
 export function formatPI(pi: string): string {

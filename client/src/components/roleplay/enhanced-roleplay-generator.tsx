@@ -14,7 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useNotifications } from '@/components/notifications/notification-provider';
 import { Sparkles, Settings, Target, Brain, Zap, ChevronRight, Loader2, Award, BookOpen, Users } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import { getRandomPIsForRoleplay, isTeamEvent, PIWithArea } from '@shared/deca-utils';
+import { getRandomPIsForRoleplay, isTeamEvent, PIWithArea, getInstructionalAreasForCluster, getClusterFromEvent } from '@shared/deca-utils';
 
 interface RoleplaySettings {
   duration: number;
@@ -57,6 +57,7 @@ export function EnhancedRoleplayGenerator() {
   const [customInstructions, setCustomInstructions] = useState('');
   const [selectedPIs, setSelectedPIs] = useState<PIWithArea[]>([]);
   const [isGeneratingPIs, setIsGeneratingPIs] = useState(false);
+  const [selectedInstructionalArea, setSelectedInstructionalArea] = useState<string>('');
   const { toast } = useToast();
   const { addNotification } = useNotifications();
 
@@ -131,7 +132,7 @@ export function EnhancedRoleplayGenerator() {
       // First generate PIs if none are selected
       let pisToUse = selectedPIs;
       if (pisToUse.length === 0) {
-        pisToUse = getRandomPIsForRoleplay(user.selectedEvent);
+        pisToUse = getRandomPIsForRoleplay(user.selectedEvent, selectedInstructionalArea || undefined);
         setSelectedPIs(pisToUse);
       }
 
@@ -379,6 +380,23 @@ export function EnhancedRoleplayGenerator() {
                     <option value="closing">Closing Techniques</option>
                     <option value="relationship-building">Relationship Building</option>
                     <option value="problem-solving">Problem Solving</option>
+                  </select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Instructional Area (Optional)</Label>
+                  <p className="text-sm text-muted-foreground mb-2">
+                    Choose a specific instructional area, or leave blank for random selection
+                  </p>
+                  <select
+                    className="w-full p-2 border rounded-md"
+                    value={selectedInstructionalArea}
+                    onChange={(e) => setSelectedInstructionalArea(e.target.value)}
+                  >
+                    <option value="">Random selection</option>
+                    {user?.selectedEvent && getInstructionalAreasForCluster(getClusterFromEvent(user.selectedEvent)).map((area) => (
+                      <option key={area} value={area}>{area}</option>
+                    ))}
                   </select>
                 </div>
 
