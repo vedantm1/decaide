@@ -167,7 +167,8 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📞 Support
 
-For support and questions, please contact our team at support@decade-learning.com.
+For support and questions, please contact our team at decaide569@gmail.com
+
 
 ---
 
