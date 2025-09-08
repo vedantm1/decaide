@@ -1,0 +1,223 @@
+/* Import DecAIde font global styles first */
+@import './styles/decaide-font-global.css';
+
+@import './styles/professional-theme.css';
+@import './styles/typography.css';
+@import './styles/micro-interactions.css';
+@import './styles/theme-variables.css';
+@import './styles/visual-styles.css';
+@import './lib/theme-colors.css';
+@import './lib/color-variables.css';
+@import './styles/force-dark-mode.css';
+@import './styles/dark-mode-fixes.css';
+@import './styles/dark-mode-gradients.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Vanta.js translucency system
+   These variables control the translucency of UI elements
+   so the Vanta wave background shows through consistently */
+:root {
+  /* Translucency levels */
+  --translucency-card: 0.5;       /* For card backgrounds */
+  --translucency-header: 0.5;     /* For headers */
+  --translucency-sidebar: 0.5;    /* For sidebars */
+  --translucency-dialog: 0.8;     /* For dialogs/modals (more opaque) */
+  --translucency-dropdown: 0.9;   /* For dropdowns (mostly opaque) */
+  --translucency-border: 0.4;     /* For borders */
+  --backdrop-blur: 8px;           /* Consistent blur amount */
+  
+  /* Light mode RGB values for translucent elements */
+  --card-rgb: 255, 255, 255;
+  --background-rgb: 248, 250, 252;
+  --border-rgb: 226, 232, 240;
+  --muted-rgb: 241, 245, 249;
+  --primary-rgb: 37, 99, 235;
+}
+
+/* Dark mode RGB values */
+html.dark {
+  /* Slightly darkened values for dark mode that still allow Vanta waves to show through */
+  --card-rgb: 24, 24, 27;
+  --background-rgb: 9, 9, 11;
+  --border-rgb: 39, 39, 42;
+  --muted-rgb: 39, 39, 42;
+  --primary-rgb: 59, 130, 246;
+  
+  /* Adjust translucency values for dark mode to ensure Vanta waves visibility */
+  --translucency-card: 0.65;      /* More translucent in dark mode */
+  --translucency-header: 0.65;    /* More translucent in dark mode */
+  --translucency-sidebar: 0.7;    /* More translucent in dark mode */
+  --translucency-dialog: 0.8;     /* Same translucency as light mode */
+  --translucency-dropdown: 0.9;   /* Same translucency as light mode */
+  --translucency-border: 0.4;     /* Same translucency as light mode */
+}
+
+/* Modern UI App Container */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* Page Transitions */
+@keyframes fadeInScale {
+  0% {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.page-transition-enter {
+  opacity: 0;
+  transform: scale(0.98);
+}
+
+.page-transition-enter-active {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 300ms, transform 300ms;
+}
+
+.page-transition-exit {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.page-transition-exit-active {
+  opacity: 0;
+  transform: scale(1.02);
+  transition: opacity 200ms, transform 200ms;
+}
+
+/* Content Container */
+.content-container {
+  padding: 2rem;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  animation: fadeInScale 0.3s ease-out forwards;
+}
+
+/* Enhanced Card styles with Vanta.js translucency */
+.enhanced-card {
+  border-radius: var(--radius);
+  background-color: rgba(var(--card-rgb), var(--translucency-card));
+  backdrop-filter: blur(var(--backdrop-blur));
+  border: 1px solid rgba(var(--border-rgb), var(--translucency-border));
+  padding: 1.5rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.enhanced-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(to right, var(--primary-300), var(--primary-500));
+  transform-origin: left;
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.enhanced-card:hover::before {
+  transform: scaleX(1);
+}
+
+/* Enhance readability for all text on translucent backgrounds */
+.enhanced-card h1, .enhanced-card h2, .enhanced-card h3, 
+.enhanced-card h4, .enhanced-card h5, .enhanced-card h6, 
+.enhanced-card p, .enhanced-card li, .enhanced-card a {
+  text-shadow: 0 0 1px rgba(var(--background-rgb), 0.1);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+  }
+}
+
+@layer components {
+  /* Text contrast enhancements */
+  .bubble-text-visible {
+    @apply text-slate-900; /* Enhanced text contrast */
+  }
+
+  .marketing-text {
+    @apply text-slate-900; /* Enhanced marketing text contrast */
+  }
+
+  /* Translucent UI elements for Vanta background visibility */
+  .translucent-header {
+    background-color: rgba(var(--card-rgb), var(--translucency-header));
+    backdrop-filter: blur(var(--backdrop-blur));
+    border-color: rgba(var(--border-rgb), var(--translucency-border));
+  }
+
+  .translucent-sidebar {
+    background-color: rgba(var(--card-rgb), var(--translucency-sidebar));
+    backdrop-filter: blur(var(--backdrop-blur));
+    border-color: rgba(var(--border-rgb), var(--translucency-border));
+  }
+
+  .translucent-card {
+    background-color: rgba(var(--card-rgb), var(--translucency-card));
+    backdrop-filter: blur(var(--backdrop-blur));
+    border-color: rgba(var(--border-rgb), var(--translucency-border));
+  }
+
+  .translucent-dialog {
+    background-color: rgba(var(--card-rgb), var(--translucency-dialog));
+    backdrop-filter: blur(var(--backdrop-blur));
+    border-color: rgba(var(--border-rgb), var(--translucency-border));
+  }
+
+  .translucent-dropdown {
+    background-color: rgba(var(--card-rgb), var(--translucency-dropdown));
+    backdrop-filter: blur(var(--backdrop-blur));
+    border-color: rgba(var(--border-rgb), var(--translucency-border));
+  }
+
+  /* Original components */
+  .deca-cluster-badge {
+    @apply absolute top-2 right-2 px-2 py-1 text-xs font-bold rounded-md text-white 
+           shadow-sm transform rotate-3 border border-white border-opacity-30
+           flex items-center justify-center tracking-wider;
+    animation: pulse-subtle 2s infinite;
+  }
+
+  .copyright-text {
+    @apply text-slate-600 text-sm text-center mt-8;
+  }
+}
+
+@keyframes pulse-subtle {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.2);
+  }
+  70% {
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+  }
+}
