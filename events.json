@@ -1,1 +1,27 @@
-[]
+[
+  { "event_code": "AAM", "cluster": "Marketing", "event_name": "Apparel and Accessories Marketing Series" },
+  { "event_code": "ASM", "cluster": "Marketing", "event_name": "Automotive Services Marketing Series" },
+  { "event_code": "BSM", "cluster": "Marketing", "event_name": "Business Services Marketing Series" },
+  { "event_code": "BTDM", "cluster": "Marketing", "event_name": "Buying and Merchandising Team Decision Making" },
+  { "event_code": "FMS", "cluster": "Marketing", "event_name": "Food Marketing Series" },
+  { "event_code": "IMCE", "cluster": "Marketing", "event_name": "Integrated Marketing Campaign-Event" },
+  { "event_code": "IMCP", "cluster": "Marketing", "event_name": "Integrated Marketing Campaign-Product" },
+  { "event_code": "IMCS", "cluster": "Marketing", "event_name": "Integrated Marketing Campaign-Service" },
+  { "event_code": "MCS", "cluster": "Marketing", "event_name": "Marketing Communications Series" },
+  { "event_code": "MTDM", "cluster": "Marketing", "event_name": "Marketing Management Team Decision Making" },
+  { "event_code": "PSE", "cluster": "Marketing", "event_name": "Professional Selling" },
+  { "event_code": "RMS", "cluster": "Marketing", "event_name": "Retail Merchandising Series" },
+  { "event_code": "SEM", "cluster": "Marketing", "event_name": "Sports and Entertainment Marketing Series" },
+  { "event_code": "STDM", "cluster": "Marketing", "event_name": "Sports and Entertainment Marketing Team Decision Making" },
+  { "event_code": "ACT", "cluster": "Finance", "event_name": "Accounting Applications Series" },
+  { "event_code": "BFS", "cluster": "Finance", "event_name": "Business Finance Series" },
+  { "event_code": "FCE", "cluster": "Finance", "event_name": "Financial Consulting" },
+  { "event_code": "FTDM", "cluster": "Finance", "event_name": "Financial Services Team Decision Making" },
+  { "event_code": "HTPS", "cluster": "Hospitality", "event_name": "Hospitality and Tourism Professional Selling" },
+  { "event_code": "HTDM", "cluster": "Hospitality", "event_name": "Hospitality Services Team Decision Making" },
+  { "event_code": "HLM", "cluster": "Hospitality", "event_name": "Hotel and Lodging Management Series" },
+  { "event_code": "QSRM", "cluster": "Hospitality", "event_name": "Quick Serve Restaurant Management Series" },
+  { "event_code": "RFSM", "cluster": "Hospitality", "event_name": "Restaurant and Food Service Management Series" },
+  { "event_code": "TTDM", "cluster": "Hospitality", "event_name": "Travel and Tourism Team Decision Making" }
+]
+

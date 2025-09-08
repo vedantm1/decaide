@@ -1,1 +1,16 @@
-[]
+[
+  { "pi_code": "BL:163", "instructional_area": "Business Law", "description": "Comply with the spirit and intent of laws and regulations" },
+  { "pi_code": "BL:067", "instructional_area": "Business Law", "description": "Discuss the nature of law and sources of law in the United States" },
+  { "pi_code": "BL:068", "instructional_area": "Business Law", "description": "Describe the United States' judicial system" },
+  { "pi_code": "BL:051", "instructional_area": "Business Law", "description": "Describe methods used to protect intellectual property" },
+  { "pi_code": "CO:054", "instructional_area": "Communication Skills", "description": "Identify sources that provide relevant, valid written material" },
+  { "pi_code": "CO:055", "instructional_area": "Communication Skills", "description": "Extract relevant information from written materials" },
+  { "pi_code": "CR:003", "instructional_area": "Customer Relations", "description": "Explain the nature of positive customer relations" },
+  { "pi_code": "CR:004", "instructional_area": "Customer Relations", "description": "Demonstrate a customer service mindset" },
+  { "pi_code": "EC:002", "instructional_area": "Economics", "description": "Distinguish between economic goods and services" },
+  { "pi_code": "EC:003", "instructional_area": "Economics", "description": "Explain the concept of economic resources" },
+  { "pi_code": "EC:001", "instructional_area": "Economics", "description": "Describe the concepts of economics and economic activities" },
+  { "pi_code": "EC:017", "instructional_area": "Economics", "description": "Explain the concept of Gross Domestic Product (GDP)" },
+  { "pi_code": "EI:001", "instructional_area": "Emotional Intelligence", "description": "Describe the nature of emotional intelligence" },
+  { "pi_code": "EI:016", "instructional_area": "Emotional Intelligence", "description": "Explain the concept of self-esteem" }
+]
