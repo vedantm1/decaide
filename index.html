@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1"
+    />
+    <title>DecA(I)de - AI Powered Learning Platform</title>
+    
+    <!-- Custom DecAIde Font -->
+    <style>
+      @font-face {
+        font-family: 'DecAIde';
+        src: url('/fonts/decaidefont.ttf') format('truetype');
+        font-weight: normal;
+        font-style: normal;
+        font-display: swap;
+        font-feature-settings: "ss01" on, "ss02" on, "ss03" on, "ss04" on, "ss05" on, "ss06" on, "ss07" on, "ss08" on, "ss09" on, "ss10" on;
+      }
+      
+      /* Apply DecAIde font to all elements */
+      * {
+        font-family: 'DecAIde', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif !important;
+        font-feature-settings: "ss01" on, "ss02" on, "ss03" on, "ss04" on, "ss05" on, "ss06" on, "ss07" on, "ss08" on, "ss09" on, "ss10" on;
+      }
+    </style>
+    <style>
+      /* Full-screen background container - transparent to show Vanta waves */
+      body {
+        background-color: transparent;
+        position: relative;
+        min-height: 100vh;
+      }
+      
+      /* No background gradient to ensure Vanta waves visibility */
+      body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: none;
+        z-index: -1;
+        pointer-events: none;
+      }
+      
+      /* Dark mode styling - transparent to show Vanta waves */
+      html.dark body {
+        background-color: transparent;
+      }
+      
+      html.dark body::before {
+        background: none;
+      }
+      
+      /* Smooth transitions */
+      body, body::before {
+        transition: background-color 0.3s ease, background 0.3s ease;
+      }
+    </style>
+    <!-- Load Three.js and Vanta.js libraries directly -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanta@0.5.24/dist/vanta.waves.min.js"></script>
+    
+    <!-- Animation Libraries -->
+    <!-- AOS (Animate on Scroll) -->
+    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css"/>
+    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+    
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://unpkg.com/animate.css@4.1.1/animate.min.css"/>
+    
+    <!-- Loaders.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/loaders.css/0.1.2/loaders.min.css"/>
+    
+    <!-- GSAP and ScrollTrigger -->
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
+    
+    <!-- Rellax (Parallax) -->
+    <script src="https://cdn.jsdelivr.net/npm/rellax@1.12.1/rellax.min.js"></script>
+    
+    <!-- Vanilla Tilt -->
+    <script src="https://cdn.jsdelivr.net/npm/vanilla-tilt@1.7.0/dist/vanilla-tilt.min.js"></script>
+    
+    <!-- Splitting.js for text animations -->
+    <link rel="stylesheet" href="https://unpkg.com/splitting/dist/splitting.css"/>
+    <script src="https://unpkg.com/splitting/dist/splitting.min.js"></script>
+  </head>
+  <body>
+    <!-- We'll use this div as a target for the Vanta effect -->
+    <div id="vanta-bg" style="position: fixed; z-index: -1; top: 0; left: 0; width: 100%; height: 100%;"></div>
+    <div id="root"></div>
+    
+    <script type="module" src="/src/main.tsx"></script>
+    <script type="module">
+      import { setupPWA } from '/src/lib/registerSW.ts';
+      setupPWA();
+    </script>
+    
+    <!-- Initialize Vanta effect using light mode by default -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // Initialize with light mode by default
+        const isDark = document.documentElement.classList.contains('dark');
+        const color = isDark ? 0x292929 : 0xa7a2a2;
+        
+        // Create the VANTA effect with the exact configuration requested
+        const vantaEffect = VANTA.WAVES({
+          el: "#vanta-bg",
+          mouseControls: true,
+          touchControls: true,
+          gyroControls: false,
+          minHeight: 200.00,
+          minWidth: 200.00,
+          scale: 1.00,
+          scaleMobile: 1.00,
+          color: color,
+          shininess: 0.00,
+          waveHeight: 28.00,
+          waveSpeed: 1.50,
+          zoom: 0.65
+        });
+        
+        // Watch for theme changes and update the VANTA effect
+        const observer = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.attributeName === 'class') {
+              const isDarkMode = document.documentElement.classList.contains('dark');
+              if (vantaEffect && vantaEffect.options) {
+                vantaEffect.setOptions({
+                  // Apply exactly the same configuration as requested for dark mode
+                  color: isDarkMode ? 0x292929 : 0xa7a2a2
+                });
+                console.log("Updated VANTA effect for", isDarkMode ? "dark mode" : "light mode");
+              }
+            }
+          });
+        });
+        
+        observer.observe(document.documentElement, { attributes: true });
+        
+        // Clean up on page unload
+        window.addEventListener('beforeunload', function() {
+          if (vantaEffect) {
+            vantaEffect.destroy();
+          }
+          observer.disconnect();
+        });
+        
+        // Initialize animation libraries
+        // AOS (Animate on Scroll)
+        AOS.init({
+          duration: 800,
+          once: true,
+          offset: 100,
+          easing: 'ease-out-quart'
+        });
+        
+        // GSAP ScrollTrigger
+        gsap.registerPlugin(ScrollTrigger);
+        
+        // Initialize Rellax for parallax effects
+        const rellax = new Rellax('[data-rellax-speed]', {
+          speed: -3,
+          center: false,
+          wrapper: null,
+          round: true,
+          vertical: true,
+          horizontal: false
+        });
+        
+        // Initialize Vanilla Tilt for cards and interactive elements
+        VanillaTilt.init(document.querySelectorAll(".tilt"), {
+          max: 15,
+          speed: 400,
+          glare: true,
+          "max-glare": 0.5
+        });
+        
+        // Initialize text splitting for animated headlines
+        Splitting();
+        
+        // Add smooth scrolling with Lenis
+        let lenis;
+        try {
+          // Use module import for Lenis smooth scrolling
+          import('https://cdn.jsdelivr.net/npm/@studio-freight/lenis/+esm').then(({ default: Lenis }) => {
+            lenis = new Lenis({
+              duration: 1.2,
+              easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+              direction: 'vertical',
+              gestureDirection: 'vertical',
+              smooth: true,
+              mouseMultiplier: 1,
+              smoothTouch: false,
+              touchMultiplier: 2,
+              infinite: false,
+            });
+            
+            function raf(time) {
+              lenis.raf(time);
+              requestAnimationFrame(raf);
+            }
+            requestAnimationFrame(raf);
+          });
+        } catch (e) {
+          console.log('Lenis smooth scrolling not available');
+        }
+      });
+    </script>
+  </body>
+</html>
