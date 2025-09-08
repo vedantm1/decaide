@@ -1,0 +1,114 @@
+/* 
+ * COMPLETELY REBUILT DARK MODE STYLES
+ * Focused on maximum translucency for Vanta.js waves visibility
+ */
+
+/* Dark mode base styles */
+html.dark,
+html[data-theme="dark"] {
+  color-scheme: dark !important;
+}
+
+/* Reset all background colors to transparent in dark mode */
+html.dark *,
+html[data-theme="dark"] * {
+  background-color: transparent !important;
+}
+
+/* Translucent backgrounds for UI elements */
+html.dark .card,
+html.dark [class*="card"],
+html.dark .bg-white,
+html.dark [class*="bg-white"],
+html.dark [class*="bg-card"],
+html.dark [class*="bg-background"],
+html.dark [class*="bg-muted"],
+html.dark [class*="bg-primary"],
+html.dark [class*="bg-secondary"],
+html.dark [class*="bg-accent"],
+html[data-theme="dark"] .card,
+html[data-theme="dark"] [class*="card"],
+html[data-theme="dark"] .bg-white,
+html[data-theme="dark"] [class*="bg-white"],
+html[data-theme="dark"] [class*="bg-card"],
+html[data-theme="dark"] [class*="bg-background"],
+html[data-theme="dark"] [class*="bg-muted"],
+html[data-theme="dark"] [class*="bg-primary"],
+html[data-theme="dark"] [class*="bg-secondary"],
+html[data-theme="dark"] [class*="bg-accent"] {
+  background-color: rgba(24, 24, 27, 0.5) !important;
+  backdrop-filter: blur(8px) !important;
+  border-color: rgba(39, 39, 42, 0.5) !important;
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Enhance contrast for text elements */
+html.dark p, html.dark span, html.dark div, 
+html.dark h1, html.dark h2, html.dark h3, 
+html.dark h4, html.dark h5, html.dark h6,
+html.dark label, html.dark a,
+html[data-theme="dark"] p, html[data-theme="dark"] span, html[data-theme="dark"] div,
+html[data-theme="dark"] h1, html[data-theme="dark"] h2, html[data-theme="dark"] h3,
+html[data-theme="dark"] h4, html[data-theme="dark"] h5, html[data-theme="dark"] h6,
+html[data-theme="dark"] label, html[data-theme="dark"] a {
+  color: rgba(255, 255, 255, 0.9) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Semi-transparent inputs for better user experience */
+html.dark input, 
+html.dark textarea, 
+html.dark select,
+html.dark button,
+html[data-theme="dark"] input, 
+html[data-theme="dark"] textarea, 
+html[data-theme="dark"] select,
+html[data-theme="dark"] button {
+  background-color: rgba(24, 24, 27, 0.6) !important;
+  border-color: rgba(39, 39, 42, 0.5) !important;
+  color: rgba(255, 255, 255, 0.9) !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+/* Input placeholders */
+html.dark input::placeholder,
+html.dark textarea::placeholder,
+html[data-theme="dark"] input::placeholder,
+html[data-theme="dark"] textarea::placeholder {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Special case for the sidebar */
+html.dark aside, 
+html[data-theme="dark"] aside {
+  background-color: rgba(24, 24, 27, 0.6) !important;
+  backdrop-filter: blur(8px) !important;
+  border-color: rgba(39, 39, 42, 0.5) !important;
+}
+
+/* Special case for header elements */
+html.dark header,
+html[data-theme="dark"] header {
+  background-color: rgba(24, 24, 27, 0.6) !important;
+  backdrop-filter: blur(8px) !important;
+  border-color: rgba(39, 39, 42, 0.5) !important;
+}
+
+/* Make all content containers transparent to allow Vanta background */
+html.dark .content-container,
+html.dark main,
+html.dark section,
+html.dark [class*="container"],
+html[data-theme="dark"] .content-container,
+html[data-theme="dark"] main,
+html[data-theme="dark"] section,
+html[data-theme="dark"] [class*="container"] {
+  background-color: transparent !important;
+}
+
+/* Ensure settings page cards are transparent */
+html.dark .settings-card,
+html[data-theme="dark"] .settings-card {
+  background-color: rgba(24, 24, 27, 0.4) !important;
+  backdrop-filter: blur(8px) !important;
+}

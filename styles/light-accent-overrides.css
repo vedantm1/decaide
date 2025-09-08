@@ -1,0 +1,6 @@
+/* Light accent overrides */
+/* This file provides light theme specific color overrides */
+
+.light [data-accent] {
+  /* Add any light theme specific accent overrides here */
+}
