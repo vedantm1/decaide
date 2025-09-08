@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express';
 import { getOpenAIClient, generateRoleplay, generateTestQuestions } from '../services/azureOpenai';
 import { storage } from '../storage';
+import { verifySupabaseToken } from '../supabase-auth';
 
 const router = express.Router();
 
@@ -39,10 +40,7 @@ router.get('/status', async (_req: Request, res: Response) => {
 });
 
 // Generate AI roleplay scenario
-router.post('/generate-roleplay', async (req: Request, res: Response) => {
-  if (!req.isAuthenticated()) {
-    return res.status(401).json({ error: "Authentication required" });
-  }
+router.post('/generate-roleplay', verifySupabaseToken, async (req: Request, res: Response) => {
   
   try {
     const { 
@@ -58,13 +56,7 @@ router.post('/generate-roleplay', async (req: Request, res: Response) => {
       });
     }
     
-    // Check user subscription
-    const canGenerate = await storage.checkRoleplayAllowance(req.user!.id);
-    if (!canGenerate) {
-      return res.status(403).json({ 
-        error: "You have reached your roleplay generation limit for your subscription tier" 
-      });
-    }
+    
     
     // Generate the roleplay
     const roleplay = await generateRoleplay({
@@ -74,8 +66,14 @@ router.post('/generate-roleplay', async (req: Request, res: Response) => {
       businessType
     });
     
-    // Record usage
-    await storage.recordRoleplayGeneration(req.user!.id);
+    // Record usage - get user ID from the Supabase auth
+    const userId = (req.user as any)?.id;
+    if (userId) {
+      const user = await storage.getUserByAuthId(userId);
+      if (user) {
+        await storage.recordRoleplayGeneration(user.id);
+      }
+    }
     
     res.json(roleplay);
   } catch (error: any) {
@@ -87,14 +85,23 @@ router.post('/generate-roleplay', async (req: Request, res: Response) => {
   }
 });
 
-// Generate test questions
+// Generate test questions with comprehensive DECA standards
 router.post('/generate-test', async (req: Request, res: Response) => {
   if (!req.isAuthenticated()) {
     return res.status(401).json({ error: "Authentication required" });
   }
   
   try {
-    const { testType, categories, numQuestions } = req.body;
+    const { 
+      testType, 
+      categories, 
+      numQuestions, 
+      cluster, 
+      level,
+      learningMode,
+      weakTopics,
+      errorRate
+    } = req.body;
     
     if (!testType || !categories || !numQuestions) {
       return res.status(400).json({ 
@@ -102,19 +109,16 @@ router.post('/generate-test', async (req: Request, res: Response) => {
       });
     }
     
-    // Check user subscription
-    const canGenerate = await storage.checkTestAllowance(req.user!.id);
-    if (!canGenerate) {
-      return res.status(403).json({ 
-        error: "You have reached your test generation limit for your subscription tier" 
-      });
-    }
-    
-    // Generate the test questions
+    // Generate the test questions with enhanced DECA system
     const test = await generateTestQuestions({
       testType,
       categories: Array.isArray(categories) ? categories : [categories],
-      numQuestions: Number(numQuestions)
+      numQuestions: Number(numQuestions),
+      cluster: cluster || "Marketing",
+      level: level || "District", 
+      learningMode: Boolean(learningMode),
+      weakTopics: Array.isArray(weakTopics) ? weakTopics : (weakTopics ? [weakTopics] : []),
+      errorRate: errorRate ? Number(errorRate) : undefined
     });
     
     // Record usage
@@ -145,13 +149,7 @@ router.post('/written-event-feedback', async (req: Request, res: Response) => {
       });
     }
     
-    // Check user subscription for written event feedback
-    const canGenerate = await storage.checkWrittenEventAllowance(req.user!.id);
-    if (!canGenerate) {
-      return res.status(403).json({ 
-        error: "You have reached your written event feedback limit for your subscription tier" 
-      });
-    }
+    
     
     const client = getOpenAIClient();
     const deployment = process.env.AZURE_OPENAI_DEPLOYMENT || "gpt-4o-mini";
@@ -197,7 +195,7 @@ router.post('/written-event-feedback', async (req: Request, res: Response) => {
     const feedback = JSON.parse(response.choices[0].message?.content || "{}");
     
     // Record usage
-    await storage.recordWrittenEventGeneration(req.user!.id);
+    await storage.recordTestGeneration(req.user!.id);
     
     res.json(feedback);
   } catch (error: any) {
@@ -208,5 +206,7 @@ router.post('/written-event-feedback', async (req: Request, res: Response) => {
     });
   }
 });
+
+
 
 export default router;

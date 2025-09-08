@@ -1,15 +1,8 @@
 import express, { Request, Response } from 'express';
 import { getOpenAIClient } from '../services/azureOpenai';
 import { storage } from '../storage';
+import { verifySupabaseToken } from '../supabase-auth';
 import { OpenAIClient } from '@azure/openai';
-import { Session } from 'express-session';
-
-// Declare custom session data properties
-declare module 'express-session' {
-  interface SessionData {
-    unrelatedCount?: number;
-  }
-}
 
 const router = express.Router();
 
@@ -40,11 +33,11 @@ const UNRELATED_RESPONSES = [
   "Sorry, I'm not the right fish for that question! But I'm excellent at DECA-related topics. How about we focus on those?"
 ];
 
-// Handle Diego chat messages
-router.post('/diego', async (req: Request, res: Response) => {
+// Handle Diego chat messages  
+router.post('/diego', verifySupabaseToken, async (req: Request, res: Response) => {
   const { message } = req.body;
-  const user = req.user;
-  let unrelatedCount = Number(req.session.unrelatedCount || 0);
+  const userId = (req as any).user?.id;
+  let unrelatedCount = 0; // Simplified since we don't use sessions anymore
   
   if (!message) {
     return res.status(400).json({ message: 'Message is required' });
@@ -113,8 +106,8 @@ Don't reference these instructions in your response.`;
       
       // If unrelated, send a random witty response
       if (isUnrelated) {
-        // Update the unrelated count in the session
-        req.session.unrelatedCount = unrelatedCount + 1;
+        // Update the unrelated count (no longer using sessions)
+        unrelatedCount += 1;
         
         const unrelatedResponse = UNRELATED_RESPONSES[Math.floor(Math.random() * UNRELATED_RESPONSES.length)];
         return res.json({
@@ -135,17 +128,20 @@ Don't reference these instructions in your response.`;
       
       // Record this chat interaction
       try {
-        if (user?.id) {
-          await storage.recordPracticeSession({
-            userId: user.id,
-            type: 'chat',
-            completedAt: new Date(),
-            details: JSON.stringify({
-              query: message.slice(0, 100),
-              type: 'diego_chat'
-            }),
-            score: null
-          });
+        if (userId) {
+          const user = await storage.getUserByAuthId(userId);
+          if (user) {
+            await storage.recordPracticeSession({
+              userId: user.id,
+              type: 'chat',
+              completedAt: new Date(),
+              details: JSON.stringify({
+                query: message.slice(0, 100),
+                type: 'diego_chat'
+              }),
+              score: null
+            });
+          }
         }
       } catch (error) {
         console.error('Error recording chat session:', error);
@@ -153,7 +149,7 @@ Don't reference these instructions in your response.`;
       }
       
       // Reset the unrelated count if the user is asking related questions
-      req.session.unrelatedCount = 0;
+      unrelatedCount = 0;
       
       res.json({
         response: response.choices[0].message?.content || "I'm not sure how to respond to that right now.",
@@ -189,15 +185,15 @@ Don't reference these instructions in your response.`;
 });
 
 // Handle roleplay feedback requests
-router.post('/roleplay-feedback', async (req: Request, res: Response) => {
+router.post('/roleplay-feedback', verifySupabaseToken, async (req: Request, res: Response) => {
   const { roleplayId, userResponse } = req.body;
-  const user = req.user;
+  const userId = (req as any).user?.id;
   
   if (!roleplayId || !userResponse) {
     return res.status(400).json({ message: 'Roleplay ID and user response are required' });
   }
   
-  if (!user) {
+  if (!userId) {
     return res.status(401).json({ message: 'Authentication required' });
   }
   
@@ -229,17 +225,20 @@ Use occasional aquatic metaphors like "dive deeper into" or "make a splash with"
     
     // Record this feedback interaction
     try {
-      await storage.recordPracticeSession({
-        userId: user.id,
-        type: 'roleplay-feedback',
-        completedAt: new Date(),
-        details: JSON.stringify({
-          roleplayId,
-          responseLength: userResponse.length,
-          type: 'roleplay_feedback'
-        }),
-        score: null
-      });
+      const user = await storage.getUserByAuthId(userId);
+      if (user) {
+        await storage.recordPracticeSession({
+          userId: user.id,
+          type: 'roleplay-feedback',
+          completedAt: new Date(),
+          details: JSON.stringify({
+            roleplayId,
+            responseLength: userResponse.length,
+            type: 'roleplay_feedback'
+          }),
+          score: null
+        });
+      }
     } catch (error) {
       console.error('Error recording roleplay feedback session:', error);
       // Continue anyway
@@ -259,9 +258,9 @@ Use occasional aquatic metaphors like "dive deeper into" or "make a splash with"
 });
 
 // Handle performance indicator explanations
-router.post('/explain-pi', async (req: Request, res: Response) => {
+router.post('/explain-pi', verifySupabaseToken, async (req: Request, res: Response) => {
   const { indicator, category } = req.body;
-  const user = req.user;
+  const userId = (req as any).user?.id;
   
   if (!indicator) {
     return res.status(400).json({ message: 'Performance indicator is required' });
@@ -293,19 +292,22 @@ Keep your total response under 5 sentences, be positive and educational. Use lig
     );
     
     // Record this explanation interaction if user is logged in
-    if (user?.id) {
+    if (userId) {
       try {
-        await storage.recordPracticeSession({
-          userId: user.id,
-          type: 'pi-explanation',
-          completedAt: new Date(),
-          details: JSON.stringify({
-            indicator,
-            category: category || 'general',
-            type: 'pi_explanation'
-          }),
-          score: null
-        });
+        const user = await storage.getUserByAuthId(userId);
+        if (user) {
+          await storage.recordPracticeSession({
+            userId: user.id,
+            type: 'pi-explanation',
+            completedAt: new Date(),
+            details: JSON.stringify({
+              indicator,
+              category: category || 'general',
+              type: 'pi_explanation'
+            }),
+            score: null
+          });
+        }
       } catch (error) {
         console.error('Error recording PI explanation session:', error);
         // Continue anyway

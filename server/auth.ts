@@ -1,12 +1,10 @@
-import passport from "passport";
-import { Strategy as LocalStrategy } from "passport-local";
-import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { Express, Request, Response, NextFunction } from "express";
-import session from "express-session";
+import cors from "cors";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 import { storage } from "./storage";
 import { User as SelectUser } from "@shared/schema";
+import { verifySupabaseToken } from "./supabase-auth";
 
 declare global {
   namespace Express {
@@ -30,253 +28,48 @@ async function comparePasswords(supplied: string, stored: string) {
 }
 
 export function setupAuth(app: Express) {
-  // Session setup with enhanced security and persistence
-  const sessionSettings: session.SessionOptions = {
-    secret: process.env.SESSION_SECRET || "decade-ai-secret-key",
-    resave: false,
-    saveUninitialized: false,
-    store: storage.sessionStore,
-    cookie: {
-      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days for better persistence
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      httpOnly: true // Prevent client-side JS from accessing the cookie
-    }
-  };
+  // Setup CORS for Replit webview compatibility
+  app.use(cors({ 
+    origin: true, 
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+    exposedHeaders: ['X-Total-Count']
+  }));
 
+  // Session management removed - using Supabase JWT tokens instead
   app.set("trust proxy", 1);
-  app.use(session(sessionSettings));
-  app.use(passport.initialize());
-  app.use(passport.session());
 
-  // Local strategy for username/password auth
-  passport.use(
-    new LocalStrategy(async (username, password, done) => {
-      try {
-        const user = await storage.getUserByUsername(username);
-        if (!user || !(await comparePasswords(password, user.password))) {
-          return done(null, false);
-        } else {
-          // Generate a unique session identifier
-          const sessionId = randomBytes(24).toString('hex');
-          
-          // Update last login date for streak tracking and store session ID
-          const now = new Date();
-          
-          // Get client IP and user agent info for session tracking
-          const sessionInfo = {
-            id: sessionId,
-            createdAt: now,
-            lastActive: now
-          };
-          
-          // Update active session for this user
-          await storage.updateUserSession(user.id, sessionInfo);
-          
-          // Update last login date
-          await storage.updateLastLogin(user.id, now);
-          
-          // Set justLoggedIn flag to trigger welcome animation
-          const userWithSessionInfo = {
-            ...user,
-            sessionId,
-            justLoggedIn: true
-          };
-          
-          return done(null, userWithSessionInfo);
-        }
-      } catch (error) {
-        return done(error);
-      }
-    }),
-  );
+  // All Passport.js authentication strategies removed - using Supabase JWT tokens
 
-  // Google OAuth strategy
-  passport.use(
-    new GoogleStrategy(
-      {
-        clientID: process.env.GOOGLE_CLIENT_ID || "",
-        clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
-        callbackURL: "/auth/google/callback",
-      },
-      async (accessToken, refreshToken, profile, done) => {
-        try {
-          const email = profile.emails?.[0]?.value;
-          const name = profile.displayName;
-          const googleId = profile.id;
-
-          if (!email) {
-            return done(new Error("No email found in Google profile"));
-          }
-
-          // Check if user already exists with this Google ID
-          let user = await storage.getUserByGoogleId(googleId);
-
-          if (!user) {
-            // Check if user exists with this email
-            user = await storage.getUserByEmail(email);
-            
-            if (user) {
-              // Link Google account to existing user
-              await storage.linkGoogleAccount(user.id, googleId);
-            } else {
-              // Create new user
-              const username = email.split('@')[0]; // Use email prefix as username
-              user = await storage.createUser({
-                username,
-                email,
-                password: "", // No password for OAuth users
-                googleId,
-                eventFormat: null,
-                eventCode: null,
-              });
-            }
-          }
-
-          // Generate session ID and update login info
-          const sessionId = randomBytes(24).toString('hex');
-          const now = new Date();
-          
-          const sessionInfo = {
-            id: sessionId,
-            createdAt: now,
-            lastActive: now
-          };
-          
-          await storage.updateUserSession(user.id, sessionInfo);
-          await storage.updateLastLogin(user.id, now);
-          
-          const userWithSessionInfo = {
-            ...user,
-            sessionId,
-            justLoggedIn: true
-          };
-          
-          return done(null, userWithSessionInfo);
-        } catch (error) {
-          return done(error);
-        }
-      }
-    )
-  );
-
-  passport.serializeUser((user, done) => done(null, user.id));
-  passport.deserializeUser(async (id: number, done) => {
-    try {
-      const user = await storage.getUser(id);
-      done(null, user);
-    } catch (error) {
-      done(error);
-    }
-  });
-
-  // Session validation middleware - protect against multiple logins from different locations
-  const validateSession = async (req: Request, res: Response, next: NextFunction) => {
-    // Skip for non-authenticated requests
-    if (!req.isAuthenticated()) {
-      return next();
-    }
-    
-    const user = req.user;
-    const sessionId = user.sessionId;
-    
-    // Skip validation for sessions without a sessionId (older sessions before feature was added)
-    // Also temporarily disable session validation for certain paths like roleplay/test generation
-    // This prevents unexpected logouts during navigation
-    if (!sessionId || 
-        req.path.includes('/roleplay') || 
-        req.path.includes('/test') || 
-        req.path.includes('/written') || 
-        req.path.includes('/pi')) {
-      return next();
-    }
-    
-    try {
-      // Check if the sessionId is valid for this user
-      const isValid = await storage.validateUserSession(user.id, sessionId);
-      
-      if (!isValid) {
-        // Session is invalid, force logout
-        req.logout((err: any) => {
-          if (err) return next(err);
-          return res.status(401).json({
-            error: "Your session has been invalidated because you logged in from another location.",
-            code: "SESSION_INVALIDATED"
-          });
-        });
-      } else {
-        // Session is valid, continue
-        next();
-      }
-    } catch (error) {
-      // If there's an error in validation, let the request proceed rather than logging out
-      console.error("Session validation error:", error);
-      next();
-    }
-  };
+  // Session validation removed - using Supabase JWT tokens instead
   
-  // Add session validation middleware
-  app.use(validateSession);
-  
-  // Authentication routes
-  app.post("/api/register", async (req, res, next) => {
+  // Old Passport.js authentication routes removed - using Supabase instead
+
+  // Get user data with Supabase authentication
+  app.get("/api/user", verifySupabaseToken, async (req, res) => {
     try {
-      const existingUser = await storage.getUserByUsername(req.body.username);
-      if (existingUser) {
-        return res.status(400).send("Username already exists");
+      const authId = (req as any).user?.id;
+      if (!authId) {
+        console.error("❌ No auth ID found in request:", { user: (req as any).user });
+        return res.status(401).json({ error: "No authentication ID found" });
       }
 
-      const user = await storage.createUser({
-        ...req.body,
-        password: await hashPassword(req.body.password),
-      });
-
-      req.login(user, (err) => {
-        if (err) return next(err);
-        res.status(201).json(user);
-      });
-    } catch (error) {
-      next(error);
-    }
-  });
-
-  app.post("/api/login", passport.authenticate("local"), (req, res) => {
-    res.status(200).json(req.user);
-  });
-
-  // Google OAuth routes
-  app.get("/auth/google", 
-    passport.authenticate("google", { scope: ["profile", "email"] })
-  );
-
-  app.get("/auth/google/callback",
-    passport.authenticate("google", { failureRedirect: "/auth?error=google_auth_failed" }),
-    (req, res) => {
-      // Successful authentication, redirect to dashboard
-      res.redirect("/");
-    }
-  );
-
-  app.post("/api/logout", async (req, res, next) => {
-    try {
-      // If user is authenticated, invalidate their session
-      if (req.isAuthenticated() && req.user.id && req.user.sessionId) {
-        // Remove the session from storage
-        await storage.invalidateOtherSessions(req.user.id, req.user.sessionId);
+      const user = await storage.getUserByAuthId(authId);
+      if (!user) {
+        console.error(`❌ User not found for auth ID: ${authId}`);
+        return res.status(404).json({ error: "User not found" });
       }
-      
-      // Now perform the logout
-      req.logout((err) => {
-        if (err) return next(err);
-        res.sendStatus(200);
-      });
-    } catch (error) {
-      next(error);
-    }
-  });
 
-  app.get("/api/user", (req, res) => {
-    if (!req.isAuthenticated()) return res.sendStatus(401);
-    res.json(req.user);
+      console.log(`✅ User data loaded successfully for ${authId}:`, {
+        selectedEvent: user.selectedEvent,
+        selectedCluster: user.selectedCluster
+      });
+
+      res.json(user);
+    } catch (error) {
+      console.error("❌ Error fetching user data:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
   });
 }
